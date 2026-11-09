@@ -26,6 +26,20 @@ test('text is deterministic and constrained for all six selections',()=>{
  KEY_GROUPS.forEach((g,i)=>{const text=generateText(i);assert.equal(text,generateText(i));assert.ok([...text].every(k=>g.keys.includes(k)));});
  assert.match(fingerHint(' '),/thumb/);assert.match(fingerHint('A'),/Shift/);
 });
+test('fixed text wraps repeatedly without resetting score or ending the active attempt',()=>{
+ const corpus='a B ';
+ const s=createAttempt({mode:'underwater',duration:60,goal:1,text:corpus,reducedMotion:true});
+ for(const key of corpus) assert.equal(typeKey(s,{key}),'correct');
+ assert.equal(s.correct,corpus.length);
+ assert.equal(typeKey(s,{key:'A'}),'error');
+ assert.equal(s.correct,corpus.length);
+ assert.equal(s.text[s.correct%s.text.length],'a');
+ for(let pass=1;pass<3;pass++) for(const key of corpus) assert.equal(typeKey(s,{key}),'correct');
+ assert.equal(s.correct,corpus.length*3);assert.equal(s.errors,1);
+ advanceTime(s,2);assert.equal(s.status,'running');assert.equal(stats(s).wpm,72);
+ assert.equal(stats(s).accuracy,12/13*100);
+ advanceTime(s,58);assert.deepEqual([result(s).correct,result(s).errors,result(s).passed],[12,1,true]);
+});
 test('quicksand sinks smoothly, recovers on recent keys, and ignores frame partition and pauses',()=>{
  const make=()=>{const s=createAttempt({mode:'castle',goal:30,text:'a'});s.castleStage='quicksand';return s;};
  const a=make(), b=make();

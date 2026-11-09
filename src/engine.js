@@ -10,9 +10,7 @@ export const MODES = { outdoor: { name: 'Smash & Dash', duration: 120 }, underwa
 export function generateText(group = 0, length = 12000, seed = 19, mode = 'outdoor') {
   if (mode !== 'outdoor') {
     const passages = ['a lad asks a lass; a lass adds a salad; ', 'the sailor sails; the quiet lake is still; ', 'we swim past the reef; brave friends explore the castle; ', 'we swim 12 laps; collect 34 coins; open gate 56; ', 'swim past the reef! find 12 coins, then rest. ', 'The reef has 12 fish. Swim past the gate! "Ready?" Yes, let us go. '];
-    const drills = KEY_GROUPS[group].keys.trim();
-    const passage = passages[group] + drills + ' ';
-    return passage.repeat(Math.ceil(length / passage.length)).slice(0, length);
+    return passages[group];
   }
   const keys = KEY_GROUPS[group].keys;
   let text = '';

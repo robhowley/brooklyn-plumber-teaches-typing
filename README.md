@@ -49,7 +49,7 @@ Then serve `dist/` at `/typing/`. Alternatively `npm run build -- --base=./` pro
 | Smash & Dash (outdoor) | Individual keys on objects | 120 seconds |
 | Wet World Challenge (underwater) | Scrolling words | 300 seconds |
 | Tunnel of Doom (castle) | Scrolling constrained sentences | 300 seconds |
-| Expert Express (practice) | Plain text and keyboard drills | 600 seconds |
+| Expert Express (practice) | Plain constrained passages | 600 seconds |
 
 Each mode remembers its duration override. Only correct characters advance. Printable mistakes count attempts/errors; spaces count. Modifier-only keys, Backspace, held-key repeat, composition and Ctrl/Meta/Alt shortcuts are ignored. Shifted characters are matched exactly.
 
@@ -72,7 +72,7 @@ Certificates are awarded on Next when crossing outdoor → underwater and underw
 5. Add symbols: lowercase letters, digits, space and `; , . ! ? ' " - : / ( )`.
 6. All keyboard: printable US ASCII, including uppercase, brackets, braces, backslash and shifted symbols.
 
-Outdoor targets use deterministic pseudo-random keys. Underwater and castle repeat newly written passages constrained to each selection, followed by a short drill containing every selected key. This deliberate compromise preserves the recognizable word/sentence passage while making every selected key reachable in the full lesson text. Practice also includes the drill. Early groups use short clauses rather than impossible capitalized/punctuated sentences. Text repeats safely when exhausted. Finger guidance maps physical US keys, highlights numbers/symbol keys and indicates opposite Shift for capitals/shifted punctuation. Other physical keyboard layouts may need different fingers.
+Outdoor targets use deterministic pseudo-random keys. Underwater, castle and practice use one newly written passage per key selection. Each passage uses only allowed keys and loops directly to its beginning when completed; it does not append an alphabet or symbol drill, and it need not use every selected key. Early groups use short clauses rather than impossible capitalized/punctuated sentences. Finger guidance maps physical US keys, highlights numbers/symbol keys and indicates opposite Shift for capitals/shifted punctuation. Other physical keyboard layouts may need different fingers.
 
 ## Checks and evidence
 
@@ -84,7 +84,7 @@ npm run test:browser
 
 Browser tests start Vite's **production preview over HTTP** at port 4173, not the development server. They use installed macOS Google Chrome when available, otherwise Playwright's installed Chromium. Set `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` to override the executable (`CHROME_PATH` is also accepted by the suite). On machines without Chrome, run `npx playwright install chromium` first, or `npx playwright install --with-deps chromium` on Linux. No test-only gameplay bypass exists in production.
 
-Tests cover exact input/scoring boundaries, ignored events, all defaults and exact selected-key coverage across four modes and six groups, castle stages, a fresh 15-pass course, idempotent Next, saved pending progression, failed retries, graduation, custom isolation, downloads, Escape/blur/visibility/pipe pauses, corrupt/unavailable storage and narrow layout. Production browser tests also type non-initial uppercase `Z` and symbol `@` targets in underwater and castle, resuming the castle pipe. Immediate-input regression tests explicitly use reduced motion with **Playwright simulated time**. Separate normal-clock tests cover outdoor contact, missed recovery, continuous travel, freeze/resume and a 20-second guided pass with Next/reload. Blur/visibility are explicitly dispatched lifecycle events. This is automated browser interaction, not human manual play or a real-time typing-speed certification.
+Tests cover exact input/scoring boundaries, ignored events, all defaults, outdoor key coverage and constrained fixed passages across six groups, castle stages, a fresh 15-pass course, idempotent Next, saved pending progression, failed retries, graduation, custom isolation, downloads, Escape/blur/visibility/pipe pauses, corrupt/unavailable storage and narrow layout. A production browser test types the all-keyboard underwater passage through repeated wraps, checks exact-case and space targets, the preview at the boundary and the continuing timer. Immediate-input regression tests explicitly use reduced motion with **Playwright simulated time**. Separate normal-clock tests cover outdoor contact, missed recovery, continuous travel, freeze/resume and a 20-second guided pass with Next/reload. Blur/visibility are explicitly dispatched lifecycle events. This is automated browser interaction, not human manual play or a real-time typing-speed certification.
 
 JUnit output and screenshots can be preserved without modifying shipped assets:
 

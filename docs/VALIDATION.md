@@ -126,8 +126,8 @@ The exploration launches Chrome through Playwright, loads `http://127.0.0.1:4174
 | --- | --- |
 | Exact keys, case, spaces, punctuation; ignored repeat/composition/modifier/shortcut keys | `tests/engine.test.js`, `tests/browser/outdoor.spec.js` |
 | Timeout-only pass, exact goal and 90% boundaries, zero-attempt failure | Node boundary tests and browser pass/fail cases |
-| Four mode defaults; each of six key groups appears exactly in generated text for all four modes, with no outside-set keys | `tests/course.test.js` |
-| Non-initial uppercase `Z` and symbol `@` reached by keyboard in underwater and castle; castle pipe resumed | `tests/browser/outdoor.spec.js` |
+| Previous validation: four mode defaults; each of six key groups appeared in generated text for all four modes, with no outside-set keys | `tests/course.test.js` at that revision |
+| Previous browser run: non-initial uppercase `Z` and symbol `@` reached in underwater and castle; castle pipe resumed | `tests/browser/outdoor.spec.js` at that revision |
 | Active-time freeze, explicit resume, 40-character pipe, alternating chambers | Node model tests; simulated browser lifecycle tests; real-clock Escape/pipe exploration |
 | Exactly 15 passes, pending Next reload, idempotent Next, custom isolation, failed retries | Course tests and production browser suite; separate fresh-profile real-clock course |
 | Persisted character/settings/results/certificates/graduation; corrupt/blocked storage | Storage tests, browser suite, exploration reload and report |
@@ -136,19 +136,19 @@ The exploration launches Chrome through Playwright, loads `http://127.0.0.1:4174
 | Desktop and 390px layout, reduced-motion gameplay | `artifacts/final-menu.png`, `final-narrow-menu.png`, `final-narrow-reduced-motion.png` |
 | Production subpath assets, no external requests or console/page errors | `artifacts/final-exploration.json` |
 
-Durable results: `artifacts/browser-results.xml` (7 passed), `artifacts/node-results.xml` (13 passed), `artifacts/final-exploration.json` (four mode loops and 15 guided passes). New Playwright target screenshots go under `.tmp/test-results/playwright/`; the `artifacts/final-{underwater,castle}-key-drill.png` files remain historical captures.
+Durable results: `artifacts/browser-results.xml` (7 passed), `artifacts/node-results.xml` (13 passed), `artifacts/final-exploration.json` (four mode loops and 15 guided passes). New Playwright target screenshots go under `.tmp/test-results/playwright/`; the `artifacts/final-{underwater,castle}-key-drill.png` files remain historical captures from the earlier generated-drill behavior.
 
 ### Separate exploratory findings
 
 - Outdoor Mario, underwater Luigi, castle Princess and practice Princess each passed with correct input plus one mistake, then failed a zero-input retry at timeout.
 - Outdoor scenery/targets changed after typing; the wrong key left the target and correct count unchanged. Underwater showed swimming, clams and word progress; castle changed from Thwomps through pipe pause to quicksand; practice changed portrait feedback without platform scenery.
-- The production browser test typed non-initial `Z` and `@` targets in both underwater and castle. Castle input paused at the 40-key pipe boundary and resumed before continuing. The two saved screenshots show the target, preview and text strips clearly.
+- An earlier production browser test typed non-initial `Z` and `@` targets in underwater and castle. Castle input paused at the 40-key pipe boundary and resumed before continuing. The two saved screenshots show the target, preview and text strips clearly.
 - All 15 guided passes used 20 correct characters over three active seconds, yielding 80 WPM. Character choice rotated across Mario, Luigi and Princess. Next was disabled after each advancement.
 - Reload with pending Next retained the unlock; reload after graduation retained graduation. Report contained 15 results and three certificates. Download saved as `artifacts/final-graduation-certificate.txt`.
 - HTTP requests were only the local HTML, bundled JS and bundled CSS. `dist/` contains those three files only, with no reference screenshots, manual, external fonts or runtime images.
 - Inspected screenshots directly: desktop menu, outdoor before/after/results, underwater after, castle pipe/quicksand, practice after, narrow menu/gameplay and graduation report. Yellow/purple cabinet, selected-character stand-ins, focus outlines and DOM targets remained readable. Narrow canvas captions are small; the larger DOM target and hints carry gameplay information.
 
-Screenshots: `artifacts/final-{outdoor,underwater,castle,practice}-{before,after,results,failure}.png`, plus `final-underwater-key-drill.png`, `final-castle-key-drill.png`, `final-escape.png`, `final-castle-pipe.png`, `final-castle-quicksand.png`, `final-pending-next-reload.png`, `final-graduation.png`, `final-report.png` and layout screenshots above. Phase-1 evidence remains as historical evidence, not the final validation.
+Screenshots: `artifacts/final-{outdoor,underwater,castle,practice}-{before,after,results,failure}.png`, plus `final-underwater-key-drill.png`, `final-castle-key-drill.png`, `final-escape.png`, `final-castle-pipe.png`, `final-castle-quicksand.png`, `final-pending-next-reload.png`, `final-graduation.png`, `final-report.png` and layout screenshots above. The key-drill captures document earlier generated-drill behavior; phase-1 evidence remains historical, not the final validation.
 
 ## Previous integration decisions and fixes
 

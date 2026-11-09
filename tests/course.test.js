@@ -25,14 +25,25 @@ test('custom passes and failed retries cannot move or erase earned course progre
  const pending=p.course.pending;recordResult(p,{...p.results.at(-1),passed:false},date);assert.equal(p.course.pending,pending);
  advanceCourse(p,date);recordResult(p,{...p.results[1]},date);assert.equal(p.course.pending,null);
 });
-test('all modes use defaults and generated text reaches exactly each selected key set',()=>{
- for(const [mode,config] of Object.entries(MODES)) {
-  assert.equal(createAttempt({mode}).duration,config.duration);
-  KEY_GROUPS.forEach((g,group)=>{
-   const text=generateText(group,12000,19,mode);
-   assert.deepEqual([...new Set(text)].sort(),[...new Set(g.keys)].sort(),`${mode}/${group}`);
-  });
- }
+test('all modes use defaults; outdoor reaches every key and fixed modes loop constrained passages',()=>{
+ const passages=[
+  'a lad asks a lass; a lass adds a salad; ',
+  'the sailor sails; the quiet lake is still; ',
+  'we swim past the reef; brave friends explore the castle; ',
+  'we swim 12 laps; collect 34 coins; open gate 56; ',
+  'swim past the reef! find 12 coins, then rest. ',
+  'The reef has 12 fish. Swim past the gate! "Ready?" Yes, let us go. ',
+ ];
+ for(const [mode,config] of Object.entries(MODES)) assert.equal(createAttempt({mode}).duration,config.duration);
+ KEY_GROUPS.forEach((g,group)=>{
+  const outdoor=generateText(group,12000,19,'outdoor');
+  assert.deepEqual([...new Set(outdoor)].sort(),[...new Set(g.keys)].sort(),`outdoor/${group}`);
+  for(const mode of ['underwater','castle','practice']) {
+   const corpus=generateText(group,12000,19,mode);
+   assert.equal(corpus,passages[group],`${mode}/${group}`);
+   assert.ok([...corpus].every(key=>g.keys.includes(key)),`${mode}/${group} contains only selected keys`);
+  }
+ });
 });
 test('castle alternates chambers every 40 correct characters and pauses input/time until resume',()=>{
  const s=createAttempt({mode:'castle',text:'a'});

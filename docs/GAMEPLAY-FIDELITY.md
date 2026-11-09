@@ -50,7 +50,7 @@ Static inspection of D found **15 `.LEE` files, 24,090 bytes and 136 tilde-delim
 
 The leading `~`, sentence backticks and final DOS EOF byte `0x1A` are observed resource structure, not verified characters the student types. Runtime selection, ordering and transformations remain unknown. Historical statements in the passages are game content, not endorsed facts.
 
-**Constrained generated text is deliberately retained.** `generateText()` uses newly written passages plus selected-key drills; outdoor uses deterministic individual keys. Every displayed character must belong to the selected keyboard set. Importing historical prose would violate that accepted constraint for early groups, and guessing that `H` means a home-row mapping would not solve it. Full sentences are used where the selected keys permit them; early groups use constrained clauses. No original corpus bytes are shipped by this change.
+**Constrained generated text is deliberately retained.** `generateText()` uses one newly written passage per key selection for underwater, castle and practice; each completed passage loops to its beginning without an appended key drill. Outdoor still uses deterministic individual keys. Every displayed character belongs to the selected keyboard set, but a fixed passage need not exercise every key in that set. Importing historical prose would violate that accepted constraint for early groups, and guessing that `H` means a home-row mapping would not solve it. Full sentences are used where the selected keys permit them; early groups use constrained clauses. This loop behavior is a recreation choice, not a claim about the DOS runtime. No original corpus bytes are shipped by this change.
 
 ## Exact recreation semantics
 

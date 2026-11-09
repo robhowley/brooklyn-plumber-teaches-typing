@@ -14,8 +14,8 @@ async function custom(page,mode,duration='1',group='5',goal='5') {
  await page.getByLabel('Keyboard lesson').selectOption(group);await page.getByLabel('Goal · WPM').fill(goal);await page.getByLabel('Time · seconds').fill(duration);
  await page.getByRole('button',{name:'Start lesson',exact:true}).click();
 }
-async function pressTarget(page,shown) {
- await page.keyboard.press(shown==='␣'?'Space':shown);
+async function pressKey(page,key) {
+ await page.keyboard.press(key===' '?'Space':key);
 }
 test('15-pass guided course via real keyboard, saved Next, graduation, certificates and practice',async({page})=>{
  const errors=[];page.on('pageerror',e=>errors.push(e.message));await boot(page);
@@ -97,28 +97,33 @@ test('mode defaults, exact capitals/punctuation/numbers/spaces, and keyboard hin
  await expect(page.getByRole('heading',{name:'A star performance!'})).toBeVisible();
  await page.reload();await page.getByLabel('Activity').selectOption('practice');await expect(page.getByLabel('Time · seconds')).toHaveValue('2');
 });
-test('underwater and castle drills reach non-initial uppercase and symbol keys',async({page},testInfo)=>{
- await boot(page);
- for(const mode of ['underwater','castle']) {
-  await custom(page,mode,'60');
-  const reached=new Set();let typed=0,pipeResumes=0;
-  while(reached.size<2&&typed<200) {
-   const shown=await page.locator('#target').textContent(),key=shown==='␣'?' ':shown;
-   if(key==='Z'||key==='@') {
-    expect(typed).toBeGreaterThan(0);reached.add(key);
-    if(mode==='underwater'&&key==='Z')await page.screenshot({path:testInfo.outputPath('underwater-key-drill.png'),fullPage:true});
-    if(mode==='castle'&&key==='@')await page.screenshot({path:testInfo.outputPath('castle-key-drill.png'),fullPage:true});
-   }
-   await pressTarget(page,shown);typed++;await expect(page.locator('#correct'),`${mode} target ${JSON.stringify(key)} at ${typed}`).toHaveText(String(typed));
-   if(await page.locator('#resume').isVisible()) {
-    expect(mode).toBe('castle');await expect(page.locator('#pause-reason')).toContainText('pipe');pipeResumes++;
-    await page.getByRole('button',{name:'Resume lesson'}).click();
-   }
-  }
-  expect([...reached].sort()).toEqual(['@','Z']);expect(typed).toBeLessThan(200);
-  if(mode==='castle')expect(pipeResumes).toBeGreaterThan(0);else expect(pipeResumes).toBe(0);
-  await page.reload();
- }
+test('underwater fixed passage wraps after real keyboard input and keeps its preview and timer aligned',async({page},testInfo)=>{
+ const corpus='The reef has 12 fish. Swim past the gate! "Ready?" Yes, let us go. ';
+ const preview=(correct)=>Array.from({length:12},(_,i)=>corpus[(correct+i+1)%corpus.length]).map(key=>key===' '?'␣':key).join(' ');
+ await page.emulateMedia({reducedMotion:'reduce'});await page.goto('/');await custom(page,'underwater','300','5');
+ await expect(page.locator('#target')).toHaveText('T');await expect(page.locator('#finger')).toContainText('opposite Shift');
+ for(const key of corpus.slice(0,-1)) await pressKey(page,key);
+ await expect(page.locator('#correct')).toHaveText(String(corpus.length-1));
+ await expect(page.locator('#target')).toHaveText('␣');await expect(page.locator('#finger')).toContainText('thumb');
+ await expect(page.locator('#preview')).toHaveText(preview(corpus.length-1));
+ await page.screenshot({path:testInfo.outputPath('underwater-fixed-corpus-wrap.png'),fullPage:true});
+ await pressKey(page,' ');
+ await expect(page.locator('#correct')).toHaveText(String(corpus.length));
+ await expect(page.locator('#target')).toHaveText('T');await expect(page.locator('#finger')).toContainText('opposite Shift');
+ await expect(page.locator('#preview')).toHaveText(preview(corpus.length));
+ await page.keyboard.press('t');
+ await expect(page.locator('#errors')).toHaveText('1');await expect(page.locator('#correct')).toHaveText(String(corpus.length));
+ await expect(page.locator('#target')).toHaveText('T');await expect(page.locator('#preview')).toHaveText(preview(corpus.length));
+ await pressKey(page,'T');
+ for(const key of corpus.slice(1)) await pressKey(page,key);
+ for(const key of corpus) await pressKey(page,key);
+ await expect(page.locator('#correct')).toHaveText(String(corpus.length*3));
+ await expect(page.locator('#errors')).toHaveText('1');await expect(page.locator('#target')).toHaveText('T');
+ await expect(page.locator('#preview')).toHaveText(preview(corpus.length*3));
+ const timeBefore=await page.locator('#time').textContent();await expect(page.locator('#resume')).toBeHidden();
+ await page.waitForTimeout(1200);
+ await expect(page.locator('#time')).not.toHaveText(timeBefore);await expect(page.locator('#correct')).toHaveText(String(corpus.length*3));
+ await expect(page.locator('.blackboard')).toHaveCount(0);
 });
 test('zero attempts fail; corrupt/unavailable storage and narrow layout stay usable',async({page})=>{
  await boot(page);await page.evaluate(key=>localStorage.setItem(key,'{'),storageKey);await page.reload();await expect(page.getByLabel('Your name')).toHaveValue('Player');
