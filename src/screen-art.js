@@ -1,5 +1,5 @@
-// Static screen illustrations. The traced title is separate from gameplay art.
-// Reference screenshots are comparison evidence only, never runtime assets.
+// Static screen illustrations. The screenshot title is separate from gameplay art.
+// Reference screenshots remain evidence only; the title still is the sole screenshot-derived runtime image.
 import { characterImage, rect, oval, poly } from './art.js';
 import { drawTitleIllustration } from './title-art.js';
 

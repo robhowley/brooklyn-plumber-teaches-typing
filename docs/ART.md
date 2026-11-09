@@ -1,12 +1,12 @@
 # Scene art
 
-Gameplay uses synchronous Canvas 2D rendering at 640×280. Artwork combines traced/edited screenshot components and drawn reconstructions. The title is a separate 1540×968 raster exported from editable SVG.
+Gameplay uses synchronous Canvas 2D rendering at 640×280. Artwork combines screenshot-derived edits and drawn reconstructions. The title is a separate 720×450 source-video crop; its lettering reveal is implemented in `src/title-art.js`.
 
 ## Sources and editing
 
 The tracing pass was authorized for this task. It does not establish redistribution rights or claim recovered native DOS sprite data. Reference originals are preserved. Complete screenshots, source frames and creator overlays remain evidence only, outside the production build.
 
-- `src/assets/title/`: editable title layers and a preloaded runtime PNG. Hidden desk, shoe and shadow details are inferred; shading remains flatter than the reference.
+- `src/assets/title/`: pixel-faithful title crop, clean subtitle base, glyph rectangles, observed timing and a standard-library rebuild script. See [title provenance and timing](TITLE-SCREEN.md).
 - `src/assets/characters/mario.json`: edited palette-indexed ground, jump, detached-cap, swim and portrait poses. The detached-cap frame is available but the unchanged scene sequence does not select it.
 - `src/outdoor-assets/`: editable component PNGs, runtime indexed grids and readable case-sensitive glyphs. Occluded shell panels and small-cloud centers are reconstructed.
 - `src/assets/underwater/`: preloaded component PNGs and an offline authoring script. Hidden reef contours are reconstructed; small rocks reuse scaled variants.
@@ -24,7 +24,7 @@ JSON grids load before drawing; PNG requests begin at module initialization. Dra
 - Castle retains performance-driven enemies, engine-owned pipe pauses and quicksand lower-body occlusion. The silver route conceals the actor during transit.
 - Practice remains plain, with a portrait and a denser DOM text preview below the hands.
 
-Pause and reduced motion retain their existing behavior. No animation claims exact original frame durations.
+Pause and reduced motion retain their existing gameplay behavior. The title's uniform 120 ms letter fades are a deliberate adaptation, not recovered original alpha curves.
 
 ## Evidence
 
