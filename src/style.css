@@ -220,6 +220,9 @@ body.playing {
 .student .fine { margin: 10px 0 0; font-size: 10px; color: #eee3f6; }
 .student .last-result { margin-bottom: 0; }
 .results { background: #a7a7a8; color: #1c1b29; padding: 22px 25px; }
+.results-passed .blackboard { border-color: #f2c743; outline-color: #fff0a0; }
+.results-passed .blackboard h2 { color: #fff176; text-shadow: 2px 2px #245b2d; }
+.victory-seal { position: absolute; z-index: 2; top: -17px; left: 43%; margin: 0; padding: 6px 13px; border: 4px double #fff4a8; background: #ad2636; color: #fff176; box-shadow: 3px 4px #28152c; font: bold 16px 'Courier New',monospace; letter-spacing: 2px; transform: rotate(4deg); }
 .results>.eyebrow { color: #292337; }
 .results h1 { font: bold 32px 'Courier New',monospace; color: #21193c; text-shadow: 1px 1px #e4e1d4; margin: 12px 0; }
 .classroom { position: relative; isolation: isolate; display: flex; align-items: center; max-width: 870px; margin: 18px auto 25px; min-height: 410px; padding: 0 170px 45px 16px; }
@@ -234,8 +237,12 @@ body.playing {
 .blackboard dl>div { padding: 8px 0; border: 0; }
 .blackboard dd { color: #94f28b; }
 .blackboard>p:last-child { color: #e7e8c4; font-size: 12px; line-height: 1.5; }
+.blackboard .result-feedback { color: #e7e8c4; font-size: 13px; line-height: 1.6; }
+.blackboard .result-feedback p { margin: 0; }
+.blackboard .result-feedback ul { margin: 6px 0 0; padding-left: 22px; }
 #teacher-art { position: absolute; right: -4px; bottom: -4px; width: 260px; height: auto; aspect-ratio: 180 / 280; image-rendering: pixelated; pointer-events: none; }
 .results>.fine { color: #292337; }
+.visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
 .report { background: #8613b3 url('./practice-texture.svg'); background-size: 360px 156px; color: #fff2b0; }
 .report>.eyebrow { color: #fff2b0; }
 .report h1 { font: 38px Georgia,serif; color: #fff06d; text-shadow: 3px 3px #2c123a; }

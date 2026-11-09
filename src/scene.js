@@ -1,8 +1,9 @@
 // VGA-inspired scenes with edited traces documented in artifacts/trace-*/.
 // The shell owns all HUD, text strips and controls.
+import { stats } from './engine.js';
 import { outdoorTile } from './outdoor-art.js';
 import { underwaterImages } from './assets/underwater/index.js';
-import { rect, oval, poly, noise, cached, runner, characterImage, star, turtle, targetLetter, thwomp } from './art.js';
+import { rect, oval, poly, noise, cached, runner, struggle, characterImage, star, turtle, targetLetter, thwomp } from './art.js';
 const WIDTH = 640, HEIGHT = 280, FLOOR = 258;
 const OUTDOOR_FLOOR = 252;
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
@@ -17,14 +18,15 @@ export function drawScene(canvas, state = {}, time = 0) {
   c.imageSmoothingEnabled = false;
   const correct = Math.max(0, Math.floor(number(state.correct)));
   const elapsed = Math.max(0, number(state.elapsed)), errors = Math.max(0, number(state.errors));
-  const wpm = elapsed > 0 ? correct * 12 / elapsed : 0;
-  const accuracy = correct + errors ? correct / (correct + errors) : 1;
+  const metrics = stats({ ...state, correct, errors, elapsed });
+  const wpm = metrics.wpm, accuracy = metrics.accuracy / 100;
   const reducedMotion = Boolean(state.reducedMotion);
   const s = { ...state, correct, elapsed, errors, wpm, accuracy, reducedMotion,
     text: typeof state.text === 'string' && state.text.length ? state.text : 'a',
     distance: reducedMotion ? 0 : number(state.travel?.distance, elapsed * 48),
     performance: clamp(.6 * wpm / Math.max(1, number(state.goal, 5)) + .4 * accuracy, 0, 1.25),
-    time: reducedMotion ? 0 : state.status === 'paused' || state.status === 'finished' ? elapsed : Math.max(0, number(time, elapsed)),
+    // The attempt's active clock is the only animation clock, including pauses.
+    time: reducedMotion ? 0 : elapsed,
   };
   if (s.mode === 'castle') castle(c, s);
   else if (s.mode === 'underwater') underwater(c, s);
@@ -212,8 +214,10 @@ function castle(c,s) {
   }
   if(!quicksand)pipe(c,mod(665-s.distance,768)-64,FLOOR,51);
   const pose=s.reducedMotion?s.correct%3:1+Math.floor(s.time*8)%2;
-  const playerFloor=quicksand?174+clamp(1-s.performance,0,1)*22:FLOOR;
-  runner(c,235,playerFloor,s.character,pose);
+  const depth=number(s.sandDepth);
+  const playerFloor=quicksand?174+depth:FLOOR;
+  if(quicksand)struggle(c,235,playerFloor,s.character,depth>5,s.reducedMotion?0:Math.floor(s.time*3)%2);
+  else runner(c,235,playerFloor,s.character,pose);
   if(quicksand){
     // Only the submerged lower body is covered. Surface and grain use identical coordinates.
     c.save();c.beginPath();c.rect(0,150,640,130);c.clip();sand(c,s);c.restore();
@@ -295,7 +299,9 @@ function practice(c,s) {
       poly(p,[[x+24,y+7],[x+34,y+16],[x+24,y+25],[x+14,y+16]],'#620aa0');
     }
   }),0,0);
-  const mood=s.correct+s.errors===0?'neutral':s.wpm>=number(s.goal,5)&&s.accuracy>=.9?'happy':s.performance<.7?'sad':'neutral';
+  // Recreation bands: below 75% goal is sad, 75–99% neutral, at goal happy.
+  // Fresh attempts get a neutral welcome; accuracy never selects an expression.
+  const mood=s.elapsed===0?'neutral':s.wpm>=number(s.goal,5)?'happy':s.wpm<number(s.goal,5)*.75?'sad':'neutral';
   // The DOS practice head floats on purple, without a circular portrait badge.
   poly(c,[[267,99],[337,63],[402,114],[393,178],[352,220],[301,192]],'#490b7d');
   const portrait=characterImage(s.character,0,mood,true);

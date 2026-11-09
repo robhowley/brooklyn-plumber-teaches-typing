@@ -26,6 +26,21 @@ test('text is deterministic and constrained for all six selections',()=>{
  KEY_GROUPS.forEach((g,i)=>{const text=generateText(i);assert.equal(text,generateText(i));assert.ok([...text].every(k=>g.keys.includes(k)));});
  assert.match(fingerHint(' '),/thumb/);assert.match(fingerHint('A'),/Shift/);
 });
+test('quicksand sinks smoothly, recovers on recent keys, and ignores frame partition and pauses',()=>{
+ const make=()=>{const s=createAttempt({mode:'castle',goal:30,text:'a'});s.castleStage='quicksand';return s;};
+ const a=make(), b=make();
+ advanceTime(a,4); for(let i=0;i<40;i++)advanceTime(b,.1);
+ assert.ok(Math.abs(a.sandDepth-b.sandDepth)<1e-9);assert.equal(a.sandDepth,12);
+ typeKey(a,{key:'a'});typeKey(b,{key:'a'});
+ advanceTime(a,.2);for(let i=0;i<10;i++)advanceTime(b,.02);
+ assert.ok(Math.abs(a.sandDepth-b.sandDepth)<1e-9);assert.ok(a.sandDepth<12);
+ pause(a);const held=structuredClone(a);advanceTime(a,100);assert.deepEqual(a,held);
+ resume(a);advanceTime(a,20);assert.equal(a.sandDepth,22);assert.equal(a.status,'running');
+ assert.equal(a.correct,1);assert.equal(a.errors,0);
+ const weak=make();for(let i=0;i<10;i++){typeKey(weak,{key:'a'});advanceTime(weak,1.2);}assert.ok(weak.sandDepth>10);
+ const reduced=createAttempt({mode:'castle',reducedMotion:true,text:'a',goal:30});reduced.castleStage='quicksand';advanceTime(reduced,12);assert.equal(reduced.sandDepth,22);
+ for(let i=0;i<30;i++)typeKey(reduced,{key:'a'});assert.equal(reduced.sandDepth,0);advanceTime(reduced,60);assert.equal(reduced.sandDepth,0);
+});
 test('storage handles reload, corrupt data, invalid settings, and unavailable storage',()=>{
  let raw;const storage={getItem:()=>raw,setItem:(_,v)=>raw=v};const p=defaults();p.name='Ada';p.character='Luigi';p.settings.duration=10;
  assert.equal(saveProfile(p,storage),true);assert.equal(loadProfile(storage).name,'Ada');assert.equal(loadProfile(storage).settings.duration,10);

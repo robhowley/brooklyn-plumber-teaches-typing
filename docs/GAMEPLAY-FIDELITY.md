@@ -1,0 +1,69 @@
+# Gameplay fidelity audit
+
+The recreation now makes quicksand sink, struggle and recover, gives every practice character three goal-linked expressions, and distinguishes victory from merely finishing. Historical hazard death rules remain unknown; this game deliberately has no hazard deaths.
+
+Audit date: November 9, 2026. Scope: original DOS course, not the enhanced CD story or sequel. The implementation brief remains the product contract. This audit compares archived source inspection with current code; it is not a controlled run of the DOS executable. Videos have no keyboard telemetry or authenticated executable version.
+
+## Evidence you can check
+
+These original-source links do not require the ignored local research archive:
+
+- **M, publisher manual:** [Interplay DOS manual scan](https://www.oldgames.sk/download?uuid=0198f687-4f00-762c-89c7-22af664c2a1a), hosted by OldGames.sk ([listing](https://www.oldgames.sk/en/game/mario-teaches-typing/download/5125)). Printed pages are cited below; add one for PDF page numbers. The 26-page scan has SHA-256 `474777760b5fdfc76d344ed2cfedb355feb03b4c2903b2cd86db4ed9d4af03ce`.
+- **D, shipped resources:** [Internet Archive DOS ZIP](https://archive.org/download/msdos_Mario_Teaches_Typing_1992/Mario_Teaches_Typing_1992.zip), item `msdos_Mario_Teaches_Typing_1992`. Locators below are filenames and zero-based byte offsets in extracted files, not executable addresses. ZIP SHA-256: `b59886a6f7b48b0057c8db1c099ed598c8a3581245b0f8884316203de55784bd`.
+- **R, contemporary review:** Sue James, *PC Review* #014, December 1992, [printed pp. 100–101](https://archive.org/details/pc-review-014). These correspond to scan leaves 99–100. The underwater disagreement is on p. 100, middle column.
+- **V, recorded play:** Cheevo Guides, [Mario Teaches Typing (1992), FULL GAME](https://www.youtube.com/watch?v=dJP7FTvGETM). Timestamps below are video time, not the lesson clock.
+- **L, additional recording:** LGR, [DOS PC Game Review](https://www.youtube.com/watch?v=TBv5jxZbD68), 04:58–05:08 hazards and 05:14–05:22 results.
+- **T, tool-assisted recording:** TASVideosChannel, [maximum-score run](https://www.youtube.com/watch?v=EAlHBxYrDbQ), 07:10–08:00 route through water, corridor, pipes and sand. Its description identifies scripts/subframe input, not ordinary typing.
+- **W, secondary summary:** [Super Mario Wiki](https://www.mariowiki.com/Mario_Teaches_Typing), original DOS gameplay section. Duration defaults are secondary-source claims, not a timing table recovered from the manual.
+
+## Audit matrix
+
+“Fixed” means a gap in this recreation was addressed, not that original code or exact timing was recovered.
+
+| Area | Verified evidence and locator | Current behavior | Decision / remaining uncertainty |
+| --- | --- | --- | --- |
+| Outdoor targets | M pp. 8–9: guiding star, box breaks, turtle flips, character advances. Intended beginner pace roughly 5–12 WPM. | Prescribed exact-key targets; continuous travel; one buffered key resolves at contact; misses return without penalties. | **Retained intentional difference:** contact window, buffering, travel speed and miss handling are recreation rules, not verified DOS algorithms. |
+| Input errors and hints | R pp. 100–101: mistakes count but leave the required character waiting, including spaces. M p. 16: finger guidance and statistics. | Exact case/punctuation/space matching; errors do not advance; DOM target, live stats and US-keyboard hints. | **Retained:** modifiers, repeat, composition, Backspace and shortcut handling follow browser constraints, not a recovered DOS handler. |
+| Underwater performance | M pp. 10–11: faster typing raises the swimmer and separates the pursuer. R p. 100 disputes speed-sensitive separation in observed play. | Higher performance raises the swimmer and moves the pursuer farther behind; no drowning or air meter. | **Retained design choice:** follow the manual's stated direction. Original build differences and the review conflict remain unresolved. |
+| Falling blocks | M pp. 12–13 warns of crushing; L 04:58–05:02 shows corridor hazards during continued play. | Thwomp pressure reacts to performance; no collision death or early result. | **Intentional difference:** visible pressure without death. No original crush threshold or countdown established. |
+| Quicksand | M p. 12 warns of burial. V [10:05–10:53](https://www.youtube.com/watch?v=dJP7FTvGETM&t=605s) shows partial submersion and changing poses while counters advance. | A partial pose existed; now actual active-time sinking, raised-arm struggle and correct-key recovery replace cumulative-performance-only height. Foreground sand masks the lower body at the same surface coordinates. | **Fixed:** visible sinking/recovery and struggle. **Intentional:** bounded nonfatal depth. Footage does not prove monotonic descent, input causality, a death timer or a bury-to-death outcome. |
+| Pipe respite | M p. 12 says transit does not count against time. V [14:56–15:03](https://www.youtube.com/watch?v=dJP7FTvGETM&t=896s) holds elapsed display at 4:56, then resumes by 15:08. | Every 40 correct castle characters changes chamber and pauses timer/input inside a pipe; explicit Resume. | **Retained intentional difference:** character-count routing and explicit resume are chosen rules. Background time never becomes active time. |
+| Practice faces | M pp. 14–15: plain practice, happy/neutral/sad according to proximity to WPM goal. R p. 101 also names three faces. | Mario, Luigi and Princess each have three visibly distinct expressions, selected by WPM alone. | **Fixed:** distinct Mario neutral mouth and WPM-only comparison. Exact original bands and update rules are unknown. |
+| Zero-input statistics | M p. 16 names displayed statistics; original formula/zero-input convention not established. | Rendering uses engine stats, including 0% accuracy for zero attempts, rather than treating untouched scenes as perfectly accurate. | **Fixed consistency:** the scene and HUD share the same calculation; no scoring change. |
+| Results versus victory | M p. 18: metrics blackboard after a game; p. 17: separate victory presentation after reaching the goal. V [03:30](https://www.youtube.com/watch?v=dJP7FTvGETM&t=210s) is an outdoor result board; [21:04.5](https://www.youtube.com/watch?v=dJP7FTvGETM&t=1264s) is practice, not castle completion. | Blackboard and Retry/Menu/Next/Report remain available on every result. Only passes get a victory seal and gold treatment; a discrete polite announcement states the result. | **Fixed:** a visible pass-only celebration. **Intentional:** integrated result treatment, not a reconstruction of an unverified original victory animation. |
+| Failure explanation | D `ENGLISH.MSD`: `YOU LOSE!` at 2588, `You stopped typing!` at 2598, `Your accuracy was poor!` at 2618. | At timeout, failures explicitly explain no input, below-goal speed and/or accuracy below this recreation's 90% rule. | **Fixed:** actionable reasons. **Unknown:** original inactivity seconds, accuracy cutoff and message priority. Static strings do not establish reachable runtime conditions. |
+| Timing and success | W reports 2/5/5/10 minutes; D `ENGLISH.MSD` includes `Lesson Times` at 1894. M p. 17 ties victory to personal goal. | Editable 120/300/300/600 active seconds. Pass only at timeout with attempts > 0, goal WPM and ≥90% accuracy; no early pass or death. | **Retained intentional rules:** five characters per word and 90% are not recovered historical formulas. L/T high-speed continued play cannot determine a death or pass threshold. |
+| Course and certificates | D `MARIO1.HLP`: editable configured-goal gates 10/30 for water/castle, not proof of prior speed. M p. 20: Next adds groups, then raises goal; world certificates. M p. 13: castle at 50 WPM graduates. | Guided 5-WPM/home-row start; six groups; all keyboard retained, goal rises by 5; 10/30 world routing; all-keyboard castle pass at 50 graduates. Custom/practice cannot advance it. | **Retained choices:** exact increments/interleaving and all-keyboard graduation prerequisite are recreation rules. Idempotent Next, certificates and saved progress unchanged. |
+| Presentation and saves | M pp. 4–7, 19–20 documents student/character selection and student files; original screenshots show DOS presentation. | Browser cabinet, Mario/Luigi/Princess, localStorage, keyboard focus, responsive DOM and reduced motion. | **Intentional adaptation:** no native student files, backend, accounts or schema migration. Existing assets/attribution are unchanged by this audit. |
+
+## Original typing corpus, not imported gameplay text
+
+Static inspection of D found **15 `.LEE` files, 24,090 bytes and 136 tilde-delimited records**: 78 `LETTERS`, 41 `WORDS`, 17 `SENTENC`. Five prefixes (`B`, `H`, `N`, `S`, `T`) each occur with all three suffixes. There is no extra all-keyboard file in that ZIP. Prefixes alone do not establish menu mappings.
+
+| Original file and byte range `[start,end)` | Short content example / corroboration |
+| --- | --- |
+| `HLETTERS.LEE` `[0,21)` | Repeated `fdsa fdsa asdf asdf` drill. |
+| `NLETTERS.LEE` `[0,31)` | `11qq qq11 1q1q q1q1` mixes letters and digits. |
+| `SWORDS.LEE` `[121,299)` | Starts `Stop! Stop! Wait! Wait! !@#% !@#%`; includes words, punctuation and symbols. |
+| `HSENTENC.LEE` `[0,565)` | American Revolutionary War passage, ending visible in V 14:44–14:54; its continuation appears at 15:08–15:10. |
+| `HSENTENC.LEE` `[565,1470)` | Abraham Lincoln passage, beginning visible in V 09:10. |
+
+The leading `~`, sentence backticks and final DOS EOF byte `0x1A` are observed resource structure, not verified characters the student types. Runtime selection, ordering and transformations remain unknown. Historical statements in the passages are game content, not endorsed facts.
+
+**Constrained generated text is deliberately retained.** `generateText()` uses newly written passages plus selected-key drills; outdoor uses deterministic individual keys. Every displayed character must belong to the selected keyboard set. Importing historical prose would violate that accepted constraint for early groups, and guessing that `H` means a home-row mapping would not solve it. Full sentences are used where the selected keys permit them; early groups use constrained clauses. No original corpus bytes are shipped by this change.
+
+## Exact recreation semantics
+
+- Normal-motion castle sand depth is bounded to **0–22 scene pixels**. Idle sinking is **3 px per active second**. Each correct castle key refreshes lift until `elapsed + 4 / goal` seconds, with **12 px/s** recovery during that interval. Intervals refresh rather than accumulate; a stale high cumulative WPM cannot supply indefinite idle lift. Regular sustained input below 60% of goal tends to sink, above it tends to recover; this is animation feedback, not pass math.
+- Raised arms alternate on the active clock at three phase changes per second when depth exceeds 5 pixels; shallower poses lower the hands. The foreground is drawn after the character. Paused/finished attempts do not animate from wall time.
+- Reduced-motion castle depth starts at 22 and changes only on correct input to `22 × max(0, 1 − WPM / goal)`. No idle sinking, waving or scrolling occurs. This static feedback is intentionally different from normal-motion recent-key recovery.
+- Practice starts neutral at elapsed time zero. Thereafter it is sad below **75%** of goal, neutral from **75% to below 100%**, happy at or above goal. Errors affect final accuracy, not expression selection. These bands are chosen, not historical findings.
+- Escape, blur, hidden-tab and pipe pause contracts remain; resume is explicit. Input, scoring, off-course isolation, certificates, graduation and version-1 persistence are unchanged. No death timer is asserted or added.
+
+## Verification and limits
+
+The tracked Node tests cover deterministic sinking, bounded idle depth, recovery, frame partition, pause and static reduced-motion behavior. Browser tests cover all characters' expressions, foreground masking, swimmer/pursuer direction, Thwomp pressure, outcomes and announcements. Pixel-isolation tests load source modules through test-only request interception; these are not evidence of the shipped bundle by themselves. A separate production UI test enters castle through real controls, types into the pipe, idles into sand, pauses, recovers through keyboard input and reaches results without module injection.
+
+The full browser suite runs against the rebuilt `dist/` over HTTP, including the existing full guided course, reload, graduation and input regressions. This is automated browser interaction with simulated time where stated in tests, not human manual play or a DOS runtime experiment. Screen-reader markup is tested; an actual assistive-technology listening session is not claimed.
+
+Optional local evidence lives under ignored `artifacts/gameplay-fidelity/`: worker screenshots/checks with `worker-provenance.json`, and integrated test output/screenshots under `integration/`. The preserved research archive is `research/gameplay-mechanics-2026-11-09/`; it contains scans, byte inventories, video samples and source records. Neither local directory is required to understand this audit or follow its original-source citations.

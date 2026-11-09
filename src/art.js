@@ -109,10 +109,11 @@ function head(c, character, mood = 'neutral') {
 function portraitHead(c, character, mood) {
   if (character === 'Mario') {
     tracedMario(c, 'portrait', 1);
-    // The source supplies the smiling face; this small frown is a recreation cue.
-    if (mood === 'sad') {
-      rect(c, 25, 47, 15, 3, marioPixels.palette['5']);
-      poly(c, [[25,49],[29,47],[35,47],[39,49],[35,48],[29,48]], marioPixels.palette['1']);
+    // Retain the traced happy face. Closed mouth/frown are recreation edits.
+    if (mood !== 'happy') {
+      rect(c, 25, 46, 15, 5, marioPixels.palette['5']);
+      if (mood === 'sad') poly(c, [[25,50],[29,46],[35,46],[39,50],[35,48],[29,48]], marioPixels.palette['1']);
+      else rect(c, 26, 48, 12, 2, marioPixels.palette['1']);
     }
     return;
   }
@@ -204,6 +205,23 @@ export function characterImage(character = 'Mario', pose = 0, mood = 'neutral', 
     else head(c, character, mood);
   });
 }
+// Sand poses reuse the trusted head/torso, never the walking leg cycle.
+// Raised alternating gloves communicate effort without simulating collision/death.
+export function struggle(c, x, floor, character, strained, phase = 0) {
+  const sprite = characterImage(character, 0);
+  const top = Math.round(floor) - sprite.height;
+  const shoulder = top + (character === 'Mario' ? 51 : 45);
+  const sleeve = character === 'Luigi' ? '#16813a' : character === 'Princess' ? '#db4b99' : '#bc2010';
+  round(c,x,shoulder+9,13,18,[ink,sleeve,sleeve]);
+  for (const side of [-1, 1]) {
+    const handY = shoulder - (strained ? 15 + (side === 1 ? phase : 1-phase)*6 : 3);
+    poly(c, [[x+side*13,shoulder+5],[x+side*29,handY+4],[x+side*32,handY-2],[x+side*20,shoulder-4]], sleeve);
+    round(c,x+side*31,handY,5,6,glove);
+  }
+  // Crop before the old arms/legs. Sand will mask the remaining lower torso.
+  c.drawImage(sprite,0,0,sprite.width,character==='Mario'?52:43,x-sprite.width/2,top,sprite.width,character==='Mario'?52:43);
+}
+
 export function runner(c, x, floor, character, pose = 0, swimming = false) {
   if (!swimming) {
     const sprite = characterImage(character, pose);

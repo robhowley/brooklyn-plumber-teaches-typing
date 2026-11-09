@@ -29,7 +29,7 @@ export function createAttempt({ mode = 'outdoor', duration, goal = 5, group = 0,
   const speed = Math.max(72, goal * 12);
   const travel = { distance: 0, speed: mode === 'outdoor' ? speed : 48, buffered: false, action: null,
     obstacles: mode === 'outdoor' ? Array.from({ length: 6 }, (_, id) => ({ id, x: reducedMotion ? 241 + id * 120 : 550 + id * 120, cleared: false })) : [] };
-  return { mode, guided, reducedMotion, travel, castleStage: 'thwomps', pipe: null, character, duration: Math.max(1, Math.min(3600, Number(duration) || MODES[mode].duration)), goal, group,
+  return { mode, guided, reducedMotion, travel, castleStage: 'thwomps', sandDepth: reducedMotion ? 22 : 0, sandLiftUntil: 0, pipe: null, character, duration: Math.max(1, Math.min(3600, Number(duration) || MODES[mode].duration)), goal, group,
     text: text || generateText(group, 12000, 19, mode), correct: 0, errors: 0, elapsed: 0, status: 'running', pauseReason: '', lastAction: null };
 }
 export function stats(s) {
@@ -50,6 +50,14 @@ export function advanceTime(s, seconds) {
   if (s.elapsed >= s.duration) { s.status = 'finished'; s.travel.buffered = false; }
 }
 function move(s, seconds) {
+  // Recreation timing, not recovered DOS values: sink 3 px/s, rise 12 px/s,
+  // bounded to 22 px. Each correct key supports one third of a goal-paced
+  // key interval: sustained typing below 60% of goal sinks, above it rises.
+  // Integrate across expiry exactly so frame rate cannot change the depth.
+  if (s.mode === 'castle' && s.castleStage === 'quicksand' && !s.reducedMotion) {
+    const rising = Math.max(0, Math.min(seconds, s.sandLiftUntil - s.elapsed));
+    s.sandDepth = Math.min(22, Math.max(0, s.sandDepth - rising * 12) + (seconds - rising) * 3);
+  }
   if (s.reducedMotion || s.mode === 'practice') return;
   const distance = seconds * s.travel.speed;
   s.travel.distance += distance;
@@ -71,6 +79,11 @@ function acceptKey(s) {
   }
   s.travel.buffered = false;
   s.correct++;
+  if (s.mode === 'castle') {
+    s.sandLiftUntil = s.elapsed + 4 / s.goal;
+    // Reduced motion changes only on input, never through idle WPM decay.
+    if (s.reducedMotion) s.sandDepth = Math.max(0, 1 - stats(s).wpm / s.goal) * 22;
+  }
   if (s.reducedMotion && s.mode === 'outdoor') {
     s.travel.obstacles = Array.from({ length: 6 }, (_, i) => ({ id: s.correct + i, x: 241 + i * 120, cleared: false }));
   }

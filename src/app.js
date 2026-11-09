@@ -9,6 +9,12 @@ const root = document.querySelector('#app');
 let storage; try { storage = window.localStorage; } catch { /* Private browsing. */ }
 let profile = loadProfile(storage), attempt, screen = 'menu', lastTime = performance.now(), recorded = false;
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const screenAnnouncement = document.createElement('div');
+screenAnnouncement.className = 'visually-hidden';
+screenAnnouncement.setAttribute('role', 'status');
+screenAnnouncement.setAttribute('aria-live', 'polite');
+screenAnnouncement.setAttribute('aria-atomic', 'true');
+document.body.append(screenAnnouncement);
 const escapeHtml = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const clock = s => `${Math.floor(Math.ceil(s) / 60)}:${String(Math.ceil(s) % 60).padStart(2, '0')}`;
 let saveFailed = !saveProfile(profile, storage);
@@ -46,6 +52,7 @@ function menu() {
   };
 }
 function start(options = lastOptions) {
+  screenAnnouncement.textContent = '';
   lastOptions = options;
   screen = 'game'; recorded = false; attempt = createAttempt({...options, reducedMotion}); lastTime = performance.now();
   shell(`<main class="play mode-${attempt.mode}">
@@ -101,9 +108,21 @@ function update() {
 function finish() {
   if(recorded) return; recorded=true; screen='results';
   const r=result(attempt); recordResult(profile,r,new Date().toISOString()); save();
-  shell(`<main class="results"><p class="eyebrow">LESSON COMPLETE · ${escapeHtml(profile.name)}</p><h1>${r.passed?'A star performance!':'Every key is practice.'}</h1><div class="classroom"><div class="blackboard"><p class="chalk-label">${MODES[r.mode].name} / ${escapeHtml(KEY_GROUPS[r.group].name)}</p><h2>${r.passed?'GOAL REACHED':'KEEP GOING'}</h2><dl><div><dt>Correct keys</dt><dd>${r.correct}</dd></div><div><dt>Errors</dt><dd>${r.errors}</dd></div><div><dt>Accuracy</dt><dd>${r.accuracy.toFixed(1)}%</dd></div><div><dt>Words / minute</dt><dd>${r.wpm.toFixed(1)}</dd></div><div><dt>Active lesson time</dt><dd>${clock(r.duration)}</dd></div></dl><p>${r.passed?'You met both targets. Nice typing!':`Aim for ${r.goal} WPM and at least 90% accuracy. Take your time finding each key.`}</p></div><canvas id="teacher-art" aria-label="Mario in a graduation gown holding a pointer beside your results."></canvas></div><div class="result-actions"><button id="retry" class="primary">Try again ↻</button><button id="menu">Main menu</button><button id="next" ${!profile.course.pending?'disabled':''}>Next lesson →</button><button id="report">Report card</button></div><p class="fine">${profile.course.graduated?'Mario Graduate! Your graduation certificate is on the report card.':profile.course.pending?'Next is unlocked. Your progress is saved even if you leave or retry.':'Only a successful guided lesson unlocks Next.'}</p></main>`);
+  const reasons = [];
+  if (!r.passed) {
+    if (!r.attempted) reasons.push('No keys were typed, so the attempt could not pass.');
+    else {
+      if (r.wpm < r.goal) reasons.push(`Speed was ${r.wpm.toFixed(1)} WPM, below your selected goal of ${r.goal} WPM.`);
+      if (r.accuracy < 90) reasons.push(`Accuracy was ${r.accuracy.toFixed(1)}%, below this recreation's 90% pass rule.`);
+    }
+  }
+  const outcome = r.passed
+    ? `Passed. ${MODES[r.mode].name}. Goal reached at timeout. You met your selected WPM goal and this recreation's 90% accuracy rule.`
+    : `Not passed. ${MODES[r.mode].name}. ${reasons.join(' ')}`;
+  shell(`<main class="results ${r.passed?'results-passed':'results-needs-practice'}" aria-labelledby="result-title"><p class="eyebrow">LESSON COMPLETE · ${escapeHtml(profile.name)}</p><h1 id="result-title">${r.passed?'A star performance!':'Every key is practice.'}</h1><div class="classroom">${r.passed?'<p class="victory-seal" aria-hidden="true">★ VICTORY! ★</p>':''}<div class="blackboard"><p class="chalk-label">${MODES[r.mode].name} / ${escapeHtml(KEY_GROUPS[r.group].name)}</p><h2>${r.passed?'GOAL REACHED':'KEEP GOING'}</h2><dl><div><dt>Correct keys</dt><dd>${r.correct}</dd></div><div><dt>Errors</dt><dd>${r.errors}</dd></div><div><dt>Accuracy</dt><dd>${r.accuracy.toFixed(1)}%</dd></div><div><dt>Words / minute</dt><dd>${r.wpm.toFixed(1)}</dd></div><div><dt>Active lesson time</dt><dd>${clock(r.duration)}</dd></div></dl><div class="result-feedback">${r.passed?'<p>Goal reached at timeout. You met your selected WPM goal and this recreation\'s 90% accuracy rule.</p>':`<p>This attempt did not meet the pass requirements:</p><ul>${reasons.map(reason=>`<li>${escapeHtml(reason)}</li>`).join('')}</ul>`}</div></div><canvas id="teacher-art" aria-label="Mario in a graduation gown holding a pointer beside your results."></canvas></div><div class="result-actions"><button id="retry" class="primary">Try again ↻</button><button id="menu">Main menu</button><button id="next" ${!profile.course.pending?'disabled':''}>Next lesson →</button><button id="report">Report card</button></div><p class="fine">${profile.course.graduated?'Mario Graduate! Your graduation certificate is on the report card.':profile.course.pending?'Next is unlocked. Your progress is saved even if you leave or retry.':'Only a successful guided lesson unlocks Next.'}</p></main>`);
   document.querySelector('#next').onclick=()=>{advanceCourse(profile,new Date().toISOString()); save(); menu();}; document.querySelector('#report').onclick=report;
   drawTeacher(document.querySelector('#teacher-art'));
+  screenAnnouncement.textContent = outcome;
   document.querySelector('#retry').onclick=()=>start(); document.querySelector('#menu').onclick=menu; document.querySelector('#retry').focus();
 }
 function report() {

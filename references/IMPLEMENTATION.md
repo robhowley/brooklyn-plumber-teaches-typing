@@ -25,6 +25,14 @@ These are recreation choices, not claims about the original.
 
 The requested scrolling revision supersedes stationary-only movement: action worlds travel with active time. Outdoor exact keys resolve at nearby contact, with one early/late key buffered for the same returning target. Misses add no penalties. Reduced motion remains stationary and immediate. Custom outdoor goals scale speed without changing scoring, course or persistence. Short overrides can expire before first contact. These are user-requested recreation rules, not newly verified DOS behavior; details are in `../docs/SCROLLING-BEHAVIOR.md`.
 
+### Gameplay feedback addendum, 2026-11-09
+
+A partial quicksand pose existed; it now has actual active-time sinking, raised-arm struggle and recovery, with foreground sand occlusion. Normal motion sinks at 3 scene px/s, recovers at 12 px/s while a correct-key lift interval lasts (`elapsed + 4 / goal` seconds), and clamps depth to 0–22 px. Keys refresh rather than accumulate lift; stale cumulative WPM does not prevent idle sinking. Arms alternate at three phase changes/s above 5 px depth. Reduced motion stays static between correct keys, using `22 × max(0, 1 − WPM / goal)` depth, initially 22. Paused and finished animation uses frozen active time.
+
+Practice expressions for all three characters use WPM only: neutral at elapsed zero, sad below 75% of goal, neutral below goal, happy at/above goal. Results retain all metrics/actions, add pass-only victory styling and a discrete accessible announcement, and explain no-input, low-speed or low-accuracy failures.
+
+These animation rates, thresholds and presentation choices are not recovered DOS rules. No death timers are asserted. Retain no early pass/death, the 90% timeout rule, exact input and scrolling contracts, explicit pause/resume, generated selected-key text, course/certificate/graduation behavior and version-1 persistence without migration. Historical evidence, conflicts, corpus findings and unknowns are in [the fidelity audit](../docs/GAMEPLAY-FIDELITY.md).
+
 ## Delivery
 - Deliver a static HTML/CSS/JavaScript build deployable to a standard web host, with deployment instructions. All screens and gameplay run within the SPA.
 - Keyboard-first gameplay; save profile, settings, course position, and results in localStorage. No accounts or backend.

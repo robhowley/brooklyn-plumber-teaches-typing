@@ -2,6 +2,8 @@
 
 A keyboard-first typing course with four activities, saved progress, report cards and downloadable certificates. Unofficial fan recreation, not an emulator or an original game release. No accounts, server API or external runtime assets.
 
+The [gameplay fidelity audit](docs/GAMEPLAY-FIDELITY.md) compares original-source evidence with implemented behavior, fixed gaps and deliberate differences, including quicksand, practice expressions, outcomes and lesson text.
+
 ## Local research and evidence
 
 `research/` contains the original research collection, including `video-dJP7FTvGETM/components/index.html`. `artifacts/` contains comparisons, provenance, captures and validation reports. Both directories, along with reference images and PDFs under `references/`, are Git-ignored and are not included in a fresh clone. Runtime artwork stays in `src/` and the production build in `dist/`.
