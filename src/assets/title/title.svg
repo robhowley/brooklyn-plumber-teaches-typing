@@ -1,0 +1,333 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" width="1540" height="968" viewBox="0 0 770 484">
+<title>Mario Teaches Typing, manually traced title reconstruction</title>
+<desc>Editable paths aligned to the supplied 1540 by 968 title reference at one-half scale. No embedded reference pixels. Original legal text, TM and creator overlay omitted. Hidden lower desk and shoe are reconstructed.</desc>
+<defs>
+ <linearGradient id="green" x1="0" y1="0" x2="1" y2=".7"><stop stop-color="#70d54c"/><stop offset=".18" stop-color="#318617"/><stop offset=".8" stop-color="#28790b"/><stop offset="1" stop-color="#194c09"/></linearGradient>
+ <linearGradient id="red"><stop stop-color="#ff946e"/><stop offset=".18" stop-color="#ee3c1c"/><stop offset=".6" stop-color="#c3210d"/><stop offset="1" stop-color="#641509"/></linearGradient>
+ <linearGradient id="gold"><stop stop-color="#fff3a2"/><stop offset=".2" stop-color="#f5d34f"/><stop offset=".42" stop-color="#6b4915"/><stop offset=".7" stop-color="#c29135"/><stop offset="1" stop-color="#fffbb1"/></linearGradient>
+ <linearGradient id="blue"><stop stop-color="#b3efff"/><stop offset=".22" stop-color="#55c4fb"/><stop offset=".48" stop-color="#3165fb"/><stop offset=".72" stop-color="#1538e1"/><stop offset="1" stop-color="#09067a"/></linearGradient>
+ <radialGradient id="skin" cx=".42" cy=".32" r=".72"><stop stop-color="#fff1d4"/><stop offset=".6" stop-color="#f6c58c"/><stop offset=".85" stop-color="#d98e4e"/><stop offset="1" stop-color="#8c4b24"/></radialGradient>
+ <radialGradient id="glove" cx=".35" cy=".25" r=".8"><stop stop-color="#fff"/><stop offset=".48" stop-color="#fff"/><stop offset=".72" stop-color="#cdd1ce"/><stop offset="1" stop-color="#707a7a"/></radialGradient>
+ <linearGradient id="pink" x1="0" y1="0" x2=".7" y2="1"><stop stop-color="#fff3ff"/><stop offset=".35" stop-color="#f392fb"/><stop offset=".65" stop-color="#de55eb"/><stop offset="1" stop-color="#8b218c"/></linearGradient>
+ <linearGradient id="hair" x1="0" y1="0" x2=".5" y2="1"><stop stop-color="#fff39b"/><stop offset=".3" stop-color="#f1d24b"/><stop offset=".55" stop-color="#bd9224"/><stop offset=".8" stop-color="#72531a"/><stop offset="1" stop-color="#e5be48"/></linearGradient>
+ <radialGradient id="shoe" cx=".35" cy=".35" r=".7"><stop stop-color="#ffe69a"/><stop offset=".22" stop-color="#e6a03e"/><stop offset=".6" stop-color="#af621e"/><stop offset="1" stop-color="#4c3617"/></radialGradient>
+ <linearGradient id="wood"><stop stop-color="#8d5e34"/><stop offset=".17" stop-color="#c18e59"/><stop offset=".65" stop-color="#aa7945"/><stop offset="1" stop-color="#5b4425"/></linearGradient>
+ <linearGradient id="desk-top" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#efbf84"/><stop offset=".5" stop-color="#bd854d"/><stop offset=".8" stop-color="#e7b27c"/><stop offset="1" stop-color="#75502f"/></linearGradient>
+ <pattern id="grain" width="13" height="130" patternUnits="userSpaceOnUse"><path d="M2 0v130 M6 0v130 M10 0v130" fill="none" stroke="#f5c991" stroke-opacity=".15"/><path d="M4 0v130 M12 0v130" fill="none" stroke="#3b2b17" stroke-opacity=".18"/></pattern>
+ <pattern id="stubble" width="4" height="4" patternUnits="userSpaceOnUse"><rect width="1" height="1" fill="#b5b9a5" opacity=".5"/><rect x="2" y="2" width="1" height="1" fill="#687367" opacity=".6"/></pattern>
+ <!-- Narrow serif outlines, hand placed rather than a runtime font. -->
+ <path id="serif-T" d="M0 0H30L31 14H29L26 4H19V53H25V56H6V53H12V4H4L2 14H0Z"/>
+ <path id="serif-E" d="M0 0H28L29 13H27L23 3H12V25H20L23 18H25V36H23L20 28H12V53H24L29 42H31L29 56H0V53H5V3H0Z"/>
+ <path id="serif-A" fill-rule="evenodd" d="M16 0H19L34 53H38V56H21V53H26L22 38H10L6 53H12V56H0V53H3Z M16 14 11 34H21Z"/>
+ <path id="serif-C" d="M30 0H32V17H30L27 7 22 3 16 3 10 9 7 20 7 37 10 47 16 53 23 53 28 48 31 40H33L30 52 24 56 15 57 7 53 2 45 0 32V23L3 12 8 4 16 0 24 1 29 5Z"/>
+ <path id="serif-H" d="M0 0H16V3H11V25H26V3H21V0H37V3H32V53H37V56H21V53H26V28H11V53H16V56H0V53H5V3H0Z"/>
+ <path id="serif-S" d="M27 0H29V17H27L24 7 18 3 11 3 6 8 6 14 10 19 25 29 30 35 32 42 30 50 25 55 17 57 8 55 3 52 2 56H0V38H2L6 49 12 53 19 53 25 49 26 43 23 37 7 27 2 21 0 15 1 8 7 2 14 0 22 2 26 5Z"/>
+ <path id="serif-Y" d="M0 0H17V3H12L23 26 31 3H26V0H39V3H35L25 30V53H31V56H12V53H18V30L4 3H0Z"/>
+ <path id="serif-P" fill-rule="evenodd" d="M0 0H19L27 3 31 10V19L27 26 19 29H12V53H18V56H0V53H5V3H0Z M12 3V26H18L23 23 25 18V11L22 5 18 3Z"/>
+ <path id="serif-I" d="M0 0H16V3H11V53H16V56H0V53H5V3H0Z"/>
+ <path id="serif-N" d="M0 0H11L30 41V3H24V0H39V3H33V56H30L9 11V53H15V56H0V53H6V3H0Z"/>
+ <path id="serif-G" d="M30 0H32V17H30L27 7 22 3 16 3 10 9 7 20V37L10 47 16 53 23 53 27 49V35H21V32H38V35H34V49L27 55 19 57 10 55 4 49 1 39 0 27 2 15 6 6 14 1 22 0 29 5Z"/>
+ <g id="teaches-typing">
+  <use href="#serif-T" x="300" y="18"/><use href="#serif-E" x="333" y="18"/><use href="#serif-A" x="365" y="18"/><use href="#serif-C" x="406" y="18"/><use href="#serif-H" x="440" y="18"/><use href="#serif-E" x="478" y="18"/><use href="#serif-S" x="513" y="18"/>
+  <use href="#serif-T" x="562" y="18"/><use href="#serif-Y" x="595" y="18"/><use href="#serif-P" x="631" y="18"/><use href="#serif-I" x="665" y="18"/><use href="#serif-N" x="683" y="18"/><use href="#serif-G" x="720" y="18"/>
+ </g>
+ <g id="mario-word" stroke="#12160d" stroke-width="2" stroke-linejoin="miter">
+  <path d="M18 101 23 13 47 13 55 20 67 9 92 27 112 82 92 97 78 49 65 68 44 48 43 101Z" fill="url(#green)"/>
+  <path d="M103 43 120 16 142 16 161 92 136 92 134 81 113 78Z M119 61 128 46 132 48 134 69Z" fill="#6e91f8" fill-rule="evenodd"/>
+  <path d="M160 15 194 15 208 33 209 54 199 62 215 78 201 93 178 70 178 91 161 91Z M178 29 178 53 190 41Z" fill="#f2d443" fill-rule="evenodd"/>
+  <path d="M216 16H228V94H216Z" fill="url(#red)"/>
+  <path d="M232 48 250 29 280 46 280 79 252 94 232 79Z M248 58 248 70 263 66 252 55Z" fill="url(#green)" fill-rule="evenodd"/>
+  <g fill="none" stroke-width="1.7"><path d="M21 94 25 16 45 16 M57 20 66 12" stroke="#b2f8a0"/><path d="M107 42 121 18 141 18" stroke="#e2f4ff"/><path d="M163 86V18H191" stroke="#fff8b3"/><path d="M218 18V89" stroke="#ffbea0"/><path d="M234 48 250 32 277 47 M250 69 261 65" stroke="#93ee7c"/></g>
+ </g>
+</defs>
+<g id="wallpaper" inkscape:groupmode="layer" inkscape:label="01 Purple wallpaper">
+ <rect width="770" height="484" fill="#7623b0"/>
+ <g fill="#48177b" opacity=".3" font-family="Times New Roman,serif" letter-spacing=".6">
+  <text x="-32" y="65" font-size="60">MARIO</text><text x="282" y="65" font-size="60">MARIO</text><text x="596" y="65" font-size="60">MARIO</text>
+  <text x="-68" y="135" font-size="28">TEACHES TYPING</text><text x="197" y="135" font-size="60">MARIO</text><text x="529" y="135" font-size="28">TEACHES TYPING</text>
+  <text x="-50" y="216" font-size="60">MARIO</text><text x="269" y="216" font-size="28">TEACHES TYPING</text><text x="574" y="216" font-size="60">MARIO</text>
+  <text x="-65" y="289" font-size="28">TEACHES TYPING</text><text x="195" y="289" font-size="60">MARIO</text><text x="523" y="289" font-size="28">TEACHES TYPING</text>
+  <text x="-52" y="392" font-size="60">MARIO</text><text x="270" y="337" font-size="28">TEACHES TYPING</text><text x="566" y="392" font-size="60">MARIO</text>
+  <text x="-68" y="468" font-size="28">TEACHES TYPING</text><text x="198" y="469" font-size="60">MARIO</text><text x="540" y="465" font-size="28">TEACHES TYPING</text>
+ </g>
+ <!-- Only the visible ground-shadow contour is supported, under text is inferred. -->
+ <path d="M480 468 493 460 532 458 566 461 583 468 611 472 626 484H469Z M648 470 661 464 678 460 704 456 722 458 725 463 713 467 684 473 659 475Z" fill="#100b17"/>
+</g>
+<g id="peach" inkscape:groupmode="layer" inkscape:label="02 Peach, behind Mario and computer" stroke="#282016" stroke-width="2.1" stroke-linejoin="round">
+ <!-- Hair and skirt contours were placed against the half-size underlay. -->
+ <path d="M377 125 363 142 345 143 319 135 308 139 304 149 284 147 271 141 267 146 267 157 285 167 315 181 349 185 376 177 400 191 430 222 450 208 460 193 460 178 468 173 463 154 467 148 460 136 443 126 416 111Z" fill="url(#hair)"/>
+ <path d="M271 148 289 155 307 157 313 143 336 150 354 151 375 140 386 137 370 156 350 163 319 166 296 161 275 154Z M310 140 318 139 336 145 321 145Z" fill="#f5e46c" stroke="none"/>
+ <path d="M272 155 293 166 320 173 341 172 M312 151 331 157 351 157" fill="none" stroke="#97731c" stroke-width="3"/>
+ <path d="M247 159Q279 174 325 186L349 219Q346 242 331 259Q309 289 281 323Q251 351 218 359L208 332 227 313Q209 284 205 256Q200 229 218 209Z" fill="url(#pink)"/>
+ <path d="M243 166 284 185 320 195 285 193 248 184 234 176Z M223 189 263 204 303 210 313 208 284 221 246 224 220 219 211 225 216 204Z M209 244 247 235 293 222 312 220 289 237 258 251 221 268 207 270Z M216 282 251 267 291 241 310 226 300 246 275 279 251 299 230 311Z M245 317 273 287 303 251 320 226 329 229 315 259 289 296 266 325Z" fill="#ffc2ff" stroke="none"/>
+ <path d="M248 172 278 185 316 197 M228 197 264 212 299 213 M210 246 247 238 284 226 M218 282 264 258 289 237" fill="none" stroke="#fff0ff" stroke-width="3"/>
+ <path d="M226 312 247 300 268 285 257 306 241 320 247 327 276 309 263 329 246 345 222 355 212 339 229 325Z" fill="#812d83" stroke="none"/>
+ <path d="M245 339 268 324 286 304 294 286 M223 350 246 333" fill="none" stroke="#ca5acb" stroke-width="4"/>
+ <!-- Bodice, puff sleeve, near arm and bent wrist. -->
+ <path d="M351 179 369 182 388 201 403 218 401 239 379 234 357 227 344 229 335 221 339 202Z" fill="#9c229d"/>
+ <path d="M350 183 364 189 369 205 388 207 393 216 367 215 347 224 340 217Z" fill="#e76be6" stroke="none"/>
+ <path d="M352 159Q363 160 367 169L365 182 356 188 344 184 336 177 334 164 342 158Z" fill="url(#pink)"/>
+ <path d="M337 179 342 183 337 192 338 197 357 197 370 198 377 195 387 198 397 202 397 208 387 212 365 212 345 213 329 209 321 205 319 198 326 185 329 180Z" fill="url(#skin)"/>
+ <path d="M324 193 324 199 331 204 356 205 378 204" fill="none" stroke="#ffe5b7" stroke-width="3"/>
+ <path d="M381 197 388 198 389 202 M385 194 394 199 396 203 M390 193 400 200" fill="none" stroke="#73522c" stroke-width="1.5"/>
+ <path d="M401 224Q411 220 422 235L432 241 447 247 458 247 462 253 459 258 450 255 445 256 429 252 414 247 400 238Z" fill="url(#skin)"/>
+ <path d="M404 227 413 231 424 242 445 249" fill="none" stroke="#ffe0b2" stroke-width="2"/>
+ <path d="M359 216 367 215 369 220 363 223 359 220Z" fill="#43a746"/>
+ <!-- Face, swept fringe, side ringlets and crown. -->
+ <path d="M384 130 400 128 416 136 423 152 426 165 419 184 410 193 397 195 390 199 379 192 372 191 368 183 371 172 376 160 377 146Z" fill="url(#skin)"/>
+ <path d="M376 173 381 163 386 158 389 167 381 179 379 186 374 184Z" fill="#ffe8bd" stroke="none"/>
+ <path d="M409 180 419 173 415 187 400 196 391 193 404 190Z" fill="#bf8144" stroke="none"/>
+ <path d="M380 151Q388 141 396 149L395 158 388 163 380 159Z" fill="#fffaf0" stroke-width="1.4"/>
+ <path d="M384 151 388 147 393 149 393 157 388 160 384 157Z" fill="#2338bf" stroke-width="1"/>
+ <path d="M387 150 390 150 391 154 388 157 386 154Z" fill="#111455" stroke="none"/>
+ <path d="M404 165Q412 157 419 164L418 174 411 178 405 173Z" fill="#fffdf3" stroke-width="1.4"/>
+ <path d="M409 165 414 162 417 165 415 174 410 175 408 171Z" fill="#2d49bf" stroke-width="1"/>
+ <path d="M411 165 414 166 413 171 411 172Z" fill="#141256" stroke="none"/>
+ <path d="M386 150h3v3h-3Z M410 165h3v3h-3Z" fill="white" stroke="none"/>
+ <path d="M378 150 382 145 379 142 M395 146 393 142 M404 163 409 158 M418 164 422 164 423 161" fill="none" stroke="#1c1b14" stroke-width="1.5"/>
+ <path d="M393 166 391 171 394 174 397 171 M379 181 382 179 386 182 384 186 380 185Z" fill="#d55c39" stroke="#c77944" stroke-width="1"/>
+ <path d="M373 169 377 171 377 174 374 173Z" fill="#e9946f" stroke="none"/>
+ <path d="M382 129Q371 132 379 147L392 143 404 135Q409 150 423 153Q437 167 424 183L413 190 403 189 400 198Q409 202 411 221L425 214Q436 216 441 206Q456 211 454 196Q468 195 456 181Q468 176 458 158L463 152Q455 137 443 136L431 133 427 126Q414 112 399 113L395 99 389 104 386 109Q372 108 373 120L376 129Z" fill="url(#hair)"/>
+ <path d="M380 115 387 119 397 110 395 121 383 129 382 134 394 132 405 123 417 126 431 141 447 147 457 150 448 151 429 145 416 137 408 133 401 141 393 144 395 136 385 141 378 138 376 129Z" fill="#f9e47a" stroke="none"/>
+ <path d="M423 151 435 152 445 159 448 170 443 183 450 191 442 192 438 184 441 174 437 161Z M420 184 422 195 419 207 413 210 414 197 409 195Z" fill="#e6c34f" stroke="none"/>
+ <path d="M411 144 419 150 424 162 M430 158 433 169 430 184 435 197 428 207 M450 156 454 169 451 179 M407 201 411 199" fill="none" stroke="#75521c" stroke-width="2.3"/>
+ <path d="M416 150 419 159 418 164" fill="none" stroke="#ffeab0" stroke-width="2"/>
+ <path d="M427 110 432 103 437 102 436 97 444 97 445 108 455 109 456 116 467 116 465 123 473 127 462 139 451 136 440 127Z" fill="#d7ac37"/>
+ <path d="M429 111 433 107 440 119 450 128 461 132 467 127 M440 101v9h10v8h9" fill="none" stroke="#fff4b1" stroke-width="3"/>
+ <path d="M443 119 446 117 450 122 447 126Z" fill="#3255bc" stroke-width="1"/>
+ <path d="M458 126 461 125 464 129 461 132Z" fill="#d5e7ff" stroke-width="1"/>
+</g>
+<g id="luigi" inkscape:groupmode="layer" inkscape:label="03 Luigi, lifted knee and raised hand" stroke="#1b1b13" stroke-width="2.5" stroke-linejoin="round">
+ <path d="M642 104 650 98 659 98 669 104 678 115 686 129 684 143 675 157 663 168 650 173 642 157 650 143 650 124Z" fill="url(#glove)"/>
+ <path d="M650 104 659 104 667 109 M648 113 663 112 673 119 M654 123 671 122 678 130 M662 132 676 134 674 144 662 153" fill="none" stroke="#5e6661" stroke-width="3"/>
+ <path d="M651 102 660 103 M650 110 665 110 M656 119 670 120" fill="none" stroke="#fff" stroke-width="2"/>
+ <path d="M547 207 568 202 586 219 610 226 620 251 599 273 583 276 570 265 556 259 543 279 523 276 507 259 503 244 509 229 524 216Z" fill="url(#green)"/>
+ <path d="M540 218 551 216 556 228 553 247 546 266 535 270 524 258 515 241 518 232Z" fill="#287e0f" stroke="none"/>
+ <path d="M534 219 547 216 550 220 533 227 519 239 516 246 511 239 515 231Z" fill="#439e22" stroke="none"/>
+ <path d="M529 266 540 265 550 236 559 240 562 275 582 277 588 268 594 281 596 312 579 331 572 353 549 373 532 394 511 406 496 401 489 390 486 370 480 357 484 335 492 313 505 289Z" fill="url(#blue)"/>
+ <path d="M515 281 530 276 526 292 517 297 510 310 500 314 500 304Z M496 320 508 314 513 313 509 322 495 334 490 347 487 349 490 332Z M531 303 546 302 553 310 542 321 537 334 531 329 529 319 523 318Z" fill="#8cddff" stroke="none"/>
+ <path d="M509 315 517 310 525 309 516 324 508 337 507 353 497 366 484 357 489 340 495 331 496 343 500 329Z M547 304 554 294 563 300 565 312 553 324 548 329 541 323Z" fill="#3f8dfd" stroke="none"/>
+ <path d="M514 324 522 321 516 339 515 359 525 367 513 379 510 391 501 391 494 377 497 366 506 359 506 342Z" fill="#1721c5" stroke="none"/>
+ <path d="M489 368 504 368 506 375 501 389 502 399 495 396 491 387Z" fill="#2b51f2" stroke="none"/>
+ <path d="M557 274 566 273 571 278 567 291 561 298 554 297 552 290Z" fill="#c5a73d"/>
+ <path d="M558 280 562 277 565 278 561 292 556 292Z" fill="#fff18a" stroke="none"/>
+ <path d="M563 280 562 288" fill="none" stroke="#5d4519" stroke-width="1.5"/>
+ <path d="M484 361 476 365 461 383 450 400 445 417 446 426 454 432 470 429 486 419 496 407 494 395 489 388Z" fill="url(#shoe)"/>
+ <path d="M480 367 470 375 457 395 451 413 451 424" fill="none" stroke="#ffe4a4" stroke-width="3"/>
+ <path d="M457 430 468 429 484 418 493 408" fill="none" stroke="#6b4e24" stroke-width="3"/>
+ <path d="M527 353 535 340 551 329 568 324 585 324 602 331 609 340 607 353 595 367 579 379 565 386 557 398 546 402 535 398 529 392 525 382Z" fill="url(#shoe)"/>
+ <path d="M539 391 540 375 550 353 564 340 582 331 598 333 604 338 587 338 573 345 562 356 551 377 546 396Z" fill="#e6bc76"/>
+ <path d="M546 397 551 379 565 355 579 344 595 338 606 341 606 350 596 363 581 374 560 384 554 398Z" fill="#44391b"/>
+ <path d="M539 386 548 364 564 344 582 335 596 335" fill="none" stroke="#fff1bd" stroke-width="2"/>
+ <!-- Reaching glove sits in front of Peach's fingertips. -->
+ <path d="M505 237 497 235 491 240 478 239 464 244 459 251 452 258 452 267 457 277 466 286 481 291 494 288 508 279 516 268 517 258 513 248Z" fill="url(#glove)"/>
+ <path d="M459 253 465 251 473 256 484 256 487 252 485 246 494 246 500 253 499 264 493 278 483 283 469 280 460 271 456 263Z" fill="#f8faf6" stroke="none"/>
+ <path d="M462 263 473 271 478 269 471 261 480 263 M469 253 477 255 M490 255h7 M489 265h6 M489 275l4 -3 M502 246 508 255 508 266 502 276" fill="none" stroke="#424a46" stroke-width="2.5"/>
+ <g stroke="none">
+  <path d="M494 327 499 322 501 321 501 324 497 329 495 336 492 338Z M505 311 510 307 513 309 510 313 507 314Z M518 287 521 283 523 283 521 290 517 293Z M531 306 537 305 541 308 539 312 535 313 533 310Z M488 343 492 340 491 351 487 355Z" fill="#a3ddff"/>
+  <path d="M497 337 500 332 504 331 501 338 499 340 498 350 495 353Z M515 316 519 313 521 314 519 318 515 319Z M541 318 545 318 542 324 540 325Z M500 373 501 379 498 385 495 381 495 377Z" fill="#4069f2"/>
+  <path d="M528 269 534 264 537 259 541 262 538 271 532 275Z M546 247 548 236 550 232 549 246 544 259 540 262Z" fill="#205b13"/>
+ </g>
+ <!-- Long three-quarter face, cheek, moustache and open mouth. -->
+ <path d="M550 155Q578 134 604 136Q632 139 640 164L649 176Q660 194 654 215Q649 232 626 242Q603 265 587 259Q569 257 566 234Q562 220 546 209Q526 200 536 178Z" fill="url(#skin)"/>
+ <path d="M563 201 570 216 579 227 579 241 586 250 595 254 605 252 595 259 581 257 573 249 570 232 558 215 550 210Z" fill="#ffe8b8" stroke="none"/>
+ <path d="M542 163 556 164 571 158 573 175 564 189 552 191 543 181 534 175Z" fill="#b75b12"/>
+ <path d="M538 169 550 166 560 165 556 175 564 182 556 186 544 181Z" fill="#f4a23c" stroke="none"/>
+ <path d="M546 180Q530 164 519 176Q504 186 516 201Q528 215 543 207L552 202 552 190Z" fill="url(#skin)"/>
+ <path d="M522 181Q513 187 523 198L531 204 533 199 528 192 534 190 539 196 541 188 533 181Z" fill="#a56531" stroke="none"/>
+ <path d="M521 184 520 190 526 198 M531 178 541 185" fill="none" stroke="#ffe4bd" stroke-width="2"/>
+ <path d="M585 161Q592 149 604 153L609 161 605 178 599 184 586 182Z" fill="#f4f5e6" stroke-width="2"/>
+ <path d="M587 165 593 157 601 157 603 161 600 178 593 183 587 180Z" fill="#2642bb" stroke-width="1.5"/>
+ <path d="M592 165 597 162 600 163 596 180 591 181Z" fill="#10104b" stroke="none"/>
+ <path d="M616 164Q621 155 627 160L631 169 628 179 617 183 613 177Z" fill="#fffce7" stroke-width="2"/>
+ <path d="M620 165 625 163 628 167 626 179 619 181 617 176Z" fill="#263daf" stroke-width="1"/>
+ <path d="M624 166 627 167 624 177 620 178Z" fill="#161a46" stroke="none"/>
+ <path d="M591 161 597 158 598 161 592 165Z M620 166 623 165 622 170 619 172Z" fill="white" stroke="none"/>
+ <path d="M583 153 590 148 598 146 604 149 M615 154 622 153 627 158" fill="none" stroke="#15160b" stroke-width="3.5"/>
+ <path d="M580 215 592 215 607 217 621 211 625 216 616 231 604 244 590 248 582 244 578 235Z" fill="#1a150b"/>
+ <path d="M583 236 590 229 600 227 607 230 602 239 593 244 585 243Z" fill="#d9401f" stroke="#79280f" stroke-width="1"/>
+ <path d="M590 236 598 232 601 232 599 238 591 242 586 241Z" fill="#f86d39" stroke="none"/>
+ <path d="M573 187 580 184 588 189 597 188 608 194 620 192 634 185 643 183 648 190 648 204 641 217 629 222 619 226 607 223 600 225 590 220 582 220 576 213 569 207 568 195Z" fill="#111511"/>
+ <path d="M575 190 583 190 589 194 600 193 608 199 605 214 596 218 584 213 576 210 572 202Z" fill="url(#stubble)" stroke="none"/>
+ <path d="M611 181Q625 173 639 183Q649 190 646 201Q643 213 629 213Q613 212 606 203Q599 191 611 181Z" fill="url(#skin)"/>
+ <!-- Slanted green cap, brim and white badge. -->
+ <path d="M515 170Q504 159 518 148Q529 141 550 135L567 118Q589 93 611 90Q638 84 648 100Q653 109 647 123L660 125Q674 131 667 144L658 154 647 162 640 151 621 143 605 139 581 146 561 156Q528 175 515 170Z" fill="url(#green)"/>
+ <path d="M518 156 528 147 551 140 568 124 591 103 606 98 623 93 633 94 638 98 619 98 605 105 589 114 571 133 554 147 529 160 518 165Z" fill="#53b923" stroke="none"/>
+ <path d="M522 151 536 145 552 138 575 117 593 103 612 95 629 94" fill="none" stroke="#8ce15d" stroke-width="2"/>
+ <path d="M614 105 620 100 626 99 636 104 641 113 640 122 620 125 611 120 610 113Z" fill="#e5f4d5"/>
+ <path d="M620 104 626 102 625 117 633 117 633 122 618 122Z" fill="#246f1a" stroke="none"/>
+ <path d="M520 169Q563 138 599 126L626 121 648 123 665 129 669 137 660 150 651 156 649 143 631 135 607 132 584 141 559 155 537 169Z" fill="#204b0e"/>
+ <path d="M530 165 558 149 586 135 606 127 627 124 649 126 661 132" fill="none" stroke="#70b84c" stroke-width="2.5"/>
+ <path d="M607 135 622 136 635 142 642 151 636 148 631 153 623 147 617 150 610 145 604 148 597 145 588 150 582 149Z" fill="#14170e" stroke="none"/>
+</g>
+<g id="toad" inkscape:groupmode="layer" inkscape:label="04 Toad, running" stroke="#241e14" stroke-width="2.1" stroke-linejoin="round">
+ <path d="M650 385 638 390 625 399 617 409 616 417 622 422 636 420 651 411 661 400Z" fill="url(#shoe)"/>
+ <path d="M621 412 629 403 641 396" fill="none" stroke="#f8d488" stroke-width="2.5"/>
+ <path d="M705 380 716 371 729 365 741 366 749 371 755 383 752 394 739 408 725 419 715 420 706 415 702 401Z" fill="url(#shoe)"/>
+ <path d="M719 416 722 395 731 380 743 372 750 376 755 383 749 397 733 412 725 417Z" fill="#443b20"/>
+ <path d="M717 413 720 393 729 378 742 370" fill="none" stroke="#efd39b" stroke-width="2.4"/>
+ <path d="M661 349 682 349 699 353 702 365Q718 367 716 388Q713 409 692 414Q663 421 652 401Q640 382 649 369Z" fill="url(#glove)"/>
+ <path d="M664 355 695 353 701 371 666 376Z" fill="url(#skin)"/>
+ <path d="M662 363 672 369 671 384 661 393 649 386 640 378 641 367 650 360Z" fill="url(#blue)"/>
+ <path d="M645 370 651 366 654 376 651 381 646 378Z" fill="#77dbff" stroke="none"/>
+ <path d="M658 374 667 371 666 382 659 388 652 383Z" fill="#1429a5" stroke="none"/>
+ <path d="M650 350 642 346 638 342 633 342 632 346 636 351 632 354 632 359 641 361 649 360 658 356Z" fill="url(#skin)"/>
+ <path d="M665 296 688 297Q711 304 720 329Q720 351 709 358Q691 368 676 361Q660 358 658 340Q654 322 665 296Z" fill="url(#skin)"/>
+ <path d="M673 316 678 314 680 318 678 323 674 323Z M696 322 701 320 703 324 701 330 697 330Z" fill="#1b1b15" stroke-width="1"/>
+ <path d="M674 316h2v3h-2Z M697 323h2v3h-2Z" fill="white" stroke="none"/>
+ <path d="M684 331h2 M690 332h2" fill="none" stroke="#89512d" stroke-width="1.5"/>
+ <path d="M672 342Q681 333 694 338L704 344 704 352 694 358 682 357 673 352Z" fill="#3b160c"/>
+ <path d="M680 350Q688 341 698 348L699 354 691 356 680 354Z" fill="#f05b31" stroke="#ad2f11" stroke-width="1"/>
+ <path d="M684 349 690 348 695 350" fill="none" stroke="#ffab77" stroke-width="2"/>
+ <!-- Cap follows the irregular domed outline and occludes the forehead. -->
+ <path d="M657 322Q645 301 659 285Q681 260 711 267Q743 272 751 306Q762 341 719 357L708 358 716 345 718 331 714 318Q691 296 664 313Z" fill="url(#glove)"/>
+ <path d="M716 318 725 328 728 344 720 353 712 357 718 345 719 332Z M737 289 747 303 747 320 740 332 731 336 729 323Z" fill="#6d7774" stroke="none"/>
+ <path d="M662 285 674 275 684 272 690 276 690 286 685 297 676 300 666 296 659 291Z" fill="url(#red)"/>
+ <path d="M703 281 712 276 721 278 726 287 723 297 716 302 706 299 701 291Z" fill="url(#red)"/>
+ <path d="M739 297 747 299 751 311 751 323 746 331 737 328 732 322 732 309Z" fill="url(#red)"/>
+ <path d="M690 271 699 270 706 272 700 279 698 296 701 301 690 300 684 302 693 288Z" fill="white" stroke="none"/>
+ <path d="M662 311 674 305 686 303 699 306 713 313 720 322" fill="none" stroke="#b8bdb7" stroke-width="2"/>
+</g>
+<g id="chair" inkscape:groupmode="layer" inkscape:label="05 Chair behind seated Mario" stroke="#45351f" stroke-width="2">
+ <path d="M10 270 56 248 76 264 71 378 112 392 106 426 98 433 96 484 78 484 79 432 36 420 37 484 20 484Z" fill="url(#wood)"/>
+ <path d="M23 276 56 261 63 269 59 398 27 401Z" fill="#4a4129"/>
+ <path d="M24 277 57 264 60 395 28 399Z" fill="url(#grain)" stroke="none"/>
+ <path d="M13 274 19 406 91 425 99 412 72 404 27 400 24 276Z" fill="#c7945e"/>
+ <path d="M14 269 55 250 M13 276 20 405 87 422 M25 424 26 484 M86 437 85 484" fill="none" stroke="#e9be86" stroke-width="3"/>
+ <path d="M31 277 34 391 M38 272 42 389 M47 268 49 394 M55 269 56 394" fill="none" stroke="#8f7950" stroke-width="1.5"/>
+</g>
+<g id="mario" inkscape:groupmode="layer" inkscape:label="06 Mario seated, face, cap and gloves" stroke="#201b11" stroke-width="2.5" stroke-linejoin="round">
+ <!-- The lower right shoe was hidden by the legal line, its continuation is inferred. -->
+ <path d="M124 455 143 447 158 454 174 464 187 475 187 484 119 484 119 472Z" fill="url(#shoe)"/>
+ <path d="M127 475 144 461 154 461 169 472 177 477 145 477Z" fill="#c88a36" stroke="none"/>
+ <path d="M113 484 129 476 151 479 175 479 187 483Z" fill="#46351d"/>
+ <path d="M55 306 79 307Q107 329 138 323L158 315Q184 333 195 351L191 372 175 393 162 408 164 434Q157 451 134 464L127 470 113 462 106 448Q91 434 91 419Q61 419 50 391Q39 368 46 341Z" fill="url(#blue)"/>
+ <path d="M54 325 61 332 62 350 75 362 101 365 111 373 97 379 84 376 68 379 55 371 50 356Z M59 381 73 384 84 381 98 379 109 387 117 405 118 422 123 440 119 457 112 451 104 431 99 414 92 399 76 399 63 392Z" fill="#439dfd" stroke="none"/>
+ <path d="M54 326 59 337 57 348 63 353 58 359 67 361 67 365 57 366 52 359 50 344Z M64 379 72 381 76 385 83 382 90 384 84 389 74 390 72 394 65 389Z M99 381 109 380 117 386 115 391 110 391 106 400 110 415 106 416 101 402 98 390Z M113 420 119 422 124 440 120 448 118 443Z" fill="#96e5ff" stroke="none"/>
+ <path d="M67 339 81 341 91 346 98 345 109 352 102 360 84 358 73 355Z M83 372 98 371 102 375 96 377 82 377Z M123 379 142 389 151 397 154 422 147 430 137 416 137 399Z" fill="#1525b8" stroke="none"/>
+ <path d="M62 352 68 355 M63 360 72 363 80 362 M74 387 87 389 M102 385 108 385 M112 394 115 403 M106 421 111 431 M123 452 127 457" fill="none" stroke="#bcecff" stroke-width="1.4"/>
+ <!-- Far sleeve and raised hand. -->
+ <path d="M156 254 178 237 190 221 204 219 209 239 202 259 186 285 167 292 151 280Z" fill="url(#red)"/>
+ <path d="M177 252 192 237 197 238 197 250 185 267 175 270Z" fill="#e63b21" stroke="none"/>
+ <path d="M188 196 192 181 200 173 207 172 210 147 214 138 222 135 229 139 228 150 221 172 228 169 240 152 249 147 256 147 259 153 257 159 242 178 238 183 243 193 244 206 239 216 231 222 216 227 203 223 198 214Z" fill="url(#glove)"/>
+ <path d="M213 166 215 147 219 140 225 140 224 152 218 169Z M231 173 242 158 251 152 255 153 250 160 238 176Z" fill="white" stroke="none"/>
+ <path d="M202 179 212 175 220 177 223 182 215 188 209 188 205 191 209 197 218 200 220 196 217 191 224 188 232 189 238 195 235 200 226 201 228 206 237 205" fill="none" stroke="#333d38" stroke-width="3"/>
+ <path d="M202 206 208 213 218 218 228 216" fill="none" stroke="#fff" stroke-width="3"/>
+ <path d="M205 218 213 223 221 224" fill="none" stroke="#6c7770" stroke-width="2"/>
+ <!-- Torso, collar and seated overall bib. -->
+ <path d="M87 268 109 270 125 282 152 279 171 285 177 303 170 326 148 340 116 334 82 329 59 317 56 300 65 283Z" fill="url(#red)"/>
+ <path d="M114 275 124 283 127 299 142 304 153 298 156 283 165 280 171 297 166 326 152 343 130 340 119 324Z" fill="#111893"/>
+ <path d="M116 276 123 279 126 287 122 291 116 288 112 282Z M159 281 163 284 166 295 161 301 156 296Z" fill="#254fda" stroke="none"/>
+ <path d="M118 321 127 319 131 325 129 332 120 333 116 328Z" fill="#a89c53" stroke-width="1.5"/>
+ <path d="M120 322 124 321 126 324 123 329 119 328Z" fill="#ded29a" stroke="none"/>
+ <!-- Ear and face outline are independent of the cap. -->
+ <path d="M86 192 107 175 133 164 153 166 175 177 187 193 194 215 197 237 188 256 173 276 160 286 142 290 127 284 113 278 95 270 82 258 72 244 73 218Z" fill="url(#skin)"/>
+ <path d="M88 238Q94 253 112 259Q129 262 136 280L147 285Q137 291 125 280L110 274Q88 268 83 256Z" fill="#ffe6b5" stroke="none"/>
+ <path d="M89 211 99 217 98 236 91 244 79 236 73 225 76 214Z" fill="#a75e16"/>
+ <path d="M82 214 91 214 96 221 94 233 88 234 79 227Z" fill="#d68b28" stroke="none"/>
+ <path d="M81 231Q68 218 59 224Q46 230 54 245Q61 260 73 261L84 258 90 251 87 240Z" fill="url(#skin)"/>
+ <path d="M61 230Q53 235 62 246L69 252 75 251 75 246 69 240 73 238 80 246 80 239 74 232 67 229Z" fill="#a36531" stroke="none"/>
+ <path d="M60 232 58 236 61 242 M69 227 76 230 82 238" fill="none" stroke="#ffe7c1" stroke-width="2"/>
+ <!-- Both large blue eyes, upper lids and brows. -->
+ <path d="M116 190Q122 177 133 181Q145 185 143 200L139 211 133 216 119 216 114 207Z" fill="#fff9e8"/>
+ <path d="M119 196Q123 189 130 192L136 198 135 211 130 217 120 214 117 207Z" fill="#253bbc" stroke-width="1.5"/>
+ <path d="M123 200 127 198 132 201 132 213 127 216 122 211Z" fill="#151041" stroke="none"/>
+ <path d="M153 181Q160 171 168 176L174 184 174 200 167 207 155 208Z" fill="#fff8e2"/>
+ <path d="M157 185 163 181 168 185 170 191 168 204 159 208 156 202Z" fill="#283db2" stroke-width="1.5"/>
+ <path d="M162 187 166 188 166 203 162 204Z" fill="#151245" stroke="none"/>
+ <path d="M121 197 125 196 126 200 122 202Z M158 187 161 185 162 190 158 192Z" fill="#fff" stroke="none"/>
+ <path d="M112 184 119 177 128 175 137 179 M151 174 157 168 164 168 171 173" fill="none" stroke="#211c11" stroke-width="4"/>
+ <!-- Open grin behind the scalloped moustache. -->
+ <path d="M127 242Q152 253 180 234L181 248 171 266 159 278 146 281 135 275 130 261Z" fill="#22160c"/>
+ <path d="M133 252 143 256 155 258 165 253 162 260 152 265 141 262Z" fill="#fffce9" stroke-width="1.5"/>
+ <path d="M139 270 146 270 153 274 159 271 166 264 163 272 153 278 146 278Z" fill="#e54826" stroke="none"/>
+ <path d="M108 221 113 224 117 230 125 231 132 225 138 227 144 232 155 227 163 229 175 225 185 216 195 216 197 224 195 237 188 246 178 252 170 251 163 255 152 252 144 255 135 250 128 252 119 246 113 245 109 239 105 235Z" fill="#121610"/>
+ <path d="M110 227 117 235 125 237 132 232 141 237 150 233 158 235 168 232 173 233 170 243 161 248 149 247 139 247 130 244 120 243 113 237Z" fill="url(#stubble)" stroke="none"/>
+ <path d="M146 211Q160 202 176 203Q191 204 197 214Q204 226 196 234Q188 241 173 238L152 235Q142 230 140 224Q136 216 146 211Z" fill="url(#skin)"/>
+ <path d="M150 211Q167 204 181 209" fill="none" stroke="#fff1d7" stroke-width="3"/>
+ <!-- Red cap and separate underside of the wide brim. -->
+ <path d="M43 219Q41 207 54 191Q57 161 69 143Q89 113 118 109Q148 106 163 127L170 143Q199 140 208 153Q211 164 179 184L174 175 160 169 149 170 130 177 108 189 85 206Q49 235 43 219Z" fill="url(#red)"/>
+ <path d="M60 178 65 157 74 141 87 127 105 118 120 114 136 115 147 120 145 124 125 121 110 125 90 139 76 156 68 179 62 188Z" fill="#ee4e32" stroke="none"/>
+ <path d="M65 169 71 148 86 133 103 122 121 116 134 117" fill="none" stroke="#ffb298" stroke-width="3"/>
+ <path d="M72 155 78 146 90 138 M84 144 92 137 M59 187 56 197" fill="none" stroke="#ff7a59" stroke-width="2"/>
+ <path d="M124 129 134 125 144 127 151 134 153 144 149 154 137 160 124 157 118 151 119 139Z" fill="#fff5dc"/>
+ <path d="M125 151 124 135 129 131 137 139 143 131 149 136 148 151 143 153 142 142 137 148 130 141 131 154Z" fill="#a72e16" stroke="none"/>
+ <path d="M46 217 58 202 78 187 102 169 124 157 146 150 171 146 191 147 204 151 207 156 202 163 189 170 174 178 166 170 152 169 132 175 111 186 87 204 64 221 51 226Z" fill="#7c200f"/>
+ <path d="M48 216 65 201 90 182 114 166 139 156 159 150 181 148 198 152" fill="none" stroke="#ec6249" stroke-width="3"/>
+ <path d="M83 200 107 182 132 169 153 163 171 165 181 171 175 176 166 172 153 171 132 177 112 187 89 205Z" fill="#201b0d" stroke="none"/>
+ <!-- Hand-placed short strokes soften the long cap highlight and add cloth pixels. -->
+ <g stroke="none">
+  <path d="M66 163 69 150 79 138 88 130 103 122 117 118 119 120 105 125 91 132 81 142 73 153 70 165Z" fill="#ffc1a2" opacity=".45"/>
+  <path d="M74 159 81 146 89 140 93 140 86 148 78 163Z M83 149 87 147 86 151 83 153Z M97 134 101 131 104 132 100 135Z M101 133 105 130 108 130 105 133Z" fill="#fb7852"/>
+  <path d="M60 180 64 166 68 160 65 175 60 193 54 201Z" fill="#e75732" opacity=".6"/>
+  <path d="M63 194 83 177 104 163 119 157 110 164 95 173 74 188Z" fill="#bc2812"/>
+  <path d="M68 349 72 351 71 354 66 352Z M57 340 60 341 60 345 58 347 56 345Z M57 355 61 354 63 357 59 358Z M69 365 74 364 77 366 72 368Z M80 362 85 361 86 364 82 365Z M66 382 72 384 70 387 66 385Z M81 386 88 385 90 388 85 390Z M102 382 108 382 109 385 103 387 100 386Z M106 388 110 387 111 391 108 395 106 394Z M113 404 116 404 117 412 114 411Z M114 424 118 426 119 433 116 432Z M122 442 125 442 127 448 124 452 121 450Z" fill="#a4e6ff"/>
+  <path d="M72 346 81 347 83 350 76 352 70 351Z M60 368 67 370 73 370 78 373 73 375 62 374Z M91 394 97 395 100 403 97 405 94 399Z M126 414 132 417 134 433 131 442 127 443 130 430Z M121 460 126 457 130 460 127 464Z" fill="#386ff2"/>
+ </g>
+ <!-- Near sleeve sits across the bib; wrist and fingers point down to keys. -->
+ <path d="M81 273Q98 274 104 284L108 295Q116 301 139 302Q151 314 138 326Q121 344 100 341Q65 337 57 315Q52 298 67 284Z" fill="url(#red)"/>
+ <path d="M72 287 81 281 91 286 94 295 90 299 101 305 120 308 125 313 111 316 96 313 91 309 78 311 71 306 66 301 67 294Z" fill="#f86c4a" stroke="none"/>
+ <path d="M69 296 73 289 78 286 85 286 86 291 79 292 76 298 81 302 87 303 88 307 81 306 79 309 72 306Z M91 308 98 308 100 312 96 314 91 312Z M105 312 113 312 117 314 116 317 108 317Z" fill="#ff9a75" stroke="none"/>
+ <path d="M65 305 68 309 71 309 69 312 66 310Z M75 314 78 313 82 315 80 317 77 317Z M100 316 105 316 106 318 102 320Z" fill="#e85833" stroke="none"/>
+ <path d="M70 293 77 287 83 287 M73 300 82 302 81 306 M87 309 96 311 M101 313 115 315" fill="none" stroke="#ffb9a0" stroke-width="2"/>
+ <path d="M63 315 73 325 88 330 105 333 120 330 130 324 138 315 138 323 126 333 108 339 91 337 75 331 64 323Z" fill="#9e1c0b" stroke="none"/>
+ <path d="M132 321 138 312 147 306 162 303 176 303 185 306 200 306 209 311 213 317 209 320 219 328 225 336 225 344 222 348 216 345 203 334 201 335 218 352 219 358 215 362 210 361 194 346 191 345 205 362 205 367 201 371 195 369 180 353 174 348 184 364 183 369 178 372 171 369 157 357 149 350 139 345 131 338Z" fill="url(#glove)"/>
+ <path d="M139 325 147 315 158 309 178 310 187 314 200 313 207 316 201 318 188 317 181 320 194 326 208 336 218 345 212 340 193 329 185 328 182 332 190 344 200 357 194 352 180 339 172 337 171 341 179 354 175 351 164 338 157 338 158 347 168 362 157 352 151 343 140 337Z" fill="#fff" stroke="none"/>
+ <path d="M147 319 143 325 146 331 M155 313 157 320 162 323 M161 309 165 314 M186 307 200 312 M135 327 136 335 142 341" fill="none" stroke="#3b423b" stroke-width="2.5"/>
+</g>
+<g id="desk-computer" inkscape:groupmode="layer" inkscape:label="07 Desk, keyboard and CRT" stroke="#282820" stroke-width="2" stroke-linejoin="round">
+ <!-- Desktop and cabinet share the reference's two vanishing directions. -->
+ <path d="M169 402 375 401 435 355 427 484H171Z" fill="url(#wood)"/>
+ <path d="M174 414H366V484H175Z" fill="url(#grain)" stroke="none"/>
+ <path d="M372 409 430 364 427 484H370Z" fill="#5a4829"/>
+ <path d="M382 416 418 389 416 484H382Z" fill="#71613a"/>
+ <path d="M390 417 391 484 M401 408 401 484 M412 400 411 484" fill="none" stroke="#887044" stroke-width="2"/>
+ <path d="M177 421 180 484 M186 420 187 484 M363 415 360 484" fill="none" stroke="#e5b781" stroke-width="3"/>
+ <path d="M161 397 284 342 440 344 439 358 370 413 162 410Z" fill="url(#desk-top)"/>
+ <path d="M164 398 369 400 435 349" fill="none" stroke="#eec593" stroke-width="2.4"/>
+ <path d="M164 406 368 408 435 357" fill="none" stroke="#664629" stroke-width="2"/>
+ <!-- Keyboard traced as a tapered case, each key row follows its perspective. -->
+ <path d="M196 381 290 340 332 344 270 383 255 388 196 387Z" fill="#a9aeaa"/>
+ <path d="M199 380 290 342 322 345 264 378 252 384 197 384Z" fill="#e5e6de" stroke="none"/>
+ <path d="M211 377 291 345 313 347 254 378Z" fill="#8e9792" stroke="none"/>
+ <g fill="none" stroke="#eff2ec" stroke-width="1.4">
+  <path d="M218 375 297 345 M226 377 304 347 M237 377 309 348 M221 371 247 377 M229 368 254 375 M237 365 261 372 M245 362 269 368 M253 359 277 364 M262 355 285 360 M270 352 293 357 M279 349 301 352 M287 346 308 350"/>
+ </g>
+ <path d="M217 381 241 381 256 375 232 376Z" fill="#d9dcd3" stroke="none"/>
+ <!-- System unit: gray front, dark right slots, recessed drive. -->
+ <path d="M276 349 369 350 408 333 408 372 370 390 275 387Z" fill="#8c918c"/>
+ <path d="M277 350 315 334 404 334 369 351Z" fill="#b4b9b3"/>
+ <path d="M277 354H368V386L277 384Z" fill="#a8ada8"/>
+ <path d="M278 355H366V366H278Z" fill="#d2d5d1" stroke="none"/>
+ <path d="M280 357H365 M279 371H365" fill="none" stroke="#e4e6e2" stroke-width="1.5"/>
+ <path d="M278 369H368" fill="none" stroke="#666d67" stroke-width="2"/>
+ <path d="M369 353 406 337 405 370 370 386Z" fill="#484f49"/>
+ <path d="M373 359 381 356 381 367 373 370Z" fill="#252b25"/>
+ <path d="M377 361v4 M384 354v20 M389 352v19 M395 348v20 M401 345v20" fill="none" stroke="#171f19" stroke-width="2"/>
+ <path d="M386 354v17 M391 351v17 M397 349v16" fill="none" stroke="#8d938b" stroke-width="1"/>
+ <path d="M280 379h2v2h-2Z M361 381h2v2h-2Z" fill="#353b34" stroke="none"/>
+ <path d="M257 381Q241 390 256 394Q279 401 320 395L334 392 338 385 338 382 343 382 343 388" fill="none" stroke="#3c4037" stroke-width="4"/>
+ <path d="M257 380Q247 389 258 392Q282 398 318 393L334 390 336 384" fill="none" stroke="#aeb3a5" stroke-width="1.5"/>
+ <!-- Rear of monitor, not a screen facing the viewer. -->
+ <path d="M293 333 309 327 382 331 383 341 365 347 305 346 291 342Z" fill="#3e443d"/>
+ <path d="M286 333 297 276 307 267 331 256 408 271 408 325 371 342 300 344 286 340Z" fill="#a2a6a2"/>
+ <path d="M297 276 307 268 330 257 404 272 370 286 309 276 303 280 291 337 287 336Z" fill="#d9ded9" stroke="none"/>
+ <path d="M310 274 334 261 400 274 370 284Z" fill="#eef0ed" stroke="none"/>
+ <path d="M309 278 370 287 369 339 300 340Z" fill="#a5aaa6" stroke="none"/>
+ <path d="M372 287 406 274 405 324 372 337Z" fill="#555e59"/>
+ <path d="M382 292 401 285 401 315 383 322Z" fill="#424b45"/>
+ <path d="M385 295 399 290 398 313 385 318Z" fill="#626b64" stroke="none"/>
+ <path d="M333 309H359 M333 313H359 M333 317H359 M333 321H359 M333 325H359 M333 329H359" fill="none" stroke="#747d75" stroke-width="1.4"/>
+ <path d="M309 280 299 336 M370 290 369 336" fill="none" stroke="#e2e5dd" stroke-width="2"/>
+</g>
+<g id="lettering" inkscape:groupmode="layer" inkscape:label="09 Hand traced lettering">
+ <path d="M39 100V120H71V80L92 94 108 83V109H142V96L165 108 161 120H190V113H206V104L216 113 224 109V111H250V99L270 115 298 99V75L281 58 280 80 254 95 232 81 230 96 215 96 204 92 180 72V94H159L136 96 134 82 113 80 111 84 94 100 78 52 66 70 44 51 44 101Z" fill="#242424" stroke="#121412" stroke-width="3"/>
+ <path d="M118 61 128 45 134 48 134 70Z M177 28 191 41 178 54Z M247 57 252 54 264 66 247 71Z" fill="#242424"/>
+ <use href="#mario-word"/>
+ <use href="#teaches-typing" transform="translate(6 8)" fill="#2a2021" stroke="#44233b" stroke-width="2"/>
+ <use href="#teaches-typing" fill="#7c5d28" stroke="#eed687" stroke-width="1.6"/>
+ <g fill="none" stroke-linecap="square">
+  <path d="M301 31V19H328 M313 22V70 M334 19H359 M339 23V70 M345 44H357 M340 71H360 M368 70 384 20 M380 53H390 M410 57 409 36 413 25 420 20 430 20 M431 22 437 26 M445 21V70 M470 22V70 M452 45H465 M479 19H506 M483 23V70 M490 44H502 M484 71H505 M515 63 520 70 529 73 540 68 M516 31 519 23 526 20 535 21 542 27 M519 41 536 53 M564 31V19H589 M575 22V70 M597 20 614 47 M619 49V70 M633 19H650 M637 22V70 M643 46H651L658 41 M667 19H679 M672 22V70 M685 19 692 19 714 67 M689 27V70 M716 22V53 M723 56 722 37 726 25 733 20 743 20 751 25 M745 51H755 M748 55V67" stroke="#fff0ac" stroke-width=".8"/>
+ </g>
+</g>
+</svg>

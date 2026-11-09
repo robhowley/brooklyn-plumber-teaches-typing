@@ -1,0 +1,3 @@
+import { existsSync } from 'node:fs';
+import { defineConfig } from '@playwright/test';
+export default defineConfig({testDir:'./tests/browser',outputDir:'.tmp/test-results/playwright',workers:1,use:{baseURL:'http://127.0.0.1:4173',viewport:{width:1280,height:1000},launchOptions:{executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH || process.env.CHROME_PATH || (existsSync('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome') ? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' : undefined)}},webServer:{command:'npm run preview -- --port 4173',url:'http://127.0.0.1:4173',reuseExistingServer:false}});
