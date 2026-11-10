@@ -12,6 +12,15 @@ function background(c,family,distance=0) {
   c.drawImage(image,-offset,0,WIDTH,HEIGHT);
   if(offset)c.drawImage(image,WIDTH-offset,0,WIDTH,HEIGHT);
 }
+function outdoorBackground(c,time) {
+  const image=originalImage('OUTSIDE');
+  c.drawImage(image,0,0,320,140,0,0,WIDTH,280);
+  // Footage suggests about 3 native pixels/s; at 2x that is 6 canvas pixels/s.
+  // The exact original pavement cadence is unknown, so use this conservative estimate.
+  const phase=Math.floor(mod(time*6,40));
+  for(let x=-phase;x<WIDTH;x+=40)c.drawImage(image,0,140,20,16,x,280,40,32);
+  c.drawImage(image,0,156,320,44,0,312,WIDTH,88);
+}
 export function drawScene(canvas,state={}) {
   const c=canvas?.getContext?.('2d');if(!c)return;
   if(canvas.width!==WIDTH)canvas.width=WIDTH;if(canvas.height!==HEIGHT)canvas.height=HEIGHT;
@@ -30,7 +39,7 @@ export function drawScene(canvas,state={}) {
 }
 function block(c,x,y,key) {drawOriginal(c,'OUTSIDE-brick1_1',x-20,y-16,2);targetLetter(c,key,x,y);}
 function outdoor(c,s) {
-  background(c,'OUTSIDE',s.distance);
+  outdoorBackground(c,s.time);
   const obstacles=s.travel?.obstacles||Array.from({length:4},(_,i)=>({id:s.correct+i,x:330+i*120}));
   for(const {id,x,cleared} of obstacles) {
     if(cleared||x < -30||x>675)continue;
@@ -53,7 +62,7 @@ function outdoor(c,s) {
 }
 function water(c,s) {
   // WATER is the normal scene. WCAS0001 is available through drawScreen; no invented transition.
-  background(c,'WATER',s.distance*.6);
+  background(c,'WATER');
   const performance=s.reducedMotion?.8:s.performance;
   const playerY=s.reducedMotion?230-s.correct%4*3:300-performance*59;
   drawOriginal(c,`WATER-bite000${[1,3,5][Math.floor(s.time*3)%3]}_1`,172-performance*75,playerY-100,2);

@@ -68,7 +68,8 @@ test('base, left-to-right reveal, exact final title, then direct main-menu hando
   await expect(page.locator('#enter')).toHaveCount(0);
   expect(await page.evaluate(() => document.body.classList.contains('title-screen') || document.body.classList.contains('playing'))).toBe(false);
   await expect(page.locator('#activity-outdoor')).not.toBeFocused();
-  for (const id of ['activity-underwater', 'activity-castle', 'next']) await expect(page.locator(`#${id}`)).toBeDisabled();
+  for (const id of ['activity-outdoor', 'activity-underwater', 'activity-castle', 'activity-practice']) await expect(page.locator(`#${id}`)).toBeEnabled();
+  await expect(page.locator('#next')).toBeDisabled();
   expect(errors).toEqual([]);
 });
 

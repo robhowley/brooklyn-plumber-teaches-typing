@@ -108,7 +108,13 @@ Use File, Student and Lessons menus for the recovered commands. Disabled or unim
 
 **Notice placement.** Keep the historical notice and generated alternative easy to find in File → Help. This placement is the coordinator's choice, not a separately selected user policy. Help's existing guided and custom browser routes retain their source chooser and generated alternative.
 
-**Retained differences.** Preserve deterministic original-first selection, labeled generated fallback for incompatible records, generated practice where wrapping remains unresolved, exact guided matching, gates, NEXT and retry behavior. Direct entry is a bounded flow change, not a claim of full original gameplay parity.
+**Retained differences.** Preserve deterministic original-first selection, labeled generated fallback for incompatible records, generated practice where wrapping remains unresolved, exact guided matching, NEXT and retry behavior. Direct entry is a bounded flow change, not a claim of full original gameplay parity. The 10/30-WPM activity access gates described in earlier policy were superseded by the follow-up below; historical DOS evidence remains unchanged.
+
+### D8 follow-up: unconditional activity access (user decision, 2026-11-10)
+
+**Choice.** Make all four activities available to new and existing students at every configured goal. The goal still sets pass requirements and guides the normal course route. Selecting an off-course activity does not alter saved settings/course position or fabricate earned progress. Exact guided eligibility, earned-only Next and certificates remain unchanged. This intentionally supersedes the former browser 10/30-WPM activity gates; it does not change or erase the historical DOS Help evidence that documented those gates.
+
+**Boundary.** No compatibility gate, save migration, unlock flag or fake progress is added. Access is a product decision, not a claim of DOS fidelity. Preserve existing results, pending progress and certificates.
 
 ## Historical gate status
 

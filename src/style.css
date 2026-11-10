@@ -452,3 +452,77 @@ body.main-menu-screen .main-menu-frame button:active {
   transform: none;
   box-shadow: none;
 }
+
+/* Keep student fields readable; transparent DOM controls activate the static action art. */
+.original-screen[data-family="PREFS"] .original-panel--student {
+  border: 2px solid #a848ce;
+  background: rgba(27, 4, 62, .94);
+  color: #fff4c6;
+  font: 16px/1.4 'Courier New', monospace;
+  padding: 8px;
+  overscroll-behavior: contain;
+  scrollbar-color: #e5ca54 #220443;
+}
+.original-screen[data-family="PREFS"] .original-panel--student label {
+  display: block;
+  color: #fff4c6;
+  font-size: 16px;
+  line-height: 1.35;
+}
+.original-screen[data-family="PREFS"] .original-panel--student :is(input:not([type="checkbox"]), select) {
+  min-height: 44px;
+  margin: 4px 0 10px;
+  padding: 7px 8px;
+  border: 2px inset #d4bf69;
+  border-radius: 0;
+  background: #fff4c6;
+  color: #21123d;
+  font: 16px 'Courier New', monospace;
+}
+.original-screen[data-family="PREFS"] .original-panel--student .sound {
+  display: flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 10px;
+  margin: 4px 0 10px;
+}
+.original-screen[data-family="PREFS"] .original-panel--student input[type="checkbox"] {
+  width: 22px;
+  height: 22px;
+  flex: 0 0 22px;
+  margin: 0;
+  accent-color: #0000aa;
+}
+.original-screen[data-family="PREFS"] .original-panel--student :focus-visible {
+  outline: 3px solid #ffff55;
+  outline-offset: 2px;
+}
+.original-screen[data-family="PREFS"] .original-panel--student p { margin: 4px 0 8px; }
+.student-native-actions { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
+.student-native-action {
+  position: absolute;
+  width: max(44px, var(--native-width));
+  height: max(44px, var(--native-height));
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  text-shadow: none;
+  font: 0/0 monospace;
+  outline: 0;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  pointer-events: auto;
+  touch-action: manipulation;
+}
+.student-native-action:hover,
+.student-native-action:active { background: transparent; box-shadow: none; transform: translate(-50%, -50%); }
+.student-native-action:focus-visible {
+  outline: 3px solid #ffff55;
+  outline-offset: -4px;
+  box-shadow: inset 0 0 0 2px #0000aa;
+}

@@ -1,5 +1,5 @@
 import {test,expect} from '@playwright/test';
-import {boot,custom,typeTargets,activate,enterActivity,fixture,stored,openMenu} from './helpers.js';
+import {boot,custom,typeTargets,activate,enterActivity,fixture,stored} from './helpers.js';
 
 for(const mode of ['outdoor','underwater','castle','practice'])test(`${mode}: keyboard pass, fail, retry and menu without custom advancement`,async({page},info)=>{
  const errors=[];page.on('pageerror',e=>errors.push(e.message));await boot(page);
@@ -42,10 +42,10 @@ test('guided first success survives failed retry and reload; explicit Next commi
  const p=(await stored(page)).students[0];expect(p.course.revision).toBe(1);expect(p.results).toHaveLength(2);expect(p.results[0].studentId).toBe(p.id);expect(p.results[0].courseRevision).toBe(0);
 });
 
-test('normal activity gates use editable student goal; custom bypass is explicit',async({page})=>{
- await boot(page,{data:fixture({goal:5})});await expect(page.locator('#activity-underwater')).toBeDisabled();await expect(page.locator('#activity-castle')).toBeDisabled();
- await openMenu(page,'Student');await activate(page,'#edit-student');await page.getByLabel('Activity goal').fill('10');await activate(page,'#student-form button.primary');
- await expect(page.locator('#activity-underwater')).toBeEnabled();await expect(page.locator('#activity-castle')).toBeDisabled();
- await openMenu(page,'Student');await activate(page,'#edit-student');await page.getByLabel('Activity goal').fill('30');await activate(page,'#student-form button.primary');
- await expect(page.locator('#activity-castle')).toBeEnabled();await custom(page,'castle');await expect(page.locator('#encounter-status')).toContainText('Browser practice');
+test('default-goal modes remain available while custom Castle stays off-course',async({page})=>{
+ await boot(page,{data:fixture({goal:5})});
+ await expect(page.locator('#activity-underwater')).toBeEnabled();await expect(page.locator('#activity-castle')).toBeEnabled();
+ await custom(page,'castle');await expect(page.locator('#encounter-status')).toContainText('Browser practice');
+ const p=(await stored(page)).students[0];expect(p.settings.goal).toBe(5);
+ expect(p.course).toMatchObject({group:0,goal:5,pending:null});expect(p.results).toHaveLength(0);expect(p.certificates).toHaveLength(0);
 });

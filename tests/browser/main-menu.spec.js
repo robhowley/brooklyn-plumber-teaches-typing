@@ -2,6 +2,9 @@ import {test,expect} from '@playwright/test';
 import {readFileSync} from 'node:fs';
 import {resolve} from 'node:path';
 import {boot,activate,custom,enterActivity,openMenu,fixture,stored,selectedStudent,typeTargets} from './helpers.js';
+import {advanceCourse,recordResult} from '../../src/course.js';
+import {advanceTime,createAttempt,resume,result,typeKey} from '../../src/engine.js';
+import {createStore} from '../../src/storage.js';
 
 const source=process.env.ORIGINAL_FIDELITY_SOURCE||'/Users/roberthowley/src/github.com/brooklyn-plumber-teaches-typing';
 const image=(path)=>`data:image/png;base64,${readFileSync(resolve(source,path)).toString('base64')}`;
@@ -23,6 +26,20 @@ const actions=[
 
 function details(page,name){
  return page.locator('details').filter({has:page.locator('summary').filter({hasText:new RegExp(`^${name}$`)})});
+}
+async function expectAllModesEnabled(page){
+ for(const mode of ['outdoor','underwater','castle','practice'])await expect(page.locator(`#activity-${mode}`)).toBeEnabled();
+}
+function existingCertifiedFixture(){
+ const profile=fixture({duration:3,goal:5,group:0}).students[0],date='2026-11-10T00:00:00.000Z';
+ profile.course.group=5;
+ const state=createAttempt({...profile.course,mode:'outdoor',guided:true,studentId:profile.id,courseRevision:profile.course.revision,duration:60,reducedMotion:true});
+ for(let i=0;i<48;i++){
+  typeKey(state,{key:state.text[state.lesson.records[state.cursor.recordIndex].start+state.cursor.characterIndex]});
+  resume(state);
+ }
+ advanceTime(state,60);recordResult(profile,result(state),date);advanceCourse(profile,date);
+ return createStore(profile);
 }
 async function nativeBox(page,selector){
  const target=typeof selector==='string'?page.locator(selector):selector;
@@ -217,8 +234,8 @@ test('Help browser options keep guided/custom source choices and generated alter
  await custom(page,'outdoor',{generated:true});await expect(page.locator('#source-caption')).toContainText('Generated practice, not original lesson text');
 });
 
-test('numeric shortcuts launch each enabled activity once without scoring the selection key',async({page})=>{
- await boot(page,{data:fixture({duration:3,goal:30})});
+test('numeric shortcuts launch every mode at the default goal without scoring the selection key',async({page})=>{
+ await boot(page,{data:fixture({duration:3,goal:5})});
  const modes=['outdoor','underwater','castle','practice'];
  for(let i=0;i<modes.length;i++){
   const mode=modes[i];await enterActivity(page,mode);
@@ -241,6 +258,7 @@ test('File help exposes browser-only options, unsupported commands do nothing, a
  await expect(page.locator('#help')).toBeFocused();await page.keyboard.press('ArrowDown');await expect(page.locator('#keyboard')).toBeFocused();
  await page.keyboard.press('ArrowUp');await expect(page.locator('#help')).toBeFocused();await page.keyboard.press('Enter');await expect(page.locator('#screen-art')).toHaveAttribute('aria-label','Original HELP background');
  await expect(page.locator('#storage-status')).toBeVisible();await expect(page.locator('#guided')).toBeVisible();await expect(page.locator('#custom')).toBeVisible();
+ await expect(page.locator('.archive-page')).toContainText('All four activities are available at every configured goal; the goal still sets the speed required to pass.');
  await page.screenshot({path:info.outputPath('menu-help.png'),fullPage:true});
  await activate(page,'#custom');await expect(page.getByRole('heading',{name:'Browser custom practice',exact:true})).toBeVisible();await activate(page,'#back');
  await page.keyboard.press('Escape');await page.keyboard.press('F2');await expect(page.locator('#screen-art')).toHaveAttribute('aria-label','Original KEYBOARD background');await activate(page,'#back');
@@ -260,7 +278,7 @@ test('File help exposes browser-only options, unsupported commands do nothing, a
 
 test('named, long and Unicode student greetings preserve names and match the video reference',async({page},info)=>{
  await boot(page,{data:fixture()});
- async function rename(name){await page.locator('summary').filter({hasText:/^Student$/}).click();await page.locator('#edit-student').click();await page.getByLabel('Name',{exact:true}).fill(name);await activate(page,'#student-form button.primary');expect((await selectedStudent(page)).name).toBe(name);await page.keyboard.press('Escape');}
+ async function rename(name){await page.locator('summary').filter({hasText:/^Student$/}).click();await page.locator('#edit-student').click();await page.getByLabel('Name',{exact:true}).fill(name);await activate(page,'#student-done');expect((await selectedStudent(page)).name).toBe(name);await page.keyboard.press('Escape');}
  await rename('Alex');await page.screenshot({path:info.outputPath('main-menu-named-greeting.png'),fullPage:true});
  const {actual,reference}=await redGreetingBounds(page,references.named);
  expect(actual.count).toBeGreaterThan(30);expect(reference.count).toBeGreaterThan(30);
@@ -273,15 +291,57 @@ test('named, long and Unicode student greetings preserve names and match the vid
  await page.reload();await activate(page,'#skip-title');expect((await selectedStudent(page)).name).toBe('Élodie Ω');
 });
 
-for(const goal of [9,10,29,30])test(`activity gates honor ${goal} WPM boundary`,async({page})=>{
+for(const goal of [5,9,10,29,30])test(`all four activities stay available at ${goal} WPM`,async({page})=>{
  await boot(page,{data:fixture({goal})});
- await expect(page.locator('#activity-outdoor')).toBeEnabled();await expect(page.locator('#activity-practice')).toBeEnabled();
- if(goal>=10)await expect(page.locator('#activity-underwater')).toBeEnabled();else await expect(page.locator('#activity-underwater')).toBeDisabled();
- if(goal>=30)await expect(page.locator('#activity-castle')).toBeEnabled();else await expect(page.locator('#activity-castle')).toBeDisabled();
+ await expectAllModesEnabled(page);
 });
 
-test('activity tile edge clicks launch once, focus gameplay and preserve original-first fallbacks',async({page},info)=>{
- await boot(page,{data:fixture({goal:30})});
+test('fresh and newly created students can access every mode at the default goal',async({page})=>{
+ await boot(page,{data:null});
+ const fresh=await selectedStudent(page);
+ expect(fresh.name).toBe('Player');expect(fresh.settings).toMatchObject({goal:5,group:0});
+ expect(fresh.course).toMatchObject({group:0,goal:5,revision:0,pending:null,graduated:false});
+ expect(fresh.results).toEqual([]);expect(fresh.certificates).toEqual([]);
+ await expectAllModesEnabled(page);await expect(page.locator('#next')).toBeDisabled();
+ await page.reload();await page.locator('#skip-title').click();
+ expect(await selectedStudent(page)).toEqual(fresh);await expectAllModesEnabled(page);
+
+ await openMenu(page,'Student');await activate(page,'#new-student');
+ await expect(page.getByLabel('Activity goal')).toHaveValue('5');
+ await page.getByLabel('Name',{exact:true}).fill('Grace');await activate(page,'#student-done');
+ const created=await selectedStudent(page);
+ expect(created.name).toBe('Grace');expect(created.settings).toMatchObject({goal:5,group:0});
+ expect(created.course).toMatchObject({group:0,goal:5,revision:0,pending:null,graduated:false});
+ expect(created.results).toEqual([]);expect(created.certificates).toEqual([]);
+ await expectAllModesEnabled(page);await expect(page.locator('#next')).toBeDisabled();
+ await page.reload();await page.locator('#skip-title').click();
+ expect(await selectedStudent(page)).toEqual(created);await expectAllModesEnabled(page);
+});
+
+test('existing saved students keep earned records while an off-course pass stays off-course',async({page})=>{
+ await boot(page,{data:existingCertifiedFixture()});
+ const before=await selectedStudent(page);
+ expect(before.settings).toMatchObject({goal:5,group:0});
+ expect(before.course).toMatchObject({group:0,goal:10,revision:1,pending:null});
+ expect(before.results).toHaveLength(1);expect(before.certificates.map(c=>c.kind)).toEqual(['outdoor']);
+ await expectAllModesEnabled(page);await expect(page.locator('#next')).toBeDisabled();
+ await page.reload();await page.locator('#skip-title').click();
+ expect(await selectedStudent(page)).toEqual(before);await expectAllModesEnabled(page);
+
+ await enterActivity(page,'underwater','pointer');
+ await expect(page.locator('#encounter-status')).toContainText('Browser practice');
+ await typeTargets(page,12);await page.clock.runFor(3100);
+ const after=await selectedStudent(page),offCourse=after.results.at(-1);
+ expect(offCourse).toMatchObject({mode:'underwater',group:0,goal:5,guided:false,passed:true});
+ expect(after.settings).toEqual(before.settings);expect(after.course).toEqual(before.course);
+ expect(after.certificates).toEqual(before.certificates);expect(after.results).toHaveLength(before.results.length+1);
+ await expect(page.locator('#next')).toBeDisabled();
+ await page.reload();await page.locator('#skip-title').click();
+ expect(await selectedStudent(page)).toEqual(after);await expectAllModesEnabled(page);await expect(page.locator('#next')).toBeDisabled();
+});
+
+test('activity tile edge clicks launch once at the default goal and preserve original-first fallbacks',async({page},info)=>{
+ await boot(page,{data:fixture({goal:5})});
  for(const [selector,rect] of actions.slice(0,4)){
   const mode=selector.slice('#activity-'.length);await clickNative(page,rect[0]+.5,rect[1]+.5);
   await expect(page.locator('#scene')).toBeVisible();await expect(page.getByRole('main',{name:'Typing activity'})).toBeFocused();
@@ -305,13 +365,12 @@ test('practice starts with its generated fallback and retry keeps the same sourc
  expect(student.results).toHaveLength(2);expect(student.results[1]).toMatchObject({guided:false,label:'Generated practice, not original lesson text'});expect(student.course).toEqual(course);
 });
 
-test('focused activity buttons use native Enter and Space activation without scoring either key',async({page})=>{
- await boot(page,{data:fixture({goal:30})});
- for(const [mode,key] of [['outdoor','Enter'],['practice','Space']]){
+test('underwater and castle activate with Enter and Space at the default goal',async({page})=>{
+ await boot(page,{data:fixture({goal:5})});
+ for(const [mode,key] of [['underwater','Enter'],['castle','Space']]){
   await page.locator(`#activity-${mode}`).focus();await page.keyboard.press(key);
   await expect(page.locator('#scene')).toBeVisible();await expect(page.getByRole('main',{name:'Typing activity'})).toBeFocused();
   await expect(page.locator('#correct')).toHaveText('0');await expect(page.locator('#errors')).toHaveText('0');
-  if(mode==='practice')await expect(page.locator('#source-caption')).toContainText('Generated practice, not original lesson text');
   await page.keyboard.press('Escape');await activate(page,'#leave');
  }
 });

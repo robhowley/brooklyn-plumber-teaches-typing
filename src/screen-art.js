@@ -3,6 +3,12 @@ import { drawMenuText, drawOriginal, originalImage } from './assets/original/ind
 
 // Native 320x200 coordinates for accessible DOM overlays. These are browser layout
 // choices, not recovered widget bounds. Controls may flow below the art at narrow widths.
+// Source art: PREFS DONE [272,178,314,195); LOAD CANCEL [180,157,236,174).
+// Cancel placement and 44px DOM hit areas are browser adaptations, not recovered states.
+export const STUDENT_ACTIONS = Object.freeze({
+  cancel: { center: [236,186.5], size: [56,17], art: [208,178,264,195] },
+  done: { center: [293,186.5], size: [42,17], art: [272,178,314,195] },
+});
 export const SCREEN_LAYOUTS = Object.freeze({
   LOGO: { panel: [0,0,320,200] },
   GREET: { panel: [120,0,195,60] }, GREETBG: { panel: [16,16,288,168] },
@@ -89,7 +95,7 @@ export function drawMenuScreen(canvas, view = {}) {
     }
   }
   for (const [id, rect] of Object.entries(view.activityBounds ?? {})) {
-    if (id === view.focusedId && !view.disabledActivities?.[id] && view.hasFocus !== false) {
+    if (id === view.focusedId && view.hasFocus !== false) {
       const [left, top, right, bottom] = rect;
       context.strokeStyle = menuColors.yellow;
       context.lineWidth = 1;
@@ -98,7 +104,14 @@ export function drawMenuScreen(canvas, view = {}) {
   }
   return SCREEN_LAYOUTS.MAINMENU;
 }
-export function drawStudentScreen(canvas) { return drawScreen(canvas, 'PREFS'); }
+export function drawStudentScreen(canvas) {
+  drawScreen(canvas, 'PREFS');
+  const context = canvas.getContext('2d');
+  const [left, top, right, bottom] = STUDENT_ACTIONS.cancel.art;
+  context.imageSmoothingEnabled = false;
+  context.drawImage(originalImage('LOAD'), 180,157,56,17, left,top,right-left,bottom-top);
+  return SCREEN_LAYOUTS.PREFS;
+}
 export function drawResultsScreen(canvas) { return drawScreen(canvas, 'BLACKBRD'); }
 export function drawReportScreen(canvas) { return drawScreen(canvas, 'RCARD'); }
 export function drawPortrait(canvas, character) {

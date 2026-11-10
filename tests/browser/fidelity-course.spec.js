@@ -47,7 +47,7 @@ for(const motion of ['no-preference','reduce'])test(`fresh full guided course, e
  test.setTimeout(65000);
  const route=[];const errors=[];page.on('pageerror',e=>errors.push(e.message));
  await boot(page,{data:null,motion});await snapshot(page,`${motion}-menu`);
- await openMenu(page,'Student');await activate(page,'#new-student');await snapshot(page,`${motion}-new`);await page.getByLabel('Name',{exact:true}).fill(`Course ${motion}`);await page.getByLabel('Character').selectOption('Mario');await activate(page,'#student-form button.primary');
+ await openMenu(page,'Student');await activate(page,'#new-student');await snapshot(page,`${motion}-new`);await page.getByLabel('Name',{exact:true}).fill(`Course ${motion}`);await page.getByLabel('Character').selectOption('Mario');await activate(page,'#student-done');
  expect((await student(page)).course).toMatchObject({goal:5,group:0,revision:0,pending:null,graduated:false});
  await times(page,motion);
  for(const [id,name] of [['help','help'],['keyboard','keyboard']]){await openMenu(page,'File');await activate(page,`#${id}`);await snapshot(page,`${motion}-${name}`);await activate(page,'#back');}
@@ -56,7 +56,7 @@ for(const motion of ['no-preference','reduce'])test(`fresh full guided course, e
  for(let step=0;step<32;step++){
   const before=await student(page);if(before.course.graduated)break;
   const {goal,group,revision}=before.course;const mode=goal<10?'outdoor':goal<30?'underwater':'castle';
-  if(group===0){await openMenu(page,'Student');await activate(page,'#edit-student');await page.getByLabel('Character').selectOption(mode==='outdoor'?'Mario':mode==='underwater'?'Luigi':'Princess');await snapshot(page,`${motion}-edit-${mode}`);await activate(page,'#student-form button.primary');await reload(page);}
+  if(group===0){await openMenu(page,'Student');await activate(page,'#edit-student');await page.getByLabel('Character').selectOption(mode==='outdoor'?'Mario':mode==='underwater'?'Luigi':'Princess');await snapshot(page,`${motion}-edit-${mode}`);await activate(page,'#student-done');await reload(page);}
   await guided(page);await snapshot(page,`${motion}-${mode}-${goal}-${group}-activity`);
   await paced(page,goal,mode);await snapshot(page,`${motion}-${mode}-${goal}-${group}-result`);
   let earned=await student(page);route.push({goal,group,revision,result:earned.results.at(-1),pending:earned.course.pending});
@@ -95,8 +95,8 @@ test('normal outdoor missed target returns without a penalty and accepts one buf
 
 test('student strings stay literal DOM text through edit, load and reload',async({page})=>{
  await boot(page,{data:null});await openMenu(page,'Student');await activate(page,'#new-student');
- const name='<img src=x onerror=1>';await page.getByLabel('Name',{exact:true}).fill(name);await activate(page,'#student-form button.primary');
+ const name='<img src=x onerror=1>';await page.getByLabel('Name',{exact:true}).fill(name);await activate(page,'#student-done');
  expect((await student(page)).name).toBe(name);await expect(page.locator('img')).toHaveCount(0);
- await openMenu(page,'Student');await activate(page,'#edit-student');await expect(page.getByLabel('Name',{exact:true})).toHaveValue(name);await activate(page,'#student-form button.primary');
+ await openMenu(page,'Student');await activate(page,'#edit-student');await expect(page.getByLabel('Name',{exact:true})).toHaveValue(name);await activate(page,'#student-done');
  await openMenu(page,'Student');await activate(page,'#load-student');await expect(page.locator('select[name=student]')).toContainText(name);await activate(page,'#load-form button.primary');await reload(page);expect((await student(page)).name).toBe(name);await expect(page.locator('img')).toHaveCount(0);
 });

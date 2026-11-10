@@ -12,7 +12,7 @@ The source and browser changes are integrated in the current worktree. From star
 
 Normal activities 1–4 now use a user-selected hard cutover to original-first gameplay after an approximately 200 ms outgoing-menu fade. Reduced motion skips it. There is no normal-entry source chooser, loading screen or black hold. File → Help carries the historical notice and explains the generated route; Help's guided/custom browser options retain their source chooser and generated alternative. Labeled fallback records and generated practice remain unchanged. This bounded flow change does not claim full original gameplay parity.
 
-Browser coverage updates normal-entry callers and checks pointer, numeric, Enter and Space activation; focus, unscored activation and transition input, exactly-once results, transition clock timing, blur/hidden cancellation with clean restart, retry, course matching, gates and NEXT. The preceding menu-phase counts are historical, not validation of this change.
+Browser coverage updates normal-entry callers and checks pointer, numeric, Enter and Space activation; focus, unscored activation and transition input, exactly-once results, transition clock timing, blur/hidden cancellation with clean restart, retry, course matching, the then-current access gates and NEXT. Those 10/30-WPM menu gates were later superseded by unconditional activity access; their mention here is historical, not current behavior.
 
 - Integration checks: source-backed `LESSON_RESEARCH_ROOT=$PWD/research/executable-1992 ORIGINAL_FIDELITY_SOURCE=$PWD node --test tests/*.test.js` passed **61/61, zero skips**. Log: `.pi/structured-returns/6e8f48fa-b924-4ba9-a596-50a1048cb795.combined.log`.
 - Private `vite build --outDir .tmp/level-entry-integrated-dist` succeeded with the large-chunk warning. Build log: `.pi/structured-returns/6aaa256a-e650-4aae-b20c-581f6b3777d2.combined.log`.
@@ -34,7 +34,9 @@ Browser coverage updates normal-entry callers and checks pointer, numeric, Enter
 - Exact source/dependency hashes (22 files), build hashes, source status, archive identity and record-level selector coverage: [final bundle-audit.json](../.tmp/fidelity-validation/phase6-final/bundle-audit.json). Re-run the retained repository-owned audit with `FIDELITY_AUDIT_OUTPUT=.tmp/fidelity-validation/phase6-final/bundle-audit.json node .tmp/fidelity-validation/audit-bundle.mjs`. The earlier root audit remains intact.
 - Source-backed corpus/art recheck: **21 passed, zero failures/skips**. Log: `.pi/structured-returns/093c1f3a-37d6-4970-9823-51deed5cf838.combined.log`. No archive program, archive script or audio was executed.
 
-### Production artifact inventory
+### Production artifact inventory at the Phase 6 checkpoint
+
+The following table records that checkpoint's four-file build. The later three-fix preview build has a separate six-file HTTP identity record under `.tmp/three-fixes-integration/preview-identity.txt`.
 
 | Artifact | Bytes | SHA-256 |
 |---|---:|---|
@@ -83,7 +85,13 @@ Derived from `LESSON_COVERAGE` in `src/lessons.js`, not inferred from file names
 - Stages 1–5 advance key group. At stage 6, achieved WPM raises goal by +2 capped at 10 outdoors, +5 capped at 30 in water, and +5 capped at the browser's 50-WPM assessment in castle. World changes reset to home row; same-world increases retain all-keyboard. Transition awards occur on Next; the eligible goal-50 castle assessment awards graduation once.
 - Save v2 (`typing-kingdom-v2`) supports non-destructive New/Load/Edit local student slots. Migration preserves v1 bytes and read-only results/awards, archives the old course position, and starts fresh at 5 WPM/home row. Rankings stay separate; corrupt/unavailable storage is not overwritten and session-only/recovery status is visible.
 - **G3** retains the precise generated gaps above; raw controls are separate from learner text. **G4** lacks browser hazard-state/terminal mapping: all early deaths remain disabled. Results expose timeout reason and actual active elapsed time separately from configured limit.
-- Scrolling/contact, explicit pause/resume, reduced motion, custom/practice isolation, welcome→menu and 10/30-WPM guided activity gates remain browser choices. Default limits are 120/300/300/600 active seconds; overrides are supported.
+- Scrolling/contact, explicit pause/resume, reduced motion and custom/practice isolation remain browser choices. The current flow is direct TITLE→MAINMENU, then normal original-first level entry with an approximately 200 ms fade. All four activities are available to new and existing students at every configured goal. The goal still controls guided course routing and pass requirements; an off-course result remains ineligible. Default limits are 120/300/300/600 active seconds; overrides are supported.
+
+### Current access, renderer and student-control decisions
+
+- All four activities are accessible for new and existing students at every configured goal. This explicitly supersedes the former browser 10/30-WPM menu gates; DOS Help's historical gate evidence is preserved. Access changes no saved goal, key group, course position, results, pending progress or certificates. Only an exact matching guided result earns course progress or certificates; Next stays earned-only.
+- OUTSIDE draws fixed sky `(0,0,320,140)` and soil `(0,156,320,44)`, repeating only pavement `(0,140,20,16)` every 40 canvas pixels. Rectangles are `(x,y,width,height)`. The 3-native-pixel/s cadence (6 canvas px/s at 2× scale) is an estimate from footage, not original timing. WATER is fixed; Castle, Practice, gameplay movement and metrics are unchanged.
+- PREFS Done is the existing static artwork. The unchanged LOAD Cancel crop `[180,157,236,174)` is placed at `[208,178,264,195)` as a browser adaptation. Transparent semantic controls provide form submit/cancel, visible focus and at least 44 CSS-pixel targets. Exact original hit bounds, pressed states and timing are not claimed.
 
 ### Reproduce and complete the evidence
 
@@ -107,6 +115,13 @@ The source-backed tests need the retained ignored research directory; omit those
 - Visual regression evidence includes 390px, 720px (200%-equivalent reflow, not native browser zoom) and 1280px practice, time controls, results/status, student/load/help/report and HUD captures. Component bounds, original panel percentages and nonblank DOM are asserted. Times and result panels scroll to retain readable text rather than shrink it; controls remain keyboard reachable.
 - Focused interactive controls ignore all typing attempts while preserving native Space/Enter activation. Start, resume and closing keyboard help focus the typing surface. Practice DOM occupies its recovered white panel; results occupy the blackboard; time/student/help/report/certificate content occupies its corresponding panel. No raster/corpus/model rewrite.
 - Pre-fix acceptance evidence is preserved in `acceptance-before-visual-fixes/`; the original root audit and `visual-review/` remain intact. `phase6-first-full/` retains the first complete integration run before the final time-control layout adjustment. Independent Phase 6 reviews subsequently passed; see the [final D1–D8 automated review](FIDELITY-DECISIONS.md#final-automated-review-2026-11-10).
+
+### Three-fix integration, 2026-11-10
+
+- Source-backed `ORIGINAL_FIDELITY_SOURCE=$PWD LESSON_RESEARCH_ROOT=$PWD/research/executable-1992 node --test tests/*.test.js`: **63 passed**. Private Vite build `.tmp/three-fixes-integration/dist`: passed.
+- Full production-browser suite on port **43814**, serving that private build: **105 passed, 0 failures, 0 errors, 0 skips**. JUnit: `.tmp/three-fixes-integration/browser-junit.xml` (105 testcase elements). Source-backed captures: `.tmp/three-fixes-integration/evidence/screenshots/`.
+- Inspected outdoor sky/soil across the old wrap, fixed WATER, and student-form captures at 390/720/1280px plus visible focus. These are automated Chromium captures and agent inspection, not human visual or accessibility approval.
+- After checks, `bash scripts/restart-preview.sh` rebuilt local `dist/` and restarted preview at 4173. PID **52978** runs this repository's Vite preview. HTTP index and all five asset files return 200 and byte-match `dist/`; hashes are retained in `.tmp/three-fixes-integration/preview-identity.txt`.
 
 ### Human review record
 

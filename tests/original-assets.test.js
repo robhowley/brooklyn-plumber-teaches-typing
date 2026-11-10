@@ -6,7 +6,7 @@ import { resolve } from 'node:path';
 import rasters from '../src/assets/original/rasters.json' with {type:'json'};
 import provenance from '../src/assets/original/provenance.json' with {type:'json'};
 import { originalImage, actionImage, practiceFace } from '../src/assets/original/index.js';
-import { drawScreen, SCREEN_LAYOUTS } from '../src/screen-art.js';
+import { drawScreen, drawStudentScreen, SCREEN_LAYOUTS, STUDENT_ACTIONS } from '../src/screen-art.js';
 import { drawScene } from '../src/scene.js';
 import { createAttempt } from '../src/engine.js';
 const hash=b=>createHash('sha256').update(b).digest('hex');
@@ -27,6 +27,15 @@ test('all 20 native backgrounds have explicit overlay placements and draw throug
   assert.equal(calls.at(-1)[0],'drawImage');assert.equal(calls.at(-1)[1],originalImage(family));
  }
  assert.throws(()=>drawScreen(canvas(),'LOADING'),RangeError);
+});
+test('student controls reuse the static PREFS Done and LOAD Cancel artwork',()=>{
+ calls.length=0;const c=canvas();
+ assert.equal(drawStudentScreen(c),SCREEN_LAYOUTS.PREFS);assert.equal(c.width,320);assert.equal(c.height,200);
+ const draws=calls.filter(call=>call[0]==='drawImage');
+ assert.equal(draws.length,2);assert.equal(draws[0][1],originalImage('PREFS'));
+ assert.deepEqual(draws[1].slice(1),[originalImage('LOAD'),180,157,56,17,208,178,56,17]);
+ assert.deepEqual(STUDENT_ACTIONS.cancel.center,[236,186.5]);assert.deepEqual(STUDENT_ACTIONS.cancel.size,[56,17]);
+ assert.deepEqual(STUDENT_ACTIONS.done.center,[293,186.5]);assert.deepEqual(STUDENT_ACTIONS.done.size,[42,17]);
 });
 test('every selected raster has intact hashes, bounded pixels and static-only provenance',()=>{
  assert.equal(provenance.records.length,Object.keys(rasters).length);

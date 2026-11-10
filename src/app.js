@@ -4,7 +4,7 @@ import { RULESET, MODES, KEY_GROUPS, createAttempt, stats, advanceTime, pause, r
 import { loadStore, currentStudent, createStudent, selectStudent, editStudent, saveStore } from './storage.js';
 import { selectLesson, HISTORICAL_NOTICE } from './lessons.js';
 import { drawScene } from './scene.js';
-import { drawMenuScreen, drawScreen, menuGeometry, MENU_TRIGGERS, SCREEN_LAYOUTS } from './screen-art.js';
+import { drawMenuScreen, drawScreen, drawStudentScreen, menuGeometry, MENU_TRIGGERS, SCREEN_LAYOUTS, STUDENT_ACTIONS } from './screen-art.js';
 import { gloveMarkup, updateGloves } from './glove-hud.js';
 import { drawTitleIllustration } from './title-art.js';
 
@@ -48,7 +48,8 @@ function shell(content) {
 function page(name, family, title, body) {
   screen = name; attempt = null;
   shell(`<main class="archive-page" aria-labelledby="page-title"><div class="archive-illustration"><canvas id="screen-art" role="img" aria-label="Original ${family} background"></canvas><p class="fine">Original static ${family} artwork. Browser controls and layout.</p></div><section class="archive-controls"><h1 id="page-title">${title}</h1>${body}</section></main>`);
-  drawScreen(document.querySelector('#screen-art'), family);
+  const screenArt = document.querySelector('#screen-art');
+  if (name === 'student') drawStudentScreen(screenArt); else drawScreen(screenArt, family);
   if (['PREFS','LOAD','LESSTIME','HELP','BLACKBRD','RCARD','CERTIF','GREETBG'].includes(family)) {
     const illustration = document.querySelector('.archive-illustration');
     const controls = document.querySelector('.archive-controls');
@@ -57,7 +58,7 @@ function page(name, family, title, body) {
     composition.className = 'original-screen';
     composition.dataset.family = family;
     const panel = document.createElement('section');
-    panel.className = `original-panel${family === 'BLACKBRD' ? ' original-panel--chalk' : ''}`;
+    panel.className = `original-panel${family === 'BLACKBRD' ? ' original-panel--chalk' : ''}${name === 'student' ? ' original-panel--student' : ''}`;
     panel.setAttribute('aria-label', title);
     panel.tabIndex = 0;
     panel.style.cssText = panelPosition(family);
@@ -65,6 +66,15 @@ function page(name, family, title, body) {
     composition.append(art, panel);
     for (const child of [...controls.children]) {
       if (!child.matches('h1,button,.result-actions')) panel.append(child);
+    }
+    if (name === 'student') {
+      const actions = panel.querySelector('.student-native-actions');
+      for (const [id, action] of Object.entries(STUDENT_ACTIONS)) {
+        const button = actions.querySelector(id === 'done' ? '#student-done' : '#back');
+        const [x, y] = action.center, [width, height] = action.size;
+        button.style.cssText = `left:${x/320*100}%;top:${y/200*100}%;--native-width:${width/320*100}cqw;--native-height:${height/320*100}cqw`;
+      }
+      composition.append(actions);
     }
     document.querySelector('.archive-page').classList.add('archive-page--overlay');
     illustration.querySelector('.fine').textContent = `Original static ${family} artwork with browser DOM in its panel. Scroll the panel for more; Tab reaches every control.`;
@@ -207,19 +217,10 @@ function nativeStyle([left, top, right, bottom], parent = [0,0,320,200]) {
   return `left:${(left-parentLeft)/(parentRight-parentLeft)*100}%;top:${(top-parentTop)/(parentBottom-parentTop)*100}%;width:${(right-left)/(parentRight-parentLeft)*100}%;height:${(bottom-top)/(parentBottom-parentTop)*100}%`;
 }
 function drawMenu(entries) {
-  const goal = profile.settings.goal;
-  const disabledActivities = {
-    'activity-outdoor':false,
-    'activity-underwater':goal < 10,
-    'activity-castle':goal < 30,
-    'activity-practice':false,
-    report:false,
-    next:!profile.course.pending,
-  };
   drawMenuScreen(document.querySelector('#screen-art'), {
     studentName:profile.name, menus:entries, openMenu:menuState.open, selectedMenu:menuState.selected,
     selectedRowId:menuState.selectedRowId, focusedId:menuState.hasFocus ? document.activeElement?.id : null,
-    hasFocus:menuState.hasFocus, activityBounds:ACTIVITY_BOUNDS, disabledActivities,
+    hasFocus:menuState.hasFocus, activityBounds:ACTIVITY_BOUNDS,
   });
 }
 function menuCommand(group, id) {
@@ -266,10 +267,8 @@ function menu() {
   }).join('');
   const goal = profile.settings.goal;
   const activities = Object.entries(MODES).map(([mode, activity], index) => {
-    const id = `activity-${mode}`, disabled = mode === 'underwater' && goal < 10 || mode === 'castle' && goal < 30;
-    const reason = mode === 'underwater' ? 'Requires a student goal of at least 10 WPM.' : 'Requires a student goal of at least 30 WPM.';
-    const label = `${index + 1}. ${activity.name}${disabled ? `. Disabled. ${reason}` : ''}`;
-    return `<button type="button" id="${id}" class="menu-hit" aria-label="${html(label)}" ${disabled?'disabled':''} style="${nativeStyle(ACTIVITY_BOUNDS[id])}"></button>`;
+    const id = `activity-${mode}`, label = `${index + 1}. ${activity.name}`;
+    return `<button type="button" id="${id}" class="menu-hit" aria-label="${html(label)}" style="${nativeStyle(ACTIVITY_BOUNDS[id])}"></button>`;
   }).join('');
   const nextLabel = profile.course.pending ? '6. Next lesson. Commits earned progress once.' : '6. Next lesson. Disabled until successful guided progress is earned.';
   root.innerHTML = `<main class="main-menu-frame" aria-label="Mario Teaches Typing main menu"><h1 class="visually-hidden">Main menu</h1><canvas id="screen-art" width="320" height="200" role="img" aria-label="Original MAINMENU background"></canvas><p class="visually-hidden">${html(profile.name)} · ${profile.character} · Activity goal ${goal} WPM. ${html(pendingText())}</p>${menus}${activities}<button type="button" id="report" class="menu-hit" aria-label="5. Report card and certificates" style="${nativeStyle(ACTIVITY_BOUNDS.report)}"></button><button type="button" id="next" class="menu-hit" aria-label="${html(nextLabel)}" ${profile.course.pending?'':'disabled'} style="${nativeStyle(ACTIVITY_BOUNDS.next)}"></button></main>`;
@@ -394,7 +393,7 @@ function menu() {
   announcement.textContent = `Main menu for ${profile.name}.`;
 }
 function studentForm(isNew) {
-  page('student', 'PREFS', isNew?'New student':'Edit student', `<form id="student-form"><label>Name<input name="name" maxlength="24" required value="${isNew?'':html(profile.name)}"></label><label>Character<select name="character">${['Mario','Luigi','Princess'].map(c=>`<option ${!isNew&&c===profile.character?'selected':''}>${c}</option>`).join('')}</select></label><label>Activity goal · WPM<input name="goal" type="number" min="1" max="150" step="1" required value="${isNew?5:profile.settings.goal}"></label><label>Activity key group<select name="group">${KEY_GROUPS.map((g,i)=>`<option value="${i}" ${!isNew&&i===profile.settings.group?'selected':''}>${g.name}</option>`).join('')}</select></label><label class="sound"><input name="sound" type="checkbox" ${!isNew&&profile.settings.sound?'checked':''}> Synthetic sound effects (no archive audio)</label><p>Activity settings do not change your earned guided course position.</p><button class="primary" type="submit">${isNew?'Create student':'Save student'}</button><button id="back" type="button">Cancel</button></form>`);
+  page('student', 'PREFS', isNew?'New student':'Edit student', `<form id="student-form"><label>Name<input name="name" maxlength="24" required value="${isNew?'':html(profile.name)}"></label><label>Character<select name="character">${['Mario','Luigi','Princess'].map(c=>`<option ${!isNew&&c===profile.character?'selected':''}>${c}</option>`).join('')}</select></label><label>Activity goal · WPM<input name="goal" type="number" min="1" max="150" step="1" required value="${isNew?5:profile.settings.goal}"></label><label>Activity key group<select name="group">${KEY_GROUPS.map((g,i)=>`<option value="${i}" ${!isNew&&i===profile.settings.group?'selected':''}>${g.name}</option>`).join('')}</select></label><label class="sound"><input name="sound" type="checkbox" ${!isNew&&profile.settings.sound?'checked':''}> Synthetic sound effects (no archive audio)</label><p>Activity settings do not change your earned guided course position.</p></form><div class="student-native-actions"><button id="student-done" class="student-native-action" type="submit" form="student-form" aria-label="${isNew?'Create student':'Save student'}">Done</button><button id="back" class="student-native-action" type="button" aria-label="Cancel">Cancel</button></div>`);
   document.querySelector('#student-form').onsubmit=e=>{
     e.preventDefault(); const data=new FormData(e.target), name=data.get('name').trim();
     if (!name) { e.target.elements.name.setCustomValidity('Enter a name.'); e.target.elements.name.reportValidity(); return; }
@@ -437,7 +436,7 @@ function prepare(options) {
 function help(keyboard) {
   const browserOptions = keyboard ? '' : `<h2>Browser-only options</h2><p>These options are browser features, not DOS menu commands. Custom practice does not advance the guided course.</p><button id="guided" ${profile.course.graduated?'disabled':''}>Continue guided course</button><button id="custom">Browser custom practice</button>`;
   const contentChoices = keyboard ? '' : `<p class="historical-notice">${HISTORICAL_NOTICE}</p><p>Activities 1–4 start original-first. To choose generated practice instead, select Continue guided course or Browser custom practice here, then choose Use generated alternative. Original-first lessons still use labeled generated practice when a record needs keys outside the selected group or practice wrapping is unresolved.</p>`;
-  page('help', keyboard?'KEYBOARD':'HELP', keyboard?'Keyboard guide':'Instructions', `<p>File, Student and Lessons are the main menus. Use Left/Right to move between them, Up/Down to select enabled rows, Enter to activate, and Escape or a click outside to close. Tab and Shift+Tab move through controls. Keys 1–6 select activities, Report and an earned Next when no menu is open. W/L/E open New/Load/Edit, F1 opens Instructions, F2 opens Keyboard, and C opens Certificates.</p><p>About, Demo, Music, Sound F/X, Speech and Quit are visible File commands but are not implemented. Water requires a student goal of at least 10 WPM; Castle requires at least 30 WPM. Next stays disabled until successful guided progress is earned.</p>${contentChoices}<p>Storage: ${storageMessage()}. Each local student keeps separate settings, results and certificates. Recovery mode will not overwrite unreadable saved data.</p>${browserOptions}<p>Type the displayed target. Wrong keys add errors without moving it. Outdoors, ASCII upper and lowercase letters match without Shift. Other activities require exact case, punctuation and spaces. Non-ASCII, repeated keys and modified shortcuts are ignored.</p><p>Outdoor keys may wait for contact and count only once. Reduced motion makes targets stationary. Escape, losing focus, hidden tabs and castle pipe stops pause both input and the clock. Resume explicitly when ready.</p><p>Net-error integer WPM and integer accuracy use a browser active-clock approximation. Timeout, at least one key, goal WPM and 90% accuracy are the browser pass rule, not a verified universal original rule. No early success or deaths.</p><p>Only matching guided lessons advance. Next preserves the first earned destination, saves it once and returns to the menu. Custom and Expert Express never advance. Certificates use browser milestones, not claimed original triggers.</p><button id="back">Back to menu</button>`);
+  page('help', keyboard?'KEYBOARD':'HELP', keyboard?'Keyboard guide':'Instructions', `<p>File, Student and Lessons are the main menus. Use Left/Right to move between them, Up/Down to select enabled rows, Enter to activate, and Escape or a click outside to close. Tab and Shift+Tab move through controls. Keys 1–6 select activities, Report and an earned Next when no menu is open. W/L/E open New/Load/Edit, F1 opens Instructions, F2 opens Keyboard, and C opens Certificates.</p><p>About, Demo, Music, Sound F/X, Speech and Quit are visible File commands but are not implemented. All four activities are available at every configured goal; the goal still sets the speed required to pass. Only a pass matching the current guided mode, key group, goal and course revision earns progress or certificates. Next stays disabled until successful guided progress is earned.</p>${contentChoices}<p>Storage: ${storageMessage()}. Each local student keeps separate settings, results and certificates. Recovery mode will not overwrite unreadable saved data.</p>${browserOptions}<p>Type the displayed target. Wrong keys add errors without moving it. Outdoors, ASCII upper and lowercase letters match without Shift. Other activities require exact case, punctuation and spaces. Non-ASCII, repeated keys and modified shortcuts are ignored.</p><p>Outdoor keys may wait for contact and count only once. Reduced motion makes targets stationary. Escape, losing focus, hidden tabs and castle pipe stops pause both input and the clock. Resume explicitly when ready.</p><p>Net-error integer WPM and integer accuracy use a browser active-clock approximation. Timeout, at least one key, goal WPM and 90% accuracy are the browser pass rule, not a verified universal original rule. No early success or deaths.</p><p>Only matching guided lessons advance. Next preserves the first earned destination, saves it once and returns to the menu. Custom and Expert Express never advance. Certificates use browser milestones, not claimed original triggers.</p><button id="back">Back to menu</button>`);
   back(menu,keyboard?'#keyboard':'#help');
   if (!keyboard) {
     document.querySelector('#guided').onclick=()=>prepare({ guided:true });

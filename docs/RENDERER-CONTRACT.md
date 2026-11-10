@@ -29,6 +29,12 @@ The canvas contains scenery, characters, hazards, and outdoor letters with a gui
 
 `time` is active animation time in seconds, not wall time. Paused and finished scenes use frozen `state.elapsed`, ignoring later `time` values. Reduced motion disables ambient movement, jumping, and flying debris. Correct input still changes position, targets, and scenery; flipped turtles remain visible without flight. Menu previews can omit status/timing/counts other than `correct`; omitted counts/timing are zero and missing actions are absent.
 
+## Background layers
+
+OUTSIDE is not a seamless full-raster tile. Draw its sky source rectangle `(x=0, y=0, width=320, height=140)` and soil `(x=0, y=156, width=320, height=44)` as fixed layers, each scaled 2×. Repeat only pavement `(x=0, y=140, width=20, height=16)` at a 40-canvas-pixel period. Its phase is based on the renderer's active animation time, currently estimated at 3 native pixels per second (6 canvas pixels per second after scaling). That cadence is an estimate from recorded footage, not recovered original timing. `drawScene` derives time from active elapsed time, so it freezes during pause and is zero in reduced motion.
+
+WATER is a fixed backdrop. Do not tile or scroll the non-seamless raster. This background treatment does not change Castle or Practice, gameplay travel/obstacles, or performance calculations. `tests/browser/background-wrap.spec.js` checks real canvas pixels across both former wraps, pavement phases, underwater, pause and reduced motion.
+
 ## Progress, obstacles, and performance
 
 Outdoor obstacle index is `correct`: even targets are blocks, odd targets turtles. Active time moves obstacles and background continuously, even without input. Exact input in x=189–241 clears the current object; otherwise one exact key waits for its contact. Missed objects return with the same ID and key, without penalties. Only cleared offscreen slots receive new IDs. Correct contact supplies `lastAction` and `travel.action` for nearby effects; wrong keys leave the target unchanged but do not stop travel. The star identifies the current target. Underwater/castle also travel continuously; practice does not. Pause, hidden/blur, pipe and finished states freeze active time and travel; explicit resume never charges background time. See `SCROLLING-BEHAVIOR.md` for timing and custom-goal scaling.
