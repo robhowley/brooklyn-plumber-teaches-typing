@@ -15,8 +15,8 @@ for(const mode of ['outdoor','underwater','castle','practice'])test(`${mode}: ke
  await expect(page.locator('#retry')).toBeFocused();await page.keyboard.press('Enter');
  await page.clock.runFor(3100);await expect(page.locator('#outcome')).toContainText('No keys were typed');
  await expect(page.locator('#next')).toBeDisabled();await activate(page,'#menu');
- await expect(page.locator('#course-position')).toContainText('Home row · 5 WPM');
- const p=(await stored(page)).students[0];expect(p.results.map(r=>r.passed)).toEqual([true,false]);expect(p.course.pending).toBeNull();
+ await expect(page.locator('#screen-art')).toHaveAttribute('aria-label','Original MAINMENU background');expect(await page.evaluate(()=>document.body.classList.contains('playing'))).toBe(false);
+ const p=(await stored(page)).students[0];expect(p.course).toMatchObject({group:0,goal:5,pending:null});expect(p.results.map(r=>r.passed)).toEqual([true,false]);
  expect(errors).toEqual([]);
 });
 
@@ -27,10 +27,11 @@ test('guided first success survives failed retry and reload; explicit Next commi
  expect(first.destination.group).toBe(1);await activate(page,'#retry');await page.clock.runFor(3100);
  await expect(page.locator('#outcome')).toContainText('Not passed');await expect(page.locator('#next')).toBeEnabled();
  expect((await stored(page)).students[0].course.pending).toEqual(first);
- await page.reload();await activate(page,'#skip-title');await page.keyboard.press('Enter');await expect(page.locator('#pending')).toContainText('Add top row');
- await page.keyboard.press('6');await expect(page.locator('#course-position')).toContainText('Add top row');
+ await page.reload();await activate(page,'#skip-title');
+ let course=(await stored(page)).students[0].course;expect(course.pending.destination).toMatchObject({group:1,goal:5});
+ await page.keyboard.press('6');course=(await stored(page)).students[0].course;expect(course).toMatchObject({group:1,goal:5,revision:1,pending:null});
  await expect(page.locator('#next')).toBeDisabled();await expect(page.locator('#target')).toHaveCount(0);
- await page.keyboard.press('6');await page.reload();await activate(page,'#skip-title');await page.keyboard.press('Enter');
+ await page.keyboard.press('6');expect((await stored(page)).students[0].course).toEqual(course);await page.reload();await activate(page,'#skip-title');
  const p=(await stored(page)).students[0];expect(p.course.revision).toBe(1);expect(p.results).toHaveLength(2);expect(p.results[0].studentId).toBe(p.id);expect(p.results[0].courseRevision).toBe(0);
 });
 

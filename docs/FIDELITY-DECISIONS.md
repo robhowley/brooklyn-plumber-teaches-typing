@@ -92,6 +92,16 @@ Retain browser scrolling/contact, reduced-motion behavior, explicit pause/resume
 
 **End review: complete within automated scope**, against implementation and final review evidence.
 
+### D8 follow-up: direct title-to-main-menu handoff (user decision, 2026-11-10)
+
+**Choice.** Replace `TITLE → GREET welcome → browser menu` with `TITLE → reconstructed MAINMENU`. There is no legacy welcome option. Automatic title completion, Enter/Space skip and click skip all enter the same menu once; the completed title keeps its 800 ms browser hold. This supersedes D8's earlier welcome→menu startup order only.
+
+Recreate the DOS menu as one 320×200 composition uniformly fitted at 8:5 and centered on black. Draw the adopted MAINMENU raster unchanged, then paint the runtime bar, greeting and dropdowns on that native raster. Keep real transparent HTML buttons/disclosures over matching coordinates for pointer, keyboard and assistive technology. Do not add the cabinet, site chrome, prose, or stacked web menu. Keep title art, gameplay, saved data and their existing handlers unchanged.
+
+Use File, Student and Lessons menus for the recovered commands. Disabled or unimplemented File commands remain visible but do not act; explain browser-only options in Help. Selecting a Lessons group changes and saves only the student's activity setting. It must not start a lesson, change the goal, reset or advance the course, or clear earned pending progress. Existing browser-deferred Next remains a one-time commit and returns to MAINMENU.
+
+**Boundary.** This is an explicit user-selected interface and handoff, not evidence that the original runtime used these exact hitboxes, focus colors, shortcuts, greeting truncation or disabled treatments. Do not rewrite earlier validation entries as evidence for this decision. Record separate test and screenshot evidence for the reconstructed menu; keep the reference screenshots out of production assets.
+
 ## Historical gate status
 
 | Gate | Historical status | Approved implementation path |

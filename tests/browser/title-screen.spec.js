@@ -17,6 +17,11 @@ async function bootTitle(page, motion = 'no-preference') {
       window.pendingFrames.add(id); return id;
     };
     window.cancelAnimationFrame = id => { window.pendingFrames.delete(id); cancel(id); };
+    new MutationObserver(() => {
+      if (document.querySelector('#title-art')?.dataset.phase === 'complete' && window.titleCompleteAt === undefined) {
+        window.titleCompleteAt = performance.now();
+      }
+    }).observe(document, { attributes: true, attributeFilter: ['data-phase'], subtree: true });
   });
   await page.goto('/');
   await expect(page.locator('#title-art')).toHaveAttribute('data-phase', motion === 'reduce' ? 'complete' : 'base');
@@ -38,7 +43,7 @@ async function matchesArtwork(page, glyphCount) {
   }, { sources, glyphs: layout.glyphs, glyphCount });
 }
 
-test('base, left-to-right reveal, exact final title, then distinct accessible welcome/menu', async ({ page }, info) => {
+test('base, left-to-right reveal, exact final title, then direct main-menu handoff', async ({ page }, info) => {
   const errors = []; page.on('pageerror', e => errors.push(e.message));
   await bootTitle(page);
   await expect(page.locator('.cabinet')).toHaveCount(0);
@@ -52,25 +57,45 @@ test('base, left-to-right reveal, exact final title, then distinct accessible we
   expect(await matchesArtwork(page, 13)).toBe(true);
   expect(await page.evaluate(() => window.pendingFrames.size)).toBe(1); // Only the existing game loop remains.
   await page.screenshot({ path: info.outputPath('title-final.png') });
-  await page.clock.runFor(1000);
+  const elapsedHold = await page.evaluate(() => performance.now() - window.titleCompleteAt);
+  await page.clock.runFor(Math.max(0, 799 - elapsedHold));
+  await expect(page.locator('#title-art')).toBeVisible(); // Completed art holds for 800ms.
+  await page.clock.runFor(1);
   await expect(page.locator('#title-art')).toHaveCount(0);
-  await expect(page.locator('#screen-art')).toHaveAttribute('aria-label', 'Original GREET background');
-  await expect(page.locator('#enter')).toBeFocused();
-  await page.keyboard.press('Enter');
   await expect(page.locator('#screen-art')).toHaveAttribute('aria-label', 'Original MAINMENU background');
-  await expect(page.locator('#activity-outdoor')).toBeFocused();
+  await expect(page.locator('summary').first()).toContainText('File');
+  await expect(page.locator('summary').first()).toBeFocused();
+  await expect(page.locator('#enter')).toHaveCount(0);
+  expect(await page.evaluate(() => document.body.classList.contains('title-screen') || document.body.classList.contains('playing'))).toBe(false);
+  await expect(page.locator('#activity-outdoor')).not.toBeFocused();
   for (const id of ['activity-underwater', 'activity-castle', 'next']) await expect(page.locator(`#${id}`)).toBeDisabled();
   expect(errors).toEqual([]);
 });
 
-for (const action of ['Enter', 'Space', 'click']) test(`${action} skips immediately and cancels later handoff`, async ({ page }) => {
+for (const action of ['Enter', 'Space', 'click']) test(`${action} skips directly to the menu without launching an action`, async ({ page }) => {
   await bootTitle(page);
   if (action === 'click') await page.locator('#skip-title').click();
   else await page.keyboard.press(action);
-  await expect(page.locator('#enter')).toBeFocused();
-  await page.keyboard.press('Enter');
+  await expect(page.locator('#screen-art')).toHaveAttribute('aria-label', 'Original MAINMENU background');
+  await expect(page.locator('summary').first()).toBeFocused();
+  await expect(page.locator('details').first()).not.toHaveAttribute('open','');
+  await expect(page.locator('#activity-outdoor')).not.toBeFocused();
   await page.clock.runFor(6000);
-  await expect(page.locator('#activity-outdoor')).toBeFocused();
+  await expect(page.locator('#screen-art')).toHaveAttribute('aria-label', 'Original MAINMENU background');
+  await expect(page.locator('#target')).toHaveCount(0);
+});
+
+for (const key of ['Enter', 'Space']) test(`held ${key} used to skip cannot activate the new menu`, async ({ page }) => {
+  await bootTitle(page);
+  await page.keyboard.down(key);
+  await expect(page.locator('#screen-art')).toHaveAttribute('aria-label', 'Original MAINMENU background');
+  await expect(page.locator('summary').first()).toBeFocused();
+  await expect(page.locator('details').first()).not.toHaveAttribute('open','');
+  await page.clock.runFor(1000);
+  await expect(page.locator('#screen-art')).toHaveAttribute('aria-label', 'Original MAINMENU background');
+  await expect(page.locator('#target')).toHaveCount(0);
+  await page.keyboard.up(key);
+  await expect(page.locator('details').first()).not.toHaveAttribute('open','');
 });
 
 for (const initial of [true, false]) test(`reduced motion ${initial ? 'at startup' : 'during reveal'} completes without animation`, async ({ page }) => {
@@ -81,8 +106,11 @@ for (const initial of [true, false]) test(`reduced motion ${initial ? 'at startu
     await expect(page.locator('#title-art')).toHaveAttribute('data-phase', 'complete');
   }
   expect(await matchesArtwork(page, 13)).toBe(true);
-  await page.clock.runFor(900);
-  await expect(page.locator('#enter')).toBeFocused();
+  await page.clock.runFor(799);
+  await expect(page.locator('#title-art')).toBeVisible();
+  await page.clock.runFor(1);
+  await expect(page.locator('#screen-art')).toHaveAttribute('aria-label', 'Original MAINMENU background');
+  await expect(page.locator('summary').first()).toBeFocused();
 });
 
 for (const elapsed of [500, 4400]) test(`detachment at ${elapsed}ms cancels painting and handoff`, async ({ page }) => {
@@ -98,6 +126,7 @@ for (const elapsed of [500, 4400]) test(`detachment at ${elapsed}ms cancels pain
   await page.clock.runFor(6000);
   expect(await page.evaluate(() => window.detachedTitle.toDataURL() === window.detachedPixels)).toBe(true);
   await expect(page.locator('#enter')).toHaveCount(0);
+  await expect(page.locator('#screen-art')).toHaveCount(0);
   expect(errors).toEqual([]);
 });
 
@@ -119,7 +148,7 @@ for (const viewport of [{ width: 1280, height: 720 }, { width: 390, height: 844 
 }
 
 test('historical notice appears before any original learner text and offers generated alternative', async ({ page }) => {
-  await page.goto('/'); await page.locator('#skip-title').click(); await page.keyboard.press('Enter'); await page.keyboard.press('1');
+  await page.goto('/'); await page.locator('#skip-title').click(); await page.keyboard.press('1');
   await expect(page.locator('.historical-notice')).toContainText('outdated or inaccurate claims');
   await expect(page.locator('.historical-notice')).toContainText('war, slavery, assassination and disasters');
   await expect(page.locator('#coverage')).toContainText('records use historical text');

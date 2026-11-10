@@ -9,8 +9,8 @@ const evidence=process.env.FIDELITY_EVIDENCE||'.tmp/fidelity-validation/phase6-f
 const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
 async function snapshot(page,name){await mkdir(`${evidence}/screenshots`,{recursive:true});await page.screenshot({path:`${evidence}/screenshots/${name}.png`,fullPage:true});}
 async function student(page){const data=await stored(page);return data.students.find(p=>p.id===data.currentStudentId);}
-async function reload(page){await page.reload();await activate(page,'#skip-title');await activate(page,'#enter');}
-async function guided(page){await openMenu(page,'Lessons');await activate(page,'#guided');await expect(page.locator('.historical-notice')).toContainText('slavery');await activate(page,'#original');}
+async function reload(page){await page.reload();await activate(page,'#skip-title');await expect(page.locator('#screen-art')).toHaveAttribute('aria-label','Original MAINMENU background');}
+async function guided(page){await openMenu(page,'File');await activate(page,'#help');await activate(page,'#guided');await expect(page.locator('.historical-notice')).toContainText('slavery');await activate(page,'#original');}
 async function times(page,label='miss'){ await openMenu(page,'Student');await activate(page,'#times');for(const mode of ['outdoor','underwater','castle','practice'])await page.locator(`[name=${mode}-seconds]`).fill(mode==='outdoor'?'60':'10');await snapshot(page,`${label}-times`);await activate(page,'#times-form button.primary');}
 // Advance one callback per paced key, not thousands of rendering frames. The engine still
 // receives cumulative active time and real DOM keyboard events, including outdoor contact.
@@ -34,7 +34,7 @@ test('production HTTP bytes match the rebuilt distribution and record provenance
  const dist=resolve(process.env.FIDELITY_DIST||'dist');const files={};
  async function walk(dir){for(const item of await readdir(dir,{withFileTypes:true})){const path=resolve(dir,item.name);if(item.isDirectory())await walk(path);else{const name=relative(dist,path);const bytes=await readFile(path);const response=await request.get('/'+name);expect(response.ok()).toBeTruthy();expect(sha(await response.body()),name).toBe(sha(bytes));files[name]=sha(bytes);}}}
  const requests=[];page.on('request',request=>requests.push(request.url()));
- await walk(dist);await page.goto('/');await activate(page,'#skip-title');await snapshot(page,'welcome');
+ await walk(dist);await page.goto('/');await activate(page,'#skip-title');await snapshot(page,'main-menu');
  expect(requests.every(url=>new URL(url).origin===new URL(page.url()).origin)).toBeTruthy();
  const source={};
  async function hashSource(dir){for(const item of await readdir(dir,{withFileTypes:true})){const path=`${dir}/${item.name}`;if(item.isDirectory())await hashSource(path);else source[path]=sha(await readFile(path));}}
@@ -47,11 +47,11 @@ for(const motion of ['no-preference','reduce'])test(`fresh full guided course, e
  test.setTimeout(65000);
  const route=[];const errors=[];page.on('pageerror',e=>errors.push(e.message));
  await boot(page,{data:null,motion});await snapshot(page,`${motion}-menu`);
- await openMenu(page,'File');await activate(page,'#new-student');await snapshot(page,`${motion}-new`);await page.getByLabel('Name',{exact:true}).fill(`Course ${motion}`);await page.getByLabel('Character').selectOption('Mario');await activate(page,'#student-form button.primary');
+ await openMenu(page,'Student');await activate(page,'#new-student');await snapshot(page,`${motion}-new`);await page.getByLabel('Name',{exact:true}).fill(`Course ${motion}`);await page.getByLabel('Character').selectOption('Mario');await activate(page,'#student-form button.primary');
  expect((await student(page)).course).toMatchObject({goal:5,group:0,revision:0,pending:null,graduated:false});
  await times(page,motion);
- for(const [id,name] of [['help','help'],['keyboard','keyboard']]){await openMenu(page,'Help');await activate(page,`#${id}`);await snapshot(page,`${motion}-${name}`);await activate(page,'#back');}
- await openMenu(page,'File');await activate(page,'#load-student');await snapshot(page,`${motion}-load`);await activate(page,'#load-form button.primary');await reload(page);
+ for(const [id,name] of [['help','help'],['keyboard','keyboard']]){await openMenu(page,'File');await activate(page,`#${id}`);await snapshot(page,`${motion}-${name}`);await activate(page,'#back');}
+ await openMenu(page,'Student');await activate(page,'#load-student');await snapshot(page,`${motion}-load`);await activate(page,'#load-form button.primary');await reload(page);
  try{
  for(let step=0;step<32;step++){
   const before=await student(page);if(before.course.graduated)break;
@@ -64,7 +64,7 @@ for(const motion of ['no-preference','reduce'])test(`fresh full guided course, e
   expect(earned.course.pending).not.toBeNull();expect(earned.course.revision).toBe(revision);
   if(group===0){const pending=earned.course.pending;await activate(page,'#retry');await page.clock.fastForward((mode==='outdoor'?60000:10000)+32);await expect(page.locator('#outcome')).toContainText('Not passed');await snapshot(page,`${motion}-${mode}-failed-retry`);expect((await student(page)).course.pending).toEqual(pending);}
   await reload(page);expect((await student(page)).course.pending).toEqual(earned.course.pending);
-  await activate(page,'#next');await expect(page.getByRole('heading',{name:'Main menu',exact:true})).toBeVisible();await expect(page.locator('#next')).toBeDisabled();
+  await activate(page,'#next');await expect(page.locator('#screen-art')).toHaveAttribute('aria-label','Original MAINMENU background');await expect(page.locator('#next')).toBeDisabled();
   const committed=await student(page);expect(committed.course.revision).toBe(revision+1);expect(committed.course.pending).toBeNull();
   await page.keyboard.press('6');expect((await student(page)).course).toEqual(committed.course);
   await reload(page);expect((await student(page)).course).toEqual(committed.course);
@@ -94,9 +94,9 @@ test('normal outdoor missed target returns without a penalty and accepts one buf
 });
 
 test('student strings stay literal DOM text through edit, load and reload',async({page})=>{
- await boot(page,{data:null});await openMenu(page,'File');await activate(page,'#new-student');
+ await boot(page,{data:null});await openMenu(page,'Student');await activate(page,'#new-student');
  const name='<img src=x onerror=1>';await page.getByLabel('Name',{exact:true}).fill(name);await activate(page,'#student-form button.primary');
- await expect(page.locator('#student-summary')).toContainText(name);await expect(page.locator('#student-summary img')).toHaveCount(0);
+ expect((await student(page)).name).toBe(name);await expect(page.locator('img')).toHaveCount(0);
  await openMenu(page,'Student');await activate(page,'#edit-student');await expect(page.getByLabel('Name',{exact:true})).toHaveValue(name);await activate(page,'#student-form button.primary');
- await openMenu(page,'File');await activate(page,'#load-student');await expect(page.locator('select[name=student]')).toContainText(name);await activate(page,'#load-form button.primary');await reload(page);await expect(page.locator('#student-summary')).toContainText(name);
+ await openMenu(page,'Student');await activate(page,'#load-student');await expect(page.locator('select[name=student]')).toContainText(name);await activate(page,'#load-form button.primary');await reload(page);expect((await student(page)).name).toBe(name);await expect(page.locator('img')).toHaveCount(0);
 });

@@ -16,15 +16,17 @@ export async function boot(page,{data=fixture(),motion='reduce',clock=true}={}) 
   if(clock)await page.clock.install({time:new Date('2026-11-10T00:00:00Z')});
   await page.goto('/');
   await page.locator('#skip-title').click();
+  await expect(page.locator('#screen-art')).toHaveAttribute('aria-label','Original MAINMENU background');
+  await expect(page.locator('summary').first()).toContainText('File');
+  await expect(page.locator('summary').first()).toBeFocused();
   if(clock)await page.clock.pauseAt(new Date('2026-11-10T00:01:00Z'));
-  await expect(page.locator('#enter')).toBeFocused();await page.keyboard.press('Enter');
 }
 export async function openMenu(page,name) {
   const summary=page.locator('summary').filter({hasText:new RegExp(`^${name}$`)});
   if(await summary.locator('..').getAttribute('open')===null){await summary.focus();await page.keyboard.press('Enter');}
 }
 export async function custom(page,mode,{generated=true}={}) {
-  await openMenu(page,'Lessons');await activate(page,'#custom');
+  await openMenu(page,'File');await activate(page,'#help');await activate(page,'#custom');
   await page.getByRole('combobox',{name:'Activity',exact:true}).selectOption(mode);
   await activate(page,'#custom-form button.primary');
   await activate(page,generated?'#generated':'#original');
@@ -38,3 +40,4 @@ export async function typeTargets(page,count,{resumePipe=true,lowercase=false}={
 }
 export async function returnMenu(page) {await page.keyboard.press('Escape');await activate(page,'#leave');}
 export async function stored(page) {return page.evaluate(key=>JSON.parse(localStorage.getItem(key)),STORAGE_KEY);}
+export async function selectedStudent(page) {const data=await stored(page);return data.students.find(student=>student.id===data.currentStudentId);}

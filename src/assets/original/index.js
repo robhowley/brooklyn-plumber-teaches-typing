@@ -1,6 +1,7 @@
 // Static browser raster data, not a DOS resource reader. Rasterize once, draw many times.
 import rasters from './rasters.json' with { type: 'json' };
 const cache = new Map();
+const menuGlyphCache = new Map();
 export function originalImage(name) {
   if (!rasters[name]) throw new RangeError(`Unknown original artwork: ${name}`);
   if (!cache.has(name)) {
@@ -34,6 +35,39 @@ export function actionImage(character, action = 'run', frame = 0) {
 export function practiceFace(mood) {
   return originalImage(`PRACTICE-prac000${{sad:1,neutral:2,happy:3}[mood] || 2}_1`);
 }
+// Menu labels use the adopted glyph core in 8x8 cells. The DOM remains the accessible text owner.
+function menuGlyph(code) {
+  if (menuGlyphCache.has(code)) return menuGlyphCache.get(code);
+  const raster = rasters[`FONT7H-font7_${code}`];
+  if (!raster) return menuGlyph(63);
+  const indices = atob(raster.pixels), runs = [];
+  for (let y = 0; y < 8; y++) {
+    let start = -1;
+    for (let x = 0; x <= 8; x++) {
+      const ink = x < 8 && indices.charCodeAt((y + 1) * raster.width + x + 1) === 1;
+      if (ink && start < 0) start = x;
+      if (!ink && start >= 0) { runs.push([y, start, x - start]); start = -1; }
+    }
+  }
+  menuGlyphCache.set(code, runs);
+  return runs;
+}
+export function drawMenuText(context, text, x, y, color = '#000000') {
+  context.imageSmoothingEnabled = false;
+  context.fillStyle = color;
+  let cell = 0;
+  for (const char of String(text)) {
+    const code = char.codePointAt(0);
+    if (code !== 32) {
+      for (const [row, left, width] of menuGlyph(code >= 33 && code <= 126 ? code : 63)) {
+        context.fillRect(Math.round(x + cell * 8 + left), Math.round(y + row), width, 1);
+      }
+    }
+    cell++;
+  }
+  return cell * 8;
+}
+
 // Decorative target glyph only. The DOM remains the accessible text owner.
 export function drawOriginalGlyph(context, char, x, y, scale = 2) {
   const code = char.charCodeAt(0);

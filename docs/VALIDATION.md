@@ -1,6 +1,12 @@
 # Integration validation
 
-**All six automated implementation and verification phases are complete. Independent Phase 6 production, visual and bundle/documentation reviews pass; the coordinator's source-backed Node rerun passes all 61 tests. Human review was not performed.** This is automated implementation verification, not release approval, human-playtested status or DOS runtime validation.
+## Direct MAINMENU reconstruction follow-up, 2026-11-10
+
+The user has replaced the `TITLE → GREET welcome → browser menu` flow with a direct `TITLE → reconstructed MAINMENU` handoff. The follow-up test/documentation work adds browser-helper migration, title handoff assertions and `tests/browser/main-menu.spec.js` coverage for reference pixels, 8:5 geometry, controls, commands, settings persistence and deferred Next. It also updates the current-flow docs and records the decision after D8.
+
+The source and browser changes are integrated in the current worktree. From starting HEAD `1e8925dcab3288a49111924d24506d320cc28ea4`, source-backed Node tests passed **61/61, zero skips**; the private Vite build succeeded (one large-chunk warning). Focused title/menu Playwright passed **33/33**, then the full browser suite passed **82/82, zero skips** against `.tmp/title-menu-validation/dist` on port 4191. JUnit and command logs are `.tmp/title-menu-validation/{focused,browser}.{xml,log}`; build identity and source hashes are in `build-evidence.json`. Fresh screenshots include `.tmp/test-results/playwright/main-menu-MAINMENU-keeps-i-bd726-and-hit-regions-at-1280x720/main-menu-1280x720.png`, the File/Student/Lessons open-menu captures in the sibling dropdown test directory, the named greeting capture, and six lesson-group captures. The retained references are read from the base repository via `ORIGINAL_FIDELITY_SOURCE`; no provenance skips were accepted. Tracked `dist/` was not used or changed. Automated integration and independent visual acceptance passed; human playtesting and accessibility review remain pending.
+
+**Earlier-build record:** all six previous automated implementation and verification phases were complete. Their reports and test results describe the welcome→menu build only, not this reconstruction. They are not release approval, human-playtested status or DOS runtime validation.
 
 ## Current fidelity build, 2026-11-10
 

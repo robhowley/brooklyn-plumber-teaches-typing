@@ -4,7 +4,7 @@ import { RULESET, MODES, KEY_GROUPS, createAttempt, stats, advanceTime, pause, r
 import { loadStore, currentStudent, createStudent, selectStudent, editStudent, saveStore } from './storage.js';
 import { selectLesson, HISTORICAL_NOTICE } from './lessons.js';
 import { drawScene } from './scene.js';
-import { drawScreen, SCREEN_LAYOUTS } from './screen-art.js';
+import { drawMenuScreen, drawScreen, menuGeometry, MENU_TRIGGERS, SCREEN_LAYOUTS } from './screen-art.js';
 import { gloveMarkup, updateGloves } from './glove-hud.js';
 import { drawTitleIllustration } from './title-art.js';
 
@@ -13,6 +13,9 @@ let storage;
 try { storage = window.localStorage; } catch { /* Recovery stays session-only. */ }
 const session = loadStore(storage);
 let profile = currentStudent(session.data), attempt, screen, lastTime = performance.now(), recorded = false, lastOptions;
+let menuCleanup, suppressedSkipKey;
+let menuState = { open: null, selected: 'file', selectedRowId: null, hasFocus: true };
+let menuReturn = { focus: '#menu-file-summary', disclosure: null, selected: 'file' };
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const announcement = document.createElement('div');
 announcement.className = 'visually-hidden';
@@ -29,7 +32,14 @@ function storageMessage() {
   if (session.persistence.status !== 'saved') return 'Storage unavailable or full: session only. Changes and earned progress may be lost on reload. Existing saved data has not been replaced.';
   return 'Progress saved on this browser';
 }
+function clearMenuScreen() {
+  menuCleanup?.(); menuCleanup = undefined;
+  menuState = { open:null, selected:'file', selectedRowId:null, hasFocus:false };
+  document.body.classList.remove('main-menu-screen');
+}
 function shell(content) {
+  clearMenuScreen();
+  document.body.classList.remove('title-screen');
   document.body.classList.toggle('playing', screen === 'game');
   root.innerHTML = `<div class="cabinet${screen === 'game' ? ' game-cabinet' : ''}"><header><a href="#" id="home" aria-label="Main menu">M<span>★</span>T</a><span>MARIO TEACHES TYPING</span><span class="edition">BROWSER EDITION</span></header>${content}<footer><span>Static 1992 archive art · Browser placement/adaptations · Rights unverified</span><span id="storage-status" role="status">${storageMessage()}</span></footer></div>`;
   document.querySelector('#home').onclick = e => { e.preventDefault(); screen === 'game' ? pauseGame('Resume or return to the menu.') : menu(); };
@@ -69,8 +79,15 @@ function panelPosition(family) {
   const [x,y,width,height] = SCREEN_LAYOUTS[family].panel;
   return `--panel-x:${x/320*100}%;--panel-y:${y/200*100}%;--panel-width:${width/320*100}%;--panel-height:${height/200*100}%`;
 }
-function back(action = menu, focus = '#activity-outdoor') {
-  document.querySelector('#back').onclick = () => { action(); const control=document.querySelector(focus); const details=control?.closest('details'); if(details)details.open=true; control?.focus(); };
+function back(action = menu, focus) {
+  document.querySelector('#back').onclick = () => {
+    action();
+    if (focus) {
+      const control = document.querySelector(focus), details = control?.closest('details');
+      if (details) details.open = true;
+      control?.focus();
+    }
+  };
 }
 function titleIntro() {
   screen = 'title';
@@ -83,40 +100,255 @@ function titleIntro() {
     dispose?.();
     document.body.classList.remove('title-screen');
     announcement.textContent = '';
-    welcome();
+    menu();
   };
   document.querySelector('.title-intro').onclick = leave;
-  // Handle keydown so holding Space cannot activate the newly focused welcome button.
   button.onkeydown = event => {
-    if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); leave(); }
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      suppressedSkipKey = event.key;
+      leave();
+    }
   };
   button.focus();
   announcement.textContent = 'Mario Teaches Typing. Press Enter or Space, or click to skip the title intro.';
   dispose = drawTitleIllustration(document.querySelector('#title-art'), { onComplete: leave });
 }
-function welcome() {
-  page('welcome', 'GREET', 'Mario Teaches Typing', '<p>Choose a student, then learn one key at a time.</p><p>Unofficial browser recreation using static archive artwork. No original program or audio runs here.</p><button id="enter" class="primary">Enter main menu</button>');
-  document.querySelector('#enter').onclick = () => menu();
-  document.querySelector('#enter').focus();
-}
 function next() { advanceCourse(profile, new Date().toISOString()); save(); menu(); }
 function pendingText() {
   return profile.course.pending ? `Earned Next: ${position(profile.course.pending.destination)}. The first successful attempt is retained across retries.` : 'Next is locked until a successful guided lesson.';
 }
-function menu(focus = '#activity-outdoor') {
-  page('menu', 'MAINMENU', 'Main menu', `<p id="student-summary">${html(profile.name)} · ${profile.character}</p><nav class="menu-bar" aria-label="Application menus"><details><summary>File</summary><button id="new-student">New student</button><button id="load-student">Load student</button></details><details><summary>Student</summary><button id="edit-student">Edit student</button><button id="times">Lesson times</button></details><details><summary>Lessons</summary><button id="guided" ${profile.course.graduated?'disabled':''}>Continue guided course</button><button id="custom">Browser custom practice</button></details><details><summary>Help</summary><button id="help">Instructions</button><button id="keyboard">Keyboard guide</button></details></nav><p id="course-position">${profile.course.graduated ? 'Graduated at 50 WPM. Practice remains available.' : `Guided course: ${position(profile.course)}`}</p><p>Normal activities use your editable student goal (${profile.settings.goal} WPM). Only the matching guided course position advances.</p><div class="activity-list">${Object.entries(MODES).map(([mode,m],i)=>`<button id="activity-${mode}" ${mode==='underwater'&&profile.settings.goal<10 || mode==='castle'&&profile.settings.goal<30?'disabled':''}>${i+1}. ${m.name}</button>`).join('')}<button id="report">5. Report card & certificates</button><button id="next" ${!profile.course.pending?'disabled':''}>6. Next lesson</button></div><p class="fine">Water requires a student goal of at least 10 WPM; castle requires 30. Edit student to change the activity goal. Browser custom practice bypasses these gates but never advances.</p><p id="pending">${pendingText()}</p><p class="fine">Keys 1–6 select these actions outside text fields. Sound: ${profile.settings.sound?'synthetic cues on':'off'}.</p>`);
-  document.querySelector('#new-student').onclick=()=>studentForm(true);
-  document.querySelector('#load-student').onclick=loadStudents;
-  document.querySelector('#edit-student').onclick=()=>studentForm(false);
-  document.querySelector('#times').onclick=times;
-  document.querySelector('#guided').onclick=()=>prepare({ guided:true });
-  document.querySelector('#custom').onclick=customPractice;
-  document.querySelector('#help').onclick=()=>help(false);
-  document.querySelector('#keyboard').onclick=()=>help(true);
-  Object.keys(MODES).forEach(mode=>document.querySelector(`#activity-${mode}`).onclick=()=>prepare({ mode, group:profile.settings.group, goal:profile.settings.goal, guided: mode !== 'practice' && !profile.course.graduated && mode===courseMode(profile.course) && profile.settings.group===profile.course.group && profile.settings.goal===profile.course.goal }));
-  document.querySelector('#report').onclick=report;
-  document.querySelector('#next').onclick=next;
-  document.querySelector(focus)?.focus();
+const MENU_COMMANDS = {
+  file: [
+    { id:'about', label:'About [A]', text:'About     [A]', disabled:true, reason:'Not implemented in the browser.' },
+    { id:'help', label:'Help [F1]', text:'Help     [F1]', run:()=>help(false) },
+    { id:'demo', label:'Demo [D]', text:'Demo      [D]', disabled:true, reason:'Not implemented in the browser.' },
+    { id:'keyboard', label:'Keyboard [F2]', text:'Keyboard [F2]', run:()=>help(true) },
+    { id:'music', label:'Music [M]', text:'Music    [M]', disabled:true, reason:'Not implemented in the browser.' },
+    { id:'sound', label:'Sound F/X [S]', text:'Sound F/X [S]', disabled:true, reason:'Not implemented in the browser.' },
+    { id:'speech', label:'Speech [G]', text:'Speech    [G]', disabled:true, reason:'Not implemented in the browser.' },
+    { id:'quit', label:'Quit [Q]', text:'Quit      [Q]', disabled:true, reason:'Not implemented in the browser.' },
+  ],
+  student: [
+    { id:'new-student', label:'New [W]', text:'New [W]', run:()=>studentForm(true) },
+    { id:'load-student', label:'Load [L]', text:'Load [L]', run:loadStudents },
+    { id:'edit-student', label:'Edit [E]', text:'Edit [E]', run:()=>studentForm(false) },
+    { id:'times', label:'Lesson Times', text:'Lesson Times', run:times },
+    { id:'student-certificates', label:'Certificates', text:'Certificates', run:()=>report('#certificates') },
+  ],
+  lessons: [
+    { id:'lesson-group-0', label:'Home Row Only', group:0 },
+    { id:'lesson-group-1', label:'Add Top Row', group:1 },
+    { id:'lesson-group-2', label:'Add Bottom Row', group:2 },
+    { id:'lesson-group-3', label:'Add Numbers', group:3 },
+    { id:'lesson-group-4', label:'Add Symbols', group:4 },
+    { id:'lesson-group-5', label:'All Keyboard', group:5 },
+  ],
+};
+const ACTIVITY_BOUNDS = {
+  'activity-outdoor':[233,9,303,40], 'activity-underwater':[233,40,303,71],
+  'activity-castle':[233,71,303,102], 'activity-practice':[233,102,303,133],
+  report:[233,133,303,164], next:[233,164,303,187],
+};
+const activityIds = ['activity-outdoor','activity-underwater','activity-castle','activity-practice','report','next'];
+function menuEntries() {
+  return Object.fromEntries(Object.entries(MENU_COMMANDS).map(([name, commands]) => [name, commands.map(command => {
+    const selected = name === 'lessons' && profile.settings.group === command.group;
+    const text = name === 'lessons' ? `${selected ? '>' : ' '}${command.label}` : command.text;
+    const ariaLabel = `${command.label}${selected ? ', selected' : ''}${command.reason ? `, ${command.reason}` : ''}`;
+    return { id:command.id, text, label:command.label, ariaLabel, disabled:!!command.disabled, selected, reason:command.reason };
+  })]));
+}
+function nativeStyle([left, top, right, bottom], parent = [0,0,320,200]) {
+  const [parentLeft, parentTop, parentRight, parentBottom] = parent;
+  return `left:${(left-parentLeft)/(parentRight-parentLeft)*100}%;top:${(top-parentTop)/(parentBottom-parentTop)*100}%;width:${(right-left)/(parentRight-parentLeft)*100}%;height:${(bottom-top)/(parentBottom-parentTop)*100}%`;
+}
+function drawMenu(entries) {
+  const goal = profile.settings.goal;
+  const disabledActivities = {
+    'activity-outdoor':false,
+    'activity-underwater':goal < 10,
+    'activity-castle':goal < 30,
+    'activity-practice':false,
+    report:false,
+    next:!profile.course.pending,
+  };
+  drawMenuScreen(document.querySelector('#screen-art'), {
+    studentName:profile.name, menus:entries, openMenu:menuState.open, selectedMenu:menuState.selected,
+    selectedRowId:menuState.selectedRowId, focusedId:menuState.hasFocus ? document.activeElement?.id : null,
+    hasFocus:menuState.hasFocus, activityBounds:ACTIVITY_BOUNDS, disabledActivities,
+  });
+}
+function menuCommand(group, id) {
+  const command = MENU_COMMANDS[group]?.find(item => item.id === id);
+  if (!command || command.disabled) return;
+  menuReturn = { focus:`#${id}`, disclosure:group, selected:group };
+  if (group === 'lessons') {
+    editStudent(session.data, profile.id, { settings:{ group:command.group } });
+    save(); menu();
+    return;
+  }
+  command.run?.();
+}
+function initialMenuRow(name, entries) {
+  const rows = entries[name];
+  return (name === 'lessons' ? rows.find(entry => entry.selected) : rows.find(entry => !entry.disabled))?.id ?? null;
+}
+function openMenu(name) {
+  for (const details of root.querySelectorAll('.menu-disclosure')) details.open = details.dataset.menu === name;
+  menuState.open = name; menuState.selected = name;
+  menuState.selectedRowId = initialMenuRow(name, menuEntries());
+  drawMenu(menuEntries());
+}
+function closeMenu(restoreFocus = true) {
+  if (!menuState.open) return;
+  const name = menuState.open;
+  root.querySelector(`[data-menu="${name}"]`).open = false;
+  menuState.open = null; menuState.selectedRowId = null;
+  drawMenu(menuEntries());
+  if (restoreFocus) root.querySelector(`#menu-${name}-summary`)?.focus();
+}
+function menu() {
+  clearMenuScreen();
+  screen = 'menu'; attempt = null;
+  document.body.classList.remove('playing','title-screen');
+  document.body.classList.add('main-menu-screen');
+  const entries = menuEntries(), opened = menuReturn.disclosure;
+  const returnRow = opened && entries[opened]?.some(entry => `#${entry.id}` === menuReturn.focus) ? menuReturn.focus.slice(1) : null;
+  menuState = { open:opened, selected:menuReturn.selected ?? opened ?? 'file', selectedRowId:opened ? returnRow ?? initialMenuRow(opened, entries) : null, hasFocus:true };
+  const menus = Object.entries(entries).map(([name, items]) => {
+    const trigger = MENU_TRIGGERS[name], geometry = menuGeometry(name, items);
+    const rows = items.map((item, index) => `<button type="button" id="${item.id}" class="menu-row" data-menu-group="${name}" aria-label="${html(item.ariaLabel)}" ${item.disabled?'disabled':''} style="${nativeStyle(geometry.rows[index], geometry.popup)}">${html(item.label)}</button>`).join('');
+    return `<details class="menu-disclosure" data-menu="${name}" ${opened===name?'open':''}><summary id="menu-${name}-summary" class="menu-summary" data-menu-summary="${name}" aria-label="${trigger.label} menu" style="${nativeStyle(geometry.trigger)}">${trigger.label}</summary><div class="menu-popup" role="group" aria-label="${trigger.label} commands" style="${nativeStyle(geometry.popup)}">${rows}</div></details>`;
+  }).join('');
+  const goal = profile.settings.goal;
+  const activities = Object.entries(MODES).map(([mode, activity], index) => {
+    const id = `activity-${mode}`, disabled = mode === 'underwater' && goal < 10 || mode === 'castle' && goal < 30;
+    const reason = mode === 'underwater' ? 'Requires a student goal of at least 10 WPM.' : 'Requires a student goal of at least 30 WPM.';
+    const label = `${index + 1}. ${activity.name}${disabled ? `. Disabled. ${reason}` : ''}`;
+    return `<button type="button" id="${id}" class="menu-hit" aria-label="${html(label)}" ${disabled?'disabled':''} style="${nativeStyle(ACTIVITY_BOUNDS[id])}"></button>`;
+  }).join('');
+  const nextLabel = profile.course.pending ? '6. Next lesson. Commits earned progress once.' : '6. Next lesson. Disabled until successful guided progress is earned.';
+  root.innerHTML = `<main class="main-menu-frame" aria-label="Mario Teaches Typing main menu"><h1 class="visually-hidden">Main menu</h1><canvas id="screen-art" width="320" height="200" role="img" aria-label="Original MAINMENU background"></canvas><p class="visually-hidden">${html(profile.name)} · ${profile.character} · Activity goal ${goal} WPM. ${html(pendingText())}</p>${menus}${activities}<button type="button" id="report" class="menu-hit" aria-label="5. Report card and certificates" style="${nativeStyle(ACTIVITY_BOUNDS.report)}"></button><button type="button" id="next" class="menu-hit" aria-label="${html(nextLabel)}" ${profile.course.pending?'':'disabled'} style="${nativeStyle(ACTIVITY_BOUNDS.next)}"></button></main>`;
+  const frame = root.querySelector('.main-menu-frame');
+  const controller = new AbortController(), { signal } = controller;
+  const render = () => { if (screen === 'menu') drawMenu(entries); };
+  for (const [name] of Object.entries(entries)) {
+    const summary = root.querySelector(`#menu-${name}-summary`);
+    summary.addEventListener('click', event => {
+      event.preventDefault();
+      if (menuState.open === name) closeMenu(false); else openMenu(name);
+    }, { signal });
+  }
+  for (const [name, items] of Object.entries(entries)) for (const item of items) {
+    if (!item.disabled) root.querySelector(`#${item.id}`).addEventListener('click', () => menuCommand(name, item.id), { signal });
+  }
+  for (const id of Object.keys(MODES).map(mode => `activity-${mode}`).concat(['report','next'])) {
+    root.querySelector(`#${id}`).addEventListener('click', () => {
+      menuReturn = { focus:`#${id}`, disclosure:null, selected:'file' };
+      if (id.startsWith('activity-')) {
+        const mode = id.slice('activity-'.length);
+        prepare({ mode, group:profile.settings.group, goal:profile.settings.goal, guided:mode !== 'practice' && !profile.course.graduated && mode === courseMode(profile.course) && profile.settings.group === profile.course.group && profile.settings.goal === profile.course.goal });
+      } else if (id === 'report') report(); else next();
+    }, { signal });
+  }
+  function topNavigation(direction) {
+    const names = Object.keys(MENU_TRIGGERS), active = document.activeElement?.dataset.menuSummary;
+    const index = names.indexOf(active ?? menuState.selected);
+    const nextName = names[(index + direction + names.length) % names.length];
+    if (menuState.open) openMenu(nextName);
+    else { menuState.selected = nextName; render(); }
+    root.querySelector(`#menu-${nextName}-summary`)?.focus();
+  }
+  function rowNavigation(direction) {
+    const name = menuState.open, candidates = menuEntries()[name].filter(entry => !entry.disabled);
+    if (!candidates.length) return;
+    const current = candidates.findIndex(entry => entry.id === document.activeElement?.id);
+    const index = current < 0 ? (direction > 0 ? 0 : candidates.length - 1) : (current + direction + candidates.length) % candidates.length;
+    menuState.selectedRowId = candidates[index].id;
+    root.querySelector(`#${candidates[index].id}`)?.focus();
+  }
+  frame.addEventListener('keydown', event => {
+    if (event.ctrlKey || event.metaKey || event.altKey || event.shiftKey || event.repeat || event.isComposing || event.target.closest('input,select,textarea,[contenteditable]')) return;
+    if (event.key === 'Escape' && menuState.open) { event.preventDefault(); closeMenu(); return; }
+    if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') { event.preventDefault(); topNavigation(event.key === 'ArrowRight' ? 1 : -1); return; }
+    if (menuState.open && (event.key === 'ArrowDown' || event.key === 'ArrowUp')) { event.preventDefault(); rowNavigation(event.key === 'ArrowDown' ? 1 : -1); return; }
+    const shortcut = { W:['student','new-student'], L:['student','load-student'], E:['student','edit-student'], F1:['file','help'], F2:['file','keyboard'], C:['student','student-certificates'] }[event.key.toUpperCase()];
+    if (menuState.open) {
+      if (/^[1-6]$/.test(event.key) || shortcut) event.preventDefault();
+      return;
+    }
+    if (shortcut) { event.preventDefault(); menuCommand(...shortcut); return; }
+    if (/^[1-6]$/.test(event.key)) { event.preventDefault(); root.querySelector(`#${activityIds[Number(event.key)-1]}`)?.click(); }
+  }, { signal });
+  let dismissedPointerTarget = null;
+  document.addEventListener('pointerdown', event => {
+    dismissedPointerTarget = null;
+    if (!menuState.open) return;
+    const popup = root.querySelector(`[data-menu="${menuState.open}"] .menu-popup`);
+    if (popup?.contains(event.target) || event.target.closest?.('.menu-summary')) return;
+    dismissedPointerTarget = event.target;
+    event.preventDefault(); event.stopImmediatePropagation(); closeMenu();
+  }, { capture:true, signal });
+  document.addEventListener('pointerup', () => {
+    if (dismissedPointerTarget) setTimeout(() => { dismissedPointerTarget = null; }, 0);
+  }, { capture:true, signal });
+  document.addEventListener('click', event => {
+    if (dismissedPointerTarget && (event.target === dismissedPointerTarget || dismissedPointerTarget.contains?.(event.target))) {
+      dismissedPointerTarget = null;
+      event.preventDefault(); event.stopImmediatePropagation(); return;
+    }
+    if (!menuState.open) return;
+    const popup = root.querySelector(`[data-menu="${menuState.open}"] .menu-popup`);
+    if (popup?.contains(event.target) || event.target.closest?.('.menu-summary')) return;
+    event.preventDefault(); event.stopImmediatePropagation(); closeMenu();
+  }, { capture:true, signal });
+  frame.addEventListener('pointerover', event => {
+    const row = event.target.closest?.('.menu-row');
+    if (row && !row.disabled && menuState.open) { menuState.selectedRowId = row.id; render(); }
+    const summary = event.target.closest?.('.menu-summary');
+    if (summary) { menuState.selected = summary.dataset.menuSummary; render(); }
+  }, { signal });
+  frame.addEventListener('focusin', event => {
+    menuState.hasFocus = true;
+    const summary = event.target.closest?.('.menu-summary');
+    if (summary) menuState.selected = summary.dataset.menuSummary;
+    const group = event.target.dataset.menuGroup;
+    if (group) menuState.selected = group;
+    render();
+  }, { signal });
+  frame.addEventListener('focusout', event => {
+    const next = event.relatedTarget;
+    if (menuState.open) {
+      const opened = root.querySelector(`[data-menu="${menuState.open}"]`);
+      if (opened && !opened.contains(next)) { opened.open = false; menuState.open = null; menuState.selectedRowId = null; }
+    }
+    if (!frame.contains(next)) {
+      menuState.hasFocus = false; menuState.selectedRowId = null;
+      if (!menuState.open) menuState.selected = 'file';
+    }
+    render();
+  }, { signal });
+  const onBlur = () => {
+    menuState.hasFocus = false; menuState.selectedRowId = null;
+    if (!menuState.open) menuState.selected = 'file';
+    render();
+  };
+  const onFocus = () => {
+    menuState.hasFocus = true;
+    const active = document.activeElement;
+    if (active?.dataset.menuSummary) menuState.selected = active.dataset.menuSummary;
+    else if (active?.dataset.menuGroup) menuState.selected = active.dataset.menuGroup;
+    render();
+  };
+  window.addEventListener('blur', onBlur, { signal });
+  window.addEventListener('focus', onFocus, { signal });
+  menuCleanup = () => controller.abort();
+  let target = root.querySelector(menuReturn.focus);
+  if (!target || target.disabled) target = root.querySelector('#activity-outdoor') ?? root.querySelector('#menu-file-summary');
+  target?.focus();
+  render();
+  announcement.textContent = `Main menu for ${profile.name}.`;
 }
 function studentForm(isNew) {
   page('student', 'PREFS', isNew?'New student':'Edit student', `<form id="student-form"><label>Name<input name="name" maxlength="24" required value="${isNew?'':html(profile.name)}"></label><label>Character<select name="character">${['Mario','Luigi','Princess'].map(c=>`<option ${!isNew&&c===profile.character?'selected':''}>${c}</option>`).join('')}</select></label><label>Activity goal · WPM<input name="goal" type="number" min="1" max="150" step="1" required value="${isNew?5:profile.settings.goal}"></label><label>Activity key group<select name="group">${KEY_GROUPS.map((g,i)=>`<option value="${i}" ${!isNew&&i===profile.settings.group?'selected':''}>${g.name}</option>`).join('')}</select></label><label class="sound"><input name="sound" type="checkbox" ${!isNew&&profile.settings.sound?'checked':''}> Synthetic sound effects (no archive audio)</label><p>Activity settings do not change your earned guided course position.</p><button class="primary" type="submit">${isNew?'Create student':'Save student'}</button><button id="back" type="button">Cancel</button></form>`);
@@ -160,8 +392,14 @@ function prepare(options) {
   back();document.querySelector('#original').focus();
 }
 function help(keyboard) {
-  page('help', keyboard?'KEYBOARD':'HELP', keyboard?'Keyboard guide':'Instructions', `<p>Use Tab and Shift+Tab to move between controls; Enter activates buttons. On the main menu, keys 1–4 select activities, 5 opens the report and 6 commits an earned Next.</p><p>Type the displayed target. Wrong keys add errors without moving it. Outdoors, ASCII upper and lowercase letters match without Shift. Other activities require exact case, punctuation and spaces. Non-ASCII, repeated keys and modified shortcuts are ignored.</p><p>Outdoor keys may wait for contact and count only once. Reduced motion makes targets stationary. Escape, losing focus, hidden tabs and castle pipe stops pause both input and the clock. Resume explicitly when ready.</p><p>Net-error integer WPM and integer accuracy use a browser active-clock approximation. Timeout, at least one key, goal WPM and 90% accuracy are the browser pass rule, not a verified universal original rule. No early success or deaths.</p><p>Only matching guided lessons advance. Next preserves the first earned destination, saves it once and returns to the menu. Custom and Expert Express never advance. Certificates use browser milestones, not claimed original triggers.</p><button id="back">Back to menu</button>`);
-  back(menu,keyboard?'#keyboard':'#help');document.querySelector('#back').focus();
+  const browserOptions = keyboard ? '' : `<h2>Browser-only options</h2><p>These options are browser features, not DOS menu commands. Custom practice does not advance the guided course.</p><button id="guided" ${profile.course.graduated?'disabled':''}>Continue guided course</button><button id="custom">Browser custom practice</button>`;
+  page('help', keyboard?'KEYBOARD':'HELP', keyboard?'Keyboard guide':'Instructions', `<p>File, Student and Lessons are the main menus. Use Left/Right to move between them, Up/Down to select enabled rows, Enter to activate, and Escape or a click outside to close. Tab and Shift+Tab move through controls. Keys 1–6 select activities, Report and an earned Next when no menu is open. W/L/E open New/Load/Edit, F1 opens Instructions, F2 opens Keyboard, and C opens Certificates.</p><p>About, Demo, Music, Sound F/X, Speech and Quit are visible File commands but are not implemented. Water requires a student goal of at least 10 WPM; Castle requires at least 30 WPM. Next stays disabled until successful guided progress is earned.</p><p>Storage: ${storageMessage()}. Each local student keeps separate settings, results and certificates. Recovery mode will not overwrite unreadable saved data.</p>${browserOptions}<p>Type the displayed target. Wrong keys add errors without moving it. Outdoors, ASCII upper and lowercase letters match without Shift. Other activities require exact case, punctuation and spaces. Non-ASCII, repeated keys and modified shortcuts are ignored.</p><p>Outdoor keys may wait for contact and count only once. Reduced motion makes targets stationary. Escape, losing focus, hidden tabs and castle pipe stops pause both input and the clock. Resume explicitly when ready.</p><p>Net-error integer WPM and integer accuracy use a browser active-clock approximation. Timeout, at least one key, goal WPM and 90% accuracy are the browser pass rule, not a verified universal original rule. No early success or deaths.</p><p>Only matching guided lessons advance. Next preserves the first earned destination, saves it once and returns to the menu. Custom and Expert Express never advance. Certificates use browser milestones, not claimed original triggers.</p><button id="back">Back to menu</button>`);
+  back(menu,keyboard?'#keyboard':'#help');
+  if (!keyboard) {
+    document.querySelector('#guided').onclick=()=>prepare({ guided:true });
+    document.querySelector('#custom').onclick=customPractice;
+  }
+  document.querySelector('#back').focus();
 }
 function start(options=lastOptions) {
   lastOptions=options;screen='game';recorded=false;announcement.textContent='';
@@ -211,11 +449,11 @@ function finish() {
   announcement.textContent=`${r.passed?'Passed':'Not passed'}. Timeout. ${r.wpm} WPM, ${r.accuracy}% accuracy. ${reasons}`;document.querySelector('#retry').focus();
 }
 const certificateTitles={outdoor:'Outdoor graduate',underwater:'Underwater graduate',graduation:'Mario Graduate · 50 WPM castle'};
-function report() {
+function report(focus = '#back') {
   const tables=[['Current ruleset',profile.results.filter(r=>r.ruleset===RULESET)],['Legacy history (not comparable)',profile.results.filter(r=>r.ruleset!==RULESET)]];
-  page('report','RCARD','Report card',`<p>${html(profile.name)} · ${position(profile.course)}</p>${profile.legacy?`<p>Legacy course archived: ${html(JSON.stringify(profile.legacy.profile.course))}. New course began at 5 WPM/home row. Original save retained; old passes and awards were not recomputed.</p>`:''}${tables.map(([title,rows])=>`<h2>${title}</h2><div class="table-scroll"><table aria-label="${html(title)}"><thead><tr><th>Activity / ruleset</th><th>Goal</th><th>WPM</th><th>Accuracy</th><th>Result</th><th>Elapsed / limit / reason</th></tr></thead><tbody>${rows.slice().reverse().map(r=>`<tr><td>${MODES[r.mode].name}<small>${html(r.ruleset)} · ${html(r.date)} · ${r.guided?'Guided':'Practice'}<br>${html(r.label??'Legacy text source not recorded')}</small></td><td>${r.goal}</td><td>${r.wpm}</td><td>${r.accuracy}%</td><td>${r.passed?'Pass':'Retry'}</td><td>${r.ruleset===RULESET?`${r.elapsed}s / ${r.duration}s / ${r.terminalReason}`:'Not recorded under current rules'}</td></tr>`).join('')}</tbody></table></div>${rows.length?'':'<p>No results in this ruleset.</p>'}`).join('')}<h2>Certificates</h2>${profile.certificates.map((c,i)=>`<button data-certificate="${i}">${certificateTitles[c.kind]} · ${html(c.name)} · ${html(c.ruleset)}</button>`).join('')||'<p>No certificates yet.</p>'}<p>Browser awards: committed world transitions and the guided 50-WPM all-keyboard castle assessment. These are not asserted original triggers. Historical awards remain intact.</p><button id="back">Main menu</button><button id="print">Print report</button>`);
+  page('report','RCARD','Report card',`<p>${html(profile.name)} · ${position(profile.course)}</p>${profile.legacy?`<p>Legacy course archived: ${html(JSON.stringify(profile.legacy.profile.course))}. New course began at 5 WPM/home row. Original save retained; old passes and awards were not recomputed.</p>`:''}${tables.map(([title,rows])=>`<h2>${title}</h2><div class="table-scroll"><table aria-label="${html(title)}"><thead><tr><th>Activity / ruleset</th><th>Goal</th><th>WPM</th><th>Accuracy</th><th>Result</th><th>Elapsed / limit / reason</th></tr></thead><tbody>${rows.slice().reverse().map(r=>`<tr><td>${MODES[r.mode].name}<small>${html(r.ruleset)} · ${html(r.date)} · ${r.guided?'Guided':'Practice'}<br>${html(r.label??'Legacy text source not recorded')}</small></td><td>${r.goal}</td><td>${r.wpm}</td><td>${r.accuracy}%</td><td>${r.passed?'Pass':'Retry'}</td><td>${r.ruleset===RULESET?`${r.elapsed}s / ${r.duration}s / ${r.terminalReason}`:'Not recorded under current rules'}</td></tr>`).join('')}</tbody></table></div>${rows.length?'':'<p>No results in this ruleset.</p>'}`).join('')}<h2 id="certificates" tabindex="-1">Certificates</h2>${profile.certificates.map((c,i)=>`<button data-certificate="${i}">${certificateTitles[c.kind]} · ${html(c.name)} · ${html(c.ruleset)}</button>`).join('')||'<p>No certificates yet.</p>'}<p>Browser awards: committed world transitions and the guided 50-WPM all-keyboard castle assessment. These are not asserted original triggers. Historical awards remain intact.</p><button id="back">Main menu</button><button id="print">Print report</button>`);
   document.querySelectorAll('[data-certificate]').forEach(b=>b.onclick=()=>certificate(Number(b.dataset.certificate)));
-  document.querySelector('#print').onclick=()=>window.print();back();document.querySelector('#back').focus();
+  document.querySelector('#print').onclick=()=>window.print();back();document.querySelector(focus)?.focus();
 }
 function certificate(index) {
   const c=profile.certificates[index];
@@ -231,9 +469,7 @@ function beep(correct) {
   try {audio ||= new AudioContext();audio.resume();const o=audio.createOscillator(),g=audio.createGain();o.type='square';o.frequency.value=correct?660:160;g.gain.setValueAtTime(.035,audio.currentTime);g.gain.exponentialRampToValueAtTime(.001,audio.currentTime+.08);o.connect(g).connect(audio.destination);o.start();o.stop(audio.currentTime+.08);}catch{/* Optional synthesized cues never control outcomes. */}
 }
 window.addEventListener('keydown',e=>{
-  if(screen==='menu'&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&!e.repeat&&!e.isComposing&&!e.target.closest('input,select,textarea,[contenteditable]')&&/^[1-6]$/.test(e.key)) {
-    e.preventDefault();document.querySelector(['#activity-outdoor','#activity-underwater','#activity-castle','#activity-practice','#report','#next'][Number(e.key)-1]).click();return;
-  }
+  if (suppressedSkipKey === e.key) { e.preventDefault(); return; }
   if(screen!=='game')return;
   if(e.key==='Escape'){e.preventDefault();pauseGame();return;}
   if(attempt.status==='paused'){
@@ -247,6 +483,7 @@ window.addEventListener('keydown',e=>{
   const outcome=typeKey(attempt,e);
   if(outcome!=='ignored'){e.preventDefault();beep(outcome==='correct'||outcome==='buffered');update();if(attempt.status==='paused')pauseGame();}
 });
+window.addEventListener('keyup',e=>{ if (suppressedSkipKey === e.key) suppressedSkipKey = undefined; });
 window.addEventListener('blur',()=>pauseGame('The window lost focus. Resume when ready.'));
 document.addEventListener('visibilitychange',()=>{if(document.hidden)pauseGame('The tab was hidden. Resume when ready.');});
 function frame(now){if(screen==='game'){tick(now);if(attempt.status==='finished')finish();else update();}requestAnimationFrame(frame);}
