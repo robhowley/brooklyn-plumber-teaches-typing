@@ -15,6 +15,7 @@ export async function boot(page,{data=fixture(),motion='reduce',clock=true}={}) 
   if(data) await page.addInitScript(({key,data})=>{if(!localStorage.getItem(key))localStorage.setItem(key,JSON.stringify(data));},{key:STORAGE_KEY,data});
   if(clock)await page.clock.install({time:new Date('2026-11-10T00:00:00Z')});
   await page.goto('/');
+  await page.locator('#skip-title').click();
   if(clock)await page.clock.pauseAt(new Date('2026-11-10T00:01:00Z'));
   await expect(page.locator('#enter')).toBeFocused();await page.keyboard.press('Enter');
 }

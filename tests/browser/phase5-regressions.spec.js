@@ -23,7 +23,7 @@ test('guided lesson six earns outdoor transition certificate through paced keys 
  let p=(await stored(page)).students[0];expect(p.results).toHaveLength(1);expect(p.results[0]).toMatchObject({guided:true,mode:'outdoor',group:5,correct:20,elapsed:20,wpm:10,passed:true});expect(p.certificates).toHaveLength(0);
  await activate(page,'#next');await expect(page.locator('#course-position')).toContainText('Home row · 10 WPM');
  p=(await stored(page)).students[0];expect(p.certificates).toHaveLength(1);expect(p.certificates[0]).toMatchObject({kind:'outdoor',resultId:p.results[0].id,achieved:10});
- await page.reload();await page.keyboard.press('Enter');await page.keyboard.press('5');
+ await page.reload();await activate(page,'#skip-title');await page.keyboard.press('Enter');await page.keyboard.press('5');
  await expect(page.getByRole('table',{name:'Current ruleset',exact:true})).toContainText('Original 1992 lesson text');await expect(page.getByRole('table',{name:'Current ruleset',exact:true})).toContainText('20s / 20s / timeout');
  await page.evaluate(()=>{window.print=()=>{window.printCalls=(window.printCalls||0)+1;};});await activate(page,'#print');expect(await page.evaluate(()=>window.printCalls)).toBe(1);
  await activate(page,'[data-certificate="0"]');await expect(page.locator('.certificate')).toContainText('Outdoor graduate');await expect(page.locator('.certificate')).toContainText('Achieved 10 WPM');

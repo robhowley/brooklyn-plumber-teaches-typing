@@ -6,7 +6,7 @@ import { resolve } from 'node:path';
 import rasters from '../src/assets/original/rasters.json' with {type:'json'};
 import provenance from '../src/assets/original/provenance.json' with {type:'json'};
 import { originalImage, actionImage, practiceFace } from '../src/assets/original/index.js';
-import { drawScreen, SCREEN_LAYOUTS, drawTitle } from '../src/screen-art.js';
+import { drawScreen, SCREEN_LAYOUTS } from '../src/screen-art.js';
 import { drawScene } from '../src/scene.js';
 import { createAttempt } from '../src/engine.js';
 const hash=b=>createHash('sha256').update(b).digest('hex');
@@ -74,12 +74,12 @@ test('Mario happy expression aligns exactly with the original practice face inse
   assert.deepEqual(background.palette.slice(a*3,a*3+3),face.palette.slice(b*3,b*3+3));
  }
 });
-test('welcome draws archive GREET and original letters with no screenshot or animation dependency',()=>{
- calls.length=0;drawTitle(canvas());
+test('browser welcome still draws the static archive GREET, separate from the title intro',()=>{
+ const c=canvas();
+ calls.length=0;drawScreen(c,'GREET');
+ assert.equal(c.width,320);assert.equal(c.height,200);
  assert.equal(calls.find(c=>c[0]==='drawImage')[1],originalImage('GREET'));
- assert.equal(calls.filter(c=>c[0]==='drawImage').length,14);
- const source=readFileSync(new URL('../src/title-art.js',import.meta.url),'utf8');
- assert.doesNotMatch(source,/assets\/title|requestAnimationFrame|performance\.now|setTimeout/);
+ assert.equal(calls.filter(c=>c[0]==='drawImage').length,1);
 });
 test('sound settings do not change scene motion or artwork',()=>{
  for(const mode of ['outdoor','underwater','castle','practice']) {

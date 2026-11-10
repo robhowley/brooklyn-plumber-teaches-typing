@@ -9,7 +9,7 @@ const evidence=process.env.FIDELITY_EVIDENCE||'.tmp/fidelity-validation/phase6-f
 const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
 async function snapshot(page,name){await mkdir(`${evidence}/screenshots`,{recursive:true});await page.screenshot({path:`${evidence}/screenshots/${name}.png`,fullPage:true});}
 async function student(page){const data=await stored(page);return data.students.find(p=>p.id===data.currentStudentId);}
-async function reload(page){await page.reload();await activate(page,'#enter');}
+async function reload(page){await page.reload();await activate(page,'#skip-title');await activate(page,'#enter');}
 async function guided(page){await openMenu(page,'Lessons');await activate(page,'#guided');await expect(page.locator('.historical-notice')).toContainText('slavery');await activate(page,'#original');}
 async function times(page,label='miss'){ await openMenu(page,'Student');await activate(page,'#times');for(const mode of ['outdoor','underwater','castle','practice'])await page.locator(`[name=${mode}-seconds]`).fill(mode==='outdoor'?'60':'10');await snapshot(page,`${label}-times`);await activate(page,'#times-form button.primary');}
 // Advance one callback per paced key, not thousands of rendering frames. The engine still
@@ -34,7 +34,7 @@ test('production HTTP bytes match the rebuilt distribution and record provenance
  const dist=resolve(process.env.FIDELITY_DIST||'dist');const files={};
  async function walk(dir){for(const item of await readdir(dir,{withFileTypes:true})){const path=resolve(dir,item.name);if(item.isDirectory())await walk(path);else{const name=relative(dist,path);const bytes=await readFile(path);const response=await request.get('/'+name);expect(response.ok()).toBeTruthy();expect(sha(await response.body()),name).toBe(sha(bytes));files[name]=sha(bytes);}}}
  const requests=[];page.on('request',request=>requests.push(request.url()));
- await walk(dist);await page.goto('/');await snapshot(page,'welcome');
+ await walk(dist);await page.goto('/');await activate(page,'#skip-title');await snapshot(page,'welcome');
  expect(requests.every(url=>new URL(url).origin===new URL(page.url()).origin)).toBeTruthy();
  const source={};
  async function hashSource(dir){for(const item of await readdir(dir,{withFileTypes:true})){const path=`${dir}/${item.name}`;if(item.isDirectory())await hashSource(path);else source[path]=sha(await readFile(path));}}

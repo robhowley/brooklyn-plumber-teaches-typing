@@ -27,10 +27,10 @@ test('guided first success survives failed retry and reload; explicit Next commi
  expect(first.destination.group).toBe(1);await activate(page,'#retry');await page.clock.runFor(3100);
  await expect(page.locator('#outcome')).toContainText('Not passed');await expect(page.locator('#next')).toBeEnabled();
  expect((await stored(page)).students[0].course.pending).toEqual(first);
- await page.reload();await page.keyboard.press('Enter');await expect(page.locator('#pending')).toContainText('Add top row');
+ await page.reload();await activate(page,'#skip-title');await page.keyboard.press('Enter');await expect(page.locator('#pending')).toContainText('Add top row');
  await page.keyboard.press('6');await expect(page.locator('#course-position')).toContainText('Add top row');
  await expect(page.locator('#next')).toBeDisabled();await expect(page.locator('#target')).toHaveCount(0);
- await page.keyboard.press('6');await page.reload();await page.keyboard.press('Enter');
+ await page.keyboard.press('6');await page.reload();await activate(page,'#skip-title');await page.keyboard.press('Enter');
  const p=(await stored(page)).students[0];expect(p.course.revision).toBe(1);expect(p.results).toHaveLength(2);expect(p.results[0].studentId).toBe(p.id);expect(p.results[0].courseRevision).toBe(0);
 });
 

@@ -10,7 +10,7 @@ test('keyboard navigation, student slots, settings and selected student survive 
  await openMenu(page,'Student');await activate(page,'#times');
  for(const [mode,minutes] of [['outdoor','2'],['underwater','5'],['castle','5'],['practice','10']])await expect(page.locator(`[name="${mode}-minutes"]`)).toHaveValue(minutes);
  await page.locator('[name=outdoor-seconds]').fill('7');await page.locator('[name=underwater-minutes]').fill('2');await expect(page.locator('[name=underwater-seconds]')).toHaveValue('');
- await activate(page,'#times-form button.primary');await page.reload();await page.keyboard.press('Enter');
+ await activate(page,'#times-form button.primary');await page.reload();await activate(page,'#skip-title');await page.keyboard.press('Enter');
  await expect(page.locator('#student-summary')).toContainText('Student 123456');
  let data=await stored(page),p=data.students.find(p=>p.id===data.currentStudentId);expect(p.settings.durations.outdoor).toBe(7);expect(p.settings.durations.underwater).toBe(120);expect(p.settings.sound).toBe(true);
  await openMenu(page,'Student');await activate(page,'#times');
@@ -18,7 +18,7 @@ test('keyboard navigation, student slots, settings and selected student survive 
  await activate(page,'#times-form button.primary');await openMenu(page,'Student');await activate(page,'#times');await expect(page.locator('[name=outdoor-seconds]')).toHaveValue('7');await expect(page.locator('[name=underwater-minutes]')).toHaveValue('2');await activate(page,'#back');
  await openMenu(page,'Student');await activate(page,'#edit-student');await page.getByLabel('Name',{exact:true}).fill('Renamed');await activate(page,'#student-form button.primary');
  await openMenu(page,'File');await activate(page,'#load-student');await page.getByLabel('Saved local students').selectOption(data.students[0].id);await activate(page,'#load-form button.primary');
- await expect(page.locator('#student-summary')).toContainText('Ada');await page.reload();await page.keyboard.press('Enter');await expect(page.locator('#student-summary')).toContainText('Ada');
+ await expect(page.locator('#student-summary')).toContainText('Ada');await page.reload();await activate(page,'#skip-title');await page.keyboard.press('Enter');await expect(page.locator('#student-summary')).toContainText('Ada');
  data=await stored(page);expect(data.students).toHaveLength(2);expect(data.students[1].name).toBe('Renamed');expect(data.students[1].settings.goal).toBe(12);
 });
 

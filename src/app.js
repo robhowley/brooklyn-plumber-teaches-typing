@@ -6,6 +6,7 @@ import { selectLesson, HISTORICAL_NOTICE } from './lessons.js';
 import { drawScene } from './scene.js';
 import { drawScreen, SCREEN_LAYOUTS } from './screen-art.js';
 import { gloveMarkup, updateGloves } from './glove-hud.js';
+import { drawTitleIllustration } from './title-art.js';
 
 const root = document.querySelector('#app');
 let storage;
@@ -70,6 +71,28 @@ function panelPosition(family) {
 }
 function back(action = menu, focus = '#activity-outdoor') {
   document.querySelector('#back').onclick = () => { action(); const control=document.querySelector(focus); const details=control?.closest('details'); if(details)details.open=true; control?.focus(); };
+}
+function titleIntro() {
+  screen = 'title';
+  document.body.classList.add('title-screen');
+  root.innerHTML = '<main class="title-intro"><button id="skip-title" aria-label="Skip title intro"><canvas id="title-art" role="img" aria-label="Mario Teaches Typing title"></canvas></button></main>';
+  const button = document.querySelector('#skip-title');
+  let dispose;
+  const leave = () => {
+    if (screen !== 'title') return;
+    dispose?.();
+    document.body.classList.remove('title-screen');
+    announcement.textContent = '';
+    welcome();
+  };
+  document.querySelector('.title-intro').onclick = leave;
+  // Handle keydown so holding Space cannot activate the newly focused welcome button.
+  button.onkeydown = event => {
+    if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); leave(); }
+  };
+  button.focus();
+  announcement.textContent = 'Mario Teaches Typing. Press Enter or Space, or click to skip the title intro.';
+  dispose = drawTitleIllustration(document.querySelector('#title-art'), { onComplete: leave });
 }
 function welcome() {
   page('welcome', 'GREET', 'Mario Teaches Typing', '<p>Choose a student, then learn one key at a time.</p><p>Unofficial browser recreation using static archive artwork. No original program or audio runs here.</p><button id="enter" class="primary">Enter main menu</button>');
@@ -227,4 +250,4 @@ window.addEventListener('keydown',e=>{
 window.addEventListener('blur',()=>pauseGame('The window lost focus. Resume when ready.'));
 document.addEventListener('visibilitychange',()=>{if(document.hidden)pauseGame('The tab was hidden. Resume when ready.');});
 function frame(now){if(screen==='game'){tick(now);if(attempt.status==='finished')finish();else update();}requestAnimationFrame(frame);}
-welcome();requestAnimationFrame(frame);
+titleIntro();requestAnimationFrame(frame);

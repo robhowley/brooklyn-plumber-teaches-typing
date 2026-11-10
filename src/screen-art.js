@@ -1,6 +1,5 @@
 import { characterImage } from './art.js';
 import { drawOriginal, originalImage } from './assets/original/index.js';
-import { drawTitleIllustration } from './title-art.js';
 
 // Native 320x200 coordinates for accessible DOM overlays. These are browser layout
 // choices, not recovered widget bounds. Controls may flow below the art at narrow widths.
@@ -35,7 +34,6 @@ export function drawMenuScreen(canvas) { return drawScreen(canvas, 'MAINMENU'); 
 export function drawStudentScreen(canvas) { return drawScreen(canvas, 'PREFS'); }
 export function drawResultsScreen(canvas) { return drawScreen(canvas, 'BLACKBRD'); }
 export function drawReportScreen(canvas) { return drawScreen(canvas, 'RCARD'); }
-export function drawTitle(canvas) { drawTitleIllustration(canvas); }
 export function drawPortrait(canvas, character) {
   canvas.width = 64; canvas.height = 76;
   const context = canvas.getContext('2d'); context.imageSmoothingEnabled = false;
