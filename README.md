@@ -1,6 +1,6 @@
 # Brooklyn Plumber Teaches Typing
 
-[![Original Mario Teaches Typing title screen](src/assets/title/title.png)](docs/TITLE-SCREEN.md)
+![Original Mario Teaches Typing title screen](src/assets/title/title.png)
 
 Mario Teaches Typing, a 1992 MS-DOS classic, recreated as a single page web app.
 
