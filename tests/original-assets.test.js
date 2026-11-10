@@ -44,6 +44,17 @@ test('every selected raster has intact hashes, bounded pixels and static-only pr
  }
  assert.deepEqual(readdirSync(new URL('../src/assets/original/',import.meta.url)).sort(),['index.js','provenance.json','rasters.json']);
 });
+test('all bundled FONT7H glyphs preserve transparent gaps, white cores and black outlines',()=>{
+ const glyphs=provenance.records.filter(record=>record.id.startsWith('FONT7H-'));
+ assert.equal(glyphs.length,94);
+ for(const record of glyphs) {
+  const glyph=rasters[record.id],pixels=Buffer.from(glyph.pixels,'base64');
+  assert.equal(glyph.width,10);assert.equal(glyph.height,10);assert.equal(glyph.transparent,0);
+  assert.deepEqual(glyph.palette.slice(3,6),[255,255,255],`${record.id} core`);
+  assert.deepEqual(glyph.palette.slice(6,9),[0,0,0],`${record.id} outline`);
+  assert.deepEqual([...new Set(pixels)].sort(),[0,1,2],`${record.id} retains only transparent, core and outline indices`);
+ }
+});
 test('selected originals match retained raw members, palette hashes and reviewed decoded references', {skip:!process.env.ORIGINAL_FIDELITY_SOURCE},()=>{
  const root=process.env.ORIGINAL_FIDELITY_SOURCE;
  const raw=resolve(root,'research/gameplay-mechanics-2026-11-09/dos-resources/extracted');

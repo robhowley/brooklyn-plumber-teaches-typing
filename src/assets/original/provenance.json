@@ -2,13 +2,13 @@
   "archiveSha256": "b59886a6f7b48b0057c8db1c099ed598c8a3581245b0f8884316203de55784bd",
   "rights": "Public redistribution rights unverified.",
   "method": "Repository-authored data conversion. All source PNG RGB pixels compared before palette/mask adaptation. No archive code executed.",
-  "paletteLimit": "Character palette names and index-zero transparency are inferred; font preview uses MPALLET, not a proved runtime binding.",
+  "paletteLimit": "Character GPO bindings and index-zero transparency are inferred. FONT7H index 1 white and index 2 black are screenshot-informed browser colors, not a proved DOS runtime palette.",
   "review": "20 source backgrounds and selected sprite contact sheets inspected. All 20 browser background canvases matched decoded PNG RGBA pixels in Chrome 157.0.8103.50. Welcome and all four activities/three characters visually inspected in a browser contact sheet. Full integrated screen/DOM, narrow-layout, motion and production comparison remain Phase 6.",
   "adaptations": [
     "640x400 activity canvas uses integer 2x native backgrounds; scene placement and cadence are browser choices.",
     "Luigi/Princess action sprites recovered; no separate practice-face sets found, so existing browser portrait adaptations remain.",
     "Mario practice expression inset at native (142,21) matches the happy background RGB pixels exactly.",
-    "Font7H ink is white because its fallback preview palette is unsuitable for legible targets.",
+    "FONT7H index 1 is white for the glyph core and index 2 black for its outline, matching screenshot appearance; the DOS runtime palette remains unverified.",
     "Index-zero sprite transparency and named GPO bindings are inferred, not proved runtime bindings.",
     "Castle masonry tiles use a recovered block; sand masking and stationary pipe remain minimal browser adaptations.",
     "OCASTLE/ENDF availability does not establish original invocation or graduation triggers."
@@ -781,8 +781,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "f80387b688f1e034d9c5550983f397b5de0e2e8500b5f3d9ad71173da9ba5234"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "e180e981df54e1d4d5cc676008d17d0df217430c69659fd67094b74975dc4950"
     },
     {
       "id": "FONT7H-font7_34",
@@ -803,8 +803,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "b5c6ac42029e5129dea6c8d035537413842e480e37fc7f3d5720b73519ad9cd0"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "0a311e9ed9e2cdf8e87fc6f9c724da52e5cbc00d861441deccc7267554816bb1"
     },
     {
       "id": "FONT7H-font7_35",
@@ -825,8 +825,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "2736ffbcd3770eed1982112fffc5c4f7b953c7195fa7301f947282447f5157c8"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "43e3a7eddf6bc5a537843863cd6459d1f822fa2fc1c064985732c97ac6b4a1dc"
     },
     {
       "id": "FONT7H-font7_36",
@@ -847,8 +847,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "097195c9da3c7f4bd4c3b268651ea4be70efcf98c0da87b75bab927b2411ee47"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "4eb77500d28460ce850dcda6eeb84b05b116d7bc9fd7a02a73114570d1f099ff"
     },
     {
       "id": "FONT7H-font7_37",
@@ -869,8 +869,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "1d2c25af2207889190c7dcc5fedfcda64d1ef9e0e07569831be6da1407202727"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "015e8ca97519f3934963cd6e51ee86200c854b04c19956bba0b45c8b001e6318"
     },
     {
       "id": "FONT7H-font7_38",
@@ -891,8 +891,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "027f6a357e384d3ff8574a2545f364d839351dfa021386687a754fb5a7780b78"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "7414be564c01c66bbe8c79758614e16eb2147fff62932147c9ab34740470f727"
     },
     {
       "id": "FONT7H-font7_39",
@@ -913,8 +913,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "e62288b4174a2fc613ab3294359b20e6de56afe63c544a1d0fcca13853281877"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "b9ec8155c706cbe6f0dc031c754d8e4768dc8ff320ffacec69ad9a4430a879e2"
     },
     {
       "id": "FONT7H-font7_40",
@@ -935,8 +935,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "fc91b4df9d63ef72a6b6e17c069fcd7e7b2603f2f697fa4fbb018e488428b953"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "e3b34b466584d66e17e3cafa3942d8ff4bafc4cab2d02ff37930ffee47b05fe9"
     },
     {
       "id": "FONT7H-font7_41",
@@ -957,8 +957,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "5a4a451b67a3dc6d226f005c78a5cf813ce499be55f338ff65dca91494d2c6aa"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "ec63be5778053570ca7e09eb90fb954d9d5186c381964d182eacf7da4f67a643"
     },
     {
       "id": "FONT7H-font7_42",
@@ -979,8 +979,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "6ef99ed8b30175efb35171c333e5723034316996a7e6e9774ec2b061e42689e7"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "1e7e2f7fb26a8d0ae1df040aa8236cfa97927e940107fb8b4e7b843b7b8d0679"
     },
     {
       "id": "FONT7H-font7_43",
@@ -1001,8 +1001,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "afa261834d37344e31d5c065128a4ece5520cbfc0c46b8ac636a5c51ec467d4b"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "172a0eed4f1a7ea372805d70dc169ef4f19e12219d9ae81203e5117d00fbe876"
     },
     {
       "id": "FONT7H-font7_44",
@@ -1023,8 +1023,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "e9c4dd56860409884073df8e4d4c76a4487ef4dcf0fb678696e48b38a2a19134"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "075f5d120491ad1beebdacb8adaafbc5e12c7e1dea668ec87dfec073e4137070"
     },
     {
       "id": "FONT7H-font7_45",
@@ -1045,8 +1045,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "342ec73a830705cf08528185ec77914a8f80d6ff1b89d27629ef7197610ca77a"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "4c99c626c7cf6efb04b21bd08a1a2eed7e2a45ba92a92398c558bca77fd492af"
     },
     {
       "id": "FONT7H-font7_46",
@@ -1067,8 +1067,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "3936bc0985133b2c1119173e8b40ef30574fb50df7dd05a32ad658285269122a"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "eae1d314dd089fb612e6254a7e804865f8735d236175783eab771b18e962d6c8"
     },
     {
       "id": "FONT7H-font7_47",
@@ -1089,8 +1089,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "5df57cd095cb90823b0fcd0859bacc5095755ddfd381d514bcc27eeffdd13b7b"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "4e0458795fbd82b9fe3300dfacc5791bfe050c4ffda99b67dedc56306d7b290e"
     },
     {
       "id": "FONT7H-font7_48",
@@ -1111,8 +1111,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "31378fa24470c85dd4a5f5d8371bf5ed6724c8b94d4df32adfd7151be8854443"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "8935238006a1e475b0dee8ddf154fd4bba7338c80365bf68339e9f3834102670"
     },
     {
       "id": "FONT7H-font7_49",
@@ -1133,8 +1133,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "98ae9a70c473268fab9b1959c3abbf5f0ebbb585b6470253790c1bebe3d1cf9a"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "1f9338bf3d557e12cf3199cae6ecebfcf19ba007af84bba13cb6c62009e13b83"
     },
     {
       "id": "FONT7H-font7_50",
@@ -1155,8 +1155,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "bff86fe555d0ab3685077f2c1eab862c7c3146f359a43dc8efeb83413e2ca912"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "c3ee294a3f85b2e620ca596d71885a40e2df304b30fdf8a5e3d247dae2eb1aae"
     },
     {
       "id": "FONT7H-font7_51",
@@ -1177,8 +1177,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "899bc5609ee216d609f5e62db312d7e377582a6e82df2e3c6d484dfa9a7b4d31"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "a55a8b3657963298b7d05b595e5c94c2761c1238bcf3ba51c3906b7b1e51a514"
     },
     {
       "id": "FONT7H-font7_52",
@@ -1199,8 +1199,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "a9cf1eda396b69ef5dfe8466e9fe43388ed117c309865bb827b7d484c0af1bec"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "317d5e71b193d0e45fd5c4663ee3178cc05fb751e9a8443baa33e7f9dee7a6b3"
     },
     {
       "id": "FONT7H-font7_53",
@@ -1221,8 +1221,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "aff1c65a2e9e3884160226107604e53209d87bc68bab0ff01adc0480e3f0f906"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "0176b0e9178bd8e3b7ad7e04707e223863d028bcb2c4d52296f53cf14cbeb0cc"
     },
     {
       "id": "FONT7H-font7_54",
@@ -1243,8 +1243,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "ef01fb1c013e88e7df34bc0cbef92ab6c701ee3acdd3b882ef9bc906d0068669"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "2eef30217ce6c43888fdf1350d8cb1949330f82329758d9e0827d9440e2f0797"
     },
     {
       "id": "FONT7H-font7_55",
@@ -1265,8 +1265,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "2f49553097d8e091d5130e8e27fb11386ecdda52c72f33c0f644d525ad0e5f6d"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "d3665d31602c9383e798715cf9a3f372308b111973f02aa363ca7f0ea8bd7ef2"
     },
     {
       "id": "FONT7H-font7_56",
@@ -1287,8 +1287,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "b132ff4f34060713537f0e0befe3bfa8fbe396f90adf62dd53e4421a21e000ee"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "c87ca3d09409927d1dcfdc69c6f6f7376c18384f2e7cd59ab2f030965a93c2fa"
     },
     {
       "id": "FONT7H-font7_57",
@@ -1309,8 +1309,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "b829daadb2d1cf59333d14e353a4bd1b11c9776b7cd66046c82035fec0c339bd"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "f30eb19deb70d107a69a212ef088287af9b62f8cf14ebf346f73ab9f22b12eed"
     },
     {
       "id": "FONT7H-font7_58",
@@ -1331,8 +1331,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "297320c9de7f069e64fa76074744b3daeee4e639c43c17d816a421539f34db6b"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "eb5287784a247b941bbca879a3ee46508836ecc22baa1d0d7e8658fffb7e42a3"
     },
     {
       "id": "FONT7H-font7_59",
@@ -1353,8 +1353,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "6bebf3e7229c0e83cbaccf637c7e34f22089c522c04d9a77fb76b44e0a3c6cb5"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "2da2a2f19d9ef8d913a95a3f911fa3dffca1b1e5b385dc928da6b0bbeb5b1ca4"
     },
     {
       "id": "FONT7H-font7_60",
@@ -1375,8 +1375,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "236ef9b44e41c9294ca7b7d8340c815c36efc15326a4a2050db9ec3426f28aeb"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "adf478a89b8a5e4419ffd198726a487b132a6a0eebba35b88cb6780c2ca412ab"
     },
     {
       "id": "FONT7H-font7_61",
@@ -1397,8 +1397,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "16acf935069da03496dbbbc822c808df48f6ce763a0b3c236f4853b85a29660c"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "2190b030163ad060b5010adb00d22a569d40803fb314433651f7104ccfc3be25"
     },
     {
       "id": "FONT7H-font7_62",
@@ -1419,8 +1419,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "6fb8a64b6c9769c38c804a5a0a12c97f048b4e6552b8df04f3ec4db009960453"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "b21b2c606bbb863b6884442a8095fbddcec86a94e037bc7b8e569ddda68dfe28"
     },
     {
       "id": "FONT7H-font7_63",
@@ -1441,8 +1441,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "8e23a665b4b19bef117f2397d9f1660d94a3c88a74b2f996de557d87e742d3b7"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "a09ae07b880083f1074d11d12b5e193a16e39322f904008c1d32079bd1d28960"
     },
     {
       "id": "FONT7H-font7_64",
@@ -1463,8 +1463,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "20cdbdeb39659438aa9355aa2b48ffcccdf88d75590aeb7cc2901f34e70cfecb"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "560c152e6baed2413b17b4b846ff59418eb911c022b7aba6c19df2064451ba12"
     },
     {
       "id": "FONT7H-font7_65",
@@ -1485,8 +1485,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "67964c5b59fc9e296333d52f75ad625b09b277094b82abb2efabc93946956519"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "a62dc2c1ad1ff3d359e4e22fb511d3a9bfdd7e0048c1ba7acceb07e8f5f153f9"
     },
     {
       "id": "FONT7H-font7_66",
@@ -1507,8 +1507,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "cdffafd5995f9eb281b5dd7a21bf9988577a45a2695ff1f51905dda03d07211e"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "9129d974e25aaf0bd96feac16c7f80e69b3f7d4d9abfeb8c5ebbfc033b18f35f"
     },
     {
       "id": "FONT7H-font7_67",
@@ -1529,8 +1529,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "bec6c149731ba9bf302622363912dec6609415dcfa648ef77b9a62193aa0163f"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "8161e9d426d5498db98ab395b63fc7f104946e8a66ad8edcebc1eaa6722ef1cb"
     },
     {
       "id": "FONT7H-font7_68",
@@ -1551,8 +1551,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "0c1c27899acb5c789fb8253f0b4ff016f0ca7c14240dce8650731501a99b925b"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "c28ce75168f1e83e4f371dd814ff0481400a036773db8b02f58b7b59044d3fd2"
     },
     {
       "id": "FONT7H-font7_69",
@@ -1573,8 +1573,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "a619e137d7a4043b705e79f1814b458c3779fcf22ceabffbce89ef5aff0572d5"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "53ffc7720b482970e4852374bcb1eb01e866843ba305c418265b379b01851afc"
     },
     {
       "id": "FONT7H-font7_70",
@@ -1595,8 +1595,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "f256c9406c5a3738e0e3b7a4d5fa994881571152f3baf631c522f0ca73214f48"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "95c21201270776fa0257f484b861c0a92da2fcc7e1c687d94afe24ba0c85b0b1"
     },
     {
       "id": "FONT7H-font7_71",
@@ -1617,8 +1617,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "360ddaf2a94f7e02fe9f1bc19e2aa0a29117e81773be726c7ec857342399a8d9"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "e794e432b07dbc0a2145d6e7aa6ee441c8aa4419bc4f01d315dd859b3afd1a79"
     },
     {
       "id": "FONT7H-font7_72",
@@ -1639,8 +1639,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "0d02f3f519bc5b6994b0d4b2bcea0fe61eb21a0d1a47132e05491c96118270ba"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "9193d2ba5d5d0a574544dd015664d414d33fd22cbc24b39900757dc1ba0bad27"
     },
     {
       "id": "FONT7H-font7_73",
@@ -1661,8 +1661,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "f150e0ec9d9852a647a63f3c0881f8831f55a15e7993e0663e6beed7ca6d2c73"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "38acfd496bc828c0224e8731534d1bcea963255fa798ebd867354d815e200999"
     },
     {
       "id": "FONT7H-font7_74",
@@ -1683,8 +1683,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "4d069c98f97f4853c54947c8ac80a08e70250fe1a0b2073b25ca690f736c2b96"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "e4ca693ba582e5ebb368a7a183e8848c569d246ff1caf0fc1fc73847e10e68ff"
     },
     {
       "id": "FONT7H-font7_75",
@@ -1705,8 +1705,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "24c5ac35ef205da00392010e7601d1a9c5bda2c017497ccb0676e495c51550b8"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "157e05090b2768e51bc2ad8ed270177b807774fc05a46bf43a6bfb82aca824a6"
     },
     {
       "id": "FONT7H-font7_76",
@@ -1727,8 +1727,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "2cc895c7e976737f4d97a7d873299f02eacbfa8b5a5eccaa1411be237ef5f86b"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "7bd6595c6139544f7bd9ebb74453a9a838fa3bae63968dac546129a75318f87e"
     },
     {
       "id": "FONT7H-font7_77",
@@ -1749,8 +1749,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "96f2499bc0ce3474504a82a9feb1fa203f612ca2e423d2fa5544227459264b83"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "4765658b92a4e7c219f48d95840a83f51431f1d9a690b26a23fadf2914e3bca4"
     },
     {
       "id": "FONT7H-font7_78",
@@ -1771,8 +1771,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "9dbde8b6eff9666d378aba5b51a9e73ed1a51345b0eb33e93a301726961a2cb9"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "939f6aa8eb824ac57a9020f80043c9e292ae6c51807dd0d78fbde7b1f0c615a8"
     },
     {
       "id": "FONT7H-font7_79",
@@ -1793,8 +1793,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "6ee5bdc2d0bdac52c09c104530e5bfbec1e742f5916874de95dca4ea8a43f09d"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "1fc10c4bb4f4f461db8c1eb69c67a578640edc7697479e5c65c4182aad7bdf35"
     },
     {
       "id": "FONT7H-font7_80",
@@ -1815,8 +1815,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "aac63acadb163116bca4049b6704abbda8ebe7ab31f89683d7d4f2dc8c46667b"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "4cba3b8bcb44a19f8ffdcca3d263609a3edb31c136b452c4e2cd849999f44b6f"
     },
     {
       "id": "FONT7H-font7_81",
@@ -1837,8 +1837,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "3d98890b922f2ce898c340d330e00f61161e7a7c0a28436c75c85d5a91570f0a"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "85f980c55d8f852c4bbc7701809bbf909efe6f62966f8f2d23066e66b2442d45"
     },
     {
       "id": "FONT7H-font7_82",
@@ -1859,8 +1859,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "fc5e32228c164af697e7d886cccaa8817ba980c5eecb87092f48e088bf9191d1"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "7f930ee593ace71ae5115845c01a62cea936eced47e4db1c4a94e0450687e433"
     },
     {
       "id": "FONT7H-font7_83",
@@ -1881,8 +1881,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "bcfc1ffb72306ce6673c4a8b6b0f5d2d76ecd0130dbc9292777bba15b83a9553"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "3bc608a37e5e680e68d97dcce5ab8017d9f35d235683f92499aac948a9358fa6"
     },
     {
       "id": "FONT7H-font7_84",
@@ -1903,8 +1903,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "3a96f36d431ae3beccf6e08915cfcb9d6127218eecd841b275908ba073baed89"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "f497eb270bd54a63c39f40af332e010c152ac3f0681fe0f1146378cd02c369d6"
     },
     {
       "id": "FONT7H-font7_85",
@@ -1925,8 +1925,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "32f64b12fe7c59e406efc8ce5437d7ef5b684f9ef8eae9dad64154914232f1d4"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "56608def57c07b6edcc0a055aa78b21f30ef9d71e1750b871f1c0d1a6fb75df4"
     },
     {
       "id": "FONT7H-font7_86",
@@ -1947,8 +1947,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "ed695a3bbeba6559f46f59bbc751bf8835e9c465b4b094fb0df70df61f019a4e"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "cd19d01d28570e19b7cb3f9fc62711be78b893cdfe4a46ebd94f47376f57c56c"
     },
     {
       "id": "FONT7H-font7_87",
@@ -1969,8 +1969,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "008734a3774cc2a28a89624984059f8a2a18a79d6881b8757c2aaa2974688bcf"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "47462a9eb1022f8be894b72f68e2116c0610d83305f3be411706e8c7902c229f"
     },
     {
       "id": "FONT7H-font7_88",
@@ -1991,8 +1991,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "123c4a6aa01197fcfdc2fad7f61175affece9f15223a6a2cbc22cecb5e13fae6"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "2608e3f4fe547dc1a65410e93b90cd4d17ec706a869da731f2a30f30d98ee05c"
     },
     {
       "id": "FONT7H-font7_89",
@@ -2013,8 +2013,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "d1db4bafec471eac0704ade038194559e81df23888949e78d3d98052af18da0f"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "e536b9b2c94d05726422badb84ba63310180cf4787a4fa08859affc437373edd"
     },
     {
       "id": "FONT7H-font7_90",
@@ -2035,8 +2035,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "549be42e8e839b900bd18b2b931bc1c5d172efb1793c0a29a77d9b94f0a6407a"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "003072ad3be66da0bb890471d4a8612dcf6802144ecef13ddf9a5918e25a1969"
     },
     {
       "id": "FONT7H-font7_91",
@@ -2057,8 +2057,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "8287e489fbd494e070ad6f717f92f9cdf678abb4dda2ddaef63dd1663f568d2a"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "ccd905413cfcc9c2ab1f50a00f4c91250d73f9588850cf28157a032ca11e3dd2"
     },
     {
       "id": "FONT7H-font7_92",
@@ -2079,8 +2079,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "85cf16a360b71fe00706bcebe95899b5c208a0850fb4e0ee118b33d12e65a77a"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "9d8e4c42a9e8bdb69c48091549a4bfdd1fbec5e2961ffb3764ccc2fe64de06b0"
     },
     {
       "id": "FONT7H-font7_93",
@@ -2101,8 +2101,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "83e100e329c12164d9c48fdce7a3747a1e8d1b692853286b70a93907557497dd"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "bad59b0ead6e0a14f631a087423130d9e33c1f7483eefca43e144bba0dee0f95"
     },
     {
       "id": "FONT7H-font7_94",
@@ -2123,8 +2123,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "0e04ccfdc9f06db2104bc213a5fcd1004c96c1d006c7f3b2da044b7fd4774b8f"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "5d7af81823053d9f74fd40ae59681f374e74f5f8e8f6505de3cd819c08ace532"
     },
     {
       "id": "FONT7H-font7_95",
@@ -2145,8 +2145,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "83cd2d1b9ee505cb9dd87d2664821ab9e087aa70af08491f9da4292de0f7ba5f"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "d9734db3882685ed7d88aec4bf5dddb6fea3aa64f289e23a559a078b42a619e1"
     },
     {
       "id": "FONT7H-font7_96",
@@ -2167,8 +2167,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "3a7cae5fb01478f95364a500277e4848160f2a2064331b083e88cd35cbd84ac2"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "7b11d8a347c85a6600ccb45eb136894f6bcc5ecb8ba2dc3c8575913c5942a1b2"
     },
     {
       "id": "FONT7H-font7_97",
@@ -2189,8 +2189,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "3ca1b902f7cba2d1fd42bfa715258a339748bb4147a55f839c4524d9f8feaf20"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "552e761f5a4332d4eb4c572e51dfda60f7241c0d55e3d9a6a3093009e37da63d"
     },
     {
       "id": "FONT7H-font7_98",
@@ -2211,8 +2211,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "652fe687670fc2e75a371a71c49fa97b0bfaefeab7af8b1451a0e9ec9e4302b9"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "113c10c6b47021b68f2a997e62b06836ea3dfb287ac0f2970bd5ce2b3b7ca976"
     },
     {
       "id": "FONT7H-font7_99",
@@ -2233,8 +2233,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "c958360f9e8c790cbf5cb1bd8cde60275a83bbb324d1ec77e6acf5805a35cb22"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "9b3b4989ca2d0f9b9c7df384a659bbcc8dd1428c6b401cd57c0bf9f8ce2323ae"
     },
     {
       "id": "FONT7H-font7_100",
@@ -2255,8 +2255,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "1a0a6376f59d8f4deea5ccc587fa00bbb24294e443d2b14d6b610a931b673d32"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "5ef63bfe33b065aa77220d4febff234e1c570201e06773f7c1813a79a5a503e6"
     },
     {
       "id": "FONT7H-font7_101",
@@ -2277,8 +2277,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "69e691881aa672fd40107d41d425642096b44aaf17cc4857784c886108875c96"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "5d84ce34f943faf58a7beb70888bc5917943be55ed2578981e03276617b24201"
     },
     {
       "id": "FONT7H-font7_102",
@@ -2299,8 +2299,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "b6c05f31596598c2cc4353e4cd4a4bcd8041ba982c23204c40b99576b39a0ced"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "3adf41be48813567bcedb0d1770de755971db31b2c74c5fab656db2f0cc5e7b9"
     },
     {
       "id": "FONT7H-font7_103",
@@ -2321,8 +2321,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "b53710d7580dc7ef884a7beace209eb7a04334200a78b0d7900a64c701ed4f37"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "5e39f30710eb79d348d1ac99d444957dd56a07bf1e917ac6e749ba8143b3f03c"
     },
     {
       "id": "FONT7H-font7_104",
@@ -2343,8 +2343,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "4f4b6bdef0968aec1ac028cac9b1a255d4b69f1df8b7d7f48917dc5dd9b52003"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "883c3187148030a259aed87198d9727938c8e3f4280a1c88fa5efd03b35132a6"
     },
     {
       "id": "FONT7H-font7_105",
@@ -2365,8 +2365,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "8a918a0d487e73299587c651b3d754c142a58064838303f6784604703e7a5f07"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "6983a33039d51614b46d75443e4995e0ec566a45f5ede6313fe34f80171f8b56"
     },
     {
       "id": "FONT7H-font7_106",
@@ -2387,8 +2387,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "96131147bee9a7e81c9d8a3070c934518875e8ec4ba2233b0936801deac20657"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "08f96a16d48ed0426f044e8273e7b0954b2b6a4af4a50c65aa96e53cb1cdcd5b"
     },
     {
       "id": "FONT7H-font7_107",
@@ -2409,8 +2409,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "5f3840246c89fcfffe2ba79173a5e7303388cdfcf26aaf6fcf6048923a26e674"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "68e23f372cce2695ec0cdc5eff5db9c9ea00d8bd50879ce8f970d3ec3a632342"
     },
     {
       "id": "FONT7H-font7_108",
@@ -2431,8 +2431,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "fb53f3044e52e4e285fa4957023415af138116e9f1822b63fef491229428aa87"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "f16aad3dde159b04ab9370001c71db43db4c2cdcc0228cc84a0a1d50e2f9caf8"
     },
     {
       "id": "FONT7H-font7_109",
@@ -2453,8 +2453,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "7f50bb10e7e89ed82f6960e2939389040496e5851277bd6081de41649fd26074"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "fef39f2b91d01851045a902e7ff721fb6fedd9ebf98bdc57861381d0730554a4"
     },
     {
       "id": "FONT7H-font7_110",
@@ -2475,8 +2475,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "250896771da819b6b7d4fe92d4cb63594aae58ce11b0bef7ac695f16c98b69a4"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "0854e8fb373491acbd76f500bf12b66819a24ad3aa229d52c805b9fe13c79329"
     },
     {
       "id": "FONT7H-font7_111",
@@ -2497,8 +2497,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "4584a458847c2034fdc52f712c9986ff1dd78f7a2465c2a78fcc6e712c725e64"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "fb516f9a6164625ae57f465375270363ef253e75c4cffa41de007a65d7ed333d"
     },
     {
       "id": "FONT7H-font7_112",
@@ -2519,8 +2519,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "e5a0ca5299304f7bb1edb8a5b4e3d0816af9709a4d1dbbabe5a7ebf9d4f09f0b"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "a8af50069449f4c8740a35ccd2f90486b869de6a495cac8afbb30b21cbb1cce6"
     },
     {
       "id": "FONT7H-font7_113",
@@ -2541,8 +2541,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "2102ef79ec901ae61746a9d13e4b302283646eaa129181a4d37687284ee48847"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "3a1a00e8097c48b8b90f20a34d5cf72705dff98841445b0507bd7eb037791520"
     },
     {
       "id": "FONT7H-font7_114",
@@ -2563,8 +2563,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "216bae58752f9da88dce5613aa730adb5cf86b79db6f0235556c44b9f414abb0"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "8c9ea4b8f3378073397af6ecb29d200d451f46b73dda742a52bcad5bf2c11df0"
     },
     {
       "id": "FONT7H-font7_115",
@@ -2585,8 +2585,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "b8dfbfe4ba4dfcd256d5903d4614c4365a237619618bc0155594ca2f87068ff6"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "447d3a0145b218267ff0ec0548aba6dd4624f86732204f89a74d4fb07c7e15f2"
     },
     {
       "id": "FONT7H-font7_116",
@@ -2607,8 +2607,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "9ce4f0b9eaa39c0a7f86b99044978e36bdee95dad332f5fadba31351a85e1bfe"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "c2275ccfc256fd22eedbaa44c717bd1aeea992f09c1ae36fefe2f0b1056b6bd3"
     },
     {
       "id": "FONT7H-font7_117",
@@ -2629,8 +2629,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "58c5aa280542243f78156756cd2d52eae12951fc4e4dd09aaf5514159540c858"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "db602d55710eb8a0ae7d3819adeb79c47c485e8666263341390dc91579629861"
     },
     {
       "id": "FONT7H-font7_118",
@@ -2651,8 +2651,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "e1fdc90bc5c9736efec7d742f48a24c509ed146d247bfeffd7e4085bc1e5ad30"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "8caa4a613cae367c8a5ee4abee105b4e553dcbd39ee7a73af40c410d48c532e8"
     },
     {
       "id": "FONT7H-font7_119",
@@ -2673,8 +2673,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "12c7b7c47409d33e647bed4f0f919d9198dee3cc327cdf58b72d1d0f25c70ebb"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "4fc399559151cc79d6292064f1d6228d43c776b4a3fa8630abb25d18812f334f"
     },
     {
       "id": "FONT7H-font7_120",
@@ -2695,8 +2695,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "f284ce8416d07392f2557acd011bb121764bd9bf1ef2f173f8dcb4c875b883f3"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "c7cbd32c90391324efa77eb570ac56292a83b0609376e88fd188ebdab71bfd1f"
     },
     {
       "id": "FONT7H-font7_121",
@@ -2717,8 +2717,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "0f213c75dc2ba47090f9e40059d44e6b52be327d263264a42ef7be8e61893a41"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "aba004da76cf4fe35db7d20398020fc099e7a62d20633f8690a4824df1b6f761"
     },
     {
       "id": "FONT7H-font7_122",
@@ -2739,8 +2739,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "46113caf011bfb2f12d76e60492bba59374d2912d7b630990dc34e7efe1afc79"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "e0bc9900e00ca053b4cfd0e24b693b3bf7d209e19967193ee1dfac04358b7e48"
     },
     {
       "id": "FONT7H-font7_123",
@@ -2761,8 +2761,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "b797ae646b2f36540a09f17bd7c80a7b3d5f931b17bbc8b24ed8066b59a1a9e1"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "d2930d81bbf13228430c28f88bde53f21267d15c248b20bad3b4f3e8299aced4"
     },
     {
       "id": "FONT7H-font7_124",
@@ -2783,8 +2783,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "4f6d23bc6053e19af31ceb5c0e101a23332f1558ab83ca27b281df53a2f8ad44"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "330b02c18d038eee03dc9db2e560f6febe6c02c234383b3bb366d35e43abbefd"
     },
     {
       "id": "FONT7H-font7_125",
@@ -2805,8 +2805,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "7f60d587884a843540a33864ada6335128b83a25acd7093b438ca846650d249a"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "503ec6e0fa43405e8b626264876f43c1d613fd847900cc4ee54d7a9f6b7b3446"
     },
     {
       "id": "FONT7H-font7_126",
@@ -2827,8 +2827,8 @@
       "width": 10,
       "height": 10,
       "transparentIndex": 0,
-      "adaptation": "Nontransparent font pixels changed to white; original glyph geometry retained.",
-      "rasterSha256": "334f2e24c488bf715db0bfdfd67b6fc6e6d4884ac31008ba8a1f25aa66188516"
+      "adaptation": "Screenshot-informed browser colors: index 1 white core and index 2 black outline; original runtime palette unverified.",
+      "rasterSha256": "d5171472ada2559d9b431fbeb0f8101a36a191939e0ff142b5b6ed2cc2cf1145"
     },
     {
       "id": "GREET-greettxt_T",

@@ -161,7 +161,7 @@ The independent verifier at `/Users/roberthowley/.pi/subagent-runs/20261110T0327
 
 - Retained 20 backgrounds and 166 sprites/glyphs (186 selections). Removed all three unused `run0009` sprites and unused `FONT7H-font7_32`; the three-frame run sequence and browser space cue already cover their roles. Importer, raster data, provenance and tests agree.
 - `drawScreen(canvas,family)` draws at 320×200 and returns `SCREEN_LAYOUTS` overlay bounds; `drawScene` draws at 640×400. Rendering remains model-read-only, cached and independent of sound settings.
-- Luigi/Princess practice faces remain browser adaptations; named palette bindings and index-zero masks remain inferred; font ink is changed to white. Castle sand/pipe, placement and animation cadence remain browser adaptations. OCASTLE/ENDF availability proves no original trigger. Rights remain unverified. No archive code or audio was executed or shipped.
+- Luigi/Princess practice faces remain browser adaptations; named palette bindings and index-zero masks remain inferred. FONT7H uses a white core (index 1) and black outline (index 2) based on screenshot appearance, not a proved DOS runtime palette. Castle sand/pipe, placement and animation cadence remain browser adaptations. OCASTLE/ENDF availability proves no original trigger. Rights remain unverified. No archive code or audio was executed or shipped.
 
 #### Checks and later-phase handoff
 
@@ -241,7 +241,7 @@ FIDELITY_DIST=.tmp/phase5-dist PLAYWRIGHT_PORT=4185 PLAYWRIGHT_JUNIT_OUTPUT_FILE
 | D5 | Coverage unchanged: outdoor all original; water H generated, T records 1–2 original/3–7 generated, B/N/S original; castle H/T/B generated, N only record 2 original, S original; all-keyboard action modes original; practice wholly generated because scored wrapping remains unresolved (G3). Explicit generated alternative stays available. Source-order/retry are deterministic browser choices. |
 | D6 | New/load/edit, literal student strings, reload, session-only/recovery and separate history/certificates pass. Panel placement changes neither form values nor storage semantics. |
 | D7 | Timeout reason and actual elapsed/configured limit remain in the blackboard DOM. Early deaths remain disabled; hazard-state/terminal mapping is still G4. |
-| D8 | Original assets remain primary; no reference image enters production. Palette/index-zero masks, white font ink, Luigi/Princess practice faces, placement/scaling/cadence, scrolling/contact, castle sand/pipe and practice mood bands remain adaptations. Browser keyboard/reflow checks pass; independent visual review was pending at this checkpoint and subsequently passed (see final review below). |
+| D8 | Original assets remain primary; no reference image enters production. FONT7H index 1 white cores and index 2 black outlines are screenshot-informed browser colors, not a proved DOS runtime palette. Character palette/index-zero masks, Luigi/Princess practice faces, placement/scaling/cadence, scrolling/contact, castle sand/pipe and practice mood bands remain adaptations. Browser keyboard/reflow checks pass; independent visual review was pending at this checkpoint and subsequently passed (see final review below). |
 
 ### Final automated review, 2026-11-10
 
