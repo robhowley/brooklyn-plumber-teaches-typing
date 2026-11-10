@@ -1,5 +1,5 @@
 import {test,expect} from '@playwright/test';
-import {boot,activate,openMenu,stored,selectedStudent} from './helpers.js';
+import {boot,activate,openMenu,enterActivity,stored,selectedStudent} from './helpers.js';
 
 test('keyboard navigation, student slots, settings and selected student survive reload',async({page})=>{
  await boot(page);await openMenu(page,'Student');await page.locator('#new-student').click();
@@ -25,7 +25,7 @@ test('keyboard navigation, student slots, settings and selected student survive 
 
 test('help returns focus and gameplay pause traps keyboard without changing clocks',async({page})=>{
  await boot(page);await openMenu(page,'File');await activate(page,'#keyboard');await expect(page.locator('#screen-art')).toHaveAttribute('aria-label','Original KEYBOARD background');await activate(page,'#back');await expect(page.locator('#keyboard')).toBeFocused();
- await page.keyboard.press('Escape');await page.keyboard.press('1');await activate(page,'#generated');await page.keyboard.press('Escape');await expect(page.locator('#resume')).toBeFocused();
+ await page.keyboard.press('Escape');await enterActivity(page,'outdoor');await page.keyboard.press('Escape');await expect(page.locator('#resume')).toBeFocused();
  const time=await page.locator('#time').textContent();await page.clock.runFor(60000);await page.keyboard.press('a');await expect(page.locator('#time')).toHaveText(time);await expect(page.locator('#correct')).toHaveText('0');
  await page.keyboard.press('Shift+Tab');await expect(page.locator('#leave')).toBeFocused();await page.keyboard.press('Tab');await expect(page.locator('#resume')).toBeFocused();await page.keyboard.press('Enter');await expect(page.locator('#pause-panel')).toBeHidden();
  await page.keyboard.press('Escape');await page.keyboard.press('Tab');await page.keyboard.press('Enter');await expect(page.locator('#screen-art')).toHaveAttribute('aria-label','Original MAINMENU background');await expect(page.locator('#activity-outdoor')).toBeFocused();expect(await page.evaluate(()=>document.body.classList.contains('playing'))).toBe(false);

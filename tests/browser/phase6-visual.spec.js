@@ -1,6 +1,6 @@
 import {test,expect} from '@playwright/test';
 import {mkdir} from 'node:fs/promises';
-import {boot,custom,activate,openMenu,fixture} from './helpers.js';
+import {boot,enterActivity,activate,openMenu,fixture} from './helpers.js';
 import {SCREEN_LAYOUTS} from '../../src/screen-art.js';
 
 const evidence=process.env.FIDELITY_EVIDENCE||'.tmp/fidelity-validation/phase6-final';
@@ -14,7 +14,7 @@ async function panelGeometry(page,family){
  await expect(panel).toBeVisible();
 }
 for(const mode of ['outdoor','underwater','castle','practice'])test(`${mode}: focused controls never type; native activation restores typing focus`,async({page})=>{
- await boot(page,{data:fixture({duration:60,goal:30})});await custom(page,mode);await expect(page.locator('main.play')).toBeFocused();
+ await boot(page,{data:fixture({duration:60,goal:30})});await enterActivity(page,mode);await expect(page.locator('main.play')).toBeFocused();
  for(const selector of ['#pause','#keyboard-toggle','#home']){
   await page.locator(selector).focus();await page.keyboard.press('a');await page.keyboard.press('Shift+A');
   await expect(page.locator('#correct')).toHaveText('0');await expect(page.locator('#errors')).toHaveText('0');
@@ -31,9 +31,9 @@ for(const width of [390,720,1280])test(`${width}px original panels contain reada
  await page.setViewportSize({width,height:width===720?450:900});await boot(page,{data:fixture({duration:3})});
  await openMenu(page,'Student');await activate(page,'#times');await panelGeometry(page,'LESSTIME');await expect(page.locator('.original-panel #times-form')).toBeVisible();await capture(page,`${width}-times`);await page.locator('[name="practice-seconds"]').focus();await capture(page,`${width}-times-scrolled`);await activate(page,'#back');
  for(const [menu,id,family] of [['Student','edit-student','PREFS'],['Student','load-student','LOAD'],['File','help','HELP']]){await openMenu(page,menu);await activate(page,`#${id}`);await panelGeometry(page,family);await capture(page,`${width}-${family}`);await activate(page,'#back');}
- await custom(page,'practice');await panelGeometry(page,'PRACTICE');await expect(page.locator('.practice-screen #text-strip mark')).not.toHaveText('');await capture(page,`${width}-practice`);
+ await page.keyboard.press('Escape');await enterActivity(page,'practice');await panelGeometry(page,'PRACTICE');await expect(page.locator('.practice-screen #text-strip mark')).not.toHaveText('');await capture(page,`${width}-practice`);
  await page.clock.fastForward(3032);await panelGeometry(page,'BLACKBRD');await expect(page.locator('.original-panel #outcome')).toContainText('Not passed');await expect(page.locator('.original-panel .result-metrics')).toContainText('WPM');await capture(page,`${width}-result`);await page.locator('#outcome').scrollIntoViewIfNeeded();await capture(page,`${width}-result-status`);await activate(page,'#report');await panelGeometry(page,'RCARD');await capture(page,`${width}-report`);await activate(page,'#back');
- await custom(page,'outdoor');
+ await enterActivity(page,'outdoor');
  const cabinet=await page.locator('.game-cabinet').boundingBox();
  for(const selector of ['.hud','.hud-right','.hud-stats','.hand-guide','#wpm','#errors'])for(const node of await page.locator(selector).all()){
   const box=await node.boundingBox();expect(box.x).toBeGreaterThanOrEqual(cabinet.x);expect(box.x+box.width).toBeLessThanOrEqual(cabinet.x+cabinet.width);

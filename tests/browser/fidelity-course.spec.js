@@ -3,7 +3,7 @@ import {mkdir,writeFile,readFile,readdir} from 'node:fs/promises';
 import {createHash} from 'node:crypto';
 import {resolve,relative} from 'node:path';
 import {execFileSync} from 'node:child_process';
-import {boot,activate,openMenu,stored,fixture} from './helpers.js';
+import {boot,activate,enterActivity,openMenu,stored,fixture} from './helpers.js';
 
 const evidence=process.env.FIDELITY_EVIDENCE||'.tmp/fidelity-validation/phase6-final';
 const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
@@ -73,7 +73,7 @@ for(const motion of ['no-preference','reduce'])test(`fresh full guided course, e
  expect(route.map(r=>`${r.goal}:${r.group}`)).toEqual([...Array.from({length:6},(_,i)=>`5:${i}`),'7:5','9:5',...Array.from({length:6},(_,i)=>`10:${i}`),'15:5','20:5','25:5',...Array.from({length:6},(_,i)=>`30:${i}`),'35:5','40:5','45:5','50:5']);
  await reload(page);await page.keyboard.press('5');await snapshot(page,`${motion}-report`);
  for(let i=0;i<3;i++){await activate(page,`[data-certificate="${i}"]`);await snapshot(page,`${motion}-certificate-${i}`);const waiting=page.waitForEvent('download');await activate(page,'#download');const download=await waiting;const path=`${evidence}/${motion}-${download.suggestedFilename()}`;await download.saveAs(path);const text=await readFile(path,'utf8');expect(text).toContain(graduated.name);expect(text).toContain(graduated.certificates[i].resultId);expect(text).toContain(graduated.certificates[i].ruleset);await activate(page,'#back');}
- await activate(page,'#back');await page.keyboard.press('4');await activate(page,'#generated');await snapshot(page,`${motion}-practice`);await paced(page,5,'practice');await snapshot(page,`${motion}-practice-result`);await activate(page,'#retry');await page.clock.fastForward(10032);await expect(page.locator('#outcome')).toContainText('Not passed');await snapshot(page,`${motion}-practice-failed-retry`);await activate(page,'#menu');
+ await activate(page,'#back');await enterActivity(page,'practice');await expect(page.locator('#source-caption')).toContainText('Generated practice, not original lesson text');await snapshot(page,`${motion}-practice`);await paced(page,5,'practice');await snapshot(page,`${motion}-practice-result`);await activate(page,'#retry');await page.clock.fastForward(10032);await expect(page.locator('#outcome')).toContainText('Not passed');await snapshot(page,`${motion}-practice-failed-retry`);await activate(page,'#menu');
  expect((await student(page)).course).toEqual(graduated.course);expect((await student(page)).certificates).toEqual(graduated.certificates);expect(errors).toEqual([]);
  }finally{await mkdir(evidence,{recursive:true});await writeFile(`${evidence}/course-${motion}.json`,JSON.stringify({route,student:await student(page),errors},null,2));}
 });

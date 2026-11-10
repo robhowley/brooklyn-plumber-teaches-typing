@@ -1,9 +1,9 @@
 import {test,expect} from '@playwright/test';
-import {boot,custom,typeTargets,activate,openMenu,fixture,stored} from './helpers.js';
+import {boot,custom,typeTargets,activate,enterActivity,openMenu,fixture,stored} from './helpers.js';
 import {defaults,createStore,STORAGE_KEY,LEGACY_STORAGE_KEY} from '../../src/storage.js';
 
 for(const errors of [1,2])test(`integer accuracy with ${errors} errors controls result and matches HUD`,async({page})=>{
- await boot(page);await custom(page,'practice');await typeTargets(page,9);for(let i=0;i<errors;i++)await page.keyboard.press('~');
+ await boot(page);await enterActivity(page,'practice');await typeTargets(page,9);for(let i=0;i<errors;i++)await page.keyboard.press('~');
  await page.clock.runFor(2900);await expect(page.locator('#accuracy')).toHaveText(errors===1?'90%':'81%');await page.clock.runFor(200);
  await expect(page.locator('#outcome')).toContainText(errors===1?'Passed at timeout':'Accuracy is below 90%');await expect(page.locator('#next')).toBeDisabled();
  const r=(await stored(page)).students[0].results[0];expect(r.accuracy).toBe(errors===1?90:81);expect(r.wpm).toBe(Math.floor((9-errors)*182/54));
@@ -29,12 +29,12 @@ for(const raw of ['{',JSON.stringify({version:99})])test(`blocked recovery does 
 test('quota failure is visible while in-memory result and Next remain available',async({page})=>{
  await boot(page,{data:fixture({group:0})});const before=await stored(page);
  await page.evaluate(()=>{Storage.prototype.setItem=()=>{throw new DOMException('Quota exceeded','QuotaExceededError');};});
- await page.keyboard.press('1');await activate(page,'#original');await typeTargets(page,12);await page.clock.runFor(3100);
+ await enterActivity(page,'outdoor');await typeTargets(page,12);await page.clock.runFor(3100);
  await expect(page.locator('#storage-status')).toContainText('session only');await expect(page.locator('#next')).toBeEnabled();expect(await stored(page)).toEqual(before);
  await activate(page,'#next');await expect(page.locator('#screen-art')).toHaveAttribute('aria-label','Original MAINMENU background');expect(await stored(page)).toEqual(before);
  await openMenu(page,'File');await activate(page,'#help');await expect(page.locator('#storage-status')).toContainText('may be lost on reload');
 });
 
 test('unavailable storage is usable but clearly temporary',async({page})=>{
- await page.addInitScript(()=>Object.defineProperty(window,'localStorage',{get(){throw Error('denied');}}));await boot(page,{data:null});await openMenu(page,'File');await activate(page,'#help');await expect(page.locator('#storage-status')).toContainText('session only');await activate(page,'#back');await page.keyboard.press('Escape');await page.keyboard.press('4');await activate(page,'#generated');await expect(page.locator('#target')).toBeVisible();
+ await page.addInitScript(()=>Object.defineProperty(window,'localStorage',{get(){throw Error('denied');}}));await boot(page,{data:null});await openMenu(page,'File');await activate(page,'#help');await expect(page.locator('#storage-status')).toContainText('session only');await activate(page,'#back');await page.keyboard.press('Escape');await enterActivity(page,'practice');await expect(page.locator('#source-caption')).toContainText('Generated practice, not original lesson text');await expect(page.locator('#target')).toBeVisible();
 });

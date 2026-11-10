@@ -1,5 +1,5 @@
 import {test,expect} from '@playwright/test';
-import {boot,custom,typeTargets,activate,fixture,stored,openMenu} from './helpers.js';
+import {boot,custom,typeTargets,activate,enterActivity,fixture,stored,openMenu} from './helpers.js';
 
 for(const mode of ['outdoor','underwater','castle','practice'])test(`${mode}: keyboard pass, fail, retry and menu without custom advancement`,async({page},info)=>{
  const errors=[];page.on('pageerror',e=>errors.push(e.message));await boot(page);
@@ -20,9 +20,16 @@ for(const mode of ['outdoor','underwater','castle','practice'])test(`${mode}: ke
  expect(errors).toEqual([]);
 });
 
+test('direct activity entry does not guide a mismatched student setting',async({page})=>{
+ await boot(page,{data:fixture({duration:3,goal:5,group:1})});await enterActivity(page,'outdoor');await typeTargets(page,12);await page.clock.runFor(3100);
+ const p=(await stored(page)).students[0];expect(p.results[0]).toMatchObject({guided:false,mode:'outdoor',group:1});
+ expect(p.course).toMatchObject({group:0,goal:5,pending:null});await expect(page.locator('#next')).toBeDisabled();
+});
+
 test('guided first success survives failed retry and reload; explicit Next commits once and returns menu',async({page})=>{
- await boot(page,{data:fixture({group:0})});await page.keyboard.press('1');await activate(page,'#original');
+ await boot(page,{data:fixture({group:0})});await enterActivity(page,'outdoor');
  await typeTargets(page,12);await page.clock.runFor(3100);await expect(page.locator('#next')).toBeEnabled();
+ const firstResult=(await stored(page)).students[0].results[0];expect(firstResult.guided).toBe(true);
  const first=(await stored(page)).students[0].course.pending;
  expect(first.destination.group).toBe(1);await activate(page,'#retry');await page.clock.runFor(3100);
  await expect(page.locator('#outcome')).toContainText('Not passed');await expect(page.locator('#next')).toBeEnabled();

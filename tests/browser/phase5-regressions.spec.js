@@ -1,8 +1,8 @@
 import {test,expect} from '@playwright/test';
-import {boot,activate,openMenu,typeTargets,fixture,stored} from './helpers.js';
+import {boot,activate,enterActivity,openMenu,typeTargets,fixture,stored} from './helpers.js';
 
 test('Space activates focused gameplay controls without typing attempts',async({page})=>{
- await boot(page);await page.keyboard.press('4');await activate(page,'#generated');
+ await boot(page);await enterActivity(page,'practice');await expect(page.locator('#source-caption')).toContainText('Generated practice, not original lesson text');
  await page.locator('#keyboard-toggle').focus();await page.keyboard.press('Space');
  await expect(page.locator('#keyboard-guide')).toBeVisible();await expect(page.locator('#keyboard-toggle')).toHaveAttribute('aria-expanded','true');
  await expect(page.locator('#correct')).toHaveText('0');await expect(page.locator('#errors')).toHaveText('0');

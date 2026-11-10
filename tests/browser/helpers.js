@@ -10,7 +10,22 @@ export async function activate(page,selector) {
   await page.locator(selector).focus();
   await page.keyboard.press('Enter');
 }
+export async function enterActivity(page,mode,via='shortcut',{waitForGameplay=true}={}) {
+  const modes={outdoor:'1',underwater:'2',castle:'3',practice:'4'};
+  if(!modes[mode])throw new RangeError(`Unknown activity: ${mode}`);
+  if(via==='pointer')await page.locator(`#activity-${mode}`).click();
+  else if(via==='shortcut')await page.keyboard.press(modes[mode]);
+  else throw new RangeError(`Unknown activity entry: ${via}`);
+  if(waitForGameplay){
+    if(page.levelEntryTestMotion==='no-preference'){
+      if(page.levelEntryTestClock)await page.clock.runFor(200);
+      else await page.waitForTimeout(250);
+    }
+    await page.locator('#scene').waitFor({state:'visible'});
+  }
+}
 export async function boot(page,{data=fixture(),motion='reduce',clock=true}={}) {
+  page.levelEntryTestMotion=motion;page.levelEntryTestClock=clock;
   await page.emulateMedia({reducedMotion:motion});
   if(data) await page.addInitScript(({key,data})=>{if(!localStorage.getItem(key))localStorage.setItem(key,JSON.stringify(data));},{key:STORAGE_KEY,data});
   if(clock)await page.clock.install({time:new Date('2026-11-10T00:00:00Z')});

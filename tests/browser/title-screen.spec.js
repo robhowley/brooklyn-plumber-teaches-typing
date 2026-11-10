@@ -147,12 +147,16 @@ for (const viewport of [{ width: 1280, height: 720 }, { width: 390, height: 844 
   });
 }
 
-test('historical notice appears before any original learner text and offers generated alternative', async ({ page }) => {
-  await page.goto('/'); await page.locator('#skip-title').click(); await page.keyboard.press('1');
+test('File Help carries the historical notice and explains the generated browser route', async ({ page }) => {
+  await page.goto('/'); await page.locator('#skip-title').click();
+  await page.locator('summary').filter({hasText:/^File$/}).click();await page.locator('#help').click();
   await expect(page.locator('.historical-notice')).toContainText('outdated or inaccurate claims');
   await expect(page.locator('.historical-notice')).toContainText('war, slavery, assassination and disasters');
+  const helpText=(await page.locator('.archive-page').innerText()).replace(/\s+/g,' ');
+  expect(helpText).toMatch(/activities 1\s*(?:–|-)\s*4/i);expect(helpText).toMatch(/original-first/i);expect(helpText).toMatch(/help.*(?:generated|custom)|(?:generated|custom).*help/i);
+  await page.locator('#guided').click();await expect(page.locator('#screen-art')).toHaveAttribute('aria-label','Original GREETBG background');
+  await expect(page.locator('.historical-notice')).toContainText('outdated or inaccurate claims');
   await expect(page.locator('#coverage')).toContainText('records use historical text');
-  await expect(page.locator('#target')).toHaveCount(0);
   await page.locator('#generated').focus(); await page.keyboard.press('Enter');
   await expect(page.locator('#source-caption')).toContainText('Generated practice, not original lesson text');
 });

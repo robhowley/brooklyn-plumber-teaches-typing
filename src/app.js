@@ -13,7 +13,7 @@ let storage;
 try { storage = window.localStorage; } catch { /* Recovery stays session-only. */ }
 const session = loadStore(storage);
 let profile = currentStudent(session.data), attempt, screen, lastTime = performance.now(), recorded = false, lastOptions;
-let menuCleanup, suppressedSkipKey;
+let menuCleanup, suppressedSkipKey, levelEntryCleanup;
 let menuState = { open: null, selected: 'file', selectedRowId: null, hasFocus: true };
 let menuReturn = { focus: '#menu-file-summary', disclosure: null, selected: 'file' };
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -33,6 +33,7 @@ function storageMessage() {
   return 'Progress saved on this browser';
 }
 function clearMenuScreen() {
+  levelEntryCleanup?.();
   menuCleanup?.(); menuCleanup = undefined;
   menuState = { open:null, selected:'file', selectedRowId:null, hasFocus:false };
   document.body.classList.remove('main-menu-screen');
@@ -115,6 +116,48 @@ function titleIntro() {
   dispose = drawTitleIllustration(document.querySelector('#title-art'), { onComplete: leave });
 }
 function next() { advanceCourse(profile, new Date().toISOString()); save(); menu(); }
+function enterLevel(options) {
+  if (screen !== 'menu' || levelEntryCleanup) return;
+  const startOriginal = () => start({ ...options, content:'original' });
+  if (reducedMotion) { startOriginal(); return; }
+
+  const frame = root.querySelector('.main-menu-frame');
+  if (!frame) return;
+  const controller = new AbortController(), { signal } = controller;
+  let timer;
+  const cancel = () => {
+    if (levelEntryCleanup !== cancel) return;
+    clearTimeout(timer);
+    controller.abort();
+    frame.classList.remove('level-entry-fading');
+    levelEntryCleanup = undefined;
+  };
+  const blockInput = event => {
+    event.preventDefault();
+    event.stopImmediatePropagation();
+  };
+  const cancelOnBlur = () => {
+    cancel();
+    announcement.textContent = 'Activity entry cancelled. The main menu is still open.';
+  };
+  const cancelWhenHidden = () => { if (document.hidden) cancelOnBlur(); };
+  const launch = () => {
+    if (screen !== 'menu') { cancel(); return; }
+    cancel();
+    startOriginal();
+  };
+
+  levelEntryCleanup = cancel;
+  frame.classList.add('level-entry-fading');
+  document.addEventListener('keydown', blockInput, { capture:true, signal });
+  document.addEventListener('keyup', blockInput, { capture:true, signal });
+  document.addEventListener('pointerdown', blockInput, { capture:true, signal });
+  document.addEventListener('pointerup', blockInput, { capture:true, signal });
+  document.addEventListener('click', blockInput, { capture:true, signal });
+  window.addEventListener('blur', cancelOnBlur, { signal });
+  document.addEventListener('visibilitychange', cancelWhenHidden, { signal });
+  timer = setTimeout(launch, 200);
+}
 function pendingText() {
   return profile.course.pending ? `Earned Next: ${position(profile.course.pending.destination)}. The first successful attempt is retained across retries.` : 'Next is locked until a successful guided lesson.';
 }
@@ -248,7 +291,7 @@ function menu() {
       menuReturn = { focus:`#${id}`, disclosure:null, selected:'file' };
       if (id.startsWith('activity-')) {
         const mode = id.slice('activity-'.length);
-        prepare({ mode, group:profile.settings.group, goal:profile.settings.goal, guided:mode !== 'practice' && !profile.course.graduated && mode === courseMode(profile.course) && profile.settings.group === profile.course.group && profile.settings.goal === profile.course.goal });
+        enterLevel({ mode, group:profile.settings.group, goal:profile.settings.goal, guided:mode !== 'practice' && !profile.course.graduated && mode === courseMode(profile.course) && profile.settings.group === profile.course.group && profile.settings.goal === profile.course.goal });
       } else if (id === 'report') report(); else next();
     }, { signal });
   }
@@ -393,7 +436,8 @@ function prepare(options) {
 }
 function help(keyboard) {
   const browserOptions = keyboard ? '' : `<h2>Browser-only options</h2><p>These options are browser features, not DOS menu commands. Custom practice does not advance the guided course.</p><button id="guided" ${profile.course.graduated?'disabled':''}>Continue guided course</button><button id="custom">Browser custom practice</button>`;
-  page('help', keyboard?'KEYBOARD':'HELP', keyboard?'Keyboard guide':'Instructions', `<p>File, Student and Lessons are the main menus. Use Left/Right to move between them, Up/Down to select enabled rows, Enter to activate, and Escape or a click outside to close. Tab and Shift+Tab move through controls. Keys 1–6 select activities, Report and an earned Next when no menu is open. W/L/E open New/Load/Edit, F1 opens Instructions, F2 opens Keyboard, and C opens Certificates.</p><p>About, Demo, Music, Sound F/X, Speech and Quit are visible File commands but are not implemented. Water requires a student goal of at least 10 WPM; Castle requires at least 30 WPM. Next stays disabled until successful guided progress is earned.</p><p>Storage: ${storageMessage()}. Each local student keeps separate settings, results and certificates. Recovery mode will not overwrite unreadable saved data.</p>${browserOptions}<p>Type the displayed target. Wrong keys add errors without moving it. Outdoors, ASCII upper and lowercase letters match without Shift. Other activities require exact case, punctuation and spaces. Non-ASCII, repeated keys and modified shortcuts are ignored.</p><p>Outdoor keys may wait for contact and count only once. Reduced motion makes targets stationary. Escape, losing focus, hidden tabs and castle pipe stops pause both input and the clock. Resume explicitly when ready.</p><p>Net-error integer WPM and integer accuracy use a browser active-clock approximation. Timeout, at least one key, goal WPM and 90% accuracy are the browser pass rule, not a verified universal original rule. No early success or deaths.</p><p>Only matching guided lessons advance. Next preserves the first earned destination, saves it once and returns to the menu. Custom and Expert Express never advance. Certificates use browser milestones, not claimed original triggers.</p><button id="back">Back to menu</button>`);
+  const contentChoices = keyboard ? '' : `<p class="historical-notice">${HISTORICAL_NOTICE}</p><p>Activities 1–4 start original-first. To choose generated practice instead, select Continue guided course or Browser custom practice here, then choose Use generated alternative. Original-first lessons still use labeled generated practice when a record needs keys outside the selected group or practice wrapping is unresolved.</p>`;
+  page('help', keyboard?'KEYBOARD':'HELP', keyboard?'Keyboard guide':'Instructions', `<p>File, Student and Lessons are the main menus. Use Left/Right to move between them, Up/Down to select enabled rows, Enter to activate, and Escape or a click outside to close. Tab and Shift+Tab move through controls. Keys 1–6 select activities, Report and an earned Next when no menu is open. W/L/E open New/Load/Edit, F1 opens Instructions, F2 opens Keyboard, and C opens Certificates.</p><p>About, Demo, Music, Sound F/X, Speech and Quit are visible File commands but are not implemented. Water requires a student goal of at least 10 WPM; Castle requires at least 30 WPM. Next stays disabled until successful guided progress is earned.</p>${contentChoices}<p>Storage: ${storageMessage()}. Each local student keeps separate settings, results and certificates. Recovery mode will not overwrite unreadable saved data.</p>${browserOptions}<p>Type the displayed target. Wrong keys add errors without moving it. Outdoors, ASCII upper and lowercase letters match without Shift. Other activities require exact case, punctuation and spaces. Non-ASCII, repeated keys and modified shortcuts are ignored.</p><p>Outdoor keys may wait for contact and count only once. Reduced motion makes targets stationary. Escape, losing focus, hidden tabs and castle pipe stops pause both input and the clock. Resume explicitly when ready.</p><p>Net-error integer WPM and integer accuracy use a browser active-clock approximation. Timeout, at least one key, goal WPM and 90% accuracy are the browser pass rule, not a verified universal original rule. No early success or deaths.</p><p>Only matching guided lessons advance. Next preserves the first earned destination, saves it once and returns to the menu. Custom and Expert Express never advance. Certificates use browser milestones, not claimed original triggers.</p><button id="back">Back to menu</button>`);
   back(menu,keyboard?'#keyboard':'#help');
   if (!keyboard) {
     document.querySelector('#guided').onclick=()=>prepare({ guided:true });

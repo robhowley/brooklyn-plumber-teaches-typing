@@ -102,6 +102,14 @@ Use File, Student and Lessons menus for the recovered commands. Disabled or unim
 
 **Boundary.** This is an explicit user-selected interface and handoff, not evidence that the original runtime used these exact hitboxes, focus colors, shortcuts, greeting truncation or disabled treatments. Do not rewrite earlier validation entries as evidence for this decision. Record separate test and screenshot evidence for the reconstructed menu; keep the reference screenshots out of production assets.
 
+### D8 follow-up: direct level entry and short fade (user decision, 2026-11-10)
+
+**Choice.** Hard-cut normal MAINMENU activity entry 1–4 over to the existing original-first start. Fade the outgoing menu for about 200 ms, then start gameplay. Do not show a source chooser, loading screen or artificial black hold. Reduced motion skips the fade; there is no opt-in to the old normal-entry flow.
+
+**Notice placement.** Keep the historical notice and generated alternative easy to find in File → Help. This placement is the coordinator's choice, not a separately selected user policy. Help's existing guided and custom browser routes retain their source chooser and generated alternative.
+
+**Retained differences.** Preserve deterministic original-first selection, labeled generated fallback for incompatible records, generated practice where wrapping remains unresolved, exact guided matching, gates, NEXT and retry behavior. Direct entry is a bounded flow change, not a claim of full original gameplay parity.
+
 ## Historical gate status
 
 | Gate | Historical status | Approved implementation path |

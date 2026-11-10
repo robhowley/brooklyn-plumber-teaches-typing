@@ -1,8 +1,8 @@
 import {test,expect} from '@playwright/test';
-import {boot,custom,fixture,activate,openMenu} from './helpers.js';
+import {boot,enterActivity,fixture,activate,openMenu} from './helpers.js';
 
 for(const width of [390,1280])for(const mode of ['outdoor','underwater','castle','practice'])test(`${mode} archive scene and DOM controls at ${width}px`,async({page},info)=>{
- await page.setViewportSize({width,height:900});await boot(page);await custom(page,mode);
+ await page.setViewportSize({width,height:900});await boot(page,{data:fixture({goal:30})});await enterActivity(page,mode);
  await expect(page.locator('.original-glove')).toHaveCount(2);await expect(page.locator('#target')).toBeVisible();await expect(page.locator('#finger')).toBeVisible();
  expect(await page.locator('#scene').evaluate(c=>[c.width,c.height])).toEqual([640,400]);
  expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);

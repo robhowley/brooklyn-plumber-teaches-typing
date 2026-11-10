@@ -1,7 +1,7 @@
 import {test,expect} from '@playwright/test';
 import {readFileSync} from 'node:fs';
 import {resolve} from 'node:path';
-import {boot,activate,openMenu,fixture,stored,selectedStudent,typeTargets} from './helpers.js';
+import {boot,activate,custom,enterActivity,openMenu,fixture,stored,selectedStudent,typeTargets} from './helpers.js';
 
 const source=process.env.ORIGINAL_FIDELITY_SOURCE||'/Users/roberthowley/src/github.com/brooklyn-plumber-teaches-typing';
 const image=(path)=>`data:image/png;base64,${readFileSync(resolve(source,path)).toString('base64')}`;
@@ -189,9 +189,8 @@ test('Lesson Times and all six Lessons rows activate through keyboard navigation
   await page.keyboard.press('Enter');expect((await selectedStudent(page)).settings.group).toBe(group);
   await expect(page.locator(`#lesson-group-${group}`)).toHaveAttribute('aria-label',`${labels[group]}, selected`);
  }
- await page.keyboard.press('Escape');await page.keyboard.press('1');
- await expect(page.locator('#screen-art')).toHaveAttribute('aria-label','Original GREETBG background');
- await expect(page.locator('.archive-page')).toContainText('All keyboard');
+ await page.keyboard.press('Escape');await enterActivity(page,'practice');
+ await expect(page.locator('#scene')).toBeVisible();await expect(page.locator('#encounter-status')).toContainText(/All keyboard/i);
 });
 
 test('File Keyboard and Report commands work through pointer and keyboard input',async({page})=>{
@@ -206,31 +205,30 @@ test('File Keyboard and Report commands work through pointer and keyboard input'
  await page.locator('#back').click();await page.keyboard.press('5');await expect(page.locator('#screen-art')).toHaveAttribute('aria-label','Original RCARD background');
 });
 
-test('Help browser options activate by pointer and keyboard',async({page})=>{
+test('Help browser options keep guided/custom source choices and generated alternatives',async({page})=>{
  await boot(page);
  async function openHelp(){await openMenu(page,'File');await page.locator('#help').click();}
  await openHelp();await page.locator('#custom').click();await expect(page.getByRole('heading',{name:'Browser custom practice',exact:true})).toBeVisible();await activate(page,'#back');
  await openHelp();await page.locator('#custom').focus();await page.keyboard.press('Enter');await expect(page.getByRole('heading',{name:'Browser custom practice',exact:true})).toBeVisible();await activate(page,'#back');
- await openHelp();await page.locator('#guided').click();await expect(page.locator('#screen-art')).toHaveAttribute('aria-label','Original GREETBG background');await activate(page,'#back');
- await openHelp();await page.locator('#guided').focus();await page.keyboard.press('Enter');await expect(page.locator('#screen-art')).toHaveAttribute('aria-label','Original GREETBG background');await activate(page,'#back');
+ await openHelp();await page.locator('#guided').click();await expect(page.locator('#screen-art')).toHaveAttribute('aria-label','Original GREETBG background');await expect(page.locator('#original')).toBeVisible();await expect(page.locator('#generated')).toBeVisible();await activate(page,'#back');
+ await openHelp();await page.locator('#guided').focus();await page.keyboard.press('Enter');await expect(page.locator('#screen-art')).toHaveAttribute('aria-label','Original GREETBG background');await activate(page,'#generated');
+ await expect(page.locator('#target')).toBeVisible();await expect(page.locator('#source-caption')).toContainText('Generated practice, not original lesson text');
+ await page.keyboard.press('Escape');await activate(page,'#leave');
+ await custom(page,'outdoor',{generated:true});await expect(page.locator('#source-caption')).toContainText('Generated practice, not original lesson text');
 });
 
-test('numeric shortcuts, modifiers, repeat, composition and text-field input are isolated',async({page})=>{
- await boot(page,{data:fixture({goal:30})});
- for(let i=0;i<4;i++){
-  await page.keyboard.press(String(i+1));await expect(page.locator('#screen-art')).toHaveAttribute('aria-label','Original GREETBG background');
-  await activate(page,'#back');await expect(page.locator(`#activity-${['outdoor','underwater','castle','practice'][i]}`)).toBeFocused();
+test('numeric shortcuts launch each enabled activity once without scoring the selection key',async({page})=>{
+ await boot(page,{data:fixture({duration:3,goal:30})});
+ const modes=['outdoor','underwater','castle','practice'];
+ for(let i=0;i<modes.length;i++){
+  const mode=modes[i];await enterActivity(page,mode);
+  await expect(page.locator('#scene')).toBeVisible();await expect(page.getByRole('main',{name:'Typing activity'})).toBeFocused();
+  await expect(page.locator('#correct')).toHaveText('0');await expect(page.locator('#errors')).toHaveText('0');
+  const first=await page.locator('#target').textContent();await page.keyboard.press(first==='␣'?'Space':first);await expect(page.locator('#correct')).toHaveText('1');
+  await page.clock.runFor(3100);await expect(page.locator('#outcome')).toBeVisible();
+  const results=(await selectedStudent(page)).results;expect(results).toHaveLength(i+1);expect(results.at(-1)).toMatchObject({mode,correct:1,errors:0});
+  await activate(page,'#menu');await page.clock.runFor(4000);await expect(page.locator('#target')).toHaveCount(0);await expect(page.locator(`#activity-${mode}`)).toBeFocused();
  }
- await page.keyboard.press('5');await expect(page.locator('#screen-art')).toHaveAttribute('aria-label','Original RCARD background');await activate(page,'#back');
- await page.keyboard.press('6');await expect(page.locator('#screen-art')).toHaveAttribute('aria-label','Original MAINMENU background');
- await page.keyboard.press('Control+1');await page.keyboard.press('Alt+1');
- await page.evaluate(()=>{
-  document.activeElement.dispatchEvent(new KeyboardEvent('keydown',{key:'1',bubbles:true,repeat:true}));
-  document.activeElement.dispatchEvent(new KeyboardEvent('keydown',{key:'1',bubbles:true,isComposing:true}));
- });
- await expect(page.locator('#screen-art')).toHaveAttribute('aria-label','Original MAINMENU background');
- await page.keyboard.press('e');await expect(page.locator('#student-form')).toBeVisible();
- await page.keyboard.press('1');await expect(page.locator('#student-form')).toBeVisible();await expect(page.locator('#screen-art')).toHaveAttribute('aria-label','Original PREFS background');
 });
 
 test('File help exposes browser-only options, unsupported commands do nothing, and shortcuts work',async({page},info)=>{
@@ -282,20 +280,120 @@ for(const goal of [9,10,29,30])test(`activity gates honor ${goal} WPM boundary`,
  if(goal>=30)await expect(page.locator('#activity-castle')).toBeEnabled();else await expect(page.locator('#activity-castle')).toBeDisabled();
 });
 
-test('tile edge clicks enter one source choice and Cancel returns to the same control',async({page},info)=>{
+test('activity tile edge clicks launch once, focus gameplay and preserve original-first fallbacks',async({page},info)=>{
  await boot(page,{data:fixture({goal:30})});
- for(const [selector,rect,label] of actions.slice(0,4)){
-  await clickNative(page,rect[0]+.5,rect[1]+.5);
-  await expect(page.locator('#screen-art')).toHaveAttribute('aria-label','Original GREETBG background');
-  await expect(page.locator('.archive-page')).toContainText(label);await expect(page.locator('#target')).toHaveCount(0);
-  await page.screenshot({path:info.outputPath(`main-menu-${selector.slice(1)}-choice.png`),fullPage:true});
-  await activate(page,'#back');await expect(page.locator('#screen-art')).toHaveAttribute('aria-label','Original MAINMENU background');
+ for(const [selector,rect] of actions.slice(0,4)){
+  const mode=selector.slice('#activity-'.length);await clickNative(page,rect[0]+.5,rect[1]+.5);
+  await expect(page.locator('#scene')).toBeVisible();await expect(page.getByRole('main',{name:'Typing activity'})).toBeFocused();
+  await expect(page.locator('#target')).toBeVisible();await expect(page.locator('#correct')).toHaveText('0');await expect(page.locator('#errors')).toHaveText('0');
+  await expect(page.locator('#source-caption')).toContainText(mode==='practice'?'Generated practice, not original lesson text':'Original 1992 lesson text');
+  await page.screenshot({path:info.outputPath(`level-entry-${mode}-initial-gameplay.png`),fullPage:true});
+  const key=await page.locator('#target').textContent();await page.keyboard.press(key==='␣'?'Space':key);await expect(page.locator('#correct')).toHaveText('1');
+  await page.keyboard.press('Escape');await activate(page,'#leave');await expect(page.locator('#screen-art')).toHaveAttribute('aria-label','Original MAINMENU background');
   await expect(page.locator(selector)).toBeFocused();
  }
 });
 
+test('practice starts with its generated fallback and retry keeps the same source without course progress',async({page})=>{
+ await boot(page,{data:fixture({duration:3,goal:5,group:0})});const course=(await selectedStudent(page)).course;
+ await enterActivity(page,'practice');await expect(page.locator('#source-caption')).toContainText('Generated practice, not original lesson text');
+ const firstTarget=await page.locator('#target').textContent();await typeTargets(page,1);await page.clock.runFor(3100);await expect(page.locator('#outcome')).toBeVisible();
+ let student=await selectedStudent(page);expect(student.results[0]).toMatchObject({guided:false,label:'Generated practice, not original lesson text'});expect(student.course).toEqual(course);
+ await activate(page,'#retry');await expect(page.locator('#source-caption')).toContainText('Generated practice, not original lesson text');
+ await expect(page.locator('#target')).toHaveText(firstTarget);await expect(page.locator('#correct')).toHaveText('0');await expect(page.locator('#errors')).toHaveText('0');
+ await typeTargets(page,1);await page.clock.runFor(3100);await expect(page.locator('#outcome')).toBeVisible();student=await selectedStudent(page);
+ expect(student.results).toHaveLength(2);expect(student.results[1]).toMatchObject({guided:false,label:'Generated practice, not original lesson text'});expect(student.course).toEqual(course);
+});
+
+test('focused activity buttons use native Enter and Space activation without scoring either key',async({page})=>{
+ await boot(page,{data:fixture({goal:30})});
+ for(const [mode,key] of [['outdoor','Enter'],['practice','Space']]){
+  await page.locator(`#activity-${mode}`).focus();await page.keyboard.press(key);
+  await expect(page.locator('#scene')).toBeVisible();await expect(page.getByRole('main',{name:'Typing activity'})).toBeFocused();
+  await expect(page.locator('#correct')).toHaveText('0');await expect(page.locator('#errors')).toHaveText('0');
+  if(mode==='practice')await expect(page.locator('#source-caption')).toContainText('Generated practice, not original lesson text');
+  await page.keyboard.press('Escape');await activate(page,'#leave');
+ }
+});
+
+test('reduced motion skips the menu fade',async({page},info)=>{
+ await boot(page,{motion:'reduce',data:fixture({duration:3})});await enterActivity(page,'outdoor','pointer');
+ await expect(page.locator('#scene')).toBeVisible();await expect(page.locator('#time')).toHaveText('0:03');
+ await page.screenshot({path:info.outputPath('level-entry-reduced-motion-gameplay.png'),fullPage:true});
+});
+
+test('normal motion fades the menu before starting gameplay time',async({page},info)=>{
+ await page.setViewportSize({width:1280,height:900});await boot(page,{motion:'no-preference',data:fixture({duration:1})});
+ await enterActivity(page,'outdoor','pointer',{waitForGameplay:false});
+ await page.keyboard.press('4');await page.keyboard.press('Space');
+ await page.locator('#activity-practice').dispatchEvent('click');
+ await page.evaluate(()=>document.dispatchEvent(new KeyboardEvent('keydown',{key:'1',repeat:true,bubbles:true})));
+ await page.clock.runFor(100);
+ await expect(page.locator('#screen-art')).toHaveAttribute('aria-label','Original MAINMENU background');await expect(page.locator('#scene')).toHaveCount(0);
+ await page.screenshot({path:info.outputPath('level-entry-menu-fade-100ms.png'),fullPage:true});
+ await page.clock.runFor(180);await expect(page.locator('#scene')).toBeVisible();await expect(page.locator('#time')).toHaveText('0:01');
+ await expect(page.locator('#correct')).toHaveText('0');await expect(page.locator('#errors')).toHaveText('0');
+ await page.screenshot({path:info.outputPath('level-entry-gameplay-after-fade.png'),fullPage:true});
+ await page.clock.runFor(750);await expect(page.locator('#outcome')).toHaveCount(0);
+ await page.clock.runFor(350);await expect(page.locator('#outcome')).toBeVisible();
+ const results=(await selectedStudent(page)).results;expect(results).toHaveLength(1);expect(results[0].mode).toBe('outdoor');
+});
+
+test('initial direct-entry gameplay fits a narrow viewport',async({page},info)=>{
+ await page.setViewportSize({width:390,height:844});await boot(page,{data:fixture({goal:30})});await enterActivity(page,'underwater','pointer');
+ await expect(page.locator('#scene')).toBeVisible();await expect(page.getByRole('main',{name:'Typing activity'})).toBeFocused();
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+ await page.screenshot({path:info.outputPath('level-entry-gameplay-390x844.png'),fullPage:true});
+});
+
+for(const cause of ['blur','hidden'])test(`${cause} during the fade cancels entry and permits a clean restart`,async({page})=>{
+ await boot(page,{motion:'no-preference',data:fixture({duration:3})});await enterActivity(page,'outdoor','pointer',{waitForGameplay:false});await page.clock.runFor(75);
+ await page.evaluate(cause=>{
+  if(cause==='blur')window.dispatchEvent(new Event('blur'));
+  else{Object.defineProperty(document,'hidden',{configurable:true,get:()=>true});document.dispatchEvent(new Event('visibilitychange'));}
+ },cause);
+ await page.clock.runFor(500);
+ await expect(page.locator('#screen-art')).toHaveAttribute('aria-label','Original MAINMENU background');
+ await expect(page.locator('#scene')).toHaveCount(0);
+ await page.evaluate(cause=>{
+  if(cause==='blur')window.dispatchEvent(new Event('focus'));
+  else{Object.defineProperty(document,'hidden',{configurable:true,get:()=>false});document.dispatchEvent(new Event('visibilitychange'));}
+ },cause);
+ await page.clock.runFor(1000);
+ await expect(page.locator('#screen-art')).toHaveAttribute('aria-label','Original MAINMENU background');await expect(page.locator('#scene')).toHaveCount(0);
+ await enterActivity(page,'practice');await expect(page.locator('#correct')).toHaveText('0');await expect(page.locator('#errors')).toHaveText('0');
+ await page.clock.runFor(3100);expect((await selectedStudent(page)).results).toHaveLength(1);
+});
+
+test('numeric shortcuts, modifiers, repeat, composition and text-field input are isolated',async({page})=>{
+ await boot(page,{data:fixture({goal:30})});await page.keyboard.press('Control+1');await page.keyboard.press('Alt+1');
+ await page.evaluate(()=>{
+  document.activeElement.dispatchEvent(new KeyboardEvent('keydown',{key:'1',bubbles:true,repeat:true}));
+  document.activeElement.dispatchEvent(new KeyboardEvent('keydown',{key:'1',bubbles:true,isComposing:true}));
+ });
+ await expect(page.locator('#screen-art')).toHaveAttribute('aria-label','Original MAINMENU background');await expect(page.locator('#target')).toHaveCount(0);
+ await page.keyboard.press('5');await expect(page.locator('#screen-art')).toHaveAttribute('aria-label','Original RCARD background');await activate(page,'#back');
+ await page.keyboard.press('6');await expect(page.locator('#screen-art')).toHaveAttribute('aria-label','Original MAINMENU background');await expect(page.locator('#target')).toHaveCount(0);
+ await page.keyboard.press('e');await expect(page.locator('#student-form')).toBeVisible();
+ await page.keyboard.press('1');await expect(page.locator('#student-form')).toBeVisible();await expect(page.locator('#screen-art')).toHaveAttribute('aria-label','Original PREFS background');
+});
+
+test('File > Help explains direct level entry and keeps the historical notice visible',async({page},info)=>{
+ await page.setViewportSize({width:1280,height:900});await boot(page,{data:null});
+ for(const viewport of [{width:1280,height:900},{width:390,height:844}]){
+  await page.setViewportSize(viewport);await openMenu(page,'File');await activate(page,'#help');
+  await expect(page.locator('.historical-notice')).toContainText('outdated or inaccurate claims');
+  await expect(page.locator('.historical-notice')).toContainText('war, slavery, assassination and disasters');
+  const text=(await page.locator('.archive-page').innerText()).replace(/\s+/g,' ');
+  expect(text).toMatch(/activities 1\s*(?:–|-)\s*4/i);expect(text).toMatch(/original-first/i);
+  expect(text).toMatch(/help.*(?:generated|custom)|(?:generated|custom).*help/i);
+  await page.screenshot({path:info.outputPath(`level-entry-help-${viewport.width}x${viewport.height}.png`),fullPage:true});
+  await activate(page,'#back');
+ }
+});
+
 test('Lessons changes persist without changing earned or pending course state',async({page},info)=>{
- await boot(page,{data:fixture({duration:3,goal:5,group:0})});await page.keyboard.press('1');await activate(page,'#original');await typeTargets(page,12);
+ await boot(page,{data:fixture({duration:3,goal:5,group:0})});await enterActivity(page,'outdoor');await typeTargets(page,12);
  await page.clock.runFor(3100);await expect(page.locator('#next')).toBeEnabled();
  const earned=(await selectedStudent(page)).course;expect(earned.pending).not.toBeNull();await activate(page,'#menu');
  expect(await page.evaluate(()=>document.body.classList.contains('playing')||document.body.classList.contains('title-screen'))).toBe(false);
@@ -309,12 +407,12 @@ test('Lessons changes persist without changing earned or pending course state',a
  }
  expect(new Set(signatures).size).toBe(6);
  await page.reload();await activate(page,'#skip-title');const reloaded=await selectedStudent(page);expect(reloaded.settings.group).toBe(5);expect(reloaded.course).toEqual(earned);
- await page.keyboard.press('4');await expect(page.locator('#screen-art')).toHaveAttribute('aria-label','Original GREETBG background');
- await expect(page.locator('.archive-page')).toContainText('All keyboard');await expect(page.locator('#next')).toHaveCount(0);
+ await enterActivity(page,'practice');await expect(page.locator('#scene')).toBeVisible();
+ await expect(page.locator('#encounter-status')).toContainText(/All keyboard/i);await expect(page.locator('#next')).toHaveCount(0);
 });
 
 test('earned NEXT commits once from the keyboard and remains committed after reload',async({page})=>{
- await boot(page,{data:fixture({duration:3,goal:5,group:0})});await page.keyboard.press('1');await activate(page,'#original');await typeTargets(page,12);
+ await boot(page,{data:fixture({duration:3,goal:5,group:0})});await enterActivity(page,'outdoor');await typeTargets(page,12);
  await page.clock.runFor(3100);await expect(page.locator('#next')).toBeEnabled();await activate(page,'#menu');
  await page.keyboard.press('6');await expect(page.locator('#screen-art')).toHaveAttribute('aria-label','Original MAINMENU background');
  const committed=(await selectedStudent(page)).course;expect(committed).toMatchObject({group:1,goal:5,revision:1,pending:null});await expect(page.locator('#next')).toBeDisabled();
@@ -323,7 +421,7 @@ test('earned NEXT commits once from the keyboard and remains committed after rel
 });
 
 test('earned NEXT commits once by pointer, returns to the menu, and stays committed after reload',async({page})=>{
- await boot(page,{data:fixture({duration:3,goal:5,group:0})});await page.keyboard.press('1');await activate(page,'#original');await typeTargets(page,12);
+ await boot(page,{data:fixture({duration:3,goal:5,group:0})});await enterActivity(page,'outdoor');await typeTargets(page,12);
  await page.clock.runFor(3100);await expect(page.locator('#next')).toBeEnabled();await activate(page,'#menu');
  const rect=actions.at(-1)[1];await clickNative(page,rect[2]-.5,rect[3]-.5);
  await expect(page.locator('#screen-art')).toHaveAttribute('aria-label','Original MAINMENU background');

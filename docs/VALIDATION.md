@@ -8,6 +8,20 @@ The source and browser changes are integrated in the current worktree. From star
 
 **Earlier-build record:** all six previous automated implementation and verification phases were complete. Their reports and test results describe the welcome→menu build only, not this reconstruction. They are not release approval, human-playtested status or DOS runtime validation.
 
+## Direct level-entry follow-up, 2026-11-10
+
+Normal activities 1–4 now use a user-selected hard cutover to original-first gameplay after an approximately 200 ms outgoing-menu fade. Reduced motion skips it. There is no normal-entry source chooser, loading screen or black hold. File → Help carries the historical notice and explains the generated route; Help's guided/custom browser options retain their source chooser and generated alternative. Labeled fallback records and generated practice remain unchanged. This bounded flow change does not claim full original gameplay parity.
+
+Browser coverage updates normal-entry callers and checks pointer, numeric, Enter and Space activation; focus, unscored activation and transition input, exactly-once results, transition clock timing, blur/hidden cancellation with clean restart, retry, course matching, gates and NEXT. The preceding menu-phase counts are historical, not validation of this change.
+
+- Integration checks: source-backed `LESSON_RESEARCH_ROOT=$PWD/research/executable-1992 ORIGINAL_FIDELITY_SOURCE=$PWD node --test tests/*.test.js` passed **61/61, zero skips**. Log: `.pi/structured-returns/6e8f48fa-b924-4ba9-a596-50a1048cb795.combined.log`.
+- Private `vite build --outDir .tmp/level-entry-integrated-dist` succeeded with the large-chunk warning. Build log: `.pi/structured-returns/6aaa256a-e650-4aae-b20c-581f6b3777d2.combined.log`.
+- Production Playwright on port **4203** passed **56/56 focused**, then **92/92 full-suite**. Actual JUnit testcase elements were checked: **zero failures, errors or skips** in both `.tmp/level-entry-integrated-validation/{focused,full}.xml`. No repair reruns were needed.
+- Fresh screenshots: `.tmp/level-entry-integrated-validation/screenshots/` contains 14 captures covering normal/reduced motion at 1280px and 390px, gameplay, Help notice and Help source options. `no-preference-*-fade.png` freezes the production CSS transition at 100 ms for a deterministic illustration, not a wall-clock timing measurement. The full-suite screenshots remain under `.tmp/level-entry-integrated-validation/full/`.
+- `git diff --check` passed. Existing dirty `dist/` file hashes and git status exactly match `.tmp/level-entry-fanout/dist-before.json`; the pre-existing README diff was also preserved.
+- Independent acceptance passed: the [verifier](/Users/roberthowley/.pi/subagent-runs/20261110T191655Z-2r3ruyy6/01-verifier.md) reran **61 Node tests and 92 browser tests**, with zero failures or skips, against a fresh `.tmp/level-entry-independent-dist` build on port 4204. Browser evidence: `.tmp/level-entry-independent-junit.xml`.
+- The [independent code and visual review](/Users/roberthowley/.pi/subagent-runs/20261110T191655Z-2r3ruyy6/02-second-opinion.md) returned **LGTM**, inspected all 14 captures, and found no in-scope blocker. These are automated checks and agent screenshot inspection; human playtesting and accessibility review were not performed.
+
 ## Current fidelity build, 2026-11-10
 
 - Final independent reports: [production verifier](/Users/roberthowley/.pi/subagent-runs/20261110T045947Z-zo1h2pya/01-verifier.md), [visual second opinion](/Users/roberthowley/.pi/subagent-runs/20261110T045947Z-zo1h2pya/02-second-opinion.md), [bundle/documentation verifier](/Users/roberthowley/.pi/subagent-runs/20261110T045947Z-zo1h2pya/03-verifier.md), all PASS (visual verdict LGTM).
