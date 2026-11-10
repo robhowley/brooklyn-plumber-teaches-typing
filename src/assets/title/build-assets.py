@@ -17,8 +17,8 @@ import zlib
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[3]
-DEFAULT_SOURCE = ROOT / "artifacts/video-r-LxHUgI2W0/frames/frame-00000400.png"
-DEFAULT_BEFORE = ROOT / "artifacts/title-still/timing/frames/frame-00285.png"
+DEFAULT_SOURCE = ROOT / "research/artifacts/video-r-LxHUgI2W0/frames/frame-00000400.png"
+DEFAULT_BEFORE = ROOT / "research/artifacts/title-still/timing/frames/frame-00285.png"
 CROP = (0, 14, 720, 464)  # x0, y0, x1, y1 in the original 720x480 frames.
 PATCH_SOURCE = (276, 16, 709, 94)  # Includes a small margin for subtitle shadows.
 GLYPHS = [
@@ -149,7 +149,7 @@ def build(source_path: Path, before_path: Path) -> None:
     paste(base, out_w, before, before_w, (px0, py0, px1, py1), y0)
 
     out_dir = ROOT / "src/assets/title"
-    evidence_dir = ROOT / "artifacts/title-still/art"
+    evidence_dir = ROOT / "research/artifacts/title-still/art"
     out_dir.mkdir(parents=True, exist_ok=True)
     evidence_dir.mkdir(parents=True, exist_ok=True)
     final_path, base_path = out_dir / "title.png", out_dir / "title-base.png"
@@ -244,7 +244,7 @@ def build(source_path: Path, before_path: Path) -> None:
             "changedPixelsWithinReplacementRect": changed_pixels,
             "maxPerChannelDifferenceBetweenSourceAndBefore": max_delta,
             "verification": "title.png decodes pixel-identical to the source crop; title-base.png equals title.png outside the replacement rectangle and the pre-letter frame inside it.",
-            "evidence": "artifacts/title-still/art/title-source-before-after.html",
+            "evidence": "research/artifacts/title-still/art/title-source-before-after.html",
         },
         "outputs": {
             "src/assets/title/title.png": {"sha256": sha256(final_path), "dimensions": [out_w, out_h]},
@@ -256,9 +256,11 @@ def build(source_path: Path, before_path: Path) -> None:
             "The rectangle is intended for a full-title reveal; per-letter reveal code can use title-layout.json glyph boxes. The background letters within it may show compression/timing differences during intermediate reveal states.",
         ],
     }
-    (out_dir / "provenance.json").write_text(json.dumps(provenance, indent=2) + "\n")
+    metadata = ROOT / "research/provenance/title.json"
+    metadata.parent.mkdir(parents=True, exist_ok=True)
+    metadata.write_text(json.dumps(provenance, indent=2) + "\n")
     print(json.dumps({"title": str(final_path), "base": str(base_path), "layout": str(out_dir / "title-layout.json"),
-                      "provenance": str(out_dir / "provenance.json"),
+                      "provenance": str(metadata),
                       "comparison": str(evidence_dir / "title-source-before-after.html"),
                       "changedPixelsInReplacement": changed_pixels, "maxChannelDelta": max_delta}, indent=2))
 

@@ -8,8 +8,4 @@ playwright-report/
 
 # Local source research and generated validation evidence (not runtime assets).
 /research/
-/artifacts/
-/references/images/
-/references/graphics-iteration/
-/references/title-iteration/
-/references/*.pdf
+/dist/

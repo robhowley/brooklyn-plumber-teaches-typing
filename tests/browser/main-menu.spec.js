@@ -6,14 +6,24 @@ import {advanceCourse,recordResult} from '../../src/course.js';
 import {advanceTime,createAttempt,resume,result,typeKey} from '../../src/engine.js';
 import {createStore} from '../../src/storage.js';
 
-const source=process.env.ORIGINAL_FIDELITY_SOURCE||'/Users/roberthowley/src/github.com/brooklyn-plumber-teaches-typing';
+// Source-image checks are opt-in; normal collection never reads local research.
+const source=process.env.ORIGINAL_FIDELITY_SOURCE;
 const image=(path)=>`data:image/png;base64,${readFileSync(resolve(source,path)).toString('base64')}`;
-const references={
- menu:image('research/images/menu.png'),
- background:image('research/executable-1992/screens/decoded/MAINMENU.png'),
- file:image('artifacts/video-r-LxHUgI2W0/frames/frame-00000750.png'),
- named:image('artifacts/video-r-LxHUgI2W0/frames/frame-00004800.png'),
-};
+test('optional local source images match menu, dropdown and named greeting',async({page})=>{
+ test.skip(!source,'Set ORIGINAL_FIDELITY_SOURCE to the checkout containing research images');
+ await boot(page,{data:null});
+ const pixels=await compareDefaultPixels(page);
+ for(const comparison of Object.values(pixels))expect(comparison.count).toBe(0);
+ await openMenu(page,'File');
+ const file=await fileDropdownReferenceBounds(page,image('research/artifacts/video-r-LxHUgI2W0/frames/frame-00000750.png'));
+ for(const edge of ['left','top','right','bottom'])expect(Math.abs(file.actual[edge]-file.reference[edge])).toBeLessThanOrEqual(2);
+ await page.keyboard.press('Escape');
+ await openMenu(page,'Student');await page.locator('#edit-student').click();
+ await page.getByLabel('Name',{exact:true}).fill('Alex');await activate(page,'#student-done');await page.keyboard.press('Escape');
+ const greeting=await redGreetingBounds(page,image('research/artifacts/video-r-LxHUgI2W0/frames/frame-00004800.png'));
+ expect(greeting.actual.count).toBeGreaterThan(30);expect(greeting.reference.count).toBeGreaterThan(30);
+ for(const edge of ['left','top','right','bottom'])expect(Math.abs(greeting.actual[edge]-greeting.reference[edge])).toBeLessThanOrEqual(3);
+});
 const viewports=[{width:1280,height:720},{width:390,height:844},{width:844,height:390}];
 const actions=[
  ['#activity-outdoor',[233,9,303,40],'Smash & Dash'],
@@ -73,7 +83,7 @@ async function compareDefaultPixels(page){
    // Screenshot compression shifts a few bubble-edge channels by one, not the drawn greeting pixels.
    genericGreeting:mismatches(menuPixels,(x,y)=>x>=130&&x<200&&y>=22&&y<74,1),
   };
- },{menu:references.menu,background:references.background});
+ },{menu:image('research/images/menu.png'),background:image('research/executable-1992/screens/decoded/MAINMENU.png')});
 }
 async function fileDropdownReferenceBounds(page,sourceImage){
  return page.locator('#screen-art').evaluate(async(canvas,src)=>{
@@ -94,10 +104,11 @@ async function fileDropdownReferenceBounds(page,sourceImage){
   };
  },sourceImage);
 }
-async function redGreetingBounds(page,sourceImage){
+async function redGreetingBounds(page,sourceImage=null){
  return page.locator('#screen-art').evaluate(async(canvas,src)=>{
-  const img=new Image();img.src=src;await img.decode();const surface=document.createElement('canvas');surface.width=img.width;surface.height=img.height;
-  const ctx=surface.getContext('2d');ctx.drawImage(img,0,0);const reference=ctx.getImageData(0,0,img.width,img.height).data;
+  const img=new Image();let reference;
+  if(src){img.src=src;await img.decode();const surface=document.createElement('canvas');surface.width=img.width;surface.height=img.height;
+   const ctx=surface.getContext('2d');ctx.drawImage(img,0,0);reference=ctx.getImageData(0,0,img.width,img.height).data;}
   const actual=canvas.getContext('2d').getImageData(0,0,320,200).data;
   function bounds(data,width,height,sample){let left=Infinity,top=Infinity,right=-1,bottom=-1,count=0;
    for(let y=24;y<74;y++)for(let x=130;x<208;x++){
@@ -107,7 +118,7 @@ async function redGreetingBounds(page,sourceImage){
    return {left,top,right:right+1,bottom:bottom+1,count};
   }
   const actualBounds=bounds(actual,320,200,(x,y)=>[x,y]);
-  const referenceBounds=bounds(reference,img.width,img.height,(x,y)=>[Math.floor((x+.5)*2.25),14+Math.floor((y+.5)*2.25)]);
+  const referenceBounds=src&&bounds(reference,img.width,img.height,(x,y)=>[Math.floor((x+.5)*2.25),14+Math.floor((y+.5)*2.25)]);
   return {actual:actualBounds,reference:referenceBounds};
  },sourceImage);
 }
@@ -132,12 +143,6 @@ for(const viewport of viewports)test(`MAINMENU keeps its native composition and 
   ['details:first-of-type > summary', [16,0,64,8]],
   ...actions.map(([selector,rect])=>[selector,rect]),
  ])await expectNativeBox(page,selector,rect);
- if(viewport.width===1280){
-  const pixels=await compareDefaultPixels(page);
-  expect(pixels.unchangedArt.count,pixels).toBe(0);
-  expect(pixels.menuBar.count,pixels).toBe(0);
-  expect(pixels.genericGreeting.count,pixels).toBe(0);
- }
  await page.screenshot({path:info.outputPath(`main-menu-${viewport.width}x${viewport.height}.png`),fullPage:true});
 });
 
@@ -158,8 +163,6 @@ test('File, Student and Lessons dropdowns match native geometry, order and pixel
   expect(Math.abs(row.y-previous.y-first.height)).toBeLessThan(1);
  }
  await page.screenshot({path:info.outputPath('main-menu-file-open.png'),fullPage:true});
- const fileBounds=await fileDropdownReferenceBounds(page,references.file);
- for(const edge of ['left','top','right','bottom'])expect(Math.abs(fileBounds.actual[edge]-fileBounds.reference[edge]),`${edge}: ${fileBounds.actual[edge]} vs ${fileBounds.reference[edge]}`).toBeLessThanOrEqual(2);
  const colorCounts=await page.locator('#screen-art').evaluate(c=>{
   const data=c.getContext('2d').getImageData(0,0,320,200).data;let yellow=0,blue=0;
   for(let y=8;y<74;y++)for(let x=15;x<121;x++){const i=(y*320+x)*4;
@@ -276,17 +279,15 @@ test('File help exposes browser-only options, unsupported commands do nothing, a
  await expect(details(page,'Student')).toHaveAttribute('open','');await expect(page.getByRole('button',{name:'Certificates',exact:true})).toBeFocused();
 });
 
-test('named, long and Unicode student greetings preserve names and match the video reference',async({page},info)=>{
+test('named, long and Unicode student greetings preserve names and fit the greeting area',async({page},info)=>{
  await boot(page,{data:fixture()});
  async function rename(name){await page.locator('summary').filter({hasText:/^Student$/}).click();await page.locator('#edit-student').click();await page.getByLabel('Name',{exact:true}).fill(name);await activate(page,'#student-done');expect((await selectedStudent(page)).name).toBe(name);await page.keyboard.press('Escape');}
  await rename('Alex');await page.screenshot({path:info.outputPath('main-menu-named-greeting.png'),fullPage:true});
- const {actual,reference}=await redGreetingBounds(page,references.named);
- expect(actual.count).toBeGreaterThan(30);expect(reference.count).toBeGreaterThan(30);
- for(const edge of ['left','top','right','bottom'])expect(Math.abs(actual[edge]-reference[edge]),`${edge}: ${actual[edge]} vs ${reference[edge]}`).toBeLessThanOrEqual(3);
+ expect((await redGreetingBounds(page)).actual.count).toBeGreaterThan(30);
  await rename('A very long student name');
- const longGreeting=await redGreetingBounds(page,references.named);expect(longGreeting.actual.right-longGreeting.actual.left).toBeLessThanOrEqual(88);
+ const longGreeting=await redGreetingBounds(page);expect(longGreeting.actual.right-longGreeting.actual.left).toBeLessThanOrEqual(88);
  await rename('Élodie Ω');expect((await selectedStudent(page)).name).toBe('Élodie Ω');
- expect((await redGreetingBounds(page,references.named)).actual.count).toBeGreaterThan(0);
+ expect((await redGreetingBounds(page)).actual.count).toBeGreaterThan(0);
  await page.screenshot({path:info.outputPath('main-menu-unicode-greeting.png'),fullPage:true});
  await page.reload();await activate(page,'#skip-title');expect((await selectedStudent(page)).name).toBe('Élodie Ω');
 });

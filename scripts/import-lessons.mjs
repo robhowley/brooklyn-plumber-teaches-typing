@@ -120,8 +120,9 @@ if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1]
   const { data, provenance } = await importLessons(resolve(process.argv[2]));
   const output = new URL('../src/data/', import.meta.url);
   await mkdir(output, { recursive: true });
-  for (const [name, value] of [['lessons.json', data], ['lessons-provenance.json', provenance]]) {
-    await writeFile(new URL(name, output), JSON.stringify(value, null, 2) + '\n');
-  }
+  await writeFile(new URL('lessons.json', output), JSON.stringify(data, null, 2) + '\n');
+  const metadata = new URL('../research/provenance/', import.meta.url);
+  await mkdir(metadata, { recursive: true });
+  await writeFile(new URL('lessons.json', metadata), JSON.stringify(provenance, null, 2) + '\n');
   console.log(JSON.stringify(provenance.totals));
 }

@@ -6,9 +6,9 @@ The title art is a 720×450 crop from a recorded game frame, not a redraw. The c
 
 `src/assets/title/title.png` is the unchanged crop from frame 400 (16.0 seconds) of [NintendoComplete's 1992 PC playthrough](https://www.youtube.com/watch?v=r-LxHUgI2W0). The source frame is 720×480; the crop is `(x: 0, y: 14, width: 720, height: 450)`. It preserves the original characters, proportions, colors, lettering and copyright notice pixel-for-pixel.
 
-`title-base.png` keeps the same crop except for the subtitle rectangle `(276, 2, 433, 78)`. That area is replaced with pixels from frame 285 (11.4 seconds), before the subtitle appears. This makes a clean layer for the letter reveal. The two frames come from compressed video, so small pixel differences remain in the replaced background. `title-layout.json` gives the 13 glyph rectangles as half-open image-coordinate boxes. `provenance.json` records source hashes and crop checks.
+`title-base.png` keeps the same crop except for the subtitle rectangle `(276, 2, 433, 78)`. That area is replaced with pixels from frame 285 (11.4 seconds), before the subtitle appears. This makes a clean layer for the letter reveal. The two frames come from compressed video, so small pixel differences remain in the replaced background. `title-layout.json` gives the 13 glyph rectangles as half-open image-coordinate boxes. `research/provenance/title.json` records source hashes and crop checks.
 
-The source frame and before/after comparison are preserved under `artifacts/title-still/art/`; timing frames, contact sheets and pixel measurements are under `artifacts/title-still/timing/`. These ignored local artifacts are evidence, not runtime dependencies. The eight screenshots in `references/images/` are not loaded or shipped by the game.
+The source frame and before/after comparison are preserved under `research/artifacts/title-still/art/`; timing frames, contact sheets and pixel measurements are under `research/artifacts/title-still/timing/`. These ignored local artifacts are evidence, not runtime dependencies. The eight screenshots in `research/references/images/` are not loaded or shipped by the game.
 
 ## Timing and runtime behavior
 
@@ -26,7 +26,7 @@ From the repository root, rebuild the title files and source comparison with:
 python3 src/assets/title/build-assets.py
 ```
 
-The defaults use `artifacts/video-r-LxHUgI2W0/frames/frame-00000400.png` and `artifacts/title-still/timing/frames/frame-00285.png`. The source recordings and extracted frames are local, Git-ignored research artifacts, so a fresh clone needs those files restored first. Alternate frame locations can be supplied explicitly:
+The defaults use `research/artifacts/video-r-LxHUgI2W0/frames/frame-00000400.png` and `research/artifacts/title-still/timing/frames/frame-00285.png`. The source recordings and extracted frames are local, Git-ignored research artifacts, so a fresh clone needs those files restored first. Alternate frame locations can be supplied explicitly:
 
 ```sh
 python3 src/assets/title/build-assets.py \

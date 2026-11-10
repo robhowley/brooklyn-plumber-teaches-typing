@@ -11,20 +11,24 @@ The app uses **20 decoded static archive backgrounds and 166 selected sprites/gl
 - `src/glove-hud.js`: recovered finger/hand art with readable DOM target and guidance. Local `hud-texture.svg`, `practice-texture.svg` and CSS remain browser decoration, not recovered archive assets.
 - `src/app.js`: direct title→menu handoff, direct normal activity entry, File/Student/Lessons commands, local student/time/help/report/certificate forms, focus/announcements and source disclosures. File → Help carries the historical notice and explains the generated-practice route. Synthetic oscillator cues remain optional; **no archive audio** is loaded or played.
 
-All assets are local. The latest production build contains one HTML, JS, CSS, one SVG and two title PNGs; static rasters and reviewed lesson text are embedded in JS, and the small practice SVG is inlined in CSS. Exact built-file hashes are in [Validation](VALIDATION.md#three-fix-integration-2026-11-10). The eight reference screenshots, old traced title/character/underwater assets, offline importers and raw research are outside the runtime dependency graph. An old title illustration in the repository README is a documentation image, not shipped application art.
+All runtime assets are local. Static rasters and reviewed lesson text are bundled by Vite. Offline importers, source recordings, reference screenshots and research metadata are not runtime dependencies. Build output is generated in CI, not committed.
 
 ## Provenance and adaptations
 
-`src/assets/original/provenance.json` records each selection's source member, byte span, member/index/palette hashes, decoded-reference hash, pixel hash and final raster hash. Archive SHA-256: `b59886a6f7b48b0057c8db1c099ed598c8a3581245b0f8884316203de55784bd`. `scripts/import-static-assets.mjs` is a repository-authored offline data converter, never imported by the app. Identity checks do not establish copyright permission.
+Local `research/provenance/original-assets.json` records each selection's source member, byte span, member/index/palette hashes, decoded-reference hash, pixel hash and final raster hash. Archive SHA-256: `b59886a6f7b48b0057c8db1c099ed598c8a3581245b0f8884316203de55784bd`. `scripts/import-static-assets.mjs` is a repository-authored offline data converter, never imported by the app. Identity checks do not establish copyright permission.
 
-- All 20 backgrounds retain native 320×200 geometry. Source review compared decoded pixels; source-backed tests and the bundle audit bind the current selections to that review.
+- All 20 backgrounds retain native 320×200 geometry. Normal tests pin the shipped raster content; optional local tests compare source members and decoded references.
 - Character GPO palette bindings and index-zero transparency are inferred, not proven DOS runtime bindings. FONT7H keeps its indexed geometry: index 1 is a white core and index 2 a black outline, matching screenshot/video appearance. These are browser colors, not a proved DOS runtime palette.
 - Mario has three recovered practice faces. Luigi/Princess action sprites are recovered, but their practice faces remain browser-drawn adaptations because separate original sets were not found.
 - Placement, animation cadence, browser aspect/scaling, scrolling/contact, castle sand masking and stationary pipe composition remain adaptations. Original OCASTLE/ENDF availability does not prove their invocation or graduation trigger.
 - Practice mood bands (sad below 75% of goal, neutral below goal, happy at goal) are chosen browser thresholds. Quicksand, swimmer/chase and Thwomp feedback are nonterminal; every early death remains disabled.
 
-## Rendering contract and evidence
+## Rendering contract
 
-Draw calls use cached images and supplied active time, never advance gameplay or own timers. Pause/finished/reduced-motion states keep their documented freezes. Sound settings cannot change art or timing. Accessible DOM targets and controls carry information independently of Canvas. See [renderer contract](RENDERER-CONTRACT.md) for ownership; older dimensional examples there are superseded by the 640×400 scene above.
+Draw calls use cached images and supplied active time, never advance gameplay or own timers. Pause/finished/reduced-motion states keep their documented freezes. Sound settings cannot change art or timing. Accessible DOM targets and controls carry information independently of Canvas. See [renderer contract](RENDERER-CONTRACT.md) for ownership.
 
-[Current validation](VALIDATION.md) records the prior build inventory separately from the direct MAINMENU integration. The new private build passed the focused title/menu specs and full browser suite; fresh captures cover three viewports, each dropdown, named greetings and all six lesson groups. Independent visual acceptance and human visual, accessibility, audio and print review were **not performed**; agent screenshot inspection and automated replay are not human or DOS runtime validation. [Phase ledger](FIDELITY-DECISIONS.md) records the new startup-flow decision separately from historical validation.
+Source comparisons and historical validation reports live under ignored `research/`. Automated checks are not human or DOS runtime validation.
+
+## Asset policy
+
+Use selected static resource data only. Never execute or ship archive code, executables, drivers, scripts, DOS decoders or runtime archive readers. Archive audio remains excluded pending review. The eight screenshots under local `research/references/images/` are reference-only, not authorized production assets. Keep source attribution and copyright notices; the repository license grants no rights to Nintendo, Interplay or other third-party material.

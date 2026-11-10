@@ -2,40 +2,28 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { CORPUS_VERSION, KEY_GROUPS, selectLesson, LESSON_COVERAGE, HISTORICAL_NOTICE, GENERATED_LABEL } from '../src/lessons.js';
-import { parseMember, transformRecord, importLessons, sha256, MEMBER_HASHES } from '../scripts/import-lessons.mjs';
+import { parseMember, transformRecord, importLessons, sha256 } from '../scripts/import-lessons.mjs';
 const corpus = JSON.parse(await readFile(new URL('../src/data/lessons.json', import.meta.url)));
-const provenance = JSON.parse(await readFile(new URL('../src/data/lessons-provenance.json', import.meta.url)));
 import { createAttempt, typeKey, resume, advanceTime, result } from '../src/engine.js';
 const modes = ['outdoor', 'underwater', 'castle', 'practice'];
 
-test('15 pinned members, 24090 bytes, 136 pinned record hashes/spans and learner hashes', () => {
+test('shipped corpus retains reviewed content, 15 members and 136 valid records', () => {
   assert.equal(CORPUS_VERSION, 'mtt-1992-reviewed-1');
-  assert.deepEqual(provenance.totals, { files: 15, bytes: 24090, records: 136 });
-  assert.equal(provenance.members.length, 15);
-  assert.equal(provenance.members.reduce((sum, m) => sum + m.sizeBytes, 0), 24090);
-  const digest = sha256(JSON.stringify(provenance.members.flatMap(m => m.records.map(r => [m.member, r.record, r.byteSpan, r.sha256]))));
-  assert.equal(digest, '1e3e84b94a8c2ce03b96daecc84cef4ac40451e866ac48be0df5163cdfe197f8');
+  assert.equal(corpus.corpusVersion, CORPUS_VERSION);
+  assert.equal(sha256(JSON.stringify(corpus)), '25acc600dcda35e63e9994cf1fe44786bb6fd6474fe0227315057db8783d54b1');
+  assert.equal(corpus.members.length, 15);
+  assert.equal(new Set(corpus.members.map(m => m.member)).size, 15);
   const counts = { outdoor: 0, underwater: 0, castle: 0 };
   for (const member of corpus.members) {
-    const p = provenance.members.find(m => m.member === member.member);
-    assert.equal(p.sha256, MEMBER_HASHES[member.member.slice(0, -4)]);
-    assert.equal(p.eofOffset, p.sizeBytes - 1);
-    assert.equal(p.records.length, member.records.length);
-    let offset = 1;
+    assert.match(member.member, /^[HTBNS](LETTERS|WORDS|SENTENC)\.LEE$/);
     for (const [i, record] of member.records.entries()) {
-      const evidence = p.records[i];
       assert.equal(record.record, i + 1);
-      assert.equal(evidence.byteSpan[0], offset);
-      offset = evidence.byteSpan[1] + 1;
-      assert.match(evidence.sha256, /^[a-f0-9]{64}$/);
-      assert.equal(sha256(record.text), evidence.textSha256);
       assert.match(record.text, /^[\x20-\x7e]+$/);
       assert.ok(!record.text.includes('`') && !record.text.includes('~'));
-      assert.ok(evidence.controls.every(c => c.offset >= evidence.byteSpan[0] && c.offset < evidence.byteSpan[1]));
-      assert.ok(record.sentenceEnds.every((end, j, ends) => end > (ends[j - 1] ?? -1) && end <= record.text.length));
+      assert.ok(record.sentenceEnds.every((end, j, ends) => Number.isInteger(end) && end > (ends[j - 1] ?? -1) && end <= record.text.length));
+      assert.ok(record.themes.every(theme => typeof theme === 'string'));
       assert.ok(!('rawText' in record) && !('rawHex' in record));
     }
-    assert.equal(offset, p.sizeBytes);
     counts[member.mode] += member.records.length;
   }
   assert.deepEqual(counts, { outdoor: 78, underwater: 41, castle: 17 });
@@ -44,6 +32,7 @@ test('15 pinned members, 24090 bytes, 136 pinned record hashes/spans and learner
 test('offline reader rechecks every raw byte, hash and reference span, without shipping raw fixtures', { skip: !process.env.LESSON_RESEARCH_ROOT }, async () => {
   const result = await importLessons(process.env.LESSON_RESEARCH_ROOT);
   assert.deepEqual(result.data, corpus);
+  const provenance = JSON.parse(await readFile(new URL('../research/provenance/lessons.json', import.meta.url)));
   assert.deepEqual(result.provenance, provenance);
 });
 

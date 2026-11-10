@@ -1,7 +1,7 @@
 // Rebuild and test exactly that production output over HTTP. No archive execution.
 import {mkdir,writeFile,open} from 'node:fs/promises';
 import {spawnSync} from 'node:child_process';
-const root=process.env.FIDELITY_EVIDENCE||'.tmp/fidelity-validation/phase6-final';await mkdir(root,{recursive:true});
+const root=process.env.FIDELITY_EVIDENCE||'research/artifacts/fidelity-validation';await mkdir(root,{recursive:true});
 const env={...process.env,FIDELITY_EVIDENCE:root,FIDELITY_DIST:`${root}/dist`,PLAYWRIGHT_PORT:process.env.PLAYWRIGHT_PORT||'4191',PLAYWRIGHT_JUNIT_OUTPUT_FILE:`${root}/browser.xml`,PLAYWRIGHT_JSON_OUTPUT_FILE:`${root}/browser.json`};
 const commands=[['node_modules/.bin/vite',['build','--outDir',env.FIDELITY_DIST,'--emptyOutDir']],['node_modules/.bin/playwright',['test','--workers=2',...(process.argv.includes('--bounded')?['--max-failures=2']:[]),'--trace=on',`--output=${root}/traces`,'--reporter=json,junit']]];
 const runs=[];

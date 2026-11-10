@@ -1,5 +1,5 @@
 // Indexed, editable sprite grids are imported before the first scene draw.
-// Editable PNG counterparts are in outdoor-assets; the underlay recipe is in artifacts/trace-outdoor.
+// Editable PNG counterparts are in outdoor-assets; the underlay recipe is in research/artifacts/trace-outdoor.
 import tiles from './outdoor-assets/tiles.json' with { type: 'json' };
 const symbols='0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!#$%&()*+,-./:;<=>?@[]^_`{|}~';
 const images=new Map();

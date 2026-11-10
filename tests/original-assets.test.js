@@ -4,7 +4,6 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { resolve } from 'node:path';
 import rasters from '../src/assets/original/rasters.json' with {type:'json'};
-import provenance from '../src/assets/original/provenance.json' with {type:'json'};
 import { originalImage, actionImage, practiceFace } from '../src/assets/original/index.js';
 import { drawScreen, drawStudentScreen, SCREEN_LAYOUTS, STUDENT_ACTIONS } from '../src/screen-art.js';
 import { drawScene } from '../src/scene.js';
@@ -37,35 +36,34 @@ test('student controls reuse the static PREFS Done and LOAD Cancel artwork',()=>
  assert.deepEqual(STUDENT_ACTIONS.cancel.center,[236,186.5]);assert.deepEqual(STUDENT_ACTIONS.cancel.size,[56,17]);
  assert.deepEqual(STUDENT_ACTIONS.done.center,[293,186.5]);assert.deepEqual(STUDENT_ACTIONS.done.size,[42,17]);
 });
-test('every selected raster has intact hashes, bounded pixels and static-only provenance',()=>{
- assert.equal(provenance.records.length,Object.keys(rasters).length);
- assert.equal(provenance.records.length,186);
+test('all 186 shipped rasters retain reviewed content and bounded palette indices',()=>{
+ assert.equal(Object.keys(rasters).length,186);
+ assert.equal(hash(JSON.stringify(rasters)),'47210c946a0aafb0cd5cebe87b598aeb5e2421928afdc9a819cd2ade177379f7');
  for(const prefix of ['m','l','p'])assert.equal(rasters[`WALKING-${prefix}run0009_1`],undefined);
  assert.equal(rasters['FONT7H-font7_32'],undefined);
- assert.match(provenance.rights,/unverified/);
- for(const r of provenance.records) {
-  const data=rasters[r.id],pixels=Buffer.from(data.pixels,'base64');
-  assert.match(r.member,/^MarioTea\/MARIO\/[A-Z0-9]+\.(CRX|GSO)$/);
-  assert.match(r.paletteMember,/\.(CRX|GPO)$/);assert.match(r.memberSha256,/^[a-f0-9]{64}$/);
-  assert.equal(hash(pixels),r.pixelSha256);assert.equal(hash(JSON.stringify(data)),r.rasterSha256);
+ for(const data of Object.values(rasters)) {
+  const pixels=Buffer.from(data.pixels,'base64');
+  assert.ok(Number.isInteger(data.width)&&data.width>0&&Number.isInteger(data.height)&&data.height>0);
   assert.equal(pixels.length,data.width*data.height);assert.equal(data.palette.length,768);
   assert.ok(data.palette.every(n=>Number.isInteger(n)&&n>=0&&n<=255));
+  assert.ok(pixels.every(n=>n*3+2<data.palette.length));
  }
- assert.deepEqual(readdirSync(new URL('../src/assets/original/',import.meta.url)).sort(),['index.js','provenance.json','rasters.json']);
+ assert.deepEqual(readdirSync(new URL('../src/assets/original/',import.meta.url)).sort(),['index.js','rasters.json']);
 });
 test('all bundled FONT7H glyphs preserve transparent gaps, white cores and black outlines',()=>{
- const glyphs=provenance.records.filter(record=>record.id.startsWith('FONT7H-'));
+ const glyphs=Object.keys(rasters).filter(id=>id.startsWith('FONT7H-'));
  assert.equal(glyphs.length,94);
- for(const record of glyphs) {
-  const glyph=rasters[record.id],pixels=Buffer.from(glyph.pixels,'base64');
+ for(const id of glyphs) {
+  const glyph=rasters[id],pixels=Buffer.from(glyph.pixels,'base64');
   assert.equal(glyph.width,10);assert.equal(glyph.height,10);assert.equal(glyph.transparent,0);
-  assert.deepEqual(glyph.palette.slice(3,6),[255,255,255],`${record.id} core`);
-  assert.deepEqual(glyph.palette.slice(6,9),[0,0,0],`${record.id} outline`);
-  assert.deepEqual([...new Set(pixels)].sort(),[0,1,2],`${record.id} retains only transparent, core and outline indices`);
+  assert.deepEqual(glyph.palette.slice(3,6),[255,255,255],`${id} core`);
+  assert.deepEqual(glyph.palette.slice(6,9),[0,0,0],`${id} outline`);
+  assert.deepEqual([...new Set(pixels)].sort(),[0,1,2],`${id} retains only transparent, core and outline indices`);
  }
 });
 test('selected originals match retained raw members, palette hashes and reviewed decoded references', {skip:!process.env.ORIGINAL_FIDELITY_SOURCE},()=>{
  const root=process.env.ORIGINAL_FIDELITY_SOURCE;
+ const provenance=JSON.parse(readFileSync(resolve(root,'research/provenance/original-assets.json')));
  const raw=resolve(root,'research/gameplay-mechanics-2026-11-09/dos-resources/extracted');
  for(const r of provenance.records) {
   const bytes=readFileSync(resolve(raw,r.member));assert.equal(hash(bytes),r.memberSha256);

@@ -6,8 +6,8 @@ from pathlib import Path
 from PIL import Image, ImageDraw, ImageFilter
 import json, sys, math
 ROOT=Path(sys.argv[1]) if len(sys.argv)>1 else Path(__file__).resolve().parents[3]/'research/video-dJP7FTvGETM'
-OUT=Path(__file__).parent
-EVIDENCE=OUT.parents[2]/'artifacts/trace-underwater'
+OUT=Path(__file__).resolve().parent
+EVIDENCE=OUT.parents[2]/'research/artifacts/trace-underwater'
 EVIDENCE.mkdir(parents=True,exist_ok=True)
 SX,SY=640/1740,280/756
 records=[]
