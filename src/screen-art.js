@@ -1,43 +1,49 @@
-// Static screen illustrations. The screenshot title is separate from gameplay art.
-// Reference screenshots remain evidence only; the title still is the sole screenshot-derived runtime image.
-import { characterImage, rect, oval, poly } from './art.js';
+import { characterImage } from './art.js';
+import { drawOriginal, originalImage } from './assets/original/index.js';
 import { drawTitleIllustration } from './title-art.js';
 
+// Native 320x200 coordinates for accessible DOM overlays. These are browser layout
+// choices, not recovered widget bounds. Controls may flow below the art at narrow widths.
+export const SCREEN_LAYOUTS = Object.freeze({
+  LOGO: { panel: [0,0,320,200] },
+  GREET: { panel: [120,0,195,60] }, GREETBG: { panel: [16,16,288,168] },
+  MAINMENU: { panel: [124,16,92,62], activities: [234,10,69,178] },
+  PREFS: { panel: [32,73,256,69], actions: [256,174,56,22] },
+  LOAD: { panel: [26,50,264,112], actions: [180,166,108,24] },
+  LESSTIME: { panel: [53,61,218,90], actions: [264,175,45,20] },
+  HELP: { panel: [15,31,290,140], actions: [12,176,292,18] },
+  KEYBOARD: { panel: [8,24,304,100] },
+  OUTSIDE: { panel: [8,164,304,30] }, OUTSKY: { panel: [8,164,304,30] },
+  WATER: { panel: [8,8,304,28] }, WCAS0001: { panel: [8,8,304,28] },
+  CASTLE: { panel: [8,8,304,28] }, OCASTLE: { panel: [8,8,304,28] },
+  PRACTICE: { panel: [27,94,266,100] },
+  BLACKBRD: { panel: [36,32,130,101], actions: [49,174,135,22] },
+  RCARD: { panel: [53,61,218,119] },
+  CERTIF: { panel: [35,76,248,94], actions: [252,173,57,20] },
+  ENDF: { panel: [16,140,288,48] },
+});
+
+// No navigation, eligibility or timing decisions here. OCASTLE/ENDF callers choose
+// browser presentation explicitly; filenames do not establish original triggers.
+export function drawScreen(canvas, family) {
+  if (!Object.hasOwn(SCREEN_LAYOUTS, family)) throw new RangeError(`Unknown screen: ${family}`);
+  canvas.width = 320; canvas.height = 200;
+  drawOriginal(canvas.getContext('2d'), family);
+  return SCREEN_LAYOUTS[family];
+}
+export function drawMenuScreen(canvas) { return drawScreen(canvas, 'MAINMENU'); }
+export function drawStudentScreen(canvas) { return drawScreen(canvas, 'PREFS'); }
+export function drawResultsScreen(canvas) { return drawScreen(canvas, 'BLACKBRD'); }
+export function drawReportScreen(canvas) { return drawScreen(canvas, 'RCARD'); }
+export function drawTitle(canvas) { drawTitleIllustration(canvas); }
 export function drawPortrait(canvas, character) {
   canvas.width = 64; canvas.height = 76;
-  canvas.getContext('2d').drawImage(characterImage(character, 0, 'happy', true), 0, 0);
+  const context = canvas.getContext('2d'); context.imageSmoothingEnabled = false;
+  context.drawImage(characterImage(character, 0, 'happy', true), 0, 0);
 }
-
-export function drawTitle(canvas) {
-  drawTitleIllustration(canvas);
-}
-
 export function drawTeacher(canvas) {
-  canvas.width=180; canvas.height=280;
-  const c=canvas.getContext('2d'); c.imageSmoothingEnabled=false;
-  oval(c,99,267,69,8,'#7c7c7d');
-  oval(c,75,260,25,10,'#8d4614'); oval(c,119,262,30,10,'#b1691b');
-  poly(c,[[69,115],[120,112],[151,229],[139,256],[48,254],[40,232]],'#25272c');
-  poly(c,[[73,119],[109,116],[134,244],[106,251],[91,154],[80,249],[57,245]],'#505156');
-  poly(c,[[80,137],[86,158],[68,243],[59,244]],'#737477');
-  poly(c,[[98,145],[106,149],[123,244],[111,246]],'#37383d');
-  // Raised sleeve and white glove hold the classroom pointer.
-  poly(c,[[76,125],[47,151],[21,111],[34,99],[56,123]],'#424449');
-  poly(c,[[43,134],[25,107],[32,102],[52,130]],'#6d7074');
-  poly(c,[[25,105],[8,49],[11,47],[30,104]],'#faf9e8');
-  oval(c,27,105,10,15,'#222630'); oval(c,25,103,8,13,'#fffdf0');
-  for(let y=99;y<113;y+=4) rect(c,20,y,8,1,'#8f969b');
-  // Shared portrait stays owned by the character renderer. Gown and cap are static screen props.
-  c.drawImage(characterImage('Mario',0,'happy',true),54,40,82,98);
-  poly(c,[[52,75],[63,47],[111,42],[137,76],[116,69],[80,67]],'#36383d');
-  poly(c,[[61,62],[75,45],[106,45],[119,65],[83,62]],'#55585d');
-  poly(c,[[28,31],[105,17],[162,42],[83,55]],'#24262b');
-  poly(c,[[33,30],[105,21],[154,42],[84,50]],'#55585d');
-  poly(c,[[105,28],[132,57],[137,90],[134,92],[128,60]],'#d5b04f');
-  rect(c,133,87,6,15,'#b58b2b');
-  poly(c,[[113,197],[146,190],[164,237],[127,249],[111,230]],'#a56a37');
-  poly(c,[[118,200],[143,196],[156,232],[128,241]],'#eeeade');
-  poly(c,[[117,139],[138,158],[151,204],[135,213],[118,184]],'#3c3e43');
-  oval(c,139,217,15,13,'#32353b'); oval(c,137,214,13,11,'#fffdf0');
-  for(let x=130;x<148;x+=5) rect(c,x,214,1,11,'#888e94');
+  // Original teacher is part of BLACKBRD, not a separately recovered sprite.
+  canvas.width = 130; canvas.height = 170;
+  const context = canvas.getContext('2d'); context.imageSmoothingEnabled = false;
+  context.drawImage(originalImage('BLACKBRD'), 170,30,130,170,0,0,130,170);
 }

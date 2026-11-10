@@ -1,0 +1,2224 @@
+{
+  "corpusVersion": "mtt-1992-reviewed-1",
+  "archiveSha256": "b59886a6f7b48b0057c8db1c099ed598c8a3581245b0f8884316203de55784bd",
+  "review": "All 136 ASCII records reviewed; historical wording retained, not endorsed. Rights unverified.",
+  "members": [
+    {
+      "member": "BLETTERS.LEE",
+      "archiveMember": "MarioTea/MARIO/BLETTERS.LEE",
+      "sha256": "46248d1375a1f755bc6a2c3161e517bc1cab18fb24f235ce3615df276de9f5f0",
+      "sizeBytes": 1082,
+      "eofOffset": 1081,
+      "records": [
+        {
+          "record": 1,
+          "byteSpan": [
+            1,
+            76
+          ],
+          "sha256": "c1f610d4143cef63e303a74c33bb46198088d1782e80b5bd15a31b2e219e2da2",
+          "controls": [],
+          "textSha256": "4a8be36e46179bfd5ada2982422a3a3edd876c0a115897ee7751cc1055a83aca"
+        },
+        {
+          "record": 2,
+          "byteSpan": [
+            77,
+            157
+          ],
+          "sha256": "272796c6f9aba30aaef6cb9737e34ae1a8b2aaf741d647dfa3934c80457fd82e",
+          "controls": [],
+          "textSha256": "888c0f4fedf0307616c4e194234397cf84a564ea22969445254cd5aa518aad12"
+        },
+        {
+          "record": 3,
+          "byteSpan": [
+            158,
+            223
+          ],
+          "sha256": "c1ff197b9f22c0f39474da5f2573dd3fba185c22d4ecc5097093a22b4935997e",
+          "controls": [],
+          "textSha256": "bb869c6637bbd8ae5a4be57ebd8b8563ff116f61b7f55a02062d5df7f959f9a3"
+        },
+        {
+          "record": 4,
+          "byteSpan": [
+            224,
+            304
+          ],
+          "sha256": "f3962ddc95a12a85114375347036a7f437bd5d424c77b2797a8a174728a41a97",
+          "controls": [],
+          "textSha256": "d9f72dc8e6f0b7f881d852ee21c240a8263888ec834cbf54ea94c2166b906f2b"
+        },
+        {
+          "record": 5,
+          "byteSpan": [
+            305,
+            355
+          ],
+          "sha256": "4a07a4678cade7bf15b8213c26e25771cccc5334471f8d224be1f61dc6ece1bf",
+          "controls": [],
+          "textSha256": "1798727cc38b56c731d07ec6b70dae19f4efd2bba8640bdcf0d38f18ca6e2985"
+        },
+        {
+          "record": 6,
+          "byteSpan": [
+            356,
+            451
+          ],
+          "sha256": "16bcf4c2412746d9753608a2901b4622910a2e51014e9dc5a6732fd36056c0e7",
+          "controls": [],
+          "textSha256": "6169a5639d85f943629fb47f2c37fcca7683132af3a23097f0c6a10c9493d2fe"
+        },
+        {
+          "record": 7,
+          "byteSpan": [
+            452,
+            577
+          ],
+          "sha256": "e047b88745447869af4005022afec1aca52b6ccde115c33db724e04d8bc10706",
+          "controls": [],
+          "textSha256": "eb289067b81e2bca23700cf11c8c8b7f1b6e95a2ae91b4e42cfd2729af83aa66"
+        },
+        {
+          "record": 8,
+          "byteSpan": [
+            578,
+            628
+          ],
+          "sha256": "42cea82c40467db83624f882b68c95b8a0a15a2a3116bec0aca41c989925aa14",
+          "controls": [],
+          "textSha256": "4350422e40379b3022897c52e4fc2f68bec0743b17ad50fbee260c28f7a1e0c9"
+        },
+        {
+          "record": 9,
+          "byteSpan": [
+            629,
+            659
+          ],
+          "sha256": "1bc2a90184c9105874418c64d5358c099fde216855e90e4132e9354b0350b6e0",
+          "controls": [],
+          "textSha256": "0b6e1d9ef59b62b3a162b7e2fc4663c08eb8470366aa466e30ca5f2f0b925ae6"
+        },
+        {
+          "record": 10,
+          "byteSpan": [
+            660,
+            730
+          ],
+          "sha256": "b3f197ad6a6f45a78fd7192db24c00bcb1cd485f12a1d28a4d8aca298b226a09",
+          "controls": [],
+          "textSha256": "5d5a8b030def7ba1328c6cc2a2f017163b23b26fef1060bdac006139e936909e"
+        },
+        {
+          "record": 11,
+          "byteSpan": [
+            731,
+            807
+          ],
+          "sha256": "6b931497cc5fbeb41a9b9e594608be4bf7281f05349ef5a7e77fcf11ee27fc95",
+          "controls": [],
+          "textSha256": "fa83da9ad8db07a834dbe8e258f24618a318d650c0760e101f8b51414c47f11b"
+        },
+        {
+          "record": 12,
+          "byteSpan": [
+            808,
+            883
+          ],
+          "sha256": "0a900b9667b6da653abcedff82eeb226a0863bfa2f2ad58a98e3e5075e01a44c",
+          "controls": [],
+          "textSha256": "2566bdd7591d86a96ab734fc2bc5be666e4f54a513989476a29f234bf8c19d92"
+        },
+        {
+          "record": 13,
+          "byteSpan": [
+            884,
+            954
+          ],
+          "sha256": "588991f7f24d29027a81bf8688789887f40662d204b1e09356fc84c5e6193d23",
+          "controls": [],
+          "textSha256": "8ab1a77bad5d7684f7fc560937aaf3cdbbba276708d183a223b428f8c7dd3812"
+        },
+        {
+          "record": 14,
+          "byteSpan": [
+            955,
+            1020
+          ],
+          "sha256": "3643df2190e6373dc9011b4264d71de94dc00d9158c4ef4214a294a9357c1b58",
+          "controls": [],
+          "textSha256": "4f26e101011233c4c89c0ab0fe4b433ab61b754f581d3c2948fbf6650b238fdd"
+        },
+        {
+          "record": 15,
+          "byteSpan": [
+            1021,
+            1081
+          ],
+          "sha256": "b152fb5ded4afced549105ec08430db3687c2b250c3295b69402c5034f1d578d",
+          "controls": [],
+          "textSha256": "35f04068f5292dd1fc346286ca1f7b016d191ca4611cef836e24ffdb7ad05501"
+        }
+      ]
+    },
+    {
+      "member": "BSENTENC.LEE",
+      "archiveMember": "MarioTea/MARIO/BSENTENC.LEE",
+      "sha256": "a303b33f863bc5082523db99b9013325a234aca06fd9eef7e2446a2a1e5eede9",
+      "sizeBytes": 1775,
+      "eofOffset": 1774,
+      "records": [
+        {
+          "record": 1,
+          "byteSpan": [
+            1,
+            592
+          ],
+          "sha256": "d3676be9ffe88fe255ceca830bf33e4c76b545e8f289d2d4c0c649108052e18d",
+          "controls": [
+            {
+              "offset": 62,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 185,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 299,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 398,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 400,
+              "kind": "CR"
+            },
+            {
+              "offset": 401,
+              "kind": "LF"
+            },
+            {
+              "offset": 515,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 587,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 588,
+              "kind": "CR"
+            },
+            {
+              "offset": 589,
+              "kind": "LF"
+            },
+            {
+              "offset": 590,
+              "kind": "CR"
+            },
+            {
+              "offset": 591,
+              "kind": "LF"
+            }
+          ],
+          "textSha256": "b2bc6cea8fcbedf22cb29c02033b1d2585fc3e0b4fb99a087af9a1641af9b92d"
+        },
+        {
+          "record": 2,
+          "byteSpan": [
+            593,
+            1170
+          ],
+          "sha256": "ddd399baf0ad2335159caed72220157250f3e5cceb713d716e78627d38c749c9",
+          "controls": [
+            {
+              "offset": 648,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 767,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 856,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 916,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 1065,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 1165,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 1166,
+              "kind": "CR"
+            },
+            {
+              "offset": 1167,
+              "kind": "LF"
+            },
+            {
+              "offset": 1168,
+              "kind": "CR"
+            },
+            {
+              "offset": 1169,
+              "kind": "LF"
+            }
+          ],
+          "textSha256": "0b43bc6609725a233ea551aa48ad81ff2defb5244f64c4a16cc2933d44d63e4e"
+        },
+        {
+          "record": 3,
+          "byteSpan": [
+            1171,
+            1774
+          ],
+          "sha256": "c42db94cc1b354441ba75e629271435e46257d28ad62089f47b45e6e4a52b2d8",
+          "controls": [
+            {
+              "offset": 1280,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 1346,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 1408,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 1457,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 1499,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 1648,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 1727,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 1769,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 1770,
+              "kind": "CR"
+            },
+            {
+              "offset": 1771,
+              "kind": "LF"
+            },
+            {
+              "offset": 1772,
+              "kind": "CR"
+            },
+            {
+              "offset": 1773,
+              "kind": "LF"
+            }
+          ],
+          "textSha256": "5297c1ab7bf02a25b56fb4cfbe434f3a6bb8eaa95d1a3dff935caf6be877075e"
+        }
+      ]
+    },
+    {
+      "member": "BWORDS.LEE",
+      "archiveMember": "MarioTea/MARIO/BWORDS.LEE",
+      "sha256": "7abe27bc7e798438c40168a3403204ee0bae0ff17de900e8301e3a6e91845083",
+      "sizeBytes": 1811,
+      "eofOffset": 1810,
+      "records": [
+        {
+          "record": 1,
+          "byteSpan": [
+            1,
+            301
+          ],
+          "sha256": "a03fea65ab646e3f719b0ea99eda918c2ec72f17649e2929c76408023fd365ba",
+          "controls": [],
+          "textSha256": "a03fea65ab646e3f719b0ea99eda918c2ec72f17649e2929c76408023fd365ba"
+        },
+        {
+          "record": 2,
+          "byteSpan": [
+            302,
+            600
+          ],
+          "sha256": "7255610b48355e450007edae6cd4dba7776fa1fea281b4edfcd60a8f1806c6ff",
+          "controls": [],
+          "textSha256": "7255610b48355e450007edae6cd4dba7776fa1fea281b4edfcd60a8f1806c6ff"
+        },
+        {
+          "record": 3,
+          "byteSpan": [
+            601,
+            799
+          ],
+          "sha256": "14d0c394ac7661e3c1d28fe7d7a8cb814512178598457141dd4004b14d990181",
+          "controls": [],
+          "textSha256": "14d0c394ac7661e3c1d28fe7d7a8cb814512178598457141dd4004b14d990181"
+        },
+        {
+          "record": 4,
+          "byteSpan": [
+            800,
+            1202
+          ],
+          "sha256": "4155a9d82bb846a040a97ae6ad05334fd4bc0c5ec2f15dc6ed2dc1bc2c56939e",
+          "controls": [],
+          "textSha256": "4155a9d82bb846a040a97ae6ad05334fd4bc0c5ec2f15dc6ed2dc1bc2c56939e"
+        },
+        {
+          "record": 5,
+          "byteSpan": [
+            1203,
+            1279
+          ],
+          "sha256": "5dbd3bb8accee940627252ee8c21dd8c5c97a8cf5d3ab27d8e3ef1e0e7ce3ced",
+          "controls": [],
+          "textSha256": "5dbd3bb8accee940627252ee8c21dd8c5c97a8cf5d3ab27d8e3ef1e0e7ce3ced"
+        },
+        {
+          "record": 6,
+          "byteSpan": [
+            1280,
+            1424
+          ],
+          "sha256": "7e3b19d47789c9a6eef670d065bf00068603084079dfa4f3c9ad45242030f7b4",
+          "controls": [],
+          "textSha256": "7e3b19d47789c9a6eef670d065bf00068603084079dfa4f3c9ad45242030f7b4"
+        },
+        {
+          "record": 7,
+          "byteSpan": [
+            1425,
+            1660
+          ],
+          "sha256": "b63c148a0cf4702126c8b3a123e30c47b8f1127c70dada1c4539e1573a36a1cd",
+          "controls": [],
+          "textSha256": "b63c148a0cf4702126c8b3a123e30c47b8f1127c70dada1c4539e1573a36a1cd"
+        },
+        {
+          "record": 8,
+          "byteSpan": [
+            1661,
+            1810
+          ],
+          "sha256": "1023bdf5c1c581c60dd757fd57509dbf3157ef4f22c9af04bcc99c59ed4ee5e8",
+          "controls": [],
+          "textSha256": "1023bdf5c1c581c60dd757fd57509dbf3157ef4f22c9af04bcc99c59ed4ee5e8"
+        }
+      ]
+    },
+    {
+      "member": "HLETTERS.LEE",
+      "archiveMember": "MarioTea/MARIO/HLETTERS.LEE",
+      "sha256": "f88a87845e17856c63192813208f67a29fea46c41f8fde164ff972eff15e71ba",
+      "sizeBytes": 1060,
+      "eofOffset": 1059,
+      "records": [
+        {
+          "record": 1,
+          "byteSpan": [
+            1,
+            21
+          ],
+          "sha256": "aa3182b613d1870dac72ae83c30af6ce39c4bd797c00eba6addb994fe407eab8",
+          "controls": [],
+          "textSha256": "68a91af2aea3e6dc58a00fdf29533a91872a8125e2d92b9b329fd6e4938aa502"
+        },
+        {
+          "record": 2,
+          "byteSpan": [
+            22,
+            52
+          ],
+          "sha256": "f3e88e1e52d3114733404796ef2c4bb1c9b1a3cba37b2e5a21eab544af33b279",
+          "controls": [],
+          "textSha256": "0c07d010079301f6411685e50dde87aa81d88346e83a2226905f058c6b3a3512"
+        },
+        {
+          "record": 3,
+          "byteSpan": [
+            53,
+            103
+          ],
+          "sha256": "fcdbed2cfbc6eb6be7426b95205469010d0c800e566a3b5ac459b12f6973a59c",
+          "controls": [],
+          "textSha256": "ef44b1ca119a69dbcdbae7c80cef1dda3b081edded1e27ec821026659ea3cf73"
+        },
+        {
+          "record": 4,
+          "byteSpan": [
+            104,
+            125
+          ],
+          "sha256": "4500b2e20a407c22167c0c502a9065b486a7fe2c6bc53b8f50ed97e60209cca5",
+          "controls": [],
+          "textSha256": "7914a33f234d2fec5c48bf0a435dbb3e5523011eaa4fa94407a1a098bc0cb40e"
+        },
+        {
+          "record": 5,
+          "byteSpan": [
+            126,
+            171
+          ],
+          "sha256": "ac31f18295ba7bdd28bf8cbe685021a14534aee23d2288c1ce2f32a5da0512f3",
+          "controls": [],
+          "textSha256": "b06f557dcbfd9373f35e65ec0af2736b349eb7bbba733a99fc05bea82d2686e1"
+        },
+        {
+          "record": 6,
+          "byteSpan": [
+            172,
+            237
+          ],
+          "sha256": "d9c069bfa98060f46c4c45318554e10b36f86d8e4848b0de54e86a4b6e6f241d",
+          "controls": [],
+          "textSha256": "2b7654d659d774c9bd50dd390d85f6df562f5fbdea2b153f9525cead20ce035f"
+        },
+        {
+          "record": 7,
+          "byteSpan": [
+            238,
+            268
+          ],
+          "sha256": "56fb00a12c3f592da21ea34555c8fbb2ff50c3f359c06540a2217313763d999e",
+          "controls": [],
+          "textSha256": "9cd26470f3a44e88f437ce850dabd1aeaeb6796303d9e6a7c8380ad5b6e4c127"
+        },
+        {
+          "record": 8,
+          "byteSpan": [
+            269,
+            299
+          ],
+          "sha256": "1c2686168f7f502b8a6ae76749d1c1e7408cd0bf30fa56e8a5960a7c34d27368",
+          "controls": [],
+          "textSha256": "a97a32146b55e60d3bed54913b17a1ecd013e14f470c6a6fef41a683904cca99"
+        },
+        {
+          "record": 9,
+          "byteSpan": [
+            300,
+            330
+          ],
+          "sha256": "16c881d8939c0751e6bfe9cab179e4d438d7a669114fdec83b42da8a8570f113",
+          "controls": [],
+          "textSha256": "6f4caa05c3eeb10ae24a46141f710c4eeeffcb1459e18deb03f770e2eaa9ee27"
+        },
+        {
+          "record": 10,
+          "byteSpan": [
+            331,
+            361
+          ],
+          "sha256": "cd874d2b53b2c01655e0b0e8173c8ee0b55ab4ba78d7fcbdf8acb16d5e2d2b44",
+          "controls": [],
+          "textSha256": "b661cd478438324219078de056ca05aa6ba984ac652659e3e45cb16476d75d55"
+        },
+        {
+          "record": 11,
+          "byteSpan": [
+            362,
+            418
+          ],
+          "sha256": "f7cc42c51cc3c764249c814b95f7434c149915be3a501d2004f0e01a160a1d57",
+          "controls": [],
+          "textSha256": "4e77e6be0d8e6b7673a6eadc894549f8aca831f87e901847baf9b8cc3a3d70b3"
+        },
+        {
+          "record": 12,
+          "byteSpan": [
+            419,
+            489
+          ],
+          "sha256": "e6c889fce64a5e3151b165ca6f5c430b980f6ff6de83b454a1df067f62223bcb",
+          "controls": [],
+          "textSha256": "8d5394ee79c5cc562758a948b81975feeb39444cf9952931411be4014642094a"
+        },
+        {
+          "record": 13,
+          "byteSpan": [
+            490,
+            530
+          ],
+          "sha256": "1703f256f1a1d6a96d22001123a3810ddc2ffe0d943214f4a77cdfb3c8d43108",
+          "controls": [],
+          "textSha256": "20769f62126aa4a79abf09353dd7217abb449dfb335579b8cc42139dd439d235"
+        },
+        {
+          "record": 14,
+          "byteSpan": [
+            531,
+            581
+          ],
+          "sha256": "03850d68effc8269fd3a1d9f1a585222416fa28f56d2d46e0f1649b48cf9e91a",
+          "controls": [],
+          "textSha256": "842b4b6cafbb251c6916f3392db5f5d48a0f71b551ad4802d0b2ca062e3e07a4"
+        },
+        {
+          "record": 15,
+          "byteSpan": [
+            582,
+            632
+          ],
+          "sha256": "7411e0eb20c99c87dcedd938cda2d627bbf74e16249013137a3da1f08f841374",
+          "controls": [],
+          "textSha256": "c1d2cce4315bcd45530ac7364ea96007ce2f38e2830d3c5255ba6a8d2f627464"
+        },
+        {
+          "record": 16,
+          "byteSpan": [
+            633,
+            678
+          ],
+          "sha256": "4bd7942503e1aee2a0d50a5a38b3a4386b5e91b7174d240db7b01166524a6f27",
+          "controls": [],
+          "textSha256": "838d831679cb7ff39c97e01696275e37f506d30740fea510e091d1c1e798b4ad"
+        },
+        {
+          "record": 17,
+          "byteSpan": [
+            679,
+            724
+          ],
+          "sha256": "40a510aa68f08df3ad55ebe55e3cf4838160369ff1876dcd5114ca01791d1144",
+          "controls": [],
+          "textSha256": "5c9e8adb398d407f1290e5cc99ff4d935ecb4599d7267fcb7ec95ff500455b86"
+        },
+        {
+          "record": 18,
+          "byteSpan": [
+            725,
+            765
+          ],
+          "sha256": "c6a91a6fab2a7840d740b42ea0352d11b5759b5e18991a1ffc01ab0d2550c371",
+          "controls": [],
+          "textSha256": "9b81082e86432ab1a6c9427cfdfbec470dbc5f86784a4f6daa69af5c19cb8781"
+        },
+        {
+          "record": 19,
+          "byteSpan": [
+            766,
+            796
+          ],
+          "sha256": "cd874d2b53b2c01655e0b0e8173c8ee0b55ab4ba78d7fcbdf8acb16d5e2d2b44",
+          "controls": [],
+          "textSha256": "b661cd478438324219078de056ca05aa6ba984ac652659e3e45cb16476d75d55"
+        },
+        {
+          "record": 20,
+          "byteSpan": [
+            797,
+            837
+          ],
+          "sha256": "92c6978af217dba80c98575dae6c9f6d961cd4747119af7cabe1aa54bc4f2615",
+          "controls": [],
+          "textSha256": "e917bc37169e2153ee4289a94ff8aceba16b62ac4e82d71481963967b47f28bf"
+        },
+        {
+          "record": 21,
+          "byteSpan": [
+            838,
+            868
+          ],
+          "sha256": "1c2686168f7f502b8a6ae76749d1c1e7408cd0bf30fa56e8a5960a7c34d27368",
+          "controls": [],
+          "textSha256": "a97a32146b55e60d3bed54913b17a1ecd013e14f470c6a6fef41a683904cca99"
+        },
+        {
+          "record": 22,
+          "byteSpan": [
+            869,
+            899
+          ],
+          "sha256": "56fb00a12c3f592da21ea34555c8fbb2ff50c3f359c06540a2217313763d999e",
+          "controls": [],
+          "textSha256": "9cd26470f3a44e88f437ce850dabd1aeaeb6796303d9e6a7c8380ad5b6e4c127"
+        },
+        {
+          "record": 23,
+          "byteSpan": [
+            900,
+            935
+          ],
+          "sha256": "d0929968d6fe1b6d563f857e2d16939f956b1899f86010bfb2c7986240fc22fc",
+          "controls": [],
+          "textSha256": "9558e20f1c031411b007eb90166609ea1b0034eb6ebc6e494e12d2f7bdd91c60"
+        },
+        {
+          "record": 24,
+          "byteSpan": [
+            936,
+            966
+          ],
+          "sha256": "13fbbdf74c20a759855ef98884d6048147a4e4b9b6ad5f697bc08775d869440c",
+          "controls": [],
+          "textSha256": "22748d58df376a9270974574917b1df650b46f99859590f1ba792c68f6720e84"
+        },
+        {
+          "record": 25,
+          "byteSpan": [
+            967,
+            997
+          ],
+          "sha256": "f5210a372647ad7b598b8cf67fcab8229204797b323f9b3d150d4cf19d246955",
+          "controls": [],
+          "textSha256": "a0e0edb843354320d5d975687eae3a225db5933be7e6d20ff64a03c99a106172"
+        },
+        {
+          "record": 26,
+          "byteSpan": [
+            998,
+            1028
+          ],
+          "sha256": "93aecfef279fe5db0bcf42d62c68805ec32ccca6ba2e98fcc2ed0a3a730bd2a4",
+          "controls": [],
+          "textSha256": "bc5365fb8041e6ce180ed5ffc1d4b700ceacc964fbad3b891dbc8afb5a44f5bc"
+        },
+        {
+          "record": 27,
+          "byteSpan": [
+            1029,
+            1059
+          ],
+          "sha256": "925912749bf64f278195c134b4abfb40096877dc7f9f09a703a2b58ea550fa53",
+          "controls": [],
+          "textSha256": "7df1689ba4433041ef938d26d311d5c020a1de9616512239f993fcb4290b450a"
+        }
+      ]
+    },
+    {
+      "member": "HSENTENC.LEE",
+      "archiveMember": "MarioTea/MARIO/HSENTENC.LEE",
+      "sha256": "9f849288ff5d40ec858ca1a8eaf8bcc12b334caa7ff4092f8798196a82ea6aef",
+      "sizeBytes": 1784,
+      "eofOffset": 1783,
+      "records": [
+        {
+          "record": 1,
+          "byteSpan": [
+            1,
+            565
+          ],
+          "sha256": "bd3a0c45548a26a921ca665908d97528f2ab0efdafacb93ebe2620f978ee2609",
+          "controls": [
+            {
+              "offset": 68,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 162,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 293,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 395,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 514,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 560,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 561,
+              "kind": "CR"
+            },
+            {
+              "offset": 562,
+              "kind": "LF"
+            },
+            {
+              "offset": 563,
+              "kind": "CR"
+            },
+            {
+              "offset": 564,
+              "kind": "LF"
+            }
+          ],
+          "textSha256": "70abd4e76942301a72e3ddc6d9eb8b3dc49ec5c8fded6c5e46d37dbc87905c1d"
+        },
+        {
+          "record": 2,
+          "byteSpan": [
+            566,
+            1470
+          ],
+          "sha256": "a646f751f4e75a417d293aefdcc6d9ca4bde27bc194dd067283c90f9338a8765",
+          "controls": [
+            {
+              "offset": 637,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 678,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 741,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 827,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 921,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 1092,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 1170,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 1260,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 1372,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 1465,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 1466,
+              "kind": "CR"
+            },
+            {
+              "offset": 1467,
+              "kind": "LF"
+            },
+            {
+              "offset": 1468,
+              "kind": "CR"
+            },
+            {
+              "offset": 1469,
+              "kind": "LF"
+            }
+          ],
+          "textSha256": "3f4d10c01421761536e646999b1a3a4c14bd5b712b3e7ee363a612bab638d534"
+        },
+        {
+          "record": 3,
+          "byteSpan": [
+            1471,
+            1783
+          ],
+          "sha256": "cbccaee3f7c253b55da5e3bc4e065f676e5d40bad2e99995ecf24ddbadc8a718",
+          "controls": [
+            {
+              "offset": 1553,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 1628,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 1705,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 1778,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 1779,
+              "kind": "CR"
+            },
+            {
+              "offset": 1780,
+              "kind": "LF"
+            },
+            {
+              "offset": 1781,
+              "kind": "CR"
+            },
+            {
+              "offset": 1782,
+              "kind": "LF"
+            }
+          ],
+          "textSha256": "164affc4748d6732a7b81ce836a02901a7e62e9b42ee0b9ea65e059a377009f3"
+        }
+      ]
+    },
+    {
+      "member": "HWORDS.LEE",
+      "archiveMember": "MarioTea/MARIO/HWORDS.LEE",
+      "sha256": "4850ea6c75791905a9fdceb052f528d5d3b01514177a37d87c5bdd8ba79fbde2",
+      "sizeBytes": 1801,
+      "eofOffset": 1800,
+      "records": [
+        {
+          "record": 1,
+          "byteSpan": [
+            1,
+            301
+          ],
+          "sha256": "81dc6aa1110d0ee36b5fb9997c99b742b27c60857c1fc92bfecb7239c038feb5",
+          "controls": [],
+          "textSha256": "81dc6aa1110d0ee36b5fb9997c99b742b27c60857c1fc92bfecb7239c038feb5"
+        },
+        {
+          "record": 2,
+          "byteSpan": [
+            302,
+            482
+          ],
+          "sha256": "242d034020c4b24028b2a2004b3209ae2719d33b1bae6d90b85bf0a27cc9cddf",
+          "controls": [],
+          "textSha256": "242d034020c4b24028b2a2004b3209ae2719d33b1bae6d90b85bf0a27cc9cddf"
+        },
+        {
+          "record": 3,
+          "byteSpan": [
+            483,
+            787
+          ],
+          "sha256": "489fcf8a1e83a63c0b6b52fab31dccd1e71827fe562330092200c89dd2bd1dbd",
+          "controls": [],
+          "textSha256": "489fcf8a1e83a63c0b6b52fab31dccd1e71827fe562330092200c89dd2bd1dbd"
+        },
+        {
+          "record": 4,
+          "byteSpan": [
+            788,
+            1164
+          ],
+          "sha256": "e5ec1d2190ba9a24844570b40cc583a820595de69f8e0874965db86c2e1305c7",
+          "controls": [],
+          "textSha256": "e5ec1d2190ba9a24844570b40cc583a820595de69f8e0874965db86c2e1305c7"
+        },
+        {
+          "record": 5,
+          "byteSpan": [
+            1165,
+            1498
+          ],
+          "sha256": "5426bf48e3a1e5681eccfec5df2290b8401dd40f5c13003f3b491a2684e8d0be",
+          "controls": [],
+          "textSha256": "5426bf48e3a1e5681eccfec5df2290b8401dd40f5c13003f3b491a2684e8d0be"
+        },
+        {
+          "record": 6,
+          "byteSpan": [
+            1499,
+            1800
+          ],
+          "sha256": "0dd4fe9b1b2925f9df3e9f1867ef3875687e44e768eca554e222bd9cbc44b014",
+          "controls": [],
+          "textSha256": "0dd4fe9b1b2925f9df3e9f1867ef3875687e44e768eca554e222bd9cbc44b014"
+        }
+      ]
+    },
+    {
+      "member": "NLETTERS.LEE",
+      "archiveMember": "MarioTea/MARIO/NLETTERS.LEE",
+      "sha256": "68930cfead2bd446cb61a6381390cf112cfe73abb2d1886e8cbabcfdb0b3acf9",
+      "sizeBytes": 1342,
+      "eofOffset": 1341,
+      "records": [
+        {
+          "record": 1,
+          "byteSpan": [
+            1,
+            31
+          ],
+          "sha256": "f5f4f2b961327ee1ff50510774db95b84ae12c0ccae3626c2704efa050917581",
+          "controls": [],
+          "textSha256": "5304a79bd100d0818edea02802502aca60bd76aae963ed05e68e11c66fa6e7f1"
+        },
+        {
+          "record": 2,
+          "byteSpan": [
+            32,
+            62
+          ],
+          "sha256": "2c0a588dfe5ad954746eeecddab90dadf24c9825bc1c04ed0e6d088ff5a288d2",
+          "controls": [],
+          "textSha256": "46f5f5b83dadbefc5361c29c317a9007ee274b132e95918dd28fd3dbafd69c5e"
+        },
+        {
+          "record": 3,
+          "byteSpan": [
+            63,
+            93
+          ],
+          "sha256": "161c35da46574973821bd5b51958da6ed73ba789d2f78293df26f543d8f76069",
+          "controls": [],
+          "textSha256": "e4faa2ac4a1648d32f06d3397282ab8134992376a5fbcb988c2747825aad2599"
+        },
+        {
+          "record": 4,
+          "byteSpan": [
+            94,
+            124
+          ],
+          "sha256": "cb7ab0451a5855ea20416ecf0986f474393dd89fc2b83b6170c7ac056d1d3f20",
+          "controls": [],
+          "textSha256": "b3cc0cd10fdd6d5eb7b63d0f28d7b6e8f7518ee204a472c1aebe46c1a60b7ee8"
+        },
+        {
+          "record": 5,
+          "byteSpan": [
+            125,
+            155
+          ],
+          "sha256": "1c235c7d2a5df5663863b034952a391fed0d814fb2fa28f9c4569d75859a8912",
+          "controls": [],
+          "textSha256": "7816a59306ea0dc98dda39f57e78b1a6621c006b6dba7fa49a14c780d00a1df7"
+        },
+        {
+          "record": 6,
+          "byteSpan": [
+            156,
+            186
+          ],
+          "sha256": "1572666c05117da3c70d12d5456ad8cc1e10bac46dd8b3232d8622bdb403e96d",
+          "controls": [],
+          "textSha256": "da51905374019afac97cf09a73c6603da13967d336bd5ede83adf1b15b54e137"
+        },
+        {
+          "record": 7,
+          "byteSpan": [
+            187,
+            217
+          ],
+          "sha256": "17915dfa7fd1740387a3c0c0386b295cbce02d64ab311f9c220d8cdcca9e06ce",
+          "controls": [],
+          "textSha256": "a8a2270e0a33a695fa0980f2c25cb6dd26c17ab5404fd9a3b49c360793cc0d76"
+        },
+        {
+          "record": 8,
+          "byteSpan": [
+            218,
+            248
+          ],
+          "sha256": "04d66fdd76bf3eb7bc2e4fd8541c65cae7dde824aaf51146850542b84c43f747",
+          "controls": [],
+          "textSha256": "f3dc8cea67f445e440bddff1dc331738cfb4fb8d8a1dea9c1a6c4f048810f5a4"
+        },
+        {
+          "record": 9,
+          "byteSpan": [
+            249,
+            279
+          ],
+          "sha256": "b00d347058ca6f46383c4c62a8511a3f795a0da98f6d393cc0fe9739ab72230d",
+          "controls": [],
+          "textSha256": "c82d3e84becf9afffcd1cb0a43691f11a4bdbf059301d48a47335259a00127a4"
+        },
+        {
+          "record": 10,
+          "byteSpan": [
+            280,
+            310
+          ],
+          "sha256": "75c2eaea03378af28a1647c4cff01f8fa89f19e1efa9b6af7fe1bb17699c4bcd",
+          "controls": [],
+          "textSha256": "765ddd8bce4e9bf6452a0af86ef95fa989a7227ba92192e2947436b955803037"
+        },
+        {
+          "record": 11,
+          "byteSpan": [
+            311,
+            361
+          ],
+          "sha256": "dae19e9fb82f15568d675cf19ca22a30ab835d69a964cd86fb7a2c18914e0b96",
+          "controls": [],
+          "textSha256": "6a6506f1d4771cb49a8542b0ff3a38c2775234565c3ce4f2c9a2564df71fe8d3"
+        },
+        {
+          "record": 12,
+          "byteSpan": [
+            362,
+            512
+          ],
+          "sha256": "9829a2b52db04714537810be407f301ab5a210b01a86f97f9a9f0bcda1202e07",
+          "controls": [],
+          "textSha256": "14a47a3d1c5b80cad77fde20d570625fa105ec1ccb44705e905444530ad2cb9d"
+        },
+        {
+          "record": 13,
+          "byteSpan": [
+            513,
+            563
+          ],
+          "sha256": "4c58bdac6c437b686aa8560939de6cbd7d184ce85cbdc5d7993e70dd5b03fd6e",
+          "controls": [],
+          "textSha256": "519c27259215559ce249fe1f95218b8891e206439131e3fb819e34dc2ae2fd1a"
+        },
+        {
+          "record": 14,
+          "byteSpan": [
+            564,
+            764
+          ],
+          "sha256": "f8fcc6bab5b3eb3074802c254286e8f7910d2bef0b130b99ee83102b0c052988",
+          "controls": [],
+          "textSha256": "98cf0f8b54520e1bccfdcd28b4eb445a00dd16557c3d443e69af2a9d64a1480c"
+        },
+        {
+          "record": 15,
+          "byteSpan": [
+            765,
+            965
+          ],
+          "sha256": "4c0be85fd24a528423dd2c463304b4737d3f5a3c4ab5d571d12fa8e4b99000d3",
+          "controls": [],
+          "textSha256": "f2632e2f4b3bb0a01d0c0faa7f881d01ebbafd2b9663b09e739f41e998c630b3"
+        },
+        {
+          "record": 16,
+          "byteSpan": [
+            966,
+            1266
+          ],
+          "sha256": "ee2adf45af618c49f6d964bedcbbe48b51604f516bc3ac1ca33e27d6c67c4ec5",
+          "controls": [],
+          "textSha256": "347a2f84a028a6fa596c59189bd5a0b9e275ba9e6e888552e221275e0cff83dd"
+        },
+        {
+          "record": 17,
+          "byteSpan": [
+            1267,
+            1341
+          ],
+          "sha256": "bbe8acc9b1d56130c2774345d12761f4d9d5b82ba45a78853a884e8e015e53a6",
+          "controls": [],
+          "textSha256": "9b5abd521ee97e6fc2ff94c6b4e5c4a173df95454034475de72a5bf8431c9950"
+        }
+      ]
+    },
+    {
+      "member": "NSENTENC.LEE",
+      "archiveMember": "MarioTea/MARIO/NSENTENC.LEE",
+      "sha256": "10914b3d4f69a52c8fd7a2275b24fa51707a46d2ccaa931b66be189f3c8f126e",
+      "sizeBytes": 1842,
+      "eofOffset": 1841,
+      "records": [
+        {
+          "record": 1,
+          "byteSpan": [
+            1,
+            612
+          ],
+          "sha256": "a7456128ed1fa3921ead7a52cbefb0abca0bd65a3756d2320c49cfda9aa357bf",
+          "controls": [
+            {
+              "offset": 106,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 223,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 343,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 524,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 607,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 608,
+              "kind": "CR"
+            },
+            {
+              "offset": 609,
+              "kind": "LF"
+            },
+            {
+              "offset": 610,
+              "kind": "CR"
+            },
+            {
+              "offset": 611,
+              "kind": "LF"
+            }
+          ],
+          "textSha256": "a648f23956537591ec54105b6aaf297e96116d43cba30c46c1b5a69ebba113a5"
+        },
+        {
+          "record": 2,
+          "byteSpan": [
+            613,
+            1217
+          ],
+          "sha256": "dc1548e92004a155ef7faca678c6fb7e5bc5ad302060c0cf1da1da9836de129f",
+          "controls": [
+            {
+              "offset": 679,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 723,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 837,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 911,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 962,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 1083,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 1136,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 1212,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 1213,
+              "kind": "CR"
+            },
+            {
+              "offset": 1214,
+              "kind": "LF"
+            },
+            {
+              "offset": 1215,
+              "kind": "CR"
+            },
+            {
+              "offset": 1216,
+              "kind": "LF"
+            }
+          ],
+          "textSha256": "f7b7fd48512c418d3639d4fa73386004e3759a98d9ce258f8c04382a3a5c3244"
+        },
+        {
+          "record": 3,
+          "byteSpan": [
+            1218,
+            1528
+          ],
+          "sha256": "7eff250ab943fe079eb0712fdd7521c41481085b2aec90656212c5f3688622a7",
+          "controls": [
+            {
+              "offset": 1351,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 1434,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 1523,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 1524,
+              "kind": "CR"
+            },
+            {
+              "offset": 1525,
+              "kind": "LF"
+            },
+            {
+              "offset": 1526,
+              "kind": "CR"
+            },
+            {
+              "offset": 1527,
+              "kind": "LF"
+            }
+          ],
+          "textSha256": "c132527056f86ad166e1a5cc4abbf9f232953cfb97dfb6d7a116af1fea7bbd6b"
+        },
+        {
+          "record": 4,
+          "byteSpan": [
+            1529,
+            1841
+          ],
+          "sha256": "bec9d39fe38d5fd4696571c93d418f1f69029acc933415f0d3dadd49e22bdc9a",
+          "controls": [
+            {
+              "offset": 1572,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 1647,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 1741,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 1836,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 1837,
+              "kind": "CR"
+            },
+            {
+              "offset": 1838,
+              "kind": "LF"
+            },
+            {
+              "offset": 1839,
+              "kind": "CR"
+            },
+            {
+              "offset": 1840,
+              "kind": "LF"
+            }
+          ],
+          "textSha256": "35d01f40f4e6f84f2675e6efc63422c84195f4be907b2b00bf5b4949450b89a6"
+        }
+      ]
+    },
+    {
+      "member": "NWORDS.LEE",
+      "archiveMember": "MarioTea/MARIO/NWORDS.LEE",
+      "sha256": "29509b1925d75c2b1a8a5d9ba7f419d1218641ec4064b89863570e4b58dfe8f2",
+      "sizeBytes": 1747,
+      "eofOffset": 1746,
+      "records": [
+        {
+          "record": 1,
+          "byteSpan": [
+            1,
+            335
+          ],
+          "sha256": "9b2d16dcc68c9afbd2024dcb42353cedfeb664f24047d402d6a87c4e4b0eb824",
+          "controls": [],
+          "textSha256": "9b2d16dcc68c9afbd2024dcb42353cedfeb664f24047d402d6a87c4e4b0eb824"
+        },
+        {
+          "record": 2,
+          "byteSpan": [
+            336,
+            581
+          ],
+          "sha256": "f36d3e27f5dd6d1af211473b265992c3987b3ab89bd3221cd3ae724564f2bcac",
+          "controls": [],
+          "textSha256": "f36d3e27f5dd6d1af211473b265992c3987b3ab89bd3221cd3ae724564f2bcac"
+        },
+        {
+          "record": 3,
+          "byteSpan": [
+            582,
+            692
+          ],
+          "sha256": "854b6d15b2fe1ff066496b018a62b4eb1d1e62b54a0d81da5edfbbcd6ed4a55e",
+          "controls": [],
+          "textSha256": "854b6d15b2fe1ff066496b018a62b4eb1d1e62b54a0d81da5edfbbcd6ed4a55e"
+        },
+        {
+          "record": 4,
+          "byteSpan": [
+            693,
+            884
+          ],
+          "sha256": "09889ddd150ee94c9a58d269834b998bbe10acb5da48e53472b4172ba8359b0a",
+          "controls": [],
+          "textSha256": "09889ddd150ee94c9a58d269834b998bbe10acb5da48e53472b4172ba8359b0a"
+        },
+        {
+          "record": 5,
+          "byteSpan": [
+            885,
+            1337
+          ],
+          "sha256": "3d4558492cf809b3062d8472e05f3be2d981d1b82162c183a2a001df80bd8b27",
+          "controls": [],
+          "textSha256": "aa2e02789de5b2c64f0345a6f084f963816e65682716cdf3d26a312bcb11e1c9"
+        },
+        {
+          "record": 6,
+          "byteSpan": [
+            1338,
+            1517
+          ],
+          "sha256": "cbe643830f575522f2d6e16a1536739b80e6d23cb291be5d948eb70c211303a5",
+          "controls": [],
+          "textSha256": "cbe643830f575522f2d6e16a1536739b80e6d23cb291be5d948eb70c211303a5"
+        },
+        {
+          "record": 7,
+          "byteSpan": [
+            1518,
+            1746
+          ],
+          "sha256": "bc177e3b25ae03cf1d071982e336aeab0bbaa5c612474bc75b1b158b83eb7f9f",
+          "controls": [],
+          "textSha256": "bc177e3b25ae03cf1d071982e336aeab0bbaa5c612474bc75b1b158b83eb7f9f"
+        }
+      ]
+    },
+    {
+      "member": "SLETTERS.LEE",
+      "archiveMember": "MarioTea/MARIO/SLETTERS.LEE",
+      "sha256": "0f84e57b29424c0ae8e8a5fd2838c9c70fc600e07889a40248280087341f322b",
+      "sizeBytes": 1806,
+      "eofOffset": 1805,
+      "records": [
+        {
+          "record": 1,
+          "byteSpan": [
+            1,
+            601
+          ],
+          "sha256": "229e41fb56e0d7546fc13f73a6565d72f4e796d9b14b5ff6347b39113738e641",
+          "controls": [],
+          "textSha256": "d6d86f633b2c0b3bcdf5ab8c62a90f7e53ad385034eb630e453cc9b54814b09e"
+        },
+        {
+          "record": 2,
+          "byteSpan": [
+            602,
+            902
+          ],
+          "sha256": "ecca72d276b1b66c130d3afb43c1c5359369ca1f7ef6abc1099433f5de0200a8",
+          "controls": [],
+          "textSha256": "ee3ea4fde076996634ba9e4c74daee1796ebb02e0b62f7132dae235e78a07508"
+        },
+        {
+          "record": 3,
+          "byteSpan": [
+            903,
+            1203
+          ],
+          "sha256": "33f67bd5a916a19d91806affd5342ba0ee42ceb757cc105034c03f62083c390d",
+          "controls": [],
+          "textSha256": "008648528783f0a579d75e3e387dae5936dd7b87ca247050e869605b9703cbc4"
+        },
+        {
+          "record": 4,
+          "byteSpan": [
+            1204,
+            1504
+          ],
+          "sha256": "b9fd0b1e61a3373bbdedefcf97a7c79cedbd3bb58fe2965157916f9563ae2305",
+          "controls": [],
+          "textSha256": "d1934c7f0b227ec416bfb3515cce8e38b0304d6179674bfe1089018fdf761ccc"
+        },
+        {
+          "record": 5,
+          "byteSpan": [
+            1505,
+            1805
+          ],
+          "sha256": "8f07882cac8f73ba18a78a37e3b2ef0305d7e610a015f3a1fc93213e5fff8434",
+          "controls": [],
+          "textSha256": "dedef41d47c0663254e2d3017c4479234c5075d056d99c7aaece90d5989f62b5"
+        }
+      ]
+    },
+    {
+      "member": "SSENTENC.LEE",
+      "archiveMember": "MarioTea/MARIO/SSENTENC.LEE",
+      "sha256": "025cca858b5997b32be4c7954f2d638b2acb317d9579b36a7b178f5a17616dd1",
+      "sizeBytes": 1827,
+      "eofOffset": 1826,
+      "records": [
+        {
+          "record": 1,
+          "byteSpan": [
+            1,
+            354
+          ],
+          "sha256": "a36903cba29638386fb27456a781fb777115064afbb6f269917bf640071a14c5",
+          "controls": [
+            {
+              "offset": 57,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 107,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 133,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 200,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 238,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 305,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 349,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 350,
+              "kind": "CR"
+            },
+            {
+              "offset": 351,
+              "kind": "LF"
+            },
+            {
+              "offset": 352,
+              "kind": "CR"
+            },
+            {
+              "offset": 353,
+              "kind": "LF"
+            }
+          ],
+          "textSha256": "c23c66fd62ca69eed86b17323820b3d9a23b0fe649fc6084eaed9ccc62adbd20"
+        },
+        {
+          "record": 2,
+          "byteSpan": [
+            355,
+            634
+          ],
+          "sha256": "041c6760f8c2c52a0227d234a1247e1354d98e5eae164fc1754c7cef684f806d",
+          "controls": [
+            {
+              "offset": 457,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 579,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 629,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 630,
+              "kind": "CR"
+            },
+            {
+              "offset": 631,
+              "kind": "LF"
+            },
+            {
+              "offset": 632,
+              "kind": "CR"
+            },
+            {
+              "offset": 633,
+              "kind": "LF"
+            }
+          ],
+          "textSha256": "ad676c22a6d158a87ec5d8e86323f0cc5a0550ebb5797c995cb2c63ab83e755d"
+        },
+        {
+          "record": 3,
+          "byteSpan": [
+            635,
+            1230
+          ],
+          "sha256": "6144d471997501987e34ad0d5e681ef486f2fb8867b15fb3ea8251c85d6cdefd",
+          "controls": [
+            {
+              "offset": 687,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 771,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 808,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 851,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 921,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 973,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 1041,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 1087,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 1188,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 1225,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 1226,
+              "kind": "CR"
+            },
+            {
+              "offset": 1227,
+              "kind": "LF"
+            },
+            {
+              "offset": 1228,
+              "kind": "CR"
+            },
+            {
+              "offset": 1229,
+              "kind": "LF"
+            }
+          ],
+          "textSha256": "1f03ff540dcfc893006659f7a45927f7991031efa8043c95c40b5a2d8c70e036"
+        },
+        {
+          "record": 4,
+          "byteSpan": [
+            1231,
+            1826
+          ],
+          "sha256": "5423a51328338a10c91cada28ff8f67096612de33d1368b7ebf6675bbc8546b3",
+          "controls": [
+            {
+              "offset": 1333,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 1453,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 1575,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 1612,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 1697,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 1759,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 1821,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 1822,
+              "kind": "CR"
+            },
+            {
+              "offset": 1823,
+              "kind": "LF"
+            },
+            {
+              "offset": 1824,
+              "kind": "CR"
+            },
+            {
+              "offset": 1825,
+              "kind": "LF"
+            }
+          ],
+          "textSha256": "f6a51c7396c95bf6a4b7d6b336f774578b0d3986e1c5f3ef447e02c9e3f3c748"
+        }
+      ]
+    },
+    {
+      "member": "SWORDS.LEE",
+      "archiveMember": "MarioTea/MARIO/SWORDS.LEE",
+      "sha256": "29cfcdeedfc195733c96e154ed37a9d34f22e13ca025e8a126b304e3e89fc77b",
+      "sizeBytes": 1788,
+      "eofOffset": 1787,
+      "records": [
+        {
+          "record": 1,
+          "byteSpan": [
+            1,
+            121
+          ],
+          "sha256": "4c0f8333b84f6c5356f223a724fcbd0c147ecf53253b1255d6c94606bc99926d",
+          "controls": [],
+          "textSha256": "4c0f8333b84f6c5356f223a724fcbd0c147ecf53253b1255d6c94606bc99926d"
+        },
+        {
+          "record": 2,
+          "byteSpan": [
+            122,
+            299
+          ],
+          "sha256": "956df01b03ef9a4cded83188d566c23de2fa6fdd931ac9f2f17dbe49ff0bc53d",
+          "controls": [],
+          "textSha256": "956df01b03ef9a4cded83188d566c23de2fa6fdd931ac9f2f17dbe49ff0bc53d"
+        },
+        {
+          "record": 3,
+          "byteSpan": [
+            300,
+            469
+          ],
+          "sha256": "98122d58473bfe379313568c872542895406a2eb304698676fb9570ebfcb66a3",
+          "controls": [],
+          "textSha256": "98122d58473bfe379313568c872542895406a2eb304698676fb9570ebfcb66a3"
+        },
+        {
+          "record": 4,
+          "byteSpan": [
+            470,
+            532
+          ],
+          "sha256": "9abd5056f311f831c3fb229bbb9618dbe9ea88a22e158db580da56161772a8cd",
+          "controls": [],
+          "textSha256": "9abd5056f311f831c3fb229bbb9618dbe9ea88a22e158db580da56161772a8cd"
+        },
+        {
+          "record": 5,
+          "byteSpan": [
+            533,
+            651
+          ],
+          "sha256": "0b0fe69addfa9fe821099174945e181842739fd499c087d9060fffe1144d446a",
+          "controls": [],
+          "textSha256": "0b0fe69addfa9fe821099174945e181842739fd499c087d9060fffe1144d446a"
+        },
+        {
+          "record": 6,
+          "byteSpan": [
+            652,
+            712
+          ],
+          "sha256": "febcc58e8eb861925a9d0aafe57a2b7aec791f6bdf60cc2c8fc2a29e228d6547",
+          "controls": [],
+          "textSha256": "febcc58e8eb861925a9d0aafe57a2b7aec791f6bdf60cc2c8fc2a29e228d6547"
+        },
+        {
+          "record": 7,
+          "byteSpan": [
+            713,
+            778
+          ],
+          "sha256": "a7b499f7aa6ae01f7981e834bbd3867c873343dfaab1b84b12d057048cdf263e",
+          "controls": [],
+          "textSha256": "a7b499f7aa6ae01f7981e834bbd3867c873343dfaab1b84b12d057048cdf263e"
+        },
+        {
+          "record": 8,
+          "byteSpan": [
+            779,
+            955
+          ],
+          "sha256": "9c53c8971d77d0486ed0ed6eaf5b742299485b81fbde1c4302573e9947d30e32",
+          "controls": [],
+          "textSha256": "79341dcbd51f680de710010c6a13283ce06c5706f12a70c1e1123857d4d1f62b"
+        },
+        {
+          "record": 9,
+          "byteSpan": [
+            956,
+            1136
+          ],
+          "sha256": "21943b2813431b11bb3ec0b1c0c106fe8c626c00bec244fe93f7658bf421715b",
+          "controls": [],
+          "textSha256": "21943b2813431b11bb3ec0b1c0c106fe8c626c00bec244fe93f7658bf421715b"
+        },
+        {
+          "record": 10,
+          "byteSpan": [
+            1137,
+            1197
+          ],
+          "sha256": "4e3327fed7d143ffcbab284ba0c79e301e61ca59768a3f2a73a1336b494146c8",
+          "controls": [],
+          "textSha256": "4e3327fed7d143ffcbab284ba0c79e301e61ca59768a3f2a73a1336b494146c8"
+        },
+        {
+          "record": 11,
+          "byteSpan": [
+            1198,
+            1491
+          ],
+          "sha256": "ce0d0aa0f645a9716beb7ff47c1de3bdafd37946676789d931ae24bcf4226f67",
+          "controls": [],
+          "textSha256": "ce0d0aa0f645a9716beb7ff47c1de3bdafd37946676789d931ae24bcf4226f67"
+        },
+        {
+          "record": 12,
+          "byteSpan": [
+            1492,
+            1562
+          ],
+          "sha256": "83773b784c510f6e994b33efbf8a60620624805cabe62159e6a9be6bbf3a05c4",
+          "controls": [],
+          "textSha256": "83773b784c510f6e994b33efbf8a60620624805cabe62159e6a9be6bbf3a05c4"
+        },
+        {
+          "record": 13,
+          "byteSpan": [
+            1563,
+            1787
+          ],
+          "sha256": "b56be8a061e0c8c3d9fa7d1b8fe029938b6ddabb7eb100bc9f4eb1d19659cd82",
+          "controls": [],
+          "textSha256": "b56be8a061e0c8c3d9fa7d1b8fe029938b6ddabb7eb100bc9f4eb1d19659cd82"
+        }
+      ]
+    },
+    {
+      "member": "TLETTERS.LEE",
+      "archiveMember": "MarioTea/MARIO/TLETTERS.LEE",
+      "sha256": "57d5d3f2731062630bc4c7a58fedb5da163fb3bbf92419f311c9862d8b7dd91f",
+      "sizeBytes": 846,
+      "eofOffset": 845,
+      "records": [
+        {
+          "record": 1,
+          "byteSpan": [
+            1,
+            41
+          ],
+          "sha256": "f8755b2b55227fa012024302adc5674f690147fb5fa9a04a3f604a16be7ede65",
+          "controls": [],
+          "textSha256": "783349bf5ef1139773fbb10bcca67d221e3673b72ca0572915f41b7888a4dc8a"
+        },
+        {
+          "record": 2,
+          "byteSpan": [
+            42,
+            87
+          ],
+          "sha256": "a66451f87c765cc3c1b90e178c840aecda4d1dc25675257da58d1a7015cc833c",
+          "controls": [],
+          "textSha256": "eaa2303e8cf99afc6ce1abb4ffe6c10ab3228b03cfade1437be13bac9573968e"
+        },
+        {
+          "record": 3,
+          "byteSpan": [
+            88,
+            128
+          ],
+          "sha256": "04a8e768b82de57265338dafe774091bb5f6c1a6f311e8ed391013d628e15a5e",
+          "controls": [],
+          "textSha256": "520d68307c34e2e4f83507c321de3cb3fb05c3bd5f8218af1cc02c4dc1a2ed70"
+        },
+        {
+          "record": 4,
+          "byteSpan": [
+            129,
+            199
+          ],
+          "sha256": "d7b9cdb2ad712570048bad687bb354bc0a13ceda6e657038344ff4745d83df77",
+          "controls": [],
+          "textSha256": "c2350b5a9bcd9b08fa5c13c2b6b0b842c1a7d5892dc6106408168d46dcceec20"
+        },
+        {
+          "record": 5,
+          "byteSpan": [
+            200,
+            380
+          ],
+          "sha256": "ce9c827b0d36f9bc9ce2b3f3913cd248c8258bc197a52b00c79f5982bb4ce309",
+          "controls": [],
+          "textSha256": "9b493f175381268a7de6a9ccab9a54027213d344e1b9a78cb274ef85f942dfd9"
+        },
+        {
+          "record": 6,
+          "byteSpan": [
+            381,
+            431
+          ],
+          "sha256": "1bca908deeae40e324e2c31247609008c26b496976f7abb54df36cf7ca676955",
+          "controls": [],
+          "textSha256": "18238d41dde0d83c5155ce187b731811c6f3dea5bb5ced1eaba520db1e0191eb"
+        },
+        {
+          "record": 7,
+          "byteSpan": [
+            432,
+            467
+          ],
+          "sha256": "cf4f7b9f75e15ca13b294f060a8e16a52d8e2887f9a8f8512cb4bb9c88c8d90f",
+          "controls": [],
+          "textSha256": "68789334b5e4cfcfd522a697592581048361650702291d70e83a7cfcc172e9fa"
+        },
+        {
+          "record": 8,
+          "byteSpan": [
+            468,
+            543
+          ],
+          "sha256": "631ea258649c5c6e3fad77951154b844c5badfec0a4d87250266c7f68e938a0c",
+          "controls": [],
+          "textSha256": "3cb7bc6f6d2180fa6fe743b000532e8e1b1d6b897e8a6f47afc3551ebaf3bc0c"
+        },
+        {
+          "record": 9,
+          "byteSpan": [
+            544,
+            614
+          ],
+          "sha256": "675544a19109c3c4ad8895f180eb68a59ce2603da43f744d3c406fe0fdeee37d",
+          "controls": [],
+          "textSha256": "216cb1609c665b1f734f999735284dc8a967aac01114e3910fe978cf28c7d393"
+        },
+        {
+          "record": 10,
+          "byteSpan": [
+            615,
+            646
+          ],
+          "sha256": "8a2c4f1ed487e340146773894d1a032529f0b8035c2927ed39a4306529cce89c",
+          "controls": [],
+          "textSha256": "f6afad9c8f3cc77bc764170a5b4b27579083b854187996728939189c09e0f0a2"
+        },
+        {
+          "record": 11,
+          "byteSpan": [
+            647,
+            682
+          ],
+          "sha256": "d5b6f40915c8c7ba273efd58c8de91e6f6b12bb291996246dd727eaa0cabc6aa",
+          "controls": [],
+          "textSha256": "69b12a922ea34a3b38ec08dfb94e6cc320420700e222bf3e623106d77c6b2023"
+        },
+        {
+          "record": 12,
+          "byteSpan": [
+            683,
+            713
+          ],
+          "sha256": "481a711e70c6e0cf8b707df7283a6c71b392b6123433d411a5ba89f24e00abb3",
+          "controls": [],
+          "textSha256": "4974eeba86f5dabbfbee360d956a96ce96f060026b334293250ab7b7459223fc"
+        },
+        {
+          "record": 13,
+          "byteSpan": [
+            714,
+            774
+          ],
+          "sha256": "bee493430d2adf08858a6ec2a42ef0cc2802197ad72c26e57794852400c464e9",
+          "controls": [],
+          "textSha256": "3b595ccd532bca32853d848777b563c9049379c621aa9fb30a70aa48814eafd2"
+        },
+        {
+          "record": 14,
+          "byteSpan": [
+            775,
+            845
+          ],
+          "sha256": "a92584cb3b8ce44f8de49d0d21eb0a1faabf95f0010b6431152cc0e0c6c41b00",
+          "controls": [],
+          "textSha256": "96225112b8c437f5e5d89d807f6efcfaafaee8ec6ea03decf9b5d6dfb3470811"
+        }
+      ]
+    },
+    {
+      "member": "TSENTENC.LEE",
+      "archiveMember": "MarioTea/MARIO/TSENTENC.LEE",
+      "sha256": "e22bc97051a48aad235461a357db7aa32c60e9430d2c5c5cb82790ff93e5ad7c",
+      "sizeBytes": 1771,
+      "eofOffset": 1770,
+      "records": [
+        {
+          "record": 1,
+          "byteSpan": [
+            1,
+            275
+          ],
+          "sha256": "4b0d6e6300cd71812d5586e3fe263f2c879dd7f7f297936f07f657d330cb5351",
+          "controls": [
+            {
+              "offset": 73,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 134,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 270,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 271,
+              "kind": "CR"
+            },
+            {
+              "offset": 272,
+              "kind": "LF"
+            },
+            {
+              "offset": 273,
+              "kind": "CR"
+            },
+            {
+              "offset": 274,
+              "kind": "LF"
+            }
+          ],
+          "textSha256": "4aaae05bf3a505babbbcd65c0e7da3856603766f549d5c0a29398e72c6bd0b32"
+        },
+        {
+          "record": 2,
+          "byteSpan": [
+            276,
+            1163
+          ],
+          "sha256": "28b990f860bace5732daeb9b55aa4c4ac7d9424fc4c3cac408102106022bcafc",
+          "controls": [
+            {
+              "offset": 364,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 511,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 566,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 633,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 775,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 891,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 1050,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 1158,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 1159,
+              "kind": "CR"
+            },
+            {
+              "offset": 1160,
+              "kind": "LF"
+            },
+            {
+              "offset": 1161,
+              "kind": "CR"
+            },
+            {
+              "offset": 1162,
+              "kind": "LF"
+            }
+          ],
+          "textSha256": "c1176fc3f1715929277cd6e122484075e8ed28168c29d739e5915cfaade3f2c6"
+        },
+        {
+          "record": 3,
+          "byteSpan": [
+            1164,
+            1770
+          ],
+          "sha256": "0696ed483a23a2aad365d31a256fdea06837f404ea569ef0ff487b884c724d7b",
+          "controls": [
+            {
+              "offset": 1212,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 1306,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 1403,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 1488,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 1582,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 1652,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 1765,
+              "kind": "sentence-break"
+            },
+            {
+              "offset": 1766,
+              "kind": "CR"
+            },
+            {
+              "offset": 1767,
+              "kind": "LF"
+            },
+            {
+              "offset": 1768,
+              "kind": "CR"
+            },
+            {
+              "offset": 1769,
+              "kind": "LF"
+            }
+          ],
+          "textSha256": "7a92e119ddd0941248dad505c9bf1466f9f19b6564398ee6b97adf01837929ef"
+        }
+      ]
+    },
+    {
+      "member": "TWORDS.LEE",
+      "archiveMember": "MarioTea/MARIO/TWORDS.LEE",
+      "sha256": "58a2839fbe46ecac594f4fc8bfeb99eed2c21d91b3e7528fd677027fe043d5cb",
+      "sizeBytes": 1808,
+      "eofOffset": 1807,
+      "records": [
+        {
+          "record": 1,
+          "byteSpan": [
+            1,
+            109
+          ],
+          "sha256": "2da1531fb16a5d94a766adb181f7e595b6ebc0efc0b384756f0363887d1305b6",
+          "controls": [],
+          "textSha256": "2da1531fb16a5d94a766adb181f7e595b6ebc0efc0b384756f0363887d1305b6"
+        },
+        {
+          "record": 2,
+          "byteSpan": [
+            110,
+            382
+          ],
+          "sha256": "54deb5a27dfa0087c5473e5de27d6b60aac17da0fafbe2ec5ba913b79d9eec73",
+          "controls": [],
+          "textSha256": "54deb5a27dfa0087c5473e5de27d6b60aac17da0fafbe2ec5ba913b79d9eec73"
+        },
+        {
+          "record": 3,
+          "byteSpan": [
+            383,
+            603
+          ],
+          "sha256": "47d8c84ca8efd1296016ebf1889135c3c7247d1d92ea33a317e638b9253e9b65",
+          "controls": [],
+          "textSha256": "47d8c84ca8efd1296016ebf1889135c3c7247d1d92ea33a317e638b9253e9b65"
+        },
+        {
+          "record": 4,
+          "byteSpan": [
+            604,
+            928
+          ],
+          "sha256": "e6178c0c6bf1ac0e07ec0c99dda5e0c1cab1ec59fd67eb0f711ec2117b738d27",
+          "controls": [],
+          "textSha256": "e6178c0c6bf1ac0e07ec0c99dda5e0c1cab1ec59fd67eb0f711ec2117b738d27"
+        },
+        {
+          "record": 5,
+          "byteSpan": [
+            929,
+            1345
+          ],
+          "sha256": "f4b5ea52cc200cd9579f24e41de703ef326c40c72d53f91778d19f15a9fd07fe",
+          "controls": [],
+          "textSha256": "f4b5ea52cc200cd9579f24e41de703ef326c40c72d53f91778d19f15a9fd07fe"
+        },
+        {
+          "record": 6,
+          "byteSpan": [
+            1346,
+            1630
+          ],
+          "sha256": "4917335d3abad33dacf954e1913589d8121923163d9b0e9d9ba998f8acf343df",
+          "controls": [],
+          "textSha256": "4917335d3abad33dacf954e1913589d8121923163d9b0e9d9ba998f8acf343df"
+        },
+        {
+          "record": 7,
+          "byteSpan": [
+            1631,
+            1807
+          ],
+          "sha256": "b15ee7eb7048a63c8f7f9bb5812ad12d058e6d6454da4a07cba6ffd7c4788909",
+          "controls": [],
+          "textSha256": "b15ee7eb7048a63c8f7f9bb5812ad12d058e6d6454da4a07cba6ffd7c4788909"
+        }
+      ]
+    }
+  ],
+  "totals": {
+    "files": 15,
+    "bytes": 24090,
+    "records": 136
+  }
+}

@@ -271,3 +271,93 @@ body.playing {
  .cabinet:not(.game-cabinet) header { font-size: 10px; gap: 12px; padding: 0 10px; letter-spacing: 0; }
 }
 @media print { .report { background: white; color: black; } .report h1 { color: black; text-shadow: none; } #teacher-art { display: none; } }
+
+/* Archive art stays unobscured beside readable browser controls. */
+.archive-page { display:grid; grid-template-columns:minmax(240px, .9fr) minmax(0, 1.1fr); gap:24px; padding:24px; background:#32116b; align-items:start; }
+.archive-illustration { position:sticky; top:24px; min-width:0; }
+.archive-illustration canvas { display:block; width:100%; height:auto; aspect-ratio:8/5; image-rendering:pixelated; border:3px ridge #ffe46a; }
+.archive-controls { min-width:0; color:#fff8d8; line-height:1.6; }
+.archive-controls h1 { font: bold 30px 'Courier New',monospace; margin:0 0 20px; text-shadow:none; }
+.archive-controls h2 { font-size:19px; }
+.archive-controls button { margin:5px 4px 5px 0; }
+.archive-controls label { color:#fff8d8; font-size:14px; }
+.archive-controls fieldset { border-bottom:1px solid #a898e0; padding-bottom:12px; }
+.archive-controls legend { color:#ffe46a; font-size:16px; }
+.archive-controls .fine,.archive-illustration .fine { color:#e0d8f8; }
+.menu-bar { display:flex; flex-wrap:wrap; gap:12px; border-block:2px solid #a898e0; padding:10px 0; }
+.menu-bar summary { cursor:pointer; color:#ffe46a; font-weight:bold; }
+.menu-bar details[open] { flex-basis:100%; }
+.activity-list { display:grid; gap:4px; }
+.activity-list button { text-align:left; }
+.historical-notice { padding:16px; background:#fff4bc; color:#241749; border-left:6px solid #bb3b25; }
+.source-caption { margin:0; padding:8px 14px; background:#241749; color:#fff8d8; font-size:12px; line-height:1.5; }
+.result-metrics { margin:20px 0; padding:16px; background:#071d19; color:#fff8d8; }
+.result-metrics>div { display:flex; flex-wrap:wrap; justify-content:space-between; gap:12px; border-bottom:1px solid #497361; }
+.result-metrics dd { margin:0; overflow-wrap:anywhere; }
+#storage-status { color:#fff4bc; font-size:12px; }
+#pause-panel { z-index:5; }
+.archive-controls .certificate { padding:16px; overflow-wrap:anywhere; }
+.archive-controls table { min-width:600px; }
+.archive-controls .result-actions { justify-content:flex-start; }
+@media(max-width:800px) { .archive-page { grid-template-columns:1fr; padding:16px; gap:16px; } .archive-illustration { position:static; max-width:480px; width:100%; margin:auto; } .archive-controls h1 { font-size:26px; } }
+@media print { .archive-page { display:block; background:white; color:black; padding:0; } .archive-illustration { display:none; } .archive-controls,.archive-controls h1,.archive-controls p { color:black; } .archive-controls table { background:white; color:black; min-width:0; font-size:10px; } .archive-controls td small { color:black; } }
+
+/* Native archive screen geometry with readable, scrollable DOM in recovered panels. */
+.original-screen { position: relative; width: 100%; aspect-ratio: 8 / 5; container-type: inline-size; }
+.original-screen > canvas { display: block; width: 100%; height: auto; image-rendering: pixelated; }
+.original-panel { position: absolute; left: var(--panel-x); top: var(--panel-y); width: var(--panel-width); height: var(--panel-height); max-height: var(--panel-height); overflow: auto; background: #fff; color: #111; padding: 6px; font-size: 16px; line-height: 1.4; scrollbar-width: thin; }
+.original-panel label { color: #111; }
+.original-panel :is(input,select,button) { background: #fff; color: #111; border-color: #111; }
+.original-panel :focus-visible { outline: 3px solid #0000b8; outline-offset: 2px; }
+.original-panel--chalk { background: #000; color: #fff; }
+.original-panel--chalk label { color: #fff; }
+.original-panel--chalk :focus-visible { outline-color: #ffff55; }
+.game-cabinet #scene, .game-cabinet .mode-practice #scene { aspect-ratio: 8 / 5; height: auto; max-height: none; }
+.original-glove { display: inline-block; position: relative; width: 78px; height: 82px; }
+.original-glove > img { width: 100%; height: 100%; image-rendering: pixelated; object-fit: contain; }
+.original-glove > .original-finger { position: absolute; right: -8px; bottom: 0; width: 32px; height: 36px; background: #111; border: 2px solid #ffff55; }
+.original-glove > .original-finger[hidden] { display: none; }
+@media (max-width: 600px) {
+  .original-glove { width:48px; height:52px; flex-shrink:0; }
+  .original-glove > .original-finger { width:24px; height:28px; right:-4px; }
+  .original-panel { font-size: 14px; }
+}
+.archive-page--overlay { display: flex; flex-direction: column; gap: 12px; }
+.archive-page--overlay .archive-illustration { position: static; width: 100%; max-width: none; }
+.archive-page--overlay .archive-controls { width: 100%; }
+.archive-page--overlay .original-screen > canvas { border: 0; }
+.archive-page--overlay .original-panel :is(p,dl) { margin: 0 0 12px; }
+.archive-page--overlay .original-panel :is(label,legend) { color: inherit; font-size: inherit; }
+.archive-page--overlay .original-panel input:not([type=checkbox]),
+.archive-page--overlay .original-panel select { padding: 5px; margin: 4px 0 10px; }
+.archive-page--overlay .original-panel fieldset { margin: 0 0 12px; }
+.archive-page--overlay .original-panel h2 { font-size: 18px; }
+.original-panel .result-metrics { padding: 0; background: transparent; color: #8dffff; }
+.original-panel .result-metrics > div { gap: 4px; padding: 3px 0; }
+.original-panel .result-metrics dd { color: #8aff70; }
+.original-panel .historical-notice { padding: 8px; }
+.original-panel .table-scroll { max-width: 100%; }
+.original-panel table { min-width: 600px; }
+.original-panel .certificate { border: 0; padding: 0; background: white; color: #111; }
+#times-form fieldset { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 8px; }
+#times-form legend { margin-bottom: 4px; }
+#times-form input { min-width: 0; }
+#times-form label { font-size: 14px; }
+.game-cabinet .mode-practice .practice-screen { width: 100%; flex: none; }
+.game-cabinet .mode-practice .practice-screen #scene { width: 100%; margin: 0; }
+.game-cabinet .mode-practice .practice-screen .text-strip {
+  position: absolute; left: var(--panel-x); top: var(--panel-y);
+  width: var(--panel-width); height: var(--panel-height); max-height: var(--panel-height);
+  min-height: 0; max-width: none; margin: 0; padding: 3px; border: 0; overflow: hidden;
+  font-size: clamp(14px, 2.05cqw, 21px); line-height: 1.25;
+}
+/* Min-content widths must not push statistics beyond the cabinet. */
+.game-cabinet .hud { grid-template-columns: minmax(0,1fr) minmax(0,1.6fr) minmax(0,1fr); font-size: clamp(13px,2cqw,21px); }
+.hud-stats, .hand-guide { min-width: 0; }
+.hud-stats > div { white-space: normal; overflow-wrap: anywhere; }
+@container (max-width: 540px) {
+  .game-cabinet .hud { grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 8px; }
+  .hand-guide { grid-column: 1 / -1; grid-row: 1; justify-content: center; gap: 20px; }
+  .hud-stats { grid-row: 2; }
+  .game-cabinet .hud { font-size: 14px; }
+}

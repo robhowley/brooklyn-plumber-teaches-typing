@@ -32,9 +32,9 @@ test('late input within reach works; missed input waits for the same returning o
  assert.equal(typeKey(missed,key(missed)),'buffered');advanceTime(missed,8.3);assert.equal(missed.correct,1);assert.equal(missed.errors,0);
  assert.equal(missed.travel.action.id,0);assert.ok(Math.abs(missed.travel.action.x-241)<1e-8);
 });
-test('wrong case, punctuation and space retain target and count once, including while a key is held',()=>{
- const s=createAttempt({text:'A !'});assert.equal(typeKey(s,{key:'a'}),'error');assert.equal(s.errors,1);assert.equal(s.correct,0);
- assert.equal(typeKey(s,{key:'A'}),'buffered');assert.equal(typeKey(s,{key:'!'}),'error');advanceTime(s,4.3);assert.equal(s.correct,1);
+test('wrong punctuation and space retain target and count once, including while a key is held',()=>{
+ const s=createAttempt({text:'A !'});assert.equal(typeKey(s,{key:'?'}),'error');assert.equal(s.errors,1);assert.equal(s.correct,0);
+ assert.equal(typeKey(s,{key:'a'}),'buffered');assert.equal(typeKey(s,{key:'!'}),'error');advanceTime(s,4.3);assert.equal(s.correct,1);
  assert.equal(typeKey(s,{key:'!'}),'error');assert.equal(typeKey(s,{key:' '}),'buffered');advanceTime(s,2);assert.equal(s.correct,2);
  assert.equal(typeKey(s,{key:'!'}),'buffered');advanceTime(s,2);assert.equal(s.correct,3);assert.equal(stats(s).attempted,6);assert.equal(stats(s).accuracy,50);
 });
@@ -67,10 +67,23 @@ test('custom outdoor goals through 150 WPM have enough encounters without changi
    advanceTime(s,.01);
   }
   assert.equal(s.reducedMotion,false);assert.equal(s.errors,0);
-  assert.ok(s.correct>=goal*10,`${goal} WPM requires ${goal*10} correct, got ${s.correct}`);
+  assert.ok(s.correct>=goal*12,`${goal} WPM requires ${goal*12} correct, got ${s.correct}`);
   assert.ok(stats(s).wpm>=goal);assert.equal(result(s).passed,true);
   assert.equal(s.travel.obstacles.length,6);
  }
+});
+test('buffered contact at timeout counts before closure, but new input at expiry is rejected',()=>{
+ const duration=(550-241)/72;
+ for(const partitions of [1,1000]) {
+ const s=createAttempt({text:'ab',duration});
+ assert.equal(typeKey(s,{key:'a'}),'buffered');assert.deepEqual(s.cursor,{recordIndex:0,characterIndex:0});
+ for(let i=0;i<partitions;i++)advanceTime(s,duration/partitions);
+ assert.equal(s.correct,1);assert.equal(s.travel.action.at,duration);assert.equal(s.terminalReason,'timeout');
+ assert.deepEqual(s.cursor,{recordIndex:0,characterIndex:1});assert.equal(stats(s).attempted,1);
+ assert.equal(typeKey(s,{key:'b'}),'ignored');assert.equal(s.correct,1);
+ }
+ const fresh=createAttempt({text:'a',duration});advanceTime(fresh,duration);
+ assert.equal(typeKey(fresh,{key:'a'}),'ignored');assert.equal(fresh.correct,0);
 });
 test('underwater/castle move without input; practice and reduced motion do not',()=>{
  for(const mode of ['outdoor','underwater','castle','practice'])for(const reducedMotion of [false,true]){

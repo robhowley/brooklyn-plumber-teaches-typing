@@ -1,6 +1,102 @@
 # Integration validation
 
-**Current traced-art integration: build, 23 Node tests, 6 focused asset tests and 27 production browser tests passed.** Automated interaction and agent image inspection, not human manual play or human fidelity approval.
+**All six automated implementation and verification phases are complete. Independent Phase 6 production, visual and bundle/documentation reviews pass; the coordinator's source-backed Node rerun passes all 61 tests. Human review was not performed.** This is automated implementation verification, not release approval, human-playtested status or DOS runtime validation.
+
+## Current fidelity build, 2026-11-10
+
+- Final independent reports: [production verifier](/Users/roberthowley/.pi/subagent-runs/20261110T045947Z-zo1h2pya/01-verifier.md), [visual second opinion](/Users/roberthowley/.pi/subagent-runs/20261110T045947Z-zo1h2pya/02-second-opinion.md), [bundle/documentation verifier](/Users/roberthowley/.pi/subagent-runs/20261110T045947Z-zo1h2pya/03-verifier.md), all PASS (visual verdict LGTM).
+- Independent production replay: **51 passed, zero failures/skips**; all four tracked/served file hashes match. Evidence: [final-verifier/](../.tmp/fidelity-validation/final-verifier/).
+- Independent Node run: **59 passed, zero failures, two optional provenance skips**. Separately, the coordinator subsequently reran `LESSON_RESEARCH_ROOT="$PWD/research/executable-1992" ORIGINAL_FIDELITY_SOURCE="$PWD" node --test tests/*.test.js` via `structured_return`: **61 passed, zero failures/skips**. These are distinct runs; the independent run is not source-verification proof.
+- Fresh agent visual review: **46 screenshots**, all four modes and three characters at desktop, 720px and 390px, PASS. Evidence: [final-visual/review.json](../.tmp/fidelity-validation/final-visual/review.json). Native browser zoom, screen-reader listening and human play remain untested.
+
+- Phase 5 independent replay: **61 Node and 38 browser tests passed, zero skips**. Reports: `/Users/roberthowley/.pi/subagent-runs/20261110T043125Z-c8wng0kz/01-verifier.md` and `02-second-opinion.md` (same directory). Earlier phase evidence is in the [phase ledger](FIDELITY-DECISIONS.md#phase-acceptance-ledger).
+- Final integration rebuilt tracked `dist/` with `./node_modules/.bin/vite build`, then reran the reviewed static audit. Private runner output and tracked output have identical hashes. HEAD is `9a42074703b5f445240378d8ca033c4ef11e8143`, **with dirty source changes**, not a HEAD-only reproducible build.
+- Exact source/dependency hashes (22 files), build hashes, source status, archive identity and record-level selector coverage: [final bundle-audit.json](../.tmp/fidelity-validation/phase6-final/bundle-audit.json). Re-run the retained repository-owned audit with `FIDELITY_AUDIT_OUTPUT=.tmp/fidelity-validation/phase6-final/bundle-audit.json node .tmp/fidelity-validation/audit-bundle.mjs`. The earlier root audit remains intact.
+- Source-backed corpus/art recheck: **21 passed, zero failures/skips**. Log: `.pi/structured-returns/093c1f3a-37d6-4970-9823-51deed5cf838.combined.log`. No archive program, archive script or audio was executed.
+
+### Production artifact inventory
+
+| Artifact | Bytes | SHA-256 |
+|---|---:|---|
+| `dist/index.html` | 455 | `5eb5440bb4c20af022d00795336969b254ded582b70b6909f23ab299e153cde0` |
+| `dist/assets/index-Drf9fmbt.js` | 2472220 | `209ebd81d37684145c482f6c35d9644ed8f46214f2befaa0450c1ff39880a213` |
+| `dist/assets/index-DYeVULVd.css` | 28360 | `5b92c43eb155e825245e166f113c96e93cb9723b81f10294273dd5ca7d9e6b74` |
+| `dist/assets/hud-texture-CKXA8tq2.svg` | 6928 | `00b8e1baa68751056c5184a292916e4aae267d6ad45b14981179a2ea23d129c7` |
+
+### Static audit scope and results
+
+| Check | Result and method |
+|---|---|
+| Runtime dependency contents | PASS: traced all 16 local JS/JSON/CSS/SVG dependencies from `src/app.js`, including CSS URLs; inspected all four output files and parsed the production JS without executing it. |
+| Selected static art | PASS: all **20 backgrounds and 166 sprites/glyphs** match source raster object hashes in the actual bundle, including JSON.parse-packed data. No screenshot-derived title or old traced-art imports. |
+| Reviewed corpus | PASS: all **136 learner strings** from 15 members occur in the actual bundle; source-backed tests verify member, record-span and transformed-text hashes. Raw corpus/research and provenance manifests are not runtime imports. |
+| Executable/unreviewed payload exclusion | PASS within the inspected dependency graph and output: no archive EXE, driver, installer, script, compressed archive, DOS decoder or runtime archive reader; no unreviewed archive resource imported. Base64 palette-indexed static pixels are permitted data, not archive code. |
+| Local assets | PASS static URL/import inspection: no external runtime asset URLs. The SVG namespace `http://www.w3.org/2000/svg` is present but is not a request. Documentation/source-reference URLs are not runtime dependencies. Final HTTP byte checks pass for every output file; the production welcome records same-origin-only browser requests. |
+| Provenance | PASS: retained ZIP SHA-256 is `b59886a6f7b48b0057c8db1c099ed598c8a3581245b0f8884316203de55784bd`; source-backed checks compare selected raw members, palettes, sprite indexes and decoded-reference hashes. Hashes establish identity, **not rights**. |
+| Sound and disclosure | PASS source inspection: oscillator synthesis only, no archive audio. Welcome/footer/settings/source captions disclose archive art, adaptations, unverified rights and synthetic sound. |
+
+**Public redistribution rights: UNVERIFIED.** Decoded static art is approved for this implementation scope, not legally cleared for public redistribution. Palette bindings, masks, faces, placement and animation remain qualified in [Scene art](ART.md).
+
+### Exact original-first coverage
+
+Derived from `LESSON_COVERAGE` in `src/lessons.js`, not inferred from file names. Cells give **original/generated record counts**; O = original, M = mixed, G = generated. Groups correspond to H/T/B/N/S, then all-keyboard H→T→B→N→S.
+
+| Mode / goal band | Home | +Top | +Bottom | +Numbers | +Symbols | All |
+|---|---|---|---|---|---|---|
+| Outdoor, all goals | O 27/0 | O 14/0 | O 15/0 | O 17/0 | O 5/0 | O 78/0 |
+| Water, all goals | G 0/6 | M 2/5 | O 8/0 | O 7/0 | O 13/0 | O 41/0 |
+| Castle, all goals | G 0/3 | G 0/3 | G 0/3 | M 1/3 | O 4/0 | O 17/0 |
+| Practice, goals 1–9 | G 0/27 | G 0/14 | G 0/15 | G 0/17 | G 0/5 | G 0/78 |
+| Practice, goals 10–29 | G 0/6 | G 0/7 | G 0/8 | G 0/7 | G 0/13 | G 0/41 |
+| Practice, goals 30–150 | G 0/3 | G 0/3 | G 0/3 | G 0/4 | G 0/4 | G 0/17 |
+
+- Water preserves TWORDS records 1–2; records 3–7 are generated. All six HWORDS records are generated for home row.
+- Castle preserves only NSENTENC record 2 for the numbers group; records 1, 3, 4 are generated. All H/T/B sentence records are generated in their corresponding groups.
+- All-keyboard action modes preserve every historical record. Practice substitutes generated text for every record because scored wrapping/separators remain unresolved. An explicit generated alternative uses one generated record in every mode/group.
+- Mixed sequences conservatively store `source: 'generated'`, with per-record source and a mixed label. No unavailable characters are silently filtered from historical records. The visible notice names outdated claims, war, slavery, assassination and disasters.
+- Source-order cycles and retry from the first record are deterministic browser choices, not recovered original randomness. Correct acceptance alone advances the engine's record/character cursor.
+
+### Current rules and remaining historical limits
+
+- WPM is `floor(max(0, correct-errors)*182/ticks)`; accuracy is `floor(100*correct/attempts)`, zero without attempts. Ticks are `floor(activeSeconds*182/10)`. **G1** still lacks exact DOS sampling/pause conversion.
+- Timeout, positive attempts, goal WPM, at least 90% accuracy and no failure establish browser eligibility. First eligible guided result becomes immutable pending progress; explicit Next commits once. Retries/reloads cannot replace it. **G2** original guards, award semantics and Next timing remain incomplete.
+- Stages 1–5 advance key group. At stage 6, achieved WPM raises goal by +2 capped at 10 outdoors, +5 capped at 30 in water, and +5 capped at the browser's 50-WPM assessment in castle. World changes reset to home row; same-world increases retain all-keyboard. Transition awards occur on Next; the eligible goal-50 castle assessment awards graduation once.
+- Save v2 (`typing-kingdom-v2`) supports non-destructive New/Load/Edit local student slots. Migration preserves v1 bytes and read-only results/awards, archives the old course position, and starts fresh at 5 WPM/home row. Rankings stay separate; corrupt/unavailable storage is not overwritten and session-only/recovery status is visible.
+- **G3** retains the precise generated gaps above; raw controls are separate from learner text. **G4** lacks browser hazard-state/terminal mapping: all early deaths remain disabled. Results expose timeout reason and actual active elapsed time separately from configured limit.
+- Scrolling/contact, explicit pause/resume, reduced motion, custom/practice isolation, welcome→menu and 10/30-WPM guided activity gates remain browser choices. Default limits are 120/300/300/600 active seconds; overrides are supported.
+
+### Reproduce and complete the evidence
+
+```sh
+npm ci
+npx playwright install chromium # if no supported local Chrome executable
+LESSON_RESEARCH_ROOT="$PWD/research/executable-1992" ORIGINAL_FIDELITY_SOURCE="$PWD" node --test tests/*.test.js
+./node_modules/.bin/vite build
+node scripts/fidelity-validation.mjs # private production build, complete browser suite, JSON/JUnit/traces
+```
+
+The source-backed tests need the retained ignored research directory; omit those environment variables only when accepting skipped provenance checks. Playwright serves `dist/` over HTTP with strict port binding and no server reuse. `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` or `CHROME_PATH` selects a local browser. Deterministic keyboard replay/fake-clock time is automation, not measurement of human typing speed. Some rendering tests intercept source modules, so they are not production-bundle proof by themselves.
+
+### Phase 6 integration evidence
+
+- **51 browser tests pass, zero failures/skips**: existing 38, six full-course/identity regressions and seven focus/geometry regressions. Bounded run: `FIDELITY_EVIDENCE=.tmp/fidelity-validation/phase6-bounded node scripts/fidelity-validation.mjs --bounded`. Final complete run: `node scripts/fidelity-validation.mjs`.
+- **61 source-backed Node tests pass, zero failures/skips** with the environment shown above; final log `phase6-final/node-source-tests.log`. A preliminary environment-free run passed 59 and skipped the two source checks; it is not the source-verification result.
+- Both fresh-student routes traverse all six groups per world, odd 7/9 goals, world resets, exact-50 graduation and successful retry, then isolated practice, under normal and reduced motion. Separate 48→50 overshoot, returning missed outdoor target, deferred Next/reload, certificates/downloads and literal DOM names remain covered. Controlled keyboard events and fake active clocks, not human-speed measurement.
+- Final evidence root: `.tmp/fidelity-validation/phase6-final/`. `browser.json`, `browser.xml`, `commands.json`, `traces/`, `course-{no-preference,reduce}.json`, certificate downloads, `screenshots/`, and `build-evidence.json` retain outcomes, browser version, source/ruleset/corpus/build hashes and same-origin welcome requests.
+- `production-dist/` independently reruns the HTTP identity test against actual tracked `dist/` (one pass). `existing-http-identity.json` proves ports 4173 and 4175 serve the same final bytes. The stale Phase 5 preview at 4173 was replaced with a strict-port preview of `dist/`; unrelated historical worktree port 4189 was left untouched.
+- Visual regression evidence includes 390px, 720px (200%-equivalent reflow, not native browser zoom) and 1280px practice, time controls, results/status, student/load/help/report and HUD captures. Component bounds, original panel percentages and nonblank DOM are asserted. Times and result panels scroll to retain readable text rather than shrink it; controls remain keyboard reachable.
+- Focused interactive controls ignore all typing attempts while preserving native Space/Enter activation. Start, resume and closing keyboard help focus the typing surface. Practice DOM occupies its recovered white panel; results occupy the blackboard; time/student/help/report/certificate content occupies its corresponding panel. No raster/corpus/model rewrite.
+- Pre-fix acceptance evidence is preserved in `acceptance-before-visual-fixes/`; the original root audit and `visual-review/` remain intact. `phase6-first-full/` retains the first complete integration run before the final time-control layout adjustment. Independent Phase 6 reviews subsequently passed; see the [final D1–D8 automated review](FIDELITY-DECISIONS.md#final-automated-review-2026-11-10).
+
+### Human review record
+
+**NOT PERFORMED.** No human keyboard playthrough, human visual/fidelity approval, assistive-technology listening session, audible sound review or physical print review is claimed. Automated keys, simulated clocks, print-dispatch assertions and agent screenshot inspection do not satisfy those reviews. No DOS executable was run. All six automated phases are complete with these omissions explicit; that is not public-release or human-playtested approval. Native browser-zoom UI review also remains NOT PERFORMED; 720px reflow checks are not native zoom.
+
+## Historical validation below
+
+The remaining entries describe superseded builds, rules, dimensions and assets. They are retained as provenance, not assertions about the current build. In particular, old five-character WPM, fixed 15-pass progression, screenshot title, 640×280 scene and three-file inventory no longer apply.
+
+**Previous traced-art integration: build, 23 Node tests, 6 focused asset tests and 27 production browser tests passed.** Automated interaction and agent image inspection, not human manual play or human fidelity approval.
 
 ## Screenshot-tracing integration (2026-11-09)
 

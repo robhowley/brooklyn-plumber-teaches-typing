@@ -1,8 +1,12 @@
-# Gameplay fidelity audit
+# Gameplay fidelity audit (historical baseline)
 
-The recreation now makes quicksand sink, struggle and recover, gives every practice character three goal-linked expressions, and distinguishes victory from merely finishing. Historical hazard death rules remain unknown; this game deliberately has no hazard deaths.
+The recreation now makes quicksand sink, struggle and recover, gives every practice character three goal-linked expressions, and distinguishes victory from merely finishing. This game deliberately has no hazard deaths. Later static findings establish scoped predicates, but not complete browser state/terminal mapping.
 
-Audit date: November 9, 2026. Scope: original DOS course, not the enhanced CD story or sequel. The implementation brief remains the product contract. This audit compares archived source inspection with current code; it is not a controlled run of the DOS executable. Videos have no keyboard telemetry or authenticated executable version.
+Audit date: November 9, 2026. Scope: original DOS course, not the enhanced CD story or sequel. This audit records current runtime behavior against static archive inspection; it is not a controlled run of the DOS executable. Videos have no keyboard telemetry or authenticated executable version.
+
+**Superseded runtime baseline, updated 2026-11-10:** the matrix and detailed semantics below describe the November 9 implementation, not today's app. Phases 1–5 now independently pass under [D1–D8](FIDELITY-DECISIONS.md). Current behavior uses net-error scoring, deferred Next with achieved-speed increments/world resets, save v2 with archived v1 history and fresh course, local student slots, reviewed original-first text with labeled generated gaps, and decoded static archive art. Exact coverage, current rules and Phase 6 evidence are in [Validation](VALIDATION.md); actual asset disclosures are in [Scene art](ART.md). Old claims below about five-character WPM, fixed +5 progression, generated-only text and unchanged v1 persistence are historical only.
+
+[Phase-1 findings](FIDELITY-PHASE-1.md) supersede this audit's historical unknowns about scoring, selection/control bytes, inactivity thresholds and certificate flags. G1–G4 still remain historically open within their stated scopes; all early deaths remain disabled. No human playtest or DOS runtime experiment is claimed.
 
 ## Evidence you can check
 
@@ -16,7 +20,7 @@ These original-source links do not require the ignored local research archive:
 - **T, tool-assisted recording:** TASVideosChannel, [maximum-score run](https://www.youtube.com/watch?v=EAlHBxYrDbQ), 07:10–08:00 route through water, corridor, pipes and sand. Its description identifies scripts/subframe input, not ordinary typing.
 - **W, secondary summary:** [Super Mario Wiki](https://www.mariowiki.com/Mario_Teaches_Typing), original DOS gameplay section. Duration defaults are secondary-source claims, not a timing table recovered from the manual.
 
-## Audit matrix
+## Historical November 9 audit matrix
 
 “Fixed” means a gap in this recreation was addressed, not that original code or exact timing was recovered.
 
@@ -33,10 +37,10 @@ These original-source links do not require the ignored local research archive:
 | Results versus victory | M p. 18: metrics blackboard after a game; p. 17: separate victory presentation after reaching the goal. V [03:30](https://www.youtube.com/watch?v=dJP7FTvGETM&t=210s) is an outdoor result board; [21:04.5](https://www.youtube.com/watch?v=dJP7FTvGETM&t=1264s) is practice, not castle completion. | Blackboard and Retry/Menu/Next/Report remain available on every result. Only passes get a victory seal and gold treatment; a discrete polite announcement states the result. | **Fixed:** a visible pass-only celebration. **Intentional:** integrated result treatment, not a reconstruction of an unverified original victory animation. |
 | Failure explanation | D `ENGLISH.MSD`: `YOU LOSE!` at 2588, `You stopped typing!` at 2598, `Your accuracy was poor!` at 2618. | At timeout, failures explicitly explain no input, below-goal speed and/or accuracy below this recreation's 90% rule. | **Fixed:** actionable reasons. **Unknown:** original inactivity seconds, accuracy cutoff and message priority. Static strings do not establish reachable runtime conditions. |
 | Timing and success | W reports 2/5/5/10 minutes; D `ENGLISH.MSD` includes `Lesson Times` at 1894. M p. 17 ties victory to personal goal. | Editable 120/300/300/600 active seconds. Pass only at timeout with attempts > 0, goal WPM and ≥90% accuracy; no early pass or death. | **Retained intentional rules:** five characters per word and 90% are not recovered historical formulas. L/T high-speed continued play cannot determine a death or pass threshold. |
-| Course and certificates | D `MARIO1.HLP`: editable configured-goal gates 10/30 for water/castle, not proof of prior speed. M p. 20: Next adds groups, then raises goal; world certificates. M p. 13: castle at 50 WPM graduates. | Guided 5-WPM/home-row start; six groups; all keyboard retained, goal rises by 5; 10/30 world routing; all-keyboard castle pass at 50 graduates. Custom/practice cannot advance it. | **Retained choices:** exact increments/interleaving and all-keyboard graduation prerequisite are recreation rules. Idempotent Next, certificates and saved progress unchanged. |
-| Presentation and saves | M pp. 4–7, 19–20 documents student/character selection and student files; original screenshots show DOS presentation. | Browser cabinet, Mario/Luigi/Princess, localStorage, keyboard focus, responsive DOM and reduced motion. | **Intentional adaptation:** no native student files, backend, accounts or schema migration. Existing assets/attribution are unchanged by this audit. |
+| Course and certificates | D `MARIO1.HLP`: editable configured-goal gates 10/30 for water/castle, not proof of prior speed. M p. 20: Next adds groups, then raises goal; world certificates. M p. 13: castle at 50 WPM graduates. | Guided 5-WPM/home-row start; six groups; all keyboard retained, goal rises by 5; 10/30 world routing; all-keyboard castle pass at 50 graduates. Custom/practice cannot advance it. | **Current behavior only:** this audit makes no future progression or save-conversion decision. D1 preserves existing data, archives the old course position and starts the new course at 5 WPM/home row. |
+| Presentation and saves | M pp. 4–7, 19–20 documents student/character selection and student files; original screenshots show DOS presentation. | Browser cabinet, Mario/Luigi/Princess, localStorage, keyboard focus, responsive DOM and reduced motion. | **Current adaptation:** no native student files, backend or accounts. This audit changes no assets or storage. D1 requires the future cutover to preserve existing data, archive the old course position and start the new course at 5 WPM/home row. |
 
-## Original typing corpus, not imported gameplay text
+## Original typing corpus before adoption
 
 Static inspection of D found **15 `.LEE` files, 24,090 bytes and 136 tilde-delimited records**: 78 `LETTERS`, 41 `WORDS`, 17 `SENTENC`. Five prefixes (`B`, `H`, `N`, `S`, `T`) each occur with all three suffixes. There is no extra all-keyboard file in that ZIP. Prefixes alone do not establish menu mappings.
 
@@ -54,13 +58,15 @@ The leading `~`, sentence backticks and final DOS EOF byte `0x1A` are observed r
 
 ## Exact recreation semantics
 
+These bullets preserve the November 9 baseline. Animation feedback largely remains; scoring, corpus, course and persistence were subsequently replaced under [D1–D8](FIDELITY-DECISIONS.md). Read the current validation contract before using these as implementation guidance.
+
 - Normal-motion castle sand depth is bounded to **0–22 scene pixels**. Idle sinking is **3 px per active second**. Each correct castle key refreshes lift until `elapsed + 4 / goal` seconds, with **12 px/s** recovery during that interval. Intervals refresh rather than accumulate; a stale high cumulative WPM cannot supply indefinite idle lift. Regular sustained input below 60% of goal tends to sink, above it tends to recover; this is animation feedback, not pass math.
 - Raised arms alternate on the active clock at three phase changes per second when depth exceeds 5 pixels; shallower poses lower the hands. The foreground is drawn after the character. Paused/finished attempts do not animate from wall time.
 - Reduced-motion castle depth starts at 22 and changes only on correct input to `22 × max(0, 1 − WPM / goal)`. No idle sinking, waving or scrolling occurs. This static feedback is intentionally different from normal-motion recent-key recovery.
 - Practice starts neutral at elapsed time zero. Thereafter it is sad below **75%** of goal, neutral from **75% to below 100%**, happy at or above goal. Errors affect final accuracy, not expression selection. These bands are chosen, not historical findings.
-- Escape, blur, hidden-tab and pipe pause contracts remain; resume is explicit. Input, scoring, off-course isolation, certificates, graduation and version-1 persistence are unchanged. No death timer is asserted or added.
+- Escape, blur, hidden-tab and pipe pause contracts remain; resume is explicit. This audit leaves current input, scoring, off-course isolation, certificates, graduation, and version-1 persistence unchanged. That describes current behavior, not the future cutover's rules or save format. No death timer is asserted or added.
 
-## Verification and limits
+## Historical verification and limits
 
 The tracked Node tests cover deterministic sinking, bounded idle depth, recovery, frame partition, pause and static reduced-motion behavior. Browser tests cover all characters' expressions, foreground masking, swimmer/pursuer direction, Thwomp pressure, outcomes and announcements. Pixel-isolation tests load source modules through test-only request interception; these are not evidence of the shipped bundle by themselves. A separate production UI test enters castle through real controls, types into the pipe, idles into sand, pauses, recovers through keyboard input and reaches results without module injection.
 

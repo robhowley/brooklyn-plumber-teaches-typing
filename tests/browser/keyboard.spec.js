@@ -1,14 +1,31 @@
-import { test, expect } from '@playwright/test';
-test('keyboard-only start, pause, resume and menu navigation',async({page})=>{
- await page.goto('/');
- await page.keyboard.press('Tab');await expect(page.locator('#home')).toBeFocused();
- for(let i=0;i<30;i++){
-  if(await page.locator('button[type=submit]').evaluate(el=>el===document.activeElement))break;
-  await page.keyboard.press('Tab');
- }
- await expect(page.locator('button[type=submit]')).toBeFocused();await page.keyboard.press('Enter');
- await expect(page.locator('#pause')).toBeFocused();await page.keyboard.press('Escape');await expect(page.locator('#resume')).toBeFocused();
- await page.keyboard.press('Enter');await expect(page.locator('#pause-panel')).toBeHidden();
- await page.keyboard.press('Escape');await page.keyboard.press('Tab');await expect(page.locator('#leave')).toBeFocused();await page.keyboard.press('Enter');
- await expect(page.locator('#profile')).toBeVisible();
+import {test,expect} from '@playwright/test';
+import {boot,activate,openMenu,stored} from './helpers.js';
+
+test('keyboard navigation, student slots, settings and selected student survive reload',async({page})=>{
+ await boot(page);await openMenu(page,'File');await activate(page,'#new-student');
+ await expect(page.getByLabel('Name',{exact:true})).toBeFocused();await page.keyboard.type('Student 123456');
+ await expect(page.getByRole('heading',{name:'New student',exact:true})).toBeVisible();
+ await page.getByLabel('Character').selectOption('Princess');await page.getByLabel('Activity goal').fill('12');await page.getByLabel('Synthetic sound').check();
+ await activate(page,'#student-form button.primary');await expect(page.locator('#student-summary')).toContainText('Student 123456 · Princess');
+ await openMenu(page,'Student');await activate(page,'#times');
+ for(const [mode,minutes] of [['outdoor','2'],['underwater','5'],['castle','5'],['practice','10']])await expect(page.locator(`[name="${mode}-minutes"]`)).toHaveValue(minutes);
+ await page.locator('[name=outdoor-seconds]').fill('7');await page.locator('[name=underwater-minutes]').fill('2');await expect(page.locator('[name=underwater-seconds]')).toHaveValue('');
+ await activate(page,'#times-form button.primary');await page.reload();await page.keyboard.press('Enter');
+ await expect(page.locator('#student-summary')).toContainText('Student 123456');
+ let data=await stored(page),p=data.students.find(p=>p.id===data.currentStudentId);expect(p.settings.durations.outdoor).toBe(7);expect(p.settings.durations.underwater).toBe(120);expect(p.settings.sound).toBe(true);
+ await openMenu(page,'Student');await activate(page,'#times');
+ await expect(page.locator('[name=underwater-minutes]')).toHaveValue('2');await expect(page.locator('[name=underwater-seconds]')).toHaveValue('120');await expect(page.locator('[name=outdoor-seconds]')).toHaveValue('7');
+ await activate(page,'#times-form button.primary');await openMenu(page,'Student');await activate(page,'#times');await expect(page.locator('[name=outdoor-seconds]')).toHaveValue('7');await expect(page.locator('[name=underwater-minutes]')).toHaveValue('2');await activate(page,'#back');
+ await openMenu(page,'Student');await activate(page,'#edit-student');await page.getByLabel('Name',{exact:true}).fill('Renamed');await activate(page,'#student-form button.primary');
+ await openMenu(page,'File');await activate(page,'#load-student');await page.getByLabel('Saved local students').selectOption(data.students[0].id);await activate(page,'#load-form button.primary');
+ await expect(page.locator('#student-summary')).toContainText('Ada');await page.reload();await page.keyboard.press('Enter');await expect(page.locator('#student-summary')).toContainText('Ada');
+ data=await stored(page);expect(data.students).toHaveLength(2);expect(data.students[1].name).toBe('Renamed');expect(data.students[1].settings.goal).toBe(12);
+});
+
+test('help returns focus and gameplay pause traps keyboard without changing clocks',async({page})=>{
+ await boot(page);await openMenu(page,'Help');await activate(page,'#keyboard');await expect(page.locator('#screen-art')).toHaveAttribute('aria-label','Original KEYBOARD background');await activate(page,'#back');await expect(page.locator('#keyboard')).toBeFocused();
+ await page.keyboard.press('1');await activate(page,'#generated');await page.keyboard.press('Escape');await expect(page.locator('#resume')).toBeFocused();
+ const time=await page.locator('#time').textContent();await page.clock.runFor(60000);await page.keyboard.press('a');await expect(page.locator('#time')).toHaveText(time);await expect(page.locator('#correct')).toHaveText('0');
+ await page.keyboard.press('Shift+Tab');await expect(page.locator('#leave')).toBeFocused();await page.keyboard.press('Tab');await expect(page.locator('#resume')).toBeFocused();await page.keyboard.press('Enter');await expect(page.locator('#pause-panel')).toBeHidden();
+ await page.keyboard.press('Escape');await page.keyboard.press('Tab');await page.keyboard.press('Enter');await expect(page.locator('#activity-outdoor')).toBeFocused();
 });
