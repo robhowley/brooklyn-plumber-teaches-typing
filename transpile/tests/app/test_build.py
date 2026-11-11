@@ -102,6 +102,19 @@ class AppDataTests(unittest.TestCase):
             self.assertGreater(same_value_writes, 0)  # cannot replace runs with frame diffs
             self.assertEqual(data['palettes']['castle-'+char.lower()], [v for rgb in manifest['worlds']['castle']['palettes'][char.lower()]['rgb8'] for v in rgb])
 
+    def test_control_resources_keep_original_font_background_palette_and_help(self):
+        data = json.loads((ROOT / 'app/data.json').read_text())
+        evidence = json.loads((ROOT / '.tmp/report-evidence.json').read_text())
+        for key in ('teachers', 'strings', 'help', 'members'):
+            self.assertEqual(data['control'][key], evidence[key])
+        menu = json.loads((ROOT / '.tmp/menu/evidence.json').read_text())
+        self.assertEqual(data['control']['menu'], {'members': menu['members'], 'prefBoxXs': menu['tables']['prefBoxXs']})
+        for name in ('PREFS', 'LOAD', 'LESSTIME', 'RCARD', 'HELP', 'KEYBOARD', 'GREETBG', 'BLACKBRD'):
+            self.assertEqual(base64.b64decode(data['backgrounds'][name]['pixels']), (ROOT/'assets/original/backgrounds'/(name+'.indices.data')).read_bytes())
+            self.assertEqual(len(data['palettes'][name+'.CRX']), 768)
+        self.assertEqual(sum(s['family']=='FONT3H' for s in data['sprites'].values()), 96)
+        self.assertIn('GREET2/prefbox_1', data['sprites'])
+
     def test_rebuild_is_identical(self):
         paths = [ROOT / 'app/data.json', *sorted((ROOT / 'assets/app').glob('*.indices'))]
         before = {p: hashlib.sha256(p.read_bytes()).hexdigest() for p in paths}

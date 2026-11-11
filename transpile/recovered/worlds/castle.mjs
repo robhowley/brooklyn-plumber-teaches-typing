@@ -107,7 +107,7 @@ export class CastleController {
     this.stats = timer(this.stats, 100, this.nowTicks);
     Object.assign(this.stats, score(this.stats));
     this.stats.previousAccuracy = this.stats.profileAccuracy;
-    this.emit('statistics', { operation: 200 });
+    this.emit('statistics', { operation: 200, stats: { ...this.stats } });
   }
   runFrame() {
     this.walkCounter = i16(this.walkCounter + 1);

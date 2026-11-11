@@ -1,6 +1,6 @@
 # Coverage of the integrated activities
 
-**Outside, Water, Castle and Practice are playable through results and Next.** Castle numeric HUD layout and optional ending playback remain omitted, not complete. “Implemented” below means used by this browser app; “recovered-only” means evidence or tested helpers exist but the feature is not exposed. “Unknown” means a consequential detail is not established, not permission to invent it.
+**All four worlds, original command widgets, report/help/keyboard/About, numeric HUDs and BLACKBRD statistics are integrated.** Phase3 was verified/pushed as `465129e`; Phase4 remains local, without independent review. Optional ending playback remains omitted. “Implemented” below means used by this browser app; “recovered-only” means evidence or tested helpers exist but the feature is not exposed. “Unknown” means a consequential detail is not established, not permission to invent it.
 
 ## Evidence map
 
@@ -14,6 +14,9 @@ All FILE offsets refer to `MarioTea/MARIO/MARIO.EXE`, SHA256 `6caed439b64dc3bad8
 - **R**: [render report](analysis/render/RENDERING.md), [BGS/world contracts](analysis/render/BGS.md), [decoded bindings](assets/render/manifest.json), indexed compositor/ground/idle/BAN/ANI evidence.
 - **T**: [runtime report](analysis/runtime/RUNTIME.md), [reentry contracts](analysis/runtime/REENTRY.md), exact RNG/corpus/Practice/bonus APIs and byte spans. These supersede historical BGS, font-binding and retained-counter gaps; [Phase 1 checks](reports/PHASE-1.md) cover current integration.
 
+- **MENU**: [menu/student evidence](analysis/control/MENU.md), frozen worker imports plus integrated source composition/blink trace.
+- **REPORT-HELP**: [report/help/HUD evidence](analysis/control/REPORT-HELP.md), original resource/font/palette bindings and exact operation200/210 layouts.
+
 ## Boot, menu and student UI
 
 | Original area | Status in app | Evidence and remaining limit |
@@ -21,27 +24,27 @@ All FILE offsets refer to `MarioTea/MARIO/MARIO.EXE`, SHA256 `6caed439b64dc3bad8
 | DOS/C startup, config, devices, command line | Recovered-only/unknown | C `0x1d89d`, `0x125b9`; no hardware/driver execution |
 | Logo, title, greeting sequence | Recovered-only/unknown | C `0xfb90`; decoded LOGO/GREET/GREETBG (A), timing omitted; direct MAINMENU entry is host adaptation |
 | Main-menu background | Implemented | A MAINMENU.CRX, indexed pixels and embedded palette |
-| Main-menu top labels/font | Implemented, partial drawing | C `0x105cc..0x106f9`; FONT5H at DS:4fc4, resource IDs1100/1110/1120; dropdowns disabled |
+| Main-menu top labels/font | Implemented | C `0x105cc..0x106f9`; FONT5H at DS:4fc4, resource IDs1100/1110/1120; indexed source borders, selection colors and lesson marker |
 | Welcome/student greeting | Implemented, provisional color | C `0x10979..0x10adf`, IDs1150/1250..1254; original slot88 unresolved, host red substitute |
 | Six right-side hit boxes | Implemented | C `0x11121..0x11167`, half-open rectangles; no added source selection |
-| Pixel-color interception and Mario click region | Recovered-only/unknown | C `0x110ce..0x1111a`, pixel88 neighborhood and x50..75/y47..66; omitted |
+| Pixel-color interception and Mario click region | Interception implemented; animation omitted | MENU `0x10e66..0x10eb7`, `0x110ce..0x1111a`; low-word linear7x7 palette88 scan precedes all pointer routes; welcome sound request visible, silent |
 | Menu hotkeys and world eligibility | Implemented for supported actions | C `0x111d8..0x114ce`; unsupported keys report disabled in host status |
-| Dropdown keyboard navigation | Recovered-only | `flow.mjs:menuNavigation`; no pretend dropdown event pump |
-| Dropdown pointer/layout/full commands | Recovered-only/unknown | C `0x10eea..0x110c7`; visibly disabled |
+| Dropdown keyboard/pointer navigation | Implemented | MENU `0x10e1c..0x119f5`; source geometry, keyboard-before-pointer API, localized accelerators, row/column wrap and outside-click close without world fallthrough |
+| Dropdown commands | Implemented or explicit omission | Bridge owns starts, group/save, students, report/help/keyboard/About and option bits; demo/audio/certificate/quit requests never start substitutes |
 | Next routing | Implemented | C `0x10412..0x10457`; group preserved when descending to Outside, reset only on change to Water/Castle; all four supported modes retain source routing; Practice Next stays mode4 |
-| New student/defaults | Implemented data, adapted UI | C `0xe39c`, `0xee28..0xee83`; eight ASCII characters, goal5/group1/character1/durations2,5,5,10 |
-| Student name collision | Implemented | C `0xed97..0xedbd`; browser name store loads existing profile, does not reset it |
-| Group selection | Implemented data, adapted UI | C `0x11668..0x11696`, groups1..6 and MSD300..305; browser select replaces disabled dropdown |
-| Goal/character editor | Implemented fields, adapted UI | C student offsets +17/+1d; goal editor bounds not fully translated, host positive-word validation; character1..3 |
-| Duration editor | Implemented all four duration fields, adapted UI | C `0x90e1..0x90f5`, `0x12c90`; clamp1..60, zero default and signed multiplication retained; Practice uses field+36/default600s; Water/Castle use fields+32/+34 and default300s |
+| New student/defaults | Implemented | MENU `0xe39c`, `0xed25..0xee83`; clears260 bytes before cancellable prompt; uppercase letters/digits only,8 characters; goal5/group1/character1/durations2,5,5,10 |
+| Student name collision/rename | Implemented with host filename matching | MENU `0xede6..0xee26`, `0xf3d8..0xf420`; duplicate New loads existing, accepted rename deletes OLD then saves NEW, Escape cancels first, no confirmation; case-insensitive lookup reuses existing storage key |
+| Group selection | Implemented | C `0x11668..0x11696`, groups1..6 via original dropdown, plus separate native fallback |
+| Goal/character editor | Implemented | MENU `0xf1fb..0xf540`; source field/focus/hit rectangles, goal5..150, FONT3H labels, GREET2/prefbox_1 selection overlay |
+| Duration editor | Implemented all four source fields | C `0x90e1..0x90f5`, `0x12c90`; clamp1..60, zero default and signed multiplication retained; Practice uses field+36/default600s; Water/Castle use fields+32/+34 and default300s |
 | Save/load structure | Implemented, host transport | C 260-byte .STU offsets and save magic; namespaced localStorage, no filesystem I/O or old app saves |
 | Last-used student | Adapted | C carryon op identified; browser `current` pointer, not original carryon file |
-| Delete/load chooser/original text cursor widgets | Recovered-only/unknown | C `0xf653`, student op0xb05; host selector only, no delete |
+| Load chooser and text cursor | Implemented with host sampling | MENU `0xf653..0xfb19`, `0x1aced..0x1b41b`; max30 sorted names,3x10 bounds, source signed tick double-press, D Done/load, cancellation never deletes; full-cell4/2 tick inversion |
 | Demo/attract loop | Recovered-only | C demo flag, O synthetic10..19 countdown; disabled, guest is not demo |
-| Report card | Recovered-only | C `0xe65b`, A RCARD.CRX; command5 disabled |
-| Help/keyboard/about | Recovered-only | C entrypoints, A HELP/KEYBOARD/HLP; disabled |
-| Music/sound/speech menu options | Recovered-only | C DS:5038 XOR bits1/2/4; disabled, no misleading toggle state |
-| Quit/Alt-X/OS error dialogs | Recovered-only | C conditional helper and MSD errors; disabled rather than closing tab |
+| Report card | Implemented | REPORT-HELP `0xe65b..0xe997`; RCARD, teacher pointers, original formats/coordinates and signed per-key ranking, including empty zero-error value |
+| Help/keyboard/About | Implemented, fades omitted | REPORT-HELP `0x1537f..0x1592c`, `0x145df..0x1467f`, `0x11d54..0x121ea`; original text/font/palettes, paging/focus and caller raster/pointer return; closing keys consumed |
+| Music/sound/speech menu options | State implemented, audio omitted | C DS:5038 XOR1/2/4, visible host notice; no playback claim |
+| Quit/Alt-X/OS errors | Explicit host limitation | Source quit cannot exit a browser process or close a tab; filesystem/device dialogs are not simulated; storage/resource errors remain visible |
 | Lesson customization/advanced reporting | Unknown UI integration | MSD20000..20201 labels retained; no functional claims |
 
 ## Outside
@@ -77,8 +80,8 @@ All FILE offsets refer to `MarioTea/MARIO/MARIO.EXE`, SHA256 `6caed439b64dc3bad8
 |---|---|---|
 | Active timer pause/resume/reset | Implemented | C `0x15afb..0x15bee`; caller supplies browser-converted18.2Hz ticks |
 | Elapsed/WPM/accuracy arithmetic | Implemented | C `0x15bac..0x15d74`; signed casts, net-character formula, stale accuracy on zero attempts retained |
-| HUD and result labels | Implemented, adapted positioning | C MSD10..13 and BLACKBRD; original operation210 text layout not fully translated |
-| Per-key errors/ranking | Counters implemented; ranking recovered-only | C `0xe41c..0xe4ef`; no counterfeit report rendering |
+| HUD and result labels | Implemented source positions/formatting | REPORT-HELP `0x15d77..0x16445`; operation200 for all4 modes, distinct FONT3H Water and FONT5H others, exact palette indices/widths/clock quirks; BLACKBRD operation210 includes profile-gated goal |
+| Per-key errors/ranking | Implemented | C `0xe41c..0xe4ef`; signed ties/wrap/space/DEL, max5, zero-error empty rendering; report does not rewrite saved counts |
 | Eligible completion/goal update | Implemented for Outside | C `0x13d4a..0x13dac`; before results, exit gate honored, strict > cap preserved |
 | Results image/buttons/keys | Implemented | C `0x164dc..0x167bb`; inclusive Next/Menu bounds, Enter pointer semantics, Next does not increment again |
 | Result speech | Recovered-only | `resultSpeech`, previousGoal comparison; silent |
@@ -97,23 +100,23 @@ All FILE offsets refer to `MarioTea/MARIO/MARIO.EXE`, SHA256 `6caed439b64dc3bad8
 | Water pursuer/bubbles | Implemented | W `0x1710a`, `0x16fd4`; scripted animation, no invented collision |
 | Water inactivity/failure/sinking | Implemented | W `0x176e6`, >20 any-input inactivity, chase/sink through results/Next |
 | Water bonus | Implemented | W `0x17560`, `0x17ef9`; all three56-packet movies, two changed-tick waits, timer stop/restore/input flush |
-| Water presentation | Implemented except HUD/audio/fades | FONT9H(0,47), FONT7H bonus, BITER slots48..63, ordered dirty actors and source wave tiles; optional celebration disabled until Phase5 |
+| Water presentation | Implemented except audio/fades | FONT9H(0,47), FONT7H bonus, BITER slots48..63, ordered dirty actors and source wave tiles; optional celebration disabled until Phase5 |
 | Castle sentences/metadata queue | Implemented | W `0xbb06..0xbf47`; case-sensitive32..126 and completion flags |
 | Castle rockfaces/movement | Implemented | W `0xc410..0xc921`; fixed tables, stage positions, no general collision engine |
 | Castle pipes/scroll transitions | Implemented | W `0xc082`, `0xca14`, `0xd127`; timed/scripted segments |
 | Castle sand/text progress/sinking | Implemented | W `0xcd7a`, `0xc36e`; WPM position and scripted failure |
 | Castle timeout/accuracy/inactivity failure | Implemented | W `0xbc7e`, `0xbffb`; separate flags, no invented lives |
-| Castle BGS/clipping/bonus bindings | Implemented except HUD/audio/fades | R BGS and CASTLE: four320×129 scenes at y26, forty eight-pixel strips with scratch/bias and pre-scroll actor position, inclusive clips, final palettes, FONT9H metadata and exact BAN write/ANI operations for all3 movies; same-value writes preserved |
+| Castle BGS/clipping/bonus bindings | Implemented except audio/fades | R BGS and CASTLE: four320×129 scenes at y26, forty eight-pixel strips with scratch/bias and pre-scroll actor position, inclusive clips, final palettes, FONT9H metadata and exact BAN write/ANI operations for all3 movies; same-value writes preserved |
 | Practice corpus/expression/key acceptance | Implemented | T exact runtime cursor/input and W `practiceCorpus/practiceExpression`; all15 real corpora, case-sensitive32..127 or CR, no inactivity loss |
 | Practice line wrap/prefill | Implemented | T `0xb3e1..0xb4d3`, exact10x33 buffer/nine fills, LF early return, partial-word rewind, NUL and repeated-overlong-word quirks preserved |
 | Practice duration/exit/results | Implemented | W `0xb1e6`, `0xb5c2`, `0xb809`; default600s/configured field, Esc early exit, F10 ignored, no progression, mode4 Next preserved |
 
-| Practice art/font/face | Implemented, partial presentation adaptation | PRACTICE.CRX/GSO indices0..2, FONT5H; face142,21, rows30,96+10*r; host HUD and static cursor replace unintegrated text callbacks |
+| Practice art/font/face | Implemented, partial presentation adaptation | PRACTICE.CRX/GSO indices0..2, FONT5H; face142,21, rows30,96+10*r; source numeric HUD; static Practice input cursor remains a host adaptation |
 
 ### World integration and remaining gates
 
 - Water now honors pending suppression (`0x17943..0x1794c`), conditional RNG order, source waits, failure/results and bonus restoration. [Controller](analysis/worlds/WATER-CONTROLLER.md), [render evidence](analysis/render/WATER.md) and [Phase2 report](reports/PHASE-2.md) define the integration. Browser scheduling/typematic/focus and omitted audio/celebrations remain explicit limits.
-- Castle integrates the full metadata queue and repeating scene controller (`0xbb06..0xde2d`), operation2/3 separation, old-position rock triggers, typing locks, repeated pipe RNG comparisons, sand entry/active/exit and both failure loops. Clean stationary rocks do not redraw. Source-key Chrome tests run two cycles for each character; source/pixel tests check scratch restoration and all40 strips. [Phase3](reports/PHASE-3.md) records checks and pending independent review.
+- Castle integrates the full metadata queue and repeating scene controller (`0xbb06..0xde2d`), operation2/3 separation, old-position rock triggers, typing locks, repeated pipe RNG comparisons, sand entry/active/exit and both failure loops. Clean stationary rocks do not redraw. Source-key Chrome tests run two cycles for each character; source/pixel tests check scratch restoration and all40 strips. [Phase3](reports/PHASE-3.md) records implementation; Phase3 independent review passed and checkpoint `465129e` was pushed. [Phase4](reports/PHASE-4.md) records current local UI/HUD checks.
 - Water/Castle controllers reuse the shared RNG/corpus and BAN/ANI decoders; numeric helpers alone are not used as a substitute for their full source scene loops. Existing [worlds mechanics](analysis/worlds/MECHANICS.md), [coverage mapping](analysis/worlds/coverage.json) and [render limits](analysis/render/RENDERING.md) enumerate bounded evidence and gaps. This is not an exhaustive decompilation claim.
 
 ## Resources and proof limits

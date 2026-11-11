@@ -3,6 +3,13 @@ import { CASTLE_CLIPS, drawCastleText, beginCastleTransition, stepCastleTransiti
   finishCastleBonus, drawCastleBonusPacket } from './castle-render.mjs';
 import { blitSprite, drawGround, characterFrame, updateSprite, spriteRect, clipRect, drawCastleScene } from '../recovered/render/render.mjs';
 import { waterActorOperations, drawWaterOperations, drawWaterText, waterBonusSprite, drawWaterBonusPacket } from './water-render.mjs';
+import { drawMenuWidgets, drawStudentChooserNames, drawTextField } from './menu-render.mjs';
+import { drawReport, drawSourceText } from './report-render.mjs';
+import { drawHelp, drawKeyboard, drawAbout } from './help-render.mjs';
+import { drawNumericHUD, drawStats } from './stats-render.mjs';
+import { studentFieldPlacement } from '../recovered/control/menu.mjs';
+import { readStudent } from '../recovered/control/student.mjs';
+import { sourceFormat } from '../recovered/control/report.mjs';
 const bytes = text => Uint8Array.from(atob(text), c=>c.charCodeAt(0));
 // Indexed full-scene redraw is a host adaptation; origins, masks, tile, palette
 // ranges and resource selection use recovered APIs. No PNG palette guessing.
@@ -28,6 +35,9 @@ export class Renderer {
       .sort((a,b)=>a[1].index-b[1].index).map(([name,sprite])=>({sprite,pixels:this.pixels[name]}));
     this.waterResources={water:records('WATER'),bubbles:records('WATER_INLINE')};
     this.font9=records('FONT9H'); this.font7=records('FONT7H');
+    this.fonts={FONT3H:records('FONT3H'),FONT5H:records('FONT5H')};
+    for(const [name,font] of Object.entries(this.fonts)) if(font.length!==96) throw new Error(`Missing decoded font ${name}`);
+    if(!this.data.control?.help || !this.data.control?.teachers) throw new Error('Missing control resources, rebuild app data');
     this.castleScenes=this.data.castle.scenes.map(bytes);
     this.castleAnimations=Object.fromEntries(Object.entries(this.data.castle.animations).map(([char,a])=>[char,a.frames.map(f=>({
       writes:f.writes.map(w=>({offset:w.offset,pixels:bytes(w.pixels)})),
@@ -83,7 +93,38 @@ export class Renderer {
       }
     });
   }
-  menu(profile) {
+  resources(name) {
+    if(!this.backgrounds[name] || !this.data.palettes[name+'.CRX']) throw new Error(`Missing control screen ${name}`);
+    return {background:this.backgrounds[name],palette:this.data.palettes[name+'.CRX'],fonts:this.fonts,
+      messages:this.data.messages,...this.data.control};
+  }
+  modal(state,student) {
+    const names={report:'RCARD',help:'HELP',keyboard:'KEYBOARD',about:'GREETBG'};
+    const name=names[state.kind], resources=this.resources(name);
+    const result=state.kind==='report'?drawReport(this.front,resources,student):state.kind==='help'?drawHelp(this.front,resources,state):state.kind==='keyboard'?drawKeyboard(this.front,resources):drawAbout(this.front,resources);
+    if(!result) throw new Error('Report requires a student');
+    this.palette=name+'.CRX';this.operations=result.operations??[];this.present();
+  }
+  studentUI(state,inverted=false) {
+    const p=readStudent(state.bytes), m=this.data.messages;
+    this.background(state.kind==='times'?'LESSTIME':'PREFS');
+    const ops=[], add=(text,x,y,font='FONT3H',color=15)=>ops.push({text,x,y,font,color,shadow:0,background:0,opaque:false});
+    if(state.kind==='new') add(m[2200],56,110);
+    else if(state.kind==='times') {
+      // 0x8d97..0x8e54, resource labels and physical field origins.
+      p.durations.forEach((n,i)=>{add(sourceFormat('%s:',m[100+i]),66,70+i*20,'FONT5H',0);add(sourceFormat('%2u',n),190,70+i*20,'FONT5H',1);add(m[5000],206,70+i*20,'FONT5H',0);});
+    } else {
+      add(sourceFormat(m[2210],p.name),64,70); add(sourceFormat(m[2220],p.goal),64,90);
+      add(sourceFormat(m[2230],m[199+p.mode]),64,100); add(sourceFormat(m[2400],m[299+p.lesson]),64,110);
+      // 0xf08c..0xf0c6, GREET2/prefbox_1 at table x, y130.
+      this.sprite('GREET2/prefbox_1',this.data.control.menu.prefBoxXs[p.character-1],130);
+    }
+    drawSourceText(this.front,this.fonts,ops,this.backgrounds[state.kind==='times'?'LESSTIME':'PREFS']);
+    if(state.field) {const placement=studentFieldPlacement(state);drawTextField(this.front,this.fonts[placement.font],state.field,{...placement,inverted});}
+    this.operations=ops;this.present();
+  }
+  chooser(state) {this.background('LOAD');drawStudentChooserNames(this.front,this.fonts.FONT5H,state);this.present();}
+  menu(profile,state) {
     this.background('MAINMENU'); this.front.fill(14,0,320*8);
     for(const [id,x] of [[1100,16],[1110,104],[1120,224]]) this.text(this.data.messages[id],x,0,{color:0,shadow:0});
     // Welcome palette slot mapping still untraced, visibly isolated host choice.
@@ -91,20 +132,7 @@ export class Renderer {
       this.text(this.data.messages[1150],144,34,{color:12,shadow:55});
       this.text(profile.name+'!',136+Math.floor((8-profile.name.length)/2)*8,49,{color:12,shadow:55});
     } else for(let i=0;i<5;i++) this.text(this.data.messages[1250+i],136,24+i*10,{color:12,shadow:55});
-    this.present();
-  }
-  setup(profile,duration=false) {
-    this.background(duration?'LESSTIME':'PREFS');
-    if(duration) {
-      this.text(`Outside: ${profile.durations[0]} min`,64,76);
-      this.text(`Water: ${profile.durations[1]} min`,64,93);
-      this.text(`Castle: ${profile.durations[2]} min`,64,110);
-      this.text(`Practice: ${profile.durations[3]} min`,64,127);
-    } else {
-      this.text(`Student Name: ${profile.name}`,40,80);
-      this.text(`Goal WPM: ${profile.goal}`,40,94);
-      this.text(`Level: ${this.data.messages[299+profile.lesson]}`,40,108);
-    }
+    if(state) drawMenuWidgets(this.front,this.fonts.FONT5H,this.data.messages,state,profile.lesson);
     this.present();
   }
   outdoor(s,stats,bonus) {
@@ -129,11 +157,7 @@ export class Renderer {
       this.sprite('OUTSIDE/brick1_1',bonus.x,bonus.y);
       this.text(String.fromCharCode(bonus.code),bonus.x+6,bonus.y+3,{font:'FONT7H'});
     }
-    // HUD layout is host-side until shared text compositor is fully traced.
-    this.text(`WPM: ${String(stats.wpm).padStart(3)}`,8,164);
-    this.text(`${Math.floor(stats.elapsedSeconds/60)}:${String(stats.elapsedSeconds%60).padStart(2,'0')}`,248,164);
-    this.text(`Typed:${String(s.attempts).padStart(3)}`,8,180);
-    this.text(`Errors:${String(s.errors).padStart(3)}`,184,180);
+    this.operations=drawNumericHUD(this.front,this.fonts,1,{...s,...stats},this.data.messages);
     this.present();
   }
   practice(s,stats,expression,typed) {
@@ -149,9 +173,7 @@ export class Renderer {
     // Host static cursor in place of shared blinking text-entry callback.
     const x=30+8*s.index;
     this.front.fill(1,103*320+x,103*320+Math.min(320,x+8));
-    this.text(String(stats.wpm),48,24); this.text(String(s.attempts),48,43);
-    this.text(String(s.errors),48,63);
-    this.text(`${Math.floor(stats.elapsedSeconds/60)}:${String(stats.elapsedSeconds%60).padStart(2,'0')}`,236,30);
+    this.operations=drawNumericHUD(this.front,this.fonts,4,{...s,...stats},this.data.messages);
     this.present();
   }
   cinematic(character,index) {
@@ -181,7 +203,8 @@ export class Renderer {
             this.front[dest]=raster[y*16+x]||scene[dest];
           }
         }
-      } else if(e.type==='text') drawWaterText(this.front,scene,this.font9,e.bytes,e.targetIndex);
+      } else if(e.type==='stats') this.operations=drawNumericHUD(this.front,this.fonts,2,e,this.data.messages);
+      else if(e.type==='text') drawWaterText(this.front,scene,this.font9,e.bytes,e.targetIndex);
       else if(['swimmer','pursuer','bubbles','bonus','bonus-erase'].includes(e.type)) {
         const actor=e.type==='bonus-erase'?'bonus':e.type;
         const before={character:this.waterDraw.character,[actor]:actor==='bubbles'?e.previous:this.waterDraw[actor]};
@@ -216,7 +239,8 @@ export class Renderer {
         this.front.set(this.castleBackground); this.castleClip=CASTLE_CLIPS.full;
         this.castleBonus=null; this.palette='castle-'+['m','l','p'][state.character-1];
         this.castleBlock=castleBonusBlock(this.castleActor({family:'CASTLE',index:14},0,0),this.font7[state.bonus.code-32]);
-      } else if(e.type==='clip') this.castleClip=rect(e.rect);
+      } else if(e.type==='statistics'&&e.operation===200) this.operations=drawNumericHUD(this.front,this.fonts,3,e.stats,this.data.messages);
+      else if(e.type==='clip') this.castleClip=rect(e.rect);
       else if(e.type==='clip-save-full') this.castleClip=CASTLE_CLIPS.full;
       else if(e.type==='clip-restore') this.castleClip=rect(e.rect);
       else if(e.type==='rockface-init'||e.type==='rockface') {
@@ -252,13 +276,13 @@ export class Renderer {
         finishCastleBonus(this.front,this.castleBackground,state.sceneType,this.castleScenes[2]);
         this.castleBonus=null; this.palette='castle-'+['m','l','p'][state.character-1];
       }
-      // Numeric HUD layout, fades, Ready audio and Phase5 endings are omitted.
+      // Fades, Ready audio and Phase5 endings remain omitted.
     }
     this.present();
   }
   results(result,profile,activity) {
     this.background('BLACKBRD');
-    const lines=[profile.name,`WPM: ${result.wpm}`,`Typed: ${activity.attempts}`,`Errors: ${activity.errors}`,`Accuracy: ${result.accuracy}%`,`${Math.floor(result.elapsedSeconds/60)}:${String(result.elapsedSeconds%60).padStart(2,'0')}`];
-    lines.forEach((line,i)=>this.text(line,40,38+i*14)); this.present();
+    this.operations=drawStats(this.front,this.resources('BLACKBRD'),{...activity,...result},profile).operations;
+    this.present();
   }
 }

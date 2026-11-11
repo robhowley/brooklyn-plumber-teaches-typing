@@ -14,8 +14,10 @@ export const BIOS_HZ = 18.2; // Host clock conversion, not measured DOS timing.
 export function dosKey(event) {
   if (event.altKey && event.key.toLowerCase() === 'x') return 0x12d;
   if (event.ctrlKey || event.metaKey || event.altKey || event.isComposing) return 0;
-  const special = { Enter:13, Escape:27, Tab:9, Backspace:8, Delete:127,
-    F1:0x13b, F2:0x13c, F10:0x144, ArrowUp:0x148, ArrowLeft:0x14b, ArrowRight:0x14d, ArrowDown:0x150 };
+  const special = { Enter:13, Escape:27, Tab:9, Backspace:8, Delete:0x153,
+    F1:0x13b, F2:0x13c, F3:0x13d, F4:0x13e, F5:0x13f, F6:0x140, F7:0x141, F8:0x142, F9:0x143, F10:0x144,
+    Home:0x147, End:0x14f, PageUp:0x149, PageDown:0x151, Insert:0x152,
+    ArrowUp:0x148, ArrowLeft:0x14b, ArrowRight:0x14d, ArrowDown:0x150 };
   return special[event.key] ?? (event.key.length === 1 && event.key.charCodeAt(0) < 128 ? event.key.charCodeAt(0) : 0);
 }
 export function editStudent(bytes, { name, lesson, goal, character, minutes, waterMinutes, castleMinutes, practiceMinutes }) {
@@ -25,7 +27,7 @@ export function editStudent(bytes, { name, lesson, goal, character, minutes, wat
     out.fill(0,4,15); [...name].forEach((c,i)=>out[4+i]=c.charCodeAt(0));
   }
   if (lesson !== undefined) v.setInt16(25,lesson,true);
-  // Host editor bounds; the DOS goal widget is not translated.
+  // Separate host-form validation. The original canvas editor owns its5..150 clamp.
   if (goal !== undefined) {
     if (!Number.isInteger(goal) || goal < 1 || goal > 32767) throw new RangeError('Goal must be 1..32767');
     v.setInt16(23,goal,true);
@@ -64,6 +66,8 @@ export class Session {
   get activity() { return this.mode===4?this.practice:this.mode===3?{...this.castle.stats,aborted:this.castle.flags.exit}:this.mode===2?{...this.water.stats,aborted:this.water.aborted}:this.outdoor; }
   start(nowTicks, mode=1, wallSeconds=Math.floor(Date.now()/1000)) {
     if (![1,2,3,4].includes(mode)) throw new Error('Unsupported activity');
+    // Student service normalization also follows a cancelled New (zeroed bytes).
+    this.student=normalizeStudent(this.student);
     const p=this.profile, rng={seed:this.seed};
     const prefix=lessonPrefix(p.lesson,rng), kind=mode===4?practiceCorpus(p.goal):mode===2?'words':mode===3?'sentenc':'letters';
     this.corpusName=(prefix+kind).toUpperCase();
@@ -300,7 +304,10 @@ export class Session {
   save(storage, profiles) {
     const bytes=studentForSave(this.student); if (!bytes) return;
     const name=readStudent(bytes).name;
-    profiles.students[name]=Array.from(bytes); profiles.current=name;
+    // DOS filename matching is case-insensitive. Reuse an existing host key,
+    // without rewriting unrelated records or changing the stored layout.
+    const key=Object.keys(profiles.students).find(n=>n.toUpperCase()===name.toUpperCase())??name;
+    profiles.students[key]=Array.from(bytes); profiles.current=key;
     storage.setItem(SAVE_KEY,JSON.stringify(profiles)); this.student=bytes;
   }
 }

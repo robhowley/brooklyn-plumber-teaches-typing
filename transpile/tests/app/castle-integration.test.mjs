@@ -61,7 +61,9 @@ test('clean stationary rockface does not erase overlapping foreground pixels, di
 test('draw snapshots retain queue metadata despite later typing; op3 ignores attempts/failure/refresh',async()=>{
  const s=make(),r=await renderer();const initial=s.takeEffects();
  const text=initial.find(e=>e.type==='text'),before=Array.from(text.words);
+ const statistics=initial.find(e=>e.type==='statistics'&&e.operation===200),statsBefore={...statistics.stats};
  s.step(s.castle.queue.target,1,100);assert.deepEqual(Array.from(text.words),before);
+ assert.deepEqual(statistics.stats,statsBefore);assert.notEqual(s.castle.stats.attempts,statistics.stats.attempts);
  r.castle(initial,s.castle);assert.ok(r.front.some(v=>v));
  let t=2;for(;s.castle.phase!=='scroll';t++){assert.ok(t<6000);auto(s,t);s.takeEffects();}
  const attempts=s.castle.stats.attempts,ticks=s.castle.stats.ticks;

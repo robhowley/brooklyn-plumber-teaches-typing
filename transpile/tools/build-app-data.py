@@ -23,7 +23,7 @@ def sprite_record(sprite, root):
     return {**sprite, 'pixels': b64(root / sprite['indicesPath'])}
 
 for sprite in manifest['sprites']:
-    if sprite['family'] in ('WALKING', 'OUTSIDE', 'FONT5H', 'FONT7H', 'FONT9H', 'PRACTICE'):
+    if sprite['family'] in ('WALKING', 'OUTSIDE', 'FONT3H', 'FONT5H', 'FONT7H', 'FONT9H', 'PRACTICE') or (sprite['family'] == 'GREET2' and sprite['name'] == 'prefbox_1'):
         result['sprites'][sprite['family'] + '/' + sprite['name']] = sprite_record(sprite, ASSETS)
 # Enabled worlds use decoded family indices, never flattened resource indices.
 for sprite in render['sprites']:
@@ -44,12 +44,16 @@ for char, animation in water['animations'].items():
 bg = render['worlds']['water']['background']
 result['backgrounds']['WATER'] = {**bg, 'pixels': b64(RENDER / bg['indicesPath'])}
 for bg in manifest['backgrounds']:
-    if bg['name'] in ('MAINMENU', 'OUTSIDE', 'OUTSKY', 'PREFS', 'LESSTIME', 'BLACKBRD', 'PRACTICE'):
+    if bg['name'] in ('MAINMENU', 'OUTSIDE', 'OUTSKY', 'PREFS', 'LOAD', 'LESSTIME', 'BLACKBRD', 'PRACTICE', 'RCARD', 'HELP', 'KEYBOARD', 'GREETBG'):
         result['backgrounds'][bg['name']] = {**bg, 'pixels': b64(ASSETS / bg['indicesPath'])}
 for lesson in manifest['lessons']:
     result['lessons'][lesson['name']] = list((ASSETS / lesson['rawPath']).read_bytes())
 result['ground'] = b64(RENDER / render['ground']['indicesPath'])
 result['messages'] = {k: v['text'] for k,v in json.loads((ROOT / 'analysis/control/messages.json').read_text())['resources'].items()}
+control = json.loads((ROOT / '.tmp/report-evidence.json').read_text())
+result['control'] = {key: control[key] for key in ('teachers', 'strings', 'help', 'members')}
+menu = json.loads((ROOT / '.tmp/menu/evidence.json').read_text())
+result['control']['menu'] = {'members': menu['members'], 'prefBoxXs': menu['tables']['prefBoxXs']}
 result['tables'] = json.loads((ROOT / 'analysis/outdoor/tables.json').read_text())['tables']
 # 0x14298 selects OUTSKY + character OUT BAN/ANI. Decode BAN changes to persistent
 # backgrounds here; browser uses recovered updateSprite for ANI erasure/overlay.

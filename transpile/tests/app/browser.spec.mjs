@@ -10,8 +10,8 @@ test('entry/menu uses local decoded assets only; disabled controls and hover sur
  await point(page,250,85);await expect(page.locator('#game')).toHaveAttribute('data-screen','castle');
  await page.locator('#game').press('Escape');await expect(page.locator('#game')).toHaveAttribute('data-screen','results');
  await page.locator('#game').press('m');
- await point(page,30,4);await expect(page.locator('#status')).toContainText('Dropdowns are disabled');
- await page.locator('#game').press('m');await expect(page.locator('#status')).toContainText('disabled');
+ await point(page,30,4);expect((await page.evaluate(()=>translationSnapshot())).menu.row).toBe(1);
+ await page.locator('#game').press('m');await expect(page.locator('#status')).toContainText('Audio playback is not translated');
  await page.setViewportSize({width:390,height:800});await point(page,250,20);await expect(page.locator('#game')).toHaveAttribute('data-screen','outdoor');
  await expect.poll(async()=>page.evaluate(()=>translationSnapshot().outdoor.targetIndex)).toBeGreaterThanOrEqual(0);
  await page.screenshot({path:'transpile/reports/browser/outdoor-mobile.png'});

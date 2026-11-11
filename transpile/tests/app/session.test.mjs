@@ -36,6 +36,19 @@ test('student edits clamp durations and groups; save does not touch old app name
  assert.throws(()=>loadProfiles(storage),SyntaxError);s.save(storage,{students:{}});assert.equal(calls[0][0],SAVE_KEY);
  assert.throws(()=>editStudent(s.student,{goal:0}));assert.throws(()=>editStudent(s.student,{name:'TOO-LONG-NAME'}));
 });
+test('save overwrites a case-insensitive filename without migrating or changing unrelated records',()=>{
+ const s=session(),other=Array.from(newStudent('Other')),existing=Array.from(newStudent('tester'));
+ const profiles={current:'tester',students:{tester:existing,Other:other}};let saved;
+ s.save({setItem:(key,value)=>{assert.equal(key,SAVE_KEY);saved=JSON.parse(value);}},profiles);
+ assert.equal(saved.current,'tester');assert.deepEqual(Object.keys(saved.students),['tester','Other']);
+ assert.equal(saved.students.tester[4],'T'.charCodeAt(0));assert.deepEqual(saved.students.Other,other);
+ assert.equal(profiles.students.Other,other);
+});
+test('cancelled New leaves zero bytes, the next source service normalizes only its owned fields',()=>{
+ const s=session();s.student=new Uint8Array(260);s.start(1,1,100);
+ assert.equal(s.profile.profilePresent,false);assert.equal(s.profile.character,1);assert.equal(s.profile.lesson,1);
+ assert.equal(s.profile.goal,0);assert.equal(s.limit,120);
+});
 test('Outside reentry retains counters and observed seconds across Practice, not entry objects',()=>{
  const s=session();s.start(0);
  s.step(0,1,100);s.step(27,2,100);
@@ -63,5 +76,6 @@ test('Outside reentry retains counters and observed seconds across Practice, not
 test('DOS keyboard boundary rejects modified, non-ASCII and composition events',()=>{
  assert.equal(dosKey({key:'F10'}),0x144);assert.equal(dosKey({key:'x',altKey:true}),0x12d);
  assert.equal(dosKey({key:'a',ctrlKey:true}),0);assert.equal(dosKey({key:'é'}),0);assert.equal(dosKey({key:'a',isComposing:true}),0);
- assert.equal(dosKey({key:'Delete'}),127);assert.equal(dosKey({key:'a'}),97);
+ assert.equal(dosKey({key:'Delete'}),0x153);assert.equal(dosKey({key:'a'}),97);
+ for(const [key,code] of Object.entries({Home:0x147,End:0x14f,PageUp:0x149,PageDown:0x151,Insert:0x152,F9:0x143})) assert.equal(dosKey({key}),code);
 });
