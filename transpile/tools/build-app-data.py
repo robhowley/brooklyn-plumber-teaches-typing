@@ -1,6 +1,8 @@
 """Bundle inert decoded resources, never execute original code. Local-only, not MIT."""
 import base64
 import json
+import struct
+import hashlib
 import sys
 from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
@@ -23,9 +25,9 @@ def sprite_record(sprite, root):
 for sprite in manifest['sprites']:
     if sprite['family'] in ('WALKING', 'OUTSIDE', 'FONT5H', 'FONT7H', 'FONT9H', 'PRACTICE'):
         result['sprites'][sprite['family'] + '/' + sprite['name']] = sprite_record(sprite, ASSETS)
-# Only Water is enabled; Castle resources remain outside the app bundle.
+# Enabled worlds use decoded family indices, never flattened resource indices.
 for sprite in render['sprites']:
-    if sprite['family'] in ('IDLE', 'WATER', 'WATER_INLINE'):
+    if sprite['family'] in ('IDLE', 'WATER', 'WATER_INLINE', 'CASTLE'):
         result['sprites'][sprite['family'] + '/' + sprite['name']] = sprite_record(sprite, RENDER)
 for palette in manifest['palettes']:
     result['palettes'][palette['name']] = json.loads((ASSETS / palette['path']).read_text())['rgb8']
@@ -73,5 +75,30 @@ for char in 'MLP':
     result['bonusAnimations'][char.lower()] = {'frames': frames, 'backgroundsPath': path,
         'member': ani['member'], 'memberSha256': ani['memberSha256'], 'palette': 'OUTSKY.CRX',
         'source': 'MARIO.EXE FILE 0x14298..0x14360; 0x82e9..0x835b'}
+# Castle FILE d6a4..d74a, d8a4..d91f, de6c..df45. Expose actual BAN
+# writes, not frame differences: unchanged values still erase foreground art.
+exe = (ASSETS / 'raw/MarioTea/MARIO/MARIO.EXE.data').read_bytes()
+assert hashlib.sha256(exe).hexdigest() == '6caed439b64dc3bad8de4f9df53b63ae5712bf3c54b0bbfc00603557e4720f5e'
+castle = render['worlds']['castle']
+result['castle'] = {'bonusXs': list(struct.unpack_from('<3h', exe, 0x213b4)),
+                    'scenes': [b64(RENDER / s['indicesPath']) for s in castle['scenes']],
+                    'animations': {}, 'playback': castle['bonusPlayback']}
+result['backgrounds']['CASTLE'] = {**castle['background'], 'pixels': b64(RENDER / castle['background']['indicesPath'])}
+for char, palette in castle['palettes'].items():
+    result['palettes']['castle-' + char] = [c for rgb in palette['rgb8'] for c in rgb]
+class Writes:
+    def __init__(self):
+        self.rows = []
+    def __setitem__(self, key, value):
+        self.rows.append({'offset': key.start, 'pixels': base64.b64encode(value).decode()})
+for char in 'MLP':
+    name = char + 'CAS'
+    ban = (ASSETS / ('raw/MarioTea/MARIO/' + name + '.BAN.data')).read_bytes()
+    frames = []
+    for packet, entry in zip(packets[name + '.BAN'], tables[name + '.ANI'], strict=True):
+        writes = Writes()
+        decode_ban(ban[packet['offset']:packet['end']] + b'\xff\xff', writes)
+        frames.append({'writes': writes.rows, 'ani': sprite_record(entry, RENDER)})
+    result['castle']['animations'][char.lower()] = {'frames': frames}
 (ROOT / 'app/data.json').write_text(json.dumps(result, separators=(',', ':')) + '\n')
 print('Built app/data.json and assets/app/* from inert resources; no original execution')

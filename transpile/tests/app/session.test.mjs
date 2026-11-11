@@ -57,7 +57,8 @@ test('Outside reentry retains counters and observed seconds across Practice, not
  assert.equal(s.bonus.lastSecond,second);
  s.step(27,10,102);s.start(11,4);
  assert.equal(s.practice.lastCorrect,practiceTime);
- assert.throws(()=>s.start(12,3),/Unsupported/);
+ s.start(12,3);assert.equal(s.screen,'castle');
+ assert.throws(()=>s.start(13,5),/Unsupported/);
 });
 test('DOS keyboard boundary rejects modified, non-ASCII and composition events',()=>{
  assert.equal(dosKey({key:'F10'}),0x144);assert.equal(dosKey({key:'x',altKey:true}),0x12d);

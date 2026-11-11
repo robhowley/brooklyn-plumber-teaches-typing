@@ -1,6 +1,6 @@
-# Coverage of the integrated two-activity slice
+# Coverage of the integrated activities
 
-**Outside, Water and Practice are playable through results and Next. Castle remains disabled.** “Implemented” below means used by this browser app; “recovered-only” means evidence or tested helpers exist but the feature is not exposed. “Unknown” means a consequential detail is not established, not permission to invent it.
+**Outside, Water, Castle and Practice are playable through results and Next.** Castle numeric HUD layout and optional ending playback remain omitted, not complete. “Implemented” below means used by this browser app; “recovered-only” means evidence or tested helpers exist but the feature is not exposed. “Unknown” means a consequential detail is not established, not permission to invent it.
 
 ## Evidence map
 
@@ -28,12 +28,12 @@ All FILE offsets refer to `MarioTea/MARIO/MARIO.EXE`, SHA256 `6caed439b64dc3bad8
 | Menu hotkeys and world eligibility | Implemented for supported actions | C `0x111d8..0x114ce`; unsupported keys report disabled in host status |
 | Dropdown keyboard navigation | Recovered-only | `flow.mjs:menuNavigation`; no pretend dropdown event pump |
 | Dropdown pointer/layout/full commands | Recovered-only/unknown | C `0x10eea..0x110c7`; visibly disabled |
-| Next routing | Implemented | C `0x10412..0x10457`; group preserved when descending to Outside, reset only on change to Water/Castle; unsupported destination stops with notice |
+| Next routing | Implemented | C `0x10412..0x10457`; group preserved when descending to Outside, reset only on change to Water/Castle; all four supported modes retain source routing; Practice Next stays mode4 |
 | New student/defaults | Implemented data, adapted UI | C `0xe39c`, `0xee28..0xee83`; eight ASCII characters, goal5/group1/character1/durations2,5,5,10 |
 | Student name collision | Implemented | C `0xed97..0xedbd`; browser name store loads existing profile, does not reset it |
 | Group selection | Implemented data, adapted UI | C `0x11668..0x11696`, groups1..6 and MSD300..305; browser select replaces disabled dropdown |
 | Goal/character editor | Implemented fields, adapted UI | C student offsets +17/+1d; goal editor bounds not fully translated, host positive-word validation; character1..3 |
-| Duration editor | Implemented Outside/Practice fields, adapted UI | C `0x90e1..0x90f5`, `0x12c90`; clamp1..60, zero default and signed multiplication retained; Practice uses field+36/default600s; inactive-world durations remain stored without an editor |
+| Duration editor | Implemented all four duration fields, adapted UI | C `0x90e1..0x90f5`, `0x12c90`; clamp1..60, zero default and signed multiplication retained; Practice uses field+36/default600s; Water/Castle use fields+32/+34 and default300s |
 | Save/load structure | Implemented, host transport | C 260-byte .STU offsets and save magic; namespaced localStorage, no filesystem I/O or old app saves |
 | Last-used student | Adapted | C carryon op identified; browser `current` pointer, not original carryon file |
 | Delete/load chooser/original text cursor widgets | Recovered-only/unknown | C `0xf653`, student op0xb05; host selector only, no delete |
@@ -83,12 +83,12 @@ All FILE offsets refer to `MarioTea/MARIO/MARIO.EXE`, SHA256 `6caed439b64dc3bad8
 | Results image/buttons/keys | Implemented | C `0x164dc..0x167bb`; inclusive Next/Menu bounds, Enter pointer semantics, Next does not increment again |
 | Result speech | Recovered-only | `resultSpeech`, previousGoal comparison; silent |
 | Water advancement | Implemented | C `0x17e24`; failure/abort gates, cached score, strict >30 completion; optional Phase5 animation explicitly skipped |
-| Castle advancement | Recovered-only | C `0xda44`; Castle disabled |
+| Castle advancement | Implemented | C `0xda44`; failure/exit gates, cached WPM, lesson/goal and completion flags; ending request explicitly acknowledged as omitted before results |
 | Ending flags/ending art | Recovered-only/unknown playback | C `0xdf46`, A ENDF; not presented |
 | Certificate queue | Recovered-only | C `0x103d0..0x103f0`; separate completion/printed/pending bytes retained; queue/print commands disabled |
 | Printer and certificate output | Unknown transport | CERTIF artwork decoded, no browser print substitute |
 
-## Water and Practice (implemented), Castle (disabled)
+## Water, Castle and Practice
 
 | Original area | Status | Evidence and limit |
 |---|---|---|
@@ -98,26 +98,26 @@ All FILE offsets refer to `MarioTea/MARIO/MARIO.EXE`, SHA256 `6caed439b64dc3bad8
 | Water inactivity/failure/sinking | Implemented | W `0x176e6`, >20 any-input inactivity, chase/sink through results/Next |
 | Water bonus | Implemented | W `0x17560`, `0x17ef9`; all three56-packet movies, two changed-tick waits, timer stop/restore/input flush |
 | Water presentation | Implemented except HUD/audio/fades | FONT9H(0,47), FONT7H bonus, BITER slots48..63, ordered dirty actors and source wave tiles; optional celebration disabled until Phase5 |
-| Castle sentences/metadata queue | Recovered-only | W `0xbb06..0xbf47`; case-sensitive32..126 and completion flags |
-| Castle rockfaces/movement | Recovered-only | W `0xc410..0xc921`; fixed tables, stage positions, no general collision engine |
-| Castle pipes/scroll transitions | Recovered-only | W `0xc082`, `0xca14`, `0xd127`; timed/scripted segments |
-| Castle sand/text progress/sinking | Recovered-only | W `0xcd7a`, `0xc36e`; WPM position and scripted failure |
-| Castle timeout/accuracy/inactivity failure | Recovered-only | W `0xbc7e`, `0xbffb`; separate flags, no invented lives |
-| Castle BGS/clipping/bonus bindings | Recovered-only, decoded/tested | R BGS: four320×129 scenes at y26, forty eight-pixel strips, inclusive clips, world palettes and exact frame/ANI bindings; controller-selected clips, transition scratch compositor and bonus restoration remain unintegrated |
+| Castle sentences/metadata queue | Implemented | W `0xbb06..0xbf47`; case-sensitive32..126 and completion flags |
+| Castle rockfaces/movement | Implemented | W `0xc410..0xc921`; fixed tables, stage positions, no general collision engine |
+| Castle pipes/scroll transitions | Implemented | W `0xc082`, `0xca14`, `0xd127`; timed/scripted segments |
+| Castle sand/text progress/sinking | Implemented | W `0xcd7a`, `0xc36e`; WPM position and scripted failure |
+| Castle timeout/accuracy/inactivity failure | Implemented | W `0xbc7e`, `0xbffb`; separate flags, no invented lives |
+| Castle BGS/clipping/bonus bindings | Implemented except HUD/audio/fades | R BGS and CASTLE: four320×129 scenes at y26, forty eight-pixel strips with scratch/bias and pre-scroll actor position, inclusive clips, final palettes, FONT9H metadata and exact BAN write/ANI operations for all3 movies; same-value writes preserved |
 | Practice corpus/expression/key acceptance | Implemented | T exact runtime cursor/input and W `practiceCorpus/practiceExpression`; all15 real corpora, case-sensitive32..127 or CR, no inactivity loss |
 | Practice line wrap/prefill | Implemented | T `0xb3e1..0xb4d3`, exact10x33 buffer/nine fills, LF early return, partial-word rewind, NUL and repeated-overlong-word quirks preserved |
 | Practice duration/exit/results | Implemented | W `0xb1e6`, `0xb5c2`, `0xb809`; default600s/configured field, Esc early exit, F10 ignored, no progression, mode4 Next preserved |
 
 | Practice art/font/face | Implemented, partial presentation adaptation | PRACTICE.CRX/GSO indices0..2, FONT5H; face142,21, rows30,96+10*r; host HUD and static cursor replace unintegrated text callbacks |
 
-### Water integration and Castle gate
+### World integration and remaining gates
 
 - Water now honors pending suppression (`0x17943..0x1794c`), conditional RNG order, source waits, failure/results and bonus restoration. [Controller](analysis/worlds/WATER-CONTROLLER.md), [render evidence](analysis/render/WATER.md) and [Phase2 report](reports/PHASE-2.md) define the integration. Browser scheduling/typematic/focus and omitted audio/celebrations remain explicit limits.
-- Castle requires the metadata text queue, operation2/3 separation, rockface stages,40-step scrolls, pipe delays with repeated random draws, sand entrance/exit, failure loops and repeated scene cycle (`0xbb06..0xde2d`). Numeric helpers are not a complete controller. CASTLE.BGS packing, visible strips and clip call sites are now recovered (R BGS); transition scratch-background/special-compositor integration and controller-selected ordering remain pending. No substitute backgrounds or scene schedule are fabricated.
-- Shared RNG/corpus and BAN/ANI decoding resolve dependencies, not these activity controllers. Existing [worlds mechanics](analysis/worlds/MECHANICS.md), [coverage mapping](analysis/worlds/coverage.json) and [render limits](analysis/render/RENDERING.md) enumerate bounded evidence and gaps. This is not an exhaustive decompilation claim.
+- Castle integrates the full metadata queue and repeating scene controller (`0xbb06..0xde2d`), operation2/3 separation, old-position rock triggers, typing locks, repeated pipe RNG comparisons, sand entry/active/exit and both failure loops. Clean stationary rocks do not redraw. Source-key Chrome tests run two cycles for each character; source/pixel tests check scratch restoration and all40 strips. [Phase3](reports/PHASE-3.md) records checks and pending independent review.
+- Water/Castle controllers reuse the shared RNG/corpus and BAN/ANI decoders; numeric helpers alone are not used as a substitute for their full source scene loops. Existing [worlds mechanics](analysis/worlds/MECHANICS.md), [coverage mapping](analysis/worlds/coverage.json) and [render limits](analysis/render/RENDERING.md) enumerate bounded evidence and gaps. This is not an exhaustive decompilation claim.
 
 ## Resources and proof limits
 
-A independently validates20 CRX backgrounds,567 indexed GSO/font sprites,15 lesson files,177 messages, ANI tables and archive/member hashes. R additionally validates145 GCO idle frames,628 BAN packets, nine ANI coordinate tables, exact tile and palette splice/mask/origin rules. Phase 1 adds four BGS scenes and144 Water/Castle/inline sprite records (289 total in the render manifest), world palettes and decoded ANI rasters. Phase2 adds only Water resources to app data; Castle remains disabled. VOC metadata is not audio playback. No executable, driver or archive script was launched, interpreted or emulated.
+A independently validates20 CRX backgrounds,567 indexed GSO/font sprites,15 lesson files,177 messages, ANI tables and archive/member hashes. R additionally validates145 GCO idle frames,628 BAN packets, nine ANI coordinate tables, exact tile and palette splice/mask/origin rules. Phase 1 adds four BGS scenes and144 Water/Castle/inline sprite records (289 total in the render manifest), world palettes and decoded ANI rasters. Phase2 adds Water resources; Phase3 adds Castle scenes/sprites/palettes, source bonus-X words and exact52-packet BAN/ANI write runs for each character to ignored app data. VOC metadata is not audio playback. No executable, driver or archive script was launched, interpreted or emulated.
 
 The tests compare source-derived expectations and browser behavior, not an executed DOS reference. This matrix is bounded by the recovered reports; it is not a claim that every original routine has been decompiled.

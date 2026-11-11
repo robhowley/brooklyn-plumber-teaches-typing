@@ -17,7 +17,11 @@
 /analysis/runtime/corpora.json
 /analysis/worlds/strings.json
 /analysis/worlds/tables.json
-# Water static traces/evidence remain local, including future focused listings.
+# World static traces/evidence remain local, including future focused listings.
+/analysis/worlds/castle-*.txt
+/analysis/worlds/castle-evidence.json
+/analysis/render/castle-*.txt
+/analysis/render/castle-evidence.json
 /analysis/worlds/water-*.txt
 /analysis/worlds/water-evidence.json
 /analysis/render/water-*.txt

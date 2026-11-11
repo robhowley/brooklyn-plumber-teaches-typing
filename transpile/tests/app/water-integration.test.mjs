@@ -79,7 +79,7 @@ test('cached timeout and final wait precede results; celebration omission does n
   s.step(0,1093,160);assert.equal(s.screen,'results');assert.equal(s.advance.advanced,true);
   assert.equal(s.profile.goal,30);assert.equal(s.profile.completed[1],completed);
   assert.equal(s.result.elapsedSeconds,60);assert.equal(s.clock.ticks,1093);
-  assert.equal(s.next(1200).mode,3);assert.equal(s.screen,'results'); // Castle remains disabled
+  assert.equal(s.next(1200).mode,3);assert.equal(s.screen,'castle'); // Water progression now routes into Castle
  }
 });
 test('real Renderer consumes draw-time snapshots, source waves, prompt, bonus pixels and restoration',async()=>{

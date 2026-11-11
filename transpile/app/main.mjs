@@ -30,6 +30,7 @@ function draw() {
   if(session.screen==='menu') renderer.menu(p);
   else if(session.screen==='student'||session.screen==='times') renderer.setup(p,session.screen==='times');
   else if(session.cinematic) renderer.cinematic(p.character,session.cinematic.frame);
+  else if(session.screen==='castle') renderer.castle(session.takeEffects(),session.castle);
   else if(session.screen==='water') renderer.water(session.takeEffects(),session.water);
   else if(session.screen==='outdoor') renderer.outdoor(session.outdoor,session.stats(),session.bonus);
   else if(session.screen==='practice') renderer.practice(session.practice,session.stats(),session.expression(Math.floor(Date.now()/1000)),session.typed);
@@ -41,12 +42,12 @@ function draw() {
 }
 function focusGame() {
   canvas.focus(); session.suspend(false,now()); pendingKey=0; session.input.flush();
-  notice(session.screen==='water'?'Water. Match case. Any input resets inactivity; after >20 seconds the chase begins. Escape or F10 ends.':session.screen==='practice'?'Practice. Match case. SPACE or Enter at line ends. Escape ends the activity.':session.screen==='outdoor'?'Outside. Type the marked target. Escape or F10 ends the activity.':'1 Outside · 4 Practice · W new student · E edit · T times · N Next'); draw();
+  notice(session.screen==='castle'?'Castle. Match case. Escape ends. Numeric HUD, fades, audio and optional ending playback are not yet translated.':session.screen==='water'?'Water. Match case. Any input resets inactivity; after >20 seconds the chase begins. Escape or F10 ends.':session.screen==='practice'?'Practice. Match case. SPACE or Enter at line ends. Escape ends the activity.':session.screen==='outdoor'?'Outside. Type the marked target. Escape or F10 ends the activity.':'1 Outside · 2 Water · 3 Castle · 4 Practice · W new student · E edit · T times · N Next'); draw();
 }
 function start(mode=1) { form.hidden=true; pendingKey=0; session.start(now(),mode); focusGame(); }
 function next() {
   const route=session.next(now()); pendingKey=0;
-  if(![1,2,4].includes(route.mode)) notice(`${data.messages[99+route.mode]} is not implemented. Next routes there at goal ${session.profile.goal}; no substitute activity was started.`);
+  if(![1,2,3,4].includes(route.mode)) notice(`${data.messages[99+route.mode]} is not implemented. Next routes there at goal ${session.profile.goal}; no substitute activity was started.`);
   else focusGame();
   draw();
 }
@@ -56,7 +57,7 @@ function openEditor(kind) {
   editorReturn=session.screen==='results'?'results':'menu'; isNew=kind==='new';
   const p=isNew ? new Session(data,{bytes:newStudent('Student')}).profile:session.profile;
   session.screen=kind==='times'?'times':'student'; form.hidden=false;
-  const values={name:isNew?'':p.name,lesson:p.lesson,goal:p.goal,character:p.character,minutes:p.durations[0]||2,waterMinutes:p.durations[1]||5,practiceMinutes:p.durations[3]||10};
+  const values={name:isNew?'':p.name,lesson:p.lesson,goal:p.goal,character:p.character,minutes:p.durations[0]||2,waterMinutes:p.durations[1]||5,castleMinutes:p.durations[2]||5,practiceMinutes:p.durations[3]||10};
   for(const [key,value] of Object.entries(values)) form.elements[key].value=value;
   for(const key of ['name','lesson','goal','character']) form.elements[key].disabled=kind==='times';
   notice('Browser editor. Values use recovered student fields; original widget behavior is not claimed.'); draw();
@@ -74,7 +75,8 @@ function menuAction(command) {
     if(canSelectMode(2,session.profile)) start(2);
     else notice('Water requires goal 10 WPM.');
   } else if(command==='castle') {
-    notice('Castle is disabled: not implemented.');
+    if(canSelectMode(3,session.profile)) start(3);
+    else notice('Castle requires goal 30 WPM.');
   } else if(!['none','unrecognized','close-menu'].includes(command)) notice(`${command} is disabled in this slice. See fidelity note below.`);
   draw();
 }
@@ -91,7 +93,7 @@ canvas.addEventListener('keydown',event=>{
   const key=dosKey(event); if(!key)return;
   event.preventDefault();
   if(session.active) {
-    if(!session.suspended && session.mode===2) session.enqueue(key);
+    if(!session.suspended && [2,3].includes(session.mode)) session.enqueue(key);
     else if(!session.suspended && !session.cinematic && !pendingKey) pendingKey=key; // Outside/Practice host latch
   } else if(session.screen==='menu') menuAction(mainMenuCommand(key));
   else if(session.screen==='results') resultsAction(resultCommand(key,pointer.x,pointer.y));
@@ -103,7 +105,7 @@ function locationInCanvas(event) {
 canvas.addEventListener('pointermove',event=>{
   pointer=locationInCanvas(event);
   const hit=session.screen==='menu'?mainMenuHit(pointer.x,pointer.y):-1;
-  canvas.style.cursor=session.screen==='menu'&&hit>=0?([0,3,5].includes(hit)||(hit===1&&canSelectMode(2,session.profile))?'pointer':'not-allowed'):session.screen==='results'&&resultHit(pointer.x,pointer.y)?'pointer':'default';
+  canvas.style.cursor=session.screen==='menu'&&hit>=0?([0,3,5].includes(hit)||([1,2].includes(hit)&&canSelectMode(hit+1,session.profile))?'pointer':'not-allowed'):session.screen==='results'&&resultHit(pointer.x,pointer.y)?'pointer':'default';
 });
 canvas.addEventListener('click',event=>{
   pointer=locationInCanvas(event); canvas.focus();
@@ -149,11 +151,18 @@ form.addEventListener('submit',event=>{
   } catch(error) { notice(error.message); }
 });
 for(let i=1;i<=6;i++) form.elements.lesson.add(new Option(data.messages[299+i],i));
-refreshStudents(); notice('1 Outside · 4 Practice · W new student · E edit · T times · N Next. Click the canvas to focus.'); draw();
+refreshStudents(); notice('1 Outside · 2 Water · 3 Castle · 4 Practice · W new student · E edit · T times · N Next. Click the canvas to focus.'); draw();
 setInterval(()=>{
   if(!session.active||session.suspended)return;
   const key=pendingKey;pendingKey=0;
-  try { session.step(key,now()); }
+  try {
+    session.step(key,now());
+    if(session.castleEnding) {
+      // Explicit Phase5 omission acknowledgement, not a guessed wait or RNG draw.
+      renderer.castle(session.takeEffects(),session.castle);
+      session.acknowledgeCastleEnding({omitted:true,reason:'Phase5 ending playback is not translated'});
+    }
+  }
   catch(error) { session.suspend(true,now()); notice(`Application stopped: ${error.message}`); return; }
   if(session.screen==='results') {
     save(); selection=0;
@@ -171,4 +180,10 @@ window.translationSnapshot=()=>({screen:session.screen,profile:session.profile,r
     swimmer:{...session.water.swimmer},pursuer:{...session.water.pursuer},bonus:{...session.water.bonus},
     failed:session.water.failed,failurePhase:session.water.failurePhase,aborted:session.water.aborted,
     lastInput:session.water.lastInput,timedOut:session.water.timedOut,movie:structuredClone(session.waterMovie)}:null,
+  castle:session.castle?{phase:session.castle.phase,cycle:session.castle.cycle,stage:session.castle.stage,
+    x:session.castle.x,y:session.castle.y,scene:session.castle.scene,sceneType:session.castle.sceneType,
+    words:Array.from(session.castle.queue.words.slice(0,40)),target:session.castle.queue.target,
+    locked:session.castle.locked,stats:{...session.castle.stats},flags:{...session.castle.flags},
+    bonus:{...session.castle.bonus},movie:structuredClone(session.castleMovie),
+    persistent:{...session.castlePersistent},ending:session.castleEnding?.event??null,endingAck:session.castleEndingAck??null}:null,
   outdoor:session.outdoor?structuredClone(session.outdoor):null});

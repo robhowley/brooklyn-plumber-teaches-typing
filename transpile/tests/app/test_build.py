@@ -37,9 +37,10 @@ class AppDataTests(unittest.TestCase):
         self.assertEqual(sum(k.startswith('IDLE/') for k in data['sprites']), 145)
         for key, sprite in data['sprites'].items():
             self.assertEqual(key, sprite['family'] + '/' + sprite['name'])
-        self.assertNotIn('worlds', data)  # only enabled Water fields enter the app
+        self.assertNotIn('worlds', data)  # explicit enabled-world app schema
         self.assertIn('water', data)
-        self.assertFalse(any(s['family']=='CASTLE' for s in data['sprites'].values()))
+        self.assertEqual(sum(s['family']=='CASTLE' for s in data['sprites'].values()), 15)
+        self.assertIn('castle', data)
         self.assertEqual(set(manifest['worlds']), {'water', 'castle'})
         for world in manifest['worlds'].values():
             for record in [world['background'], *world.get('scenes', [])]:
@@ -66,6 +67,40 @@ class AppDataTests(unittest.TestCase):
             for frame, source in zip(frames, bindings['animations'][char]['frames'], strict=True):
                 self.assertEqual(frame['writes'], source['writes'])
                 self.assertEqual(base64.b64decode(frame['ani']['pixels']), (ROOT/'assets/render'/source['ani']['indicesPath']).read_bytes())
+
+    def test_castle_scene_font_palette_and_exact_ban_write_transport(self):
+        data = json.loads((ROOT / 'app/data.json').read_text())
+        manifest = json.loads((ROOT / 'assets/render/manifest.json').read_text())
+        packets = json.loads((ROOT / 'assets/render/ban-packets.json').read_text())
+        raw = ROOT / 'assets/original/raw/MarioTea/MARIO'
+        exe = (raw / 'MARIO.EXE.data').read_bytes()
+        self.assertEqual(data['castle']['bonusXs'], list(struct.unpack_from('<3h', exe, 0x213b4)))
+        self.assertEqual(exe[0xc186:0xc18b], bytes.fromhex('832e065008'))
+        self.assertEqual(exe[0xc50d:0xc50f], bytes.fromhex('7431'))
+        for got, scene in zip(data['castle']['scenes'], manifest['worlds']['castle']['scenes'], strict=True):
+            self.assertEqual(base64.b64decode(got), (ROOT/'assets/render'/scene['indicesPath']).read_bytes())
+        self.assertEqual(data['castle']['playback']['tickWaitsPerPacket'], 2)
+        for char in 'MLP':
+            frames = data['castle']['animations'][char.lower()]['frames']
+            self.assertEqual(len(frames), 52)
+            ban = (raw / (char+'CAS.BAN.data')).read_bytes()
+            ani = (raw / (char+'CAS.ANI.data')).read_bytes()
+            background = bytearray(64000)
+            same_value_writes = 0
+            for packet, frame in zip(packets[char+'CAS.BAN'], frames, strict=True):
+                before = background[:]
+                decode_ban(ban[packet['offset']:packet['end']] + b'\xff\xff', background)
+                transported = before[:]
+                for write in frame['writes']:
+                    values = base64.b64decode(write['pixels']); offset = write['offset']
+                    same_value_writes += sum(a == b for a,b in zip(transported[offset:offset+len(values)], values))
+                    transported[offset:offset+len(values)] = values
+                self.assertEqual(transported, background)
+                actor = frame['ani']; start = actor['rasterOffset']+8
+                self.assertEqual(struct.unpack_from('<hhI', ani, actor['offset']), (actor['x'],actor['y'],actor['rasterOffset']))
+                self.assertEqual(base64.b64decode(actor['pixels']), ani[start:start+actor['width']*actor['height']])
+            self.assertGreater(same_value_writes, 0)  # cannot replace runs with frame diffs
+            self.assertEqual(data['palettes']['castle-'+char.lower()], [v for rgb in manifest['worlds']['castle']['palettes'][char.lower()]['rgb8'] for v in rgb])
 
     def test_rebuild_is_identical(self):
         paths = [ROOT / 'app/data.json', *sorted((ROOT / 'assets/app').glob('*.indices'))]

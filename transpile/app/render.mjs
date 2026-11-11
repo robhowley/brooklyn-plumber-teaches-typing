@@ -1,4 +1,7 @@
-import { blitSprite, drawGround, characterFrame, updateSprite, spriteRect, clipRect } from '../recovered/render/render.mjs';
+import { CASTLE_CLIPS, drawCastleText, beginCastleTransition, stepCastleTransition,
+  finishCastleTransition, drawCastleBonusActor, castleBonusBlock, beginCastleBonus,
+  finishCastleBonus, drawCastleBonusPacket } from './castle-render.mjs';
+import { blitSprite, drawGround, characterFrame, updateSprite, spriteRect, clipRect, drawCastleScene } from '../recovered/render/render.mjs';
 import { waterActorOperations, drawWaterOperations, drawWaterText, waterBonusSprite, drawWaterBonusPacket } from './water-render.mjs';
 const bytes = text => Uint8Array.from(atob(text), c=>c.charCodeAt(0));
 // Indexed full-scene redraw is a host adaptation; origins, masks, tile, palette
@@ -25,6 +28,11 @@ export class Renderer {
       .sort((a,b)=>a[1].index-b[1].index).map(([name,sprite])=>({sprite,pixels:this.pixels[name]}));
     this.waterResources={water:records('WATER'),bubbles:records('WATER_INLINE')};
     this.font9=records('FONT9H'); this.font7=records('FONT7H');
+    this.castleScenes=this.data.castle.scenes.map(bytes);
+    this.castleAnimations=Object.fromEntries(Object.entries(this.data.castle.animations).map(([char,a])=>[char,a.frames.map(f=>({
+      writes:f.writes.map(w=>({offset:w.offset,pixels:bytes(w.pixels)})),
+      current:{x:f.ani.x,y:f.ani.y,sprite:f.ani,pixels:bytes(f.ani.pixels)}
+    }))]));
     this.waves=this.data.water.waves.map(bytes);
     this.waterAnimations=Object.fromEntries(Object.entries(this.data.water.animations).map(([char,a])=>[char,a.frames.map(f=>({
       writes:f.writes.map(w=>({offset:w.offset,pixels:bytes(w.pixels)})),
@@ -90,7 +98,8 @@ export class Renderer {
     if(duration) {
       this.text(`Outside: ${profile.durations[0]} min`,64,76);
       this.text(`Water: ${profile.durations[1]} min`,64,93);
-      this.text(`Practice: ${profile.durations[3]} min`,64,110);
+      this.text(`Castle: ${profile.durations[2]} min`,64,110);
+      this.text(`Practice: ${profile.durations[3]} min`,64,127);
     } else {
       this.text(`Student Name: ${profile.name}`,40,80);
       this.text(`Goal WPM: ${profile.goal}`,40,94);
@@ -190,6 +199,60 @@ export class Renderer {
       } else if(e.type==='restore-scene') this.front.set(scene);
       else if(e.type==='restore-palette') this.palette='water-'+['m','l','p'][state.character];
       // Audio/fades and optional Phase5 presentation are explicitly disabled.
+    }
+    this.present();
+  }
+  castleActor(frame,x,y) {
+    const entry=Object.entries(this.data.sprites).find(([,s])=>s.family===frame.family&&s.index===frame.index);
+    if(!entry) throw new Error(`Missing Castle actor ${frame.family}/${frame.index}`);
+    const [name,sprite]=entry; return {sprite,pixels:this.pixels[name],x,y};
+  }
+  castle(effects,state) {
+    const rect=a=>({left:a[0],top:a[1],right:a[2],bottom:a[3]});
+    for(const e of effects) {
+      if(e.type==='scene') {
+        this.castleBackground=this.backgrounds.CASTLE.slice();
+        drawCastleScene(this.castleBackground,this.castleScenes[e.scene]);
+        this.front.set(this.castleBackground); this.castleClip=CASTLE_CLIPS.full;
+        this.castleBonus=null; this.palette='castle-'+['m','l','p'][state.character-1];
+        this.castleBlock=castleBonusBlock(this.castleActor({family:'CASTLE',index:14},0,0),this.font7[state.bonus.code-32]);
+      } else if(e.type==='clip') this.castleClip=rect(e.rect);
+      else if(e.type==='clip-save-full') this.castleClip=CASTLE_CLIPS.full;
+      else if(e.type==='clip-restore') this.castleClip=rect(e.rect);
+      else if(e.type==='rockface-init'||e.type==='rockface') {
+        const rock=r=>this.castleActor({family:'CASTLE',index:r.resourceIndex},r.x,r.y);
+        updateSprite(this.front,this.castleBackground,rock(e.current),e.previous?rock(e.previous):null,this.castleClip);
+      } else if(e.type==='player') {
+        const current=this.castleActor(e.frame,e.x,e.y), previous=this.castleActor(e.oldFrame,e.oldX,e.oldY);
+        if(e.special) stepCastleTransition(this.front,this.castleBackground,this.castleTransition,current,previous,rect(e.clip));
+        else updateSprite(this.front,this.castleBackground,current,previous,rect(e.clip));
+      } else if(e.type==='player-erase') updateSprite(this.front,this.castleBackground,null,this.castleActor(e.frame,e.x,e.y),this.castleClip);
+      else if(e.type==='scroll-begin') this.castleTransition=beginCastleTransition(this.castleBackground,this.castleScenes[e.scene],e.y);
+      else if(e.type==='scroll-end') finishCastleTransition(this.front,this.castleBackground,this.castleTransition);
+      else if(e.type==='text') drawCastleText(this.front,this.castleBackground,e.words,this.font9.map(g=>g.pixels));
+      else if(e.type==='text-clear') this.front.set(this.castleBackground.subarray(0,26*320));
+      else if(e.type==='pipe-draw'||e.type==='pipe-erase') {
+        const actor=this.castleActor(e,e.x,e.y);
+        updateSprite(this.front,this.castleBackground,e.type==='pipe-draw'?actor:null,e.type==='pipe-erase'?actor:null,this.castleClip);
+      } else if(e.type==='bonus-actor') {
+        const current={...this.castleBlock,x:e.x,y:e.y},previous={...this.castleBlock,x:e.oldX,y:e.oldY};
+        drawCastleBonusActor(this.front,this.castleBackground,current,previous,state.sceneType,this.castleClip);
+        this.castleBonus=current;
+      } else if(e.type==='bonus-erase') {
+        if(this.castleBonus) drawCastleBonusActor(this.front,this.castleBackground,null,this.castleBonus,state.sceneType,this.castleClip);
+        this.castleBonus=null;
+      } else if(e.type==='bonus-playback') {
+        beginCastleBonus(this.front,this.castleBackground,state.sceneType,this.castleScenes[0]);
+        this.castleMoviePrevious=null;
+      } else if(e.type==='castle-packet') {
+        const packet=this.castleAnimations[['m','l','p'][state.character-1]][e.frame];
+        drawCastleBonusPacket(this.front,this.castleBackground,packet.writes,packet.current,this.castleMoviePrevious);
+        this.castleMoviePrevious=packet.current;
+      } else if(e.type==='bonus-restore') {
+        finishCastleBonus(this.front,this.castleBackground,state.sceneType,this.castleScenes[2]);
+        this.castleBonus=null; this.palette='castle-'+['m','l','p'][state.character-1];
+      }
+      // Numeric HUD layout, fades, Ready audio and Phase5 endings are omitted.
     }
     this.present();
   }
