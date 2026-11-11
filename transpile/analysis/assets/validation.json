@@ -1,0 +1,14 @@
+{
+  "archiveSha256": "b59886a6f7b48b0057c8db1c099ed598c8a3581245b0f8884316203de55784bd",
+  "buildCommand": "python3 tools/assets/pipeline.py",
+  "testCommand": "python3 -B -m unittest discover -s tests/assets -p 'test_*.py'",
+  "workingDirectory": "transpile/",
+  "testTool": "structured_return",
+  "testResult": {"passed": 19, "failed": 0},
+  "reproducibility": "Test rebuilds every output from the hash-verified archive in a fresh directory and compares complete relative-path to SHA-256 maps.",
+  "priorResearchComparison": {"backgroundPixelHashesAgree": 20, "spriteOffsetsAndDimensionsAgree": 567},
+  "newAnimationDecode": {"members": 9, "tableEntries": 489, "distinctRastersWithinMembers": 218},
+  "visualInspection": ["assets/original/backgrounds/OUTSIDE.png"],
+  "notVerified": ["runtime palette binding", "sprite mask/transparency", "animation timing and invocation", "BAN/GCO/BGS decoding", "audio synthesis", "original gameplay behavior"],
+  "originalCodeExecuted": false
+}

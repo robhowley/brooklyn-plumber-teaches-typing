@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Mario Teaches Typing, static translation</title><link rel="stylesheet" href="./app/style.css"></head>
+<body>
+<main>
+  <h1>Mario Teaches Typing</h1>
+  <canvas id="game" width="320" height="200" tabindex="0" aria-label="Original game canvas. 1 Outside, 4 Practice, W new student, E edit student, T lesson times, N Next. Escape exits activity."></canvas>
+  <p id="status" role="status">Loading decoded resources...</p>
+  <section aria-label="Browser host controls">
+    <p class="caption">Browser host controls (not original game UI)</p>
+    <div class="controls"><button id="focus">Focus game</button><button id="suspend" disabled>Suspend</button><button id="new">W · New student</button><button id="edit">E · Edit student</button><button id="times">T · Lesson times</button><label>Saved student <select id="students"><option value="">Choose...</option></select></label><button id="load">L · Load</button></div>
+    <form id="setup" hidden>
+      <p id="editor-label">Browser editor, original input-widget details are not yet translated.</p>
+      <label>Name <input name="name" maxlength="8" required pattern="[ -~]{1,8}" autocomplete="off"></label>
+      <label>Group <select name="lesson"></select></label>
+      <label>Goal WPM <input name="goal" type="number" min="1" max="32767" required></label>
+      <label>Teacher <select name="character"><option value="1">Mario</option><option value="2">Luigi</option><option value="3">Princess</option></select></label>
+      <label>Outside minutes <input name="minutes" type="number" min="1" max="60" required></label>
+      <label>Practice minutes <input name="practiceMinutes" type="number" min="1" max="60" required></label>
+      <button type="submit">Done</button><button id="cancel" type="button">Cancel</button>
+    </form>
+    <p>Click the canvas, then type. Outside accepts the next target immediately, even at a distance. Escape or F10 ends the activity; results: N Next, M Menu, arrows/Tab select, Enter uses pointer position.</p>
+    <details open><summary>Fidelity and disabled commands</summary><p>Playable: Outside and Practice with original art, recovered corpus cursors, movement, scoring, early exit and Next routing. Practice preserves case and accepts SPACE or Enter at line ends. No invented lives, countdown or Practice failure.</p><p>Disabled: dropdowns, Water, Castle, report, demo, help, keyboard screen, audio, certificates, quit, title and progression cinematics. Outside bonus BAN/ANI plays with stopped lesson time. Outside palettes, transparent index zero, additive sprite origins, ground tile and idle frames are recovered. Full-scene redraw, HUD placement, complete text-engine behavior and static Practice cursor remain browser adaptations. Student controls above are browser adaptations.</p><p>Focus loss suspends updates and active time. Click Focus game to resume. No original pause key is claimed. Default seed is low16 of current host epoch seconds (DOS timezone rules are not reproduced). Reproducible entry seed: <code>?seed=1</code>. Saves use only <code>mtt-static-translation.students.v1</code>.</p><p><a href="./README.md">Run and checks</a> · <a href="./COVERAGE.md">Coverage</a> · <a href="./ASSUMPTIONS.md">Assumptions and integration hooks</a></p></details>
+  </section>
+</main><script type="module" src="./app/main.mjs"></script>
+</body></html>

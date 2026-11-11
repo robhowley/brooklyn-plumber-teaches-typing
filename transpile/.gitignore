@@ -1,0 +1,57 @@
+# Local original-derived resources, never publish or apply repository MIT license.
+/assets/
+/app/data.json
+/analysis/**/*.data
+/analysis/**/*.elf
+# Static listings/byte evidence and generated original text/numeric resources.
+/analysis/**/*.asm.txt
+/analysis/**/disassembly.txt
+/analysis/**/verified-disassembly.txt
+/analysis/control/byte-slices.json
+/analysis/control/messages.json
+/analysis/control/tables.json
+/analysis/outdoor/evidence.json
+/analysis/outdoor/tables.json
+/analysis/render/evidence.json
+/analysis/runtime/evidence.json
+/analysis/runtime/corpora.json
+/analysis/worlds/strings.json
+/analysis/worlds/tables.json
+/recovered/worlds/tables.mjs
+# Worker checkouts and host scratch must stay on disk, outside accidental adds.
+/.worktrees/
+/.tmp/
+/.pi/
+/.scratch/
+/scratch/
+.DS_Store
+*.pid
+*.pid.lock
+*.sock
+.env
+.env.*
+**/__pycache__/
+*.pyc
+*.log
+# Local worker transcripts, status bundles, browser screenshots and test artifacts.
+/reports/**/*.json
+/reports/**/*.jsonl
+/reports/**/*.xml
+/reports/**/*.png
+/reports/**/*.webm
+/reports/**/*.zip
+/reports/**/*.txt
+/reports/browser/artifacts/
+# Worker handoffs/transcripts carry local paths and tool/session metadata.
+/reports/research/
+/reports/implementation/
+/reports/integration/
+/reports/verification-logs/
+/reports/continuation/
+# Inert executable/archive bundles, if copied locally.
+*.zip
+*.EXE
+*.exe
+*.COM
+*.com
+*.data

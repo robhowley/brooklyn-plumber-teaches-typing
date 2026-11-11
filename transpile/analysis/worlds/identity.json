@@ -1,0 +1,9 @@
+{
+  "archiveSha256": "b59886a6f7b48b0057c8db1c099ed598c8a3581245b0f8884316203de55784bd",
+  "member": "MarioTea/MARIO/MARIO.EXE",
+  "sha256": "6caed439b64dc3bad8de4f9df53b63ae5712bf3c54b0bbfc00603557e4720f5e",
+  "headerBytes": 11776,
+  "dsFileBase": "0x1f270",
+  "instructionsByteVerified": true,
+  "method": "ZIP byte read and static code16 disassembly only; linear data is not proven executable"
+}

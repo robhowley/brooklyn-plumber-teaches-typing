@@ -1,0 +1,27 @@
+{
+  "commands": [
+    {
+      "command": "python3 transpile/tools/runtime/inspect.py",
+      "runner": "structured_return",
+      "result": "passed",
+      "verifiedExecutableSpans": 24,
+      "hashVerifiedCorpora": 15,
+      "method": "ZIP reads and trusted static objdump only; printed instruction bytes compared to original archive member"
+    },
+    {
+      "command": "node --test transpile/tests/runtime/runtime.test.mjs",
+      "runner": "structured_return",
+      "parseAs": "node-test-text",
+      "result": "passed",
+      "tests": 17,
+      "failures": 0
+    }
+  ],
+  "limits": [
+    "Only newly authored JavaScript and static byte analysis ran, never original code or an emulator",
+    "Source-derived arithmetic/branch tests, not differential execution against DOS",
+    "No browser, renderer, audio or cinematic validation",
+    "DOS TZ parser and historical daylight predicate retained as static evidence but not translated",
+    "No app or other lane modified; integration examples are documented, not executed"
+  ]
+}

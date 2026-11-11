@@ -1,0 +1,28 @@
+{
+  "source": {
+    "member": "MarioTea/MARIO/MARIO.EXE",
+    "sha256": "6caed439b64dc3bad8de4f9df53b63ae5712bf3c54b0bbfc00603557e4720f5e",
+    "offsetKind": "executable FILE offsets",
+    "archiveSha256": "b59886a6f7b48b0057c8db1c099ed598c8a3581245b0f8884316203de55784bd"
+  },
+  "routines": [
+    {"export":"score", "module":"scoring.mjs", "ranges":[["0x15bac","0x15d77"]], "status":"direct arithmetic translation", "criticalBranches":["0x15ca0 signed attempts <= 0 skips profile accuracy write", "0x15d53 low-word store precedes signed negative clamp"]},
+    {"export":"timer", "module":"scoring.mjs", "ranges":[["0x15afb","0x15b8c"],["0x15bee","0x15c2f"]], "status":"direct transition predicates, explicit supplied tick sample"},
+    {"export":"canSelectMode", "module":"flow.mjs", "ranges":[["0x11465","0x114d2"]], "status":"direct predicates"},
+    {"export":"nextRoute", "module":"flow.mjs", "ranges":[["0x10412","0x10457"]], "status":"direct branch translation"},
+    {"export":"progression", "module":"flow.mjs", "ranges":[["0x13d4a","0x13db2"],["0x17e24","0x17e99"],["0xda44","0xdae6"]], "status":"direct progression arithmetic and gate predicates; animations/save side effects returned as decisions", "criticalBranches":["0x13d96 JLE skips completion at exactly 10", "0x17e7e JLE skips completion at exactly 30", "0xdab2 JL selects ending2 below45, castle goal uncapped"]},
+    {"export":"queueCertificates", "module":"flow.mjs", "ranges":[["0x103be","0x103f8"]], "status":"direct pending predicate; no printing"},
+    {"export":"corpusRoute", "module":"flow.mjs", "ranges":[["0x92af","0x935a"],["0x9485","0x9491"]], "status":"direct filename routing; random value supplied; English extension only"},
+    {"export":"mainMenuHit", "module":"flow.mjs", "ranges":[["0x11121","0x11169"],["0x21708","0x21738"]], "status":"six right-side half-open boxes only"},
+    {"export":"mainMenuCommand", "module":"flow.mjs", "ranges":[["0x111d8","0x113d1"],["0x11a37","0x11aef"]], "status":"English DOS key-command mapping; localized initials not generalized"},
+    {"export":"menuNavigation", "module":"flow.mjs", "ranges":[["0x1169e","0x119f7"],["0x10f2c","0x10f35"]], "status":"dropdown row/column changes only"},
+    {"export":"newStudent", "module":"student.mjs", "ranges":[["0xe39c","0xe3bc"],["0xee28","0xee85"],["0xeb91","0xebd2"]], "status":"direct defaults; name already accepted; no editor"},
+    {"export":"normalizeStudent", "module":"student.mjs", "ranges":[["0xe184","0xe1d0"]], "status":"signed clamps before student service dispatch"},
+    {"export":"studentForSave", "module":"student.mjs", "ranges":[["0xe2df","0xe36f"]], "status":"binary preparation, no filesystem transport"},
+    {"export":"recordProblemKey/problemKeys", "module":"student.mjs", "ranges":[["0xe41c","0xe4f1"]], "status":"counter/ranking translation, presentation fallback omitted"},
+    {"export":"resultHit/resultCommand/resultSpeech", "module":"results.mjs", "ranges":[["0x165a9","0x16608"],["0x16648","0x16762"],["0x167bb","0x167f3"]], "status":"direct conditions and English key mapping"},
+    {"export":"clampLessonMinutes/lessonLimitSeconds", "module":"results.mjs", "ranges":[["0x90e1","0x90f9"],["0x12c90","0x12cbc"]], "status":"direct signed arithmetic, supplied default"}
+  ],
+  "resourceEvidence": "messages.json contains original ENGLISH.MSD resource IDs and member offsets; identity.json contains all archive-member SHA256 values",
+  "limits": ["No original execution or dynamic comparison", "No complete UI or browser implementation", "No hidden printer/audio/OS emulation", "No invented pause key", "No RNG implementation", "No claim that byte verification proves every linear-disassembly boundary"]
+}

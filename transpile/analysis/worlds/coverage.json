@@ -1,0 +1,29 @@
+{
+  "source": "MarioTea/MARIO/MARIO.EXE",
+  "sha256": "6caed439b64dc3bad8de4f9df53b63ae5712bf3c54b0bbfc00603557e4720f5e",
+  "offsetKind": "original member FILE offset, hexadecimal",
+  "translated": [
+    {"function":"durationSeconds","ranges":["16d0e-16d34","b1e6-b20c","d949-d96f"],"state":["DS:50c8 water minutes","DS:50ca castle minutes","DS:50cc practice minutes"],"limits":"Caller supplies default300 or600; low-word signed product preserved"},
+    {"function":"waterCharacter","ranges":["17892-178e5"],"limits":"Ordinary input branch only; bonus/special command dispatch excluded"},
+    {"function":"practiceCorpus","ranges":["b10f-b138"],"state":["DS:50bf goal","DS:50b7 corpus mode"]},
+    {"function":"practiceCharacter","ranges":["b73d-b7e0"],"state":["DS:41c3 cursor","DS:41e6 target row","DS:41b3 last-correct time"],"limits":"Returns next-line action; wrapping and drawing excluded"},
+    {"function":"practiceExpression","ranges":["b4f6-b547","b343-b36d"],"resources":["PRACTICE.GSO indices0,1,2"]},
+    {"function":"castleFailure","ranges":["bc7e-bcd0"],"state":["DS:46e2 failure","DS:46d5 last-input time"],"limits":"Operation2 only; no timing-unit conversion"},
+    {"function":"waterSwimmer","ranges":["17301-17453"],"state":["DS:4c9b peak","DS:4c99 delay","DS:5006 x","DS:5004 y","DS:4c1a update counter","DS:4ff8 frame","DS:4c1f ended"],"limits":"Random bubble spawn/rendering excluded"},
+    {"function":"waterPursuer","ranges":["1711d-172cf"],"state":["DS:4c31 mode","DS:4c33 frame","DS:4c35 y","DS:4c37 x","DS:4c39 drawnX","DS:4c21 savedY","DS:4c1d failurePhase"],"resources":["WATER.GSO indices18..22 bite","WATER.GSO indices23..32 octo"]},
+    {"function":"waterBubble","ranges":["17013-170f5"],"state":["record+0 active","+1 x","+3 y","+5 dx","+7 dy","+9 large"],"resources":["inline sprites DS:2a9c and DS:2aa8"],"limits":"Caller owns ten-slot pool allocation and scheduling"},
+    {"function":"castleApproach","ranges":["c7f3-c845"],"state":["BP-0x10 velocity","BP-0xc target","DS:5006 x"]},
+    {"function":"castleRockface","ranges":["c451-c4d9"],"state":["DS:469f +18*index","record+0 x","+2 y","+8 phase"],"resources":["CASTLE.GSO indices0..3"],"limits":"Valid phase0,1..32,100; no rendering or collision invented"},
+    {"function":"castleSand","ranges":["cd7a-cdac"],"state":["DS:50b9 WPM","DS:468b text target","DS:5006 x","DS:5004 y"]},
+    {"function":"castleTextTarget","ranges":["bf30-bf47"],"state":["DS:4689 correct in segment","DS:468d queue length","DS:468b target"],"limits":"Positive queue length or0; preserve signed16 low product"}
+  ],
+  "notTranslated": [
+    {"area":"practice line wrapping","range":"b3e1-b4d3","reason":"32-byte lookahead/rewind and long-word cases require additional contract proof"},
+    {"area":"castle sentence collection","range":"dd93-ddfa","reason":"Shared circular corpus lifecycle and fatal error callback not implemented"},
+    {"area":"bonus animation","ranges":["17801-17890","bdba-be80","17ef9-17fa3","de6c-df45"],"reason":"BAN/ANI payload and shared bonus activation remain unresolved"},
+    {"area":"pause and extended keys","ranges":["177e4-177ff","bd65-bdae","b712-b73a"],"reason":"Shared keyboard translation and option gates not translated"},
+    {"area":"castle scripted pipe/scene rendering","ranges":["c082-c27b","ca14-cb14","d127-d227","cefa-d378"],"reason":"Draw/clipping/decompression and synchronization omitted; sequence documented"},
+    {"area":"RNG and scheduling","reason":"No original-machine execution; seed and update cadence not recovered here"},
+    {"area":"full gameplay equivalence","reason":"No claim; unit tests validate authored translations against statically derived expectations only"}
+  ]
+}

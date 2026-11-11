@@ -1,0 +1,172 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { i16, upperCode, random15, lessonBytes, nextTarget, selectLessonSegment,
+  makeObstacle, motion, idleFrame, createOutdoor, updatePlayer, updateObstacles,
+  updateParticles, selectTarget, acceptKey, tick, makeBonus, updateBonus, JUMP_Y, CURSOR_FRAMES, BLOCK_HEIGHTS } from '../../recovered/outdoor/outdoor.mjs';
+const root = new URL('../../analysis/outdoor/', import.meta.url);
+const tables = JSON.parse(readFileSync(new URL('tables.json', root)));
+const evidence = JSON.parse(readFileSync(new URL('evidence.json', root)));
+const idleSchedule = tables.tables.marioIdle.values, idlePeriod = 90;
+const options = { idleSchedule, idlePeriod };
+const state = () => createOutdoor({ bytes: Buffer.from('asdf'), seed: 1 });
+const span = (offset, length) => {
+  const record = evidence.spans.find(s => parseInt(s.start) <= offset && parseInt(s.endExclusive) >= offset + length);
+  assert.ok(record, `covered FILE ${offset.toString(16)}`);
+  return Buffer.from(record.hex, 'hex').subarray(offset - parseInt(record.start), offset - parseInt(record.start) + length);
+};
+
+test('tables and lowercase classification match copied executable bytes', () => {
+  for (const [name, translated] of [['jumpY', JUMP_Y], ['cursorFrames', CURSOR_FRAMES], ['blockHeights', BLOCK_HEIGHTS]]) {
+    const t = tables.tables[name], b = span(parseInt(t.fileOffset), translated.length * 2);
+    assert.deepEqual([...translated], t.values);
+    assert.deepEqual([...translated], Array.from({ length: translated.length }, (_, i) => b.readInt16LE(i * 2)));
+  }
+  const flags = span(0x1f270 + 0x3903, 256);
+  assert.deepEqual([...flags.keys()].filter(i => flags[i] & 8), Array.from({ length: 26 }, (_, i) => 97 + i));
+  for (let c = 0; c < 256; c++) assert.equal(upperCode(c), flags[c] & 8 ? c - 32 : c);
+  assert.equal(upperCode(-1), -1);
+  assert.equal(upperCode(0x161), 65);
+});
+
+test('source opcodes preserve strict spacing, countdown and loop order', () => {
+  assert.equal(span(0x13070, 5).toString('hex'), 'c746f8dc00');
+  assert.equal(span(0x13cdf, 6).toString('hex'), '26c747180600');
+  const calls = evidence.callEdges.filter(c => parseInt(c.from) >= 0x139c7 && parseInt(c.from) <= 0x139dd);
+  assert.deepEqual(calls.map(c => parseInt(c.to)), [0x1436c, 0x13852, 0x135c9, 0x13058, 0x12f59, 0x133f7]);
+});
+
+test('lesson resources are hash-verified and filtered without random letters', () => {
+  for (const item of tables.lessons) {
+    const b = readFileSync(new URL(item.localFile, root));
+    assert.equal(createHash('sha256').update(b).digest('hex'), item.sha256);
+    const s = { bytes: lessonBytes(b), index: 0 };
+    for (let i = 0; i < 1000; i++) { const c = nextTarget(s); assert.ok(c > 32 && c < 127 && c !== 126); }
+  }
+  const s = { bytes: lessonBytes(Uint8Array.from([13, 10, 32, 126, 97, 96, 127, 200, 98, 26, 99])), index: 0 };
+  assert.deepEqual([nextTarget(s), nextTarget(s), nextTarget(s), nextTarget(s)], [65, 96, 66, 65]);
+  assert.throws(() => lessonBytes(Buffer.from('~ \r\n')), /No outdoor targets/);
+  const segmented = { bytes: lessonBytes(Buffer.from('a~b~c')), index: 0 };
+  selectLessonSegment(segmented, 32767);
+  assert.equal(nextTarget(segmented), 66); // two delimiter scans include prepended sentinel
+});
+
+test('LCG agrees with independent BigInt arithmetic including overflow', () => {
+  for (const seed of [0, 1, 0x12345678, 0xffffffff, 0x80000000]) {
+    const next = Number((BigInt(seed) * 0x015a4e35n + 1n) & 0xffffffffn);
+    assert.deepEqual(random15(seed), { seed: next, value: (next >>> 16) & 32767 });
+  }
+});
+
+test('type boundary and degenerate height selection are exact', () => {
+  assert.equal(makeObstacle(65, 16383).type, 1);
+  assert.equal(makeObstacle(65, 16384).type, 2);
+  for (let r = 0; r < 32768; r++) assert.equal(makeObstacle(65, 0, r).y, 57);
+  assert.equal(makeObstacle(65, 32767).x, 283);
+  assert.equal(makeObstacle(65, 32767).xOffset, 30);
+});
+
+test('pursuit uses truncated signed division, asymmetric bias and old scroll', () => {
+  const base = { x: 20, cursorX: 31, mode: 0, followX: 99, scroll: 1, speed: 5 };
+  assert.deepEqual(motion(base), { followX: 20, dx: 0, x: 20, scroll: 0 });
+  assert.equal(motion({ ...base, cursorX: 32 }).dx, 1);
+  assert.equal(motion({ ...base, cursorX: 30 }).dx, -2);
+  assert.equal(motion({ ...base, cursorX: 293 }).dx, 8);
+  assert.equal(motion({ ...base, cursorX: -1 }).scroll, 9);
+  assert.equal(motion({ ...base, x: 1, cursorX: 0 }).x, 0);
+  assert.equal(motion({ ...base, speed: 32767, cursorX: 319 }).scroll, Math.trunc(i16(32767 * 319) / 160));
+});
+
+test('far-away target accepts lowercase immediately, no collision/input buffer', () => {
+  const s = state(); s.obstacles[0] = makeObstacle(65, 0); selectTarget(s);
+  assert.equal(s.cursorX, 293);
+  assert.equal(acceptKey(s, 97), 'correct');
+  assert.equal(s.mode, 1); assert.equal(s.jumpIndex, 0);
+  assert.equal(s.obstacles[0].countdown, 6); assert.equal(s.obstacles[0].code, 0);
+  selectTarget(s);
+  assert.equal(acceptKey(s, 115), 'ignored'); assert.equal(s.attempts, 1);
+  assert.equal(s.errors, 0);
+});
+
+test('wrong, space, DEL and nonprintable keys have distinct semantics', () => {
+  const s = state(); s.obstacles[0] = makeObstacle(65, 32767); selectTarget(s);
+  for (const c of [0, 13, 128, 0x13b]) assert.equal(acceptKey(s, c), 'ignored');
+  assert.equal(acceptKey(s, 32), 'wrong'); assert.equal(acceptKey(s, 127), 'wrong');
+  assert.equal(acceptKey(s, 65), 'correct'); assert.equal(s.mode, 0); // turtle doesn't jump
+  assert.deepEqual([s.attempts, s.correct, s.errors], [3, 1, 2]);
+});
+
+test('spawn threshold is >220, removal is sixth update, one-slot shift', () => {
+  const s = state(); s.scroll = 0; s.obstacles[0] = makeObstacle(65, 0); s.obstacles[0].x = 221;
+  updateObstacles(s); assert.equal(s.obstacles.filter(o => o.active).length, 1);
+  s.obstacles[0].x = 220; updateObstacles(s); assert.equal(s.obstacles.filter(o => o.active).length, 2);
+  selectTarget(s); acceptKey(s, 65);
+  for (let n = 0; n < 5; n++) updateObstacles(s);
+  assert.equal(s.obstacles[0].countdown, 1);
+  const events = updateObstacles(s);
+  assert.ok(events.some(e => e.id === 4)); assert.equal(s.particles.length, 4);
+  assert.equal(s.obstacles[0].code, 65); // first lesson character was generated for second object
+});
+
+test('debris gravity, scroll and inclusive clipping bounds', () => {
+  const s = state(); s.scroll = 1;
+  s.particles = [{ x: 10, y: 50, vx: -2, vy: -6 }, { x: 310, y: 131, vx: 0, vy: 0 }, { x: 0, y: 0, vx: 0, vy: 0 }];
+  updateParticles(s);
+  assert.deepEqual(s.particles, [{ x: 7, y: 44, vx: -2, vy: -5 }, { x: 309, y: 131, vx: 0, vy: 1 }]);
+  updateParticles(s); assert.equal(s.particles.length, 1);
+});
+
+test('jump sequence, landing override, idle threshold and frame wrap', () => {
+  const s = state(); s.mode = 1; const ys = [];
+  for (let n = 0; n < 12; n++) { updatePlayer(s, idleSchedule, idlePeriod); ys.push(s.y); }
+  assert.deepEqual(ys, [90, 71, 64, 62, 62, 65, 70, 88, 90, 90, 90, 85]);
+  assert.equal(s.mode, 0); assert.equal(s.jumpIndex, 0);
+  assert.equal(idleFrame(179, idleSchedule, idlePeriod).ticks, 0);
+  const stationary = state(); stationary.cursorX = -1;
+  for (let n = 0; n < 4; n++) updatePlayer(stationary, idleSchedule, idlePeriod);
+  assert.equal(stationary.frame.kind, 'run');
+  updatePlayer(stationary, idleSchedule, idlePeriod); assert.equal(stationary.frame.kind, 'idle');
+});
+
+test('end-to-end loop starts moving before input and keeps old ground scroll', () => {
+  const s = state();
+  tick(s, { ...options, key: 97 });
+  assert.equal(s.groundPhase, 1); assert.equal(s.scroll, 9);
+  assert.equal(s.obstacles[0].x, 284); assert.equal(s.correct, 1); assert.equal(s.mode, 1);
+  assert.equal(s.y, 90); // jump starts on NEXT iteration
+  for (let n = 0; n < 12; n++) tick(s, options);
+  assert.equal(s.mode, 0); assert.equal(s.y, 85);
+});
+
+test('timeout is checked after updates; pending jump state is overwritten next timeout', () => {
+  const s = state(); tick(s, { ...options, key: 97 });
+  tick(s, { ...options, elapsed: 120, key: 115 });
+  assert.equal(s.mode, 2); assert.equal(s.ended, false); assert.equal(s.attempts, 1);
+  tick(s, { ...options, elapsed: 120 });
+  assert.equal(s.mode, 3); assert.equal(s.ended, true);
+  const aborted = state(); tick(aborted, { ...options, key: 27 });
+  assert.equal(aborted.ended, true); assert.equal(aborted.aborted, true);
+});
+
+test('bonus uses separate second and iteration clocks, then intercepts punctuation', () => {
+  const b = makeBonus(1, 120, true);
+  assert.equal(b.countdown, 15); assert.ok(b.code >= 33 && b.code <= 47);
+  updateBonus(b, 20, 100); assert.equal(b.countdown, 14); // no 100-second catchup
+  updateBonus(b, 20, 100); assert.equal(b.countdown, 14);
+  for (let second = 101; second < 115; second++) updateBonus(b, 20, second);
+  assert.equal(b.mode, 2); assert.equal(b.countdown, 45);
+  const oldX = b.x; updateBonus(b, 300, 114); assert.equal(b.x, oldX + 1);
+  const s = state();
+  const events = tick(s, { ...options, bonus: b, key: b.code });
+  assert.ok(events.some(e => e.type === 'bonus-cinematic-required'));
+  assert.equal(s.attempts, 0); assert.equal(b.countdown, 0);
+  updateBonus(b, 20, 115); assert.equal(b.mode, 0);
+});
+
+test('no-input simulation stops scrolling near earliest unsolved obstacle', () => {
+  const s = state();
+  for (let n = 0; n < 400; n++) tick(s, options);
+  assert.ok(s.cursorX >= 0 && s.cursorX < 32);
+  assert.equal(s.scroll, 0); assert.equal(s.attempts, 0); assert.equal(s.ended, false);
+});
