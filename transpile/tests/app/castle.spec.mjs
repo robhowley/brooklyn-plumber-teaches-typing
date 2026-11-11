@@ -43,7 +43,7 @@ for(const char of [1,2,3])test(`Castle character${char}: actual source-key two-c
  await page.locator('#game').press('Escape');await page.clock.runFor(120);s=await snap(page);
  expect(s.screen).toBe('results');expect(s.castle.flags.exit).toBe(true);expect(s.profile.lesson).toBe(1);
  await page.locator('#game').press('n');s=await snap(page);expect(s.screen).toBe('castle');expect(s.castle.stats.attempts).toBe(0);
- expect(s.profile.character).toBe(char);await page.locator('#game').press('Escape');await page.clock.runFor(120);
+ expect(s.profile.character).toBe(char);await page.clock.runFor(120);await page.waitForFunction(()=>!translationSnapshot().audioHost.blocking);await page.locator('#game').press('Escape');await page.clock.runFor(120);
  await page.locator('#game').press('m');
  for(const mode of ['1','2','3','4','3']) {
   await page.clock.runFor(300);await page.locator('#game').press(mode);await page.clock.runFor(300);

@@ -17,8 +17,8 @@ async function pixels(page) {return page.evaluate(()=>Array.from(document.queryS
 test('real dropdown mouse and keyboard choose the same group and options, outside click cannot start a world',async({page})=>{
  await ready(page);await point(page,240,4);await point(page,210,28);expect((await snap(page)).profile.lesson).toBe(3);
  await press(page,'Enter');await press(page,'ArrowDown');await press(page,'ArrowDown');await press(page,'Enter');expect((await snap(page)).profile.lesson).toBe(3);
- await point(page,30,4);await point(page,30,44);expect((await snap(page)).menu.options).toBe(1);
- await press(page,'m');expect((await snap(page)).menu.options).toBe(0);
+ await point(page,30,4);await point(page,30,44);expect((await snap(page)).menu.options).toBe(6);
+ await press(page,'m');expect((await snap(page)).menu.options).toBe(7);
  await point(page,30,4);await point(page,250,110);await expect(page.locator('#game')).toHaveAttribute('data-screen','menu');
  await press(page,'q');await expect(page.locator('#status')).toContainText('cannot quit');
 });
@@ -90,7 +90,7 @@ test('all four HUDs use exact original values, origins, palette and font pixels;
 });
 test('palette88 welcome intercept precedes world hit, and blocked storage/resource errors stay visible',async({page})=>{
  const altered=structuredClone(data);const front=Buffer.from(altered.backgrounds.MAINMENU.pixels,'base64');front[20*320+250]=88;altered.backgrounds.MAINMENU.pixels=front.toString('base64');
- await page.route('**/app/data.json',r=>r.fulfill({json:altered}));await ready(page);await point(page,250,20);await expect(page.locator('#game')).toHaveAttribute('data-screen','menu');await expect(page.locator('#status')).toContainText('welcome sound requested');
+ await page.route('**/app/data.json',r=>r.fulfill({json:altered}));await ready(page);await point(page,250,20);await expect(page.locator('#game')).toHaveAttribute('data-screen','menu');await expect.poll(async()=> (await snap(page)).audio.some(e=>e.request.name==='welcome')).toBe(true);
  await page.addInitScript(()=>{Storage.prototype.setItem=function(){throw new Error('blocked');};});await page.reload();await skipStartupUI(page);await expect(page.locator('#game')).toHaveAttribute('data-screen','menu');await press(page,'w');await page.keyboard.type('TEST');await press(page,'Enter');await press(page,'Escape');await expect(page.locator('#status')).toContainText('storage unavailable');
  await page.unroute('**/app/data.json');await page.route('**/app/data.json',r=>r.fulfill({json:{...data,sprites:{}}}));await page.reload();await expect(page.locator('#status')).toContainText('Missing decoded font');
 });

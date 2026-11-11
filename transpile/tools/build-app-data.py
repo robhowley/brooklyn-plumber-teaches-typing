@@ -78,7 +78,9 @@ for char in 'MLP':
     (ROOT / path).write_bytes(backgrounds)
     result['bonusAnimations'][char.lower()] = {'frames': frames, 'backgroundsPath': path,
         'member': ani['member'], 'memberSha256': ani['memberSha256'], 'palette': 'OUTSKY.CRX',
-        'source': 'MARIO.EXE FILE 0x14298..0x14360; 0x82e9..0x835b'}
+        'source': 'MARIO.EXE FILE 0x14298..0x14360; 0x82e9..0x835b',
+        'playback': {'callbackFileOffset': '0x14259', 'tickWaitsPerPacket': 2,
+                     'sound7OneBasedFrames': list((ASSETS / 'raw/MarioTea/MARIO/MARIO.EXE.data').read_bytes()[0x219e7:0x219f2])}}
 # Castle FILE d6a4..d74a, d8a4..d91f, de6c..df45. Expose actual BAN
 # writes, not frame differences: unchanged values still erase foreground art.
 exe = (ASSETS / 'raw/MarioTea/MARIO/MARIO.EXE.data').read_bytes()
@@ -115,5 +117,9 @@ result['startup'] = {
                 for family, rows in startup['sprites'].items()},
     'letters': startup['letters'], 'letterX': startup['letterX'], 'members': startup['members']}
 result['celebration'] = json.loads((RENDER / 'celebration/bindings.json').read_text())
+audio_root = ROOT / 'assets/audio'
+audio = json.loads((audio_root / 'manifest.json').read_text())
+result['audio'] = {**audio, 'clips': {name: {**clip, 'pcm': b64(audio_root / clip['path'])}
+                                      for name, clip in audio['clips'].items()}}
 (ROOT / 'app/data.json').write_text(json.dumps(result, separators=(',', ':')) + '\n')
 print('Built app/data.json and assets/app/* from inert resources; no original execution')

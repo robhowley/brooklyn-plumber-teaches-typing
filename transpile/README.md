@@ -1,6 +1,6 @@
 # Mario Teaches Typing, static JavaScript translation
 
-**Startup, explicit Demo, menu idle and source celebrations/endings now join the four playable worlds.** Phase4 was verified and pushed as `2f9ad12` (parent status). Phase5 is local; checks and remaining gaps are recorded in [PHASE-5](reports/PHASE-5.md). No Phase5 commit/push or independent approval is claimed.
+**Four exact VOC clips now play at source call boundaries across the four playable worlds.** Phase5 was independently verified and pushed as `764788a` (user-provided status). Phase6 is independently verified, main checkpoint pending:309 Node +45 Python +42 Chrome and live4179 smoke passed. Two fresh18-script bootstraps matched2,543 files and38 listing headers. This is bounded recovery, not full-game completion or a resource publication. Evidence: [FINAL](reports/FINAL.md); ordered remaining scope: [PLAN](PLAN.md#remaining-recoverable-work-in-order).
 
 ```sh
 python3 -m http.server 4179 --bind 127.0.0.1 --directory transpile
@@ -16,7 +16,7 @@ Open **http://127.0.0.1:4179/**. Native JavaScript and Python are sufficient; no
 - Outside accepts the marked target immediately, including lowercase equivalents. Type a displayed bonus punctuation key to play its recovered BAN/ANI sequence; lesson time stops during playback.
 - Practice preserves case. Copy the second text row into the first; at the line end press **SPACE or Enter**. Nine source rows remain buffered. Wrapping uses the original cursor/rewind algorithm, including its overlong-word quirk, not conventional word wrap.
 - Water matches case in the highlighted word window. Any input resets inactivity; strictly more than20 seconds starts the scripted chase and sink. Bonus punctuation stops lesson time during MSWM/LSWM/PSWM playback.
-- Castle repeats rockfaces, pipe1, sand and pipe2. Match the colored FONT9H target; bonus punctuation plays MCAS/LCAS/PCAS with stopped lesson time. Escape exits; F10 is ignored. Advancement plays its source ending; first graduation repeats ENDF until a key. Audio and intermediate world fades remain unsupported.
+- Castle repeats rockfaces, pipe1, sand and pipe2. Match the colored FONT9H target; bonus punctuation plays MCAS/LCAS/PCAS with stopped lesson time. Escape exits; F10 is ignored. Advancement plays its source ending; first graduation repeats ENDF until a key. Music/effect synthesis and intermediate world fades remain unsupported.
 - **Escape** ends any activity early; **F10** also ends Outside/Water but is ignored in Practice. There are no lives, countdown, contact typing gate or invented Practice failure.
 - Results: **N Next**, **M / Escape Menu**. Enter activates the pointer position; Tab/arrows select the original button positions. Space does not activate results.
 - Use the original dropdowns with pointer or arrows/Enter. **W / E / T / L** open original canvas New/Edit/Times/Load paths. Name fields uppercase letters/digits, accept8 characters, and consume ordinary keys instead of launching menu shortcuts. Home/End, Insert/Delete/Backspace work. Numeric fields clamp goal5..150 and each duration1..60.
@@ -31,8 +31,10 @@ Guest `Player` is unsaved and is not Demo. New students default to goal5, group1
 
 - Recovered: lesson bytes/cursors, shared activity RNG draws, low16 seed, Outside mechanics/order, bonus interception and timer stop/restart, Practice rows/input/expression, scoring/results/progression, sprite origins/index-zero mask, ground, final Outside palettes, decoded idle and bonus rasters.
 - Host adaptations: epoch clocks, approximately18.2Hz scheduling, Outside/Practice single-key latch, Water/Castle unbounded FIFO, focus pause, full-scene Outside/Practice redraw, native fallback form, localStorage and safe short-help bounds. Original student caret inversion uses4/2 changed-low-tick waits, without catchup.
-- Unsupported: audio playback, actual printing, intermediate world/modal fades, DOS timezone/hardware behavior, original mouse imagery and the Practice input blink. Startup/celebration fades preserve all source palette writes without guessed per-write delays. Welcome text still uses an explicit provisional color mapping.
-- Quit is visible but cannot terminate a browser process or close this tab. Storage/resource failures stay visible; no generic art or corpus is substituted.
+- Audio: four exact PCM VOC clips (158,254 samples), source request/stop/options and blocking continuations. Supplied CNF selects speech3, music/effects4 and options7. Browser availability and trusted-gesture unlock are explicit adaptations; skipped requests never replay later.
+- **Enable browser audio** unlocks transport; **Mute browser audio** is separate from source M/S/G. VOC speech drains input until completion. Locked, denied, muted, missing, blurred or suspended playback is visibly omitted without a guessed delay. Water's already-running lesson timer includes Ready; only the explicit host focus policy pauses it.
+- Unsupported: 58 music/effect/RS/driver/bank resources, certificate chooser/text output and actual printing, intermediate world/modal fades, DOS timezone/hardware behavior, original mouse imagery, finger-hint graphics and the Practice input blink. Startup/celebration fades preserve all source palette writes without guessed per-write delays. Welcome text still uses an explicit provisional color mapping.
+- Alt-X queries signed KWD>=10, not audio bit0x10. With no browser KWD environment it is consumed without quit/abort outside the ordinary menu; menu Quit remains unconditional, notice only. Quit cannot terminate a browser process or close this tab. Storage/resource failures stay visible; no generic art or corpus is substituted.
 
 `?seed=1` fixes the **process entry seed**, including startup and subsequent menu/world/firework draws. Natural seed1 startup consumes13 RNG draws and291 changed-low-tick observations; skipped title delays consume fewer. Menu callbacks also consume source-timed draws, so input timing changes later lessons. This is a static translation, not an executed DOS replay. State is retained across supported activities. There is no source-selector interstitial or three-second countdown.
 
@@ -49,7 +51,7 @@ See [coverage](COVERAGE.md), [adaptations](ASSUMPTIONS.md) and [Phase 1 results]
 | `app/render.mjs` | Calls recovered indexed renderer; isolates host drawing choices |
 | `app/data.json`, `assets/app/` | Local generated resources, ignored by Git |
 | `tools/build-app-data.py` | Bundles inert resources; applies tested Python BAN decoder |
-| `recovered/{control,outdoor,worlds,runtime,render}/` | Source-cited, tested APIs, including Phase 1 retained-state and world-render primitives |
+| `recovered/{audio,control,outdoor,worlds,runtime,render}/` | Source-cited, tested APIs, including Phase 1 retained-state and world-render primitives |
 | `assets/render/manifest.json` | Local next-phase world API: `worlds`, family/index sprite records, palettes, scenes and ANI paths; all paths relative to this manifest |
 | `analysis/*/` | Executable FILE offsets, hashes, resource indices and limits |
 
@@ -65,16 +67,18 @@ python3 -B transpile/tools/control/menu-inspect.py
 python3 -B transpile/tools/control/report-inspect.py
 python3 -B transpile/tools/control/startup-inspect.py
 python3 -B transpile/tools/control/celebration-inspect.py
+python3 -B transpile/tools/audio/decode.py
 python3 -B transpile/tools/build-app-data.py
-node --test transpile/tests/{app,control,outdoor,worlds,runtime,render}/*.test.mjs
+node --test transpile/tests/{app,control,outdoor,worlds,runtime,render,audio}/*.test.mjs
 python3 -B -m unittest discover -s transpile/tests/assets -p 'test_*.py'
 python3 -B -m unittest discover -s transpile/tests/render -p 'test_*.py'
 python3 -B -m unittest discover -s transpile/tests/app -p 'test_*.py'
+python3 -B -m unittest discover -s transpile/tests/audio -p 'test_*.py'
 mkdir -p transpile/.tmp
 TMPDIR="$PWD/transpile/.tmp" PLAYWRIGHT_JUNIT_OUTPUT_FILE=transpile/reports/browser/results.xml \
   node_modules/.bin/playwright test -c transpile/playwright.config.mjs --reporter=junit
 ```
 
-Run checks through `structured_return` in Pi (`node-test-text`, `unittest-text`, `junit-xml`). Browser tests use the existing root Playwright installation and installed Google Chrome and write artifacts under `transpile/`. The checked-in config starts port4179 and refuses an existing listener. If4179 is already your server, leave it running and set `TRANSLATION_PORT=4194` for Playwright (used for Phase5, leaving4179 untouched). In worker checkouts the supplied `transpile/node_modules` symlink may be the CLI location; it is ignored, not a vendored dependency. Root configuration is unchanged. Python resource validation requires the original ZIP; running the built app does not.
+Run checks through `structured_return` in Pi (`node-test-text`, `unittest-text`, `junit-xml`). Browser tests use the existing root Playwright installation and installed Google Chrome and write artifacts under `transpile/`. The checked-in config starts port4179 and refuses an existing listener. If4179 is already your server, leave it running and set `TRANSLATION_PORT=4199` for Playwright (initial Phase6 run; final recheck used4203, leaving4179 untouched). In worker checkouts the supplied `transpile/node_modules` symlink may be the CLI location; it is ignored, not a vendored dependency. Root configuration is unchanged. Python resource validation requires the original ZIP; running the built app does not.
 
 Passing checks establish authored integration and byte-derived expectations, not pixel-perfect or runtime equivalence to an executed DOS reference. `.gitignore` keeps worktrees, scratch, local binary bundles and browser/worker artifacts on disk but out of accidental adds.

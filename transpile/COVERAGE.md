@@ -1,6 +1,6 @@
 # Coverage of the integrated activities
 
-**All four worlds, original command widgets, report/help/keyboard/About, numeric HUDs and BLACKBRD statistics are integrated.** Phase4 was verified/pushed as `2f9ad12` (parent status). Phase5 locally integrates startup/menu idle, explicit Demo and source celebrations/endings; independent Phase5 review is not claimed. “Implemented” below means used by this browser app; “recovered-only” means evidence or tested helpers exist but the feature is not exposed. “Unknown” means a consequential detail is not established, not permission to invent it.
+**All four worlds, original command widgets, report/help/keyboard/About, numeric HUDs and BLACKBRD statistics are integrated.** Phase4 was verified/pushed as `2f9ad12` (parent status). Phase5 independently passed verification and was pushed as `764788a` (user-provided status). Phase6 bounded VOC playback and host corrections passed independent verification:309 Node +45 Python +42 Chrome and live4179 smoke; main checkpoint pending. Two fresh18-script bootstraps matched2,543 files, including38 listing headers. See [FINAL](reports/FINAL.md) and [FINAL-BOOTSTRAP](reports/FINAL-BOOTSTRAP.md). Six verified bundles do not mean full-game completion; remaining recoverable scope is ordered at the bottom of [PLAN](PLAN.md#remaining-recoverable-work-in-order). “Implemented” below means used by this browser app; “recovered-only” means evidence or tested helpers exist but the feature is not exposed. “Unknown” means a consequential detail is not established, not permission to invent it.
 
 ## Evidence map
 
@@ -15,6 +15,7 @@ All FILE offsets refer to `MarioTea/MARIO/MARIO.EXE`, SHA256 `6caed439b64dc3bad8
 - **T**: [runtime report](analysis/runtime/RUNTIME.md), [reentry contracts](analysis/runtime/REENTRY.md), exact RNG/corpus/Practice/bonus APIs and byte spans. These supersede historical BGS, font-binding and retained-counter gaps; [Phase 1 checks](reports/PHASE-1.md) cover current integration.
 
 - **MENU**: [menu/student evidence](analysis/control/MENU.md), frozen worker imports plus integrated source composition/blink trace.
+- **AUDIO**: [audio formats/call sites](analysis/audio/AUDIO.md), [host boundaries](analysis/control/HOST-GAPS.md) and [Phase6 proof](reports/PHASE-6.md). Four PCM clips and continuation boundaries, not hardware equivalence.
 - **REPORT-HELP**: [report/help/HUD evidence](analysis/control/REPORT-HELP.md), original resource/font/palette bindings and exact operation200/210 layouts.
 
 ## Boot, menu and student UI
@@ -27,7 +28,7 @@ All FILE offsets refer to `MarioTea/MARIO/MARIO.EXE`, SHA256 `6caed439b64dc3bad8
 | Main-menu top labels/font | Implemented | C `0x105cc..0x106f9`; FONT5H at DS:4fc4, resource IDs1100/1110/1120; indexed source borders, selection colors and lesson marker |
 | Welcome/student greeting | Implemented, provisional color | C `0x10979..0x10adf`, IDs1150/1250..1254; original slot88 unresolved, host red substitute |
 | Six right-side hit boxes | Implemented | C `0x11121..0x11167`, half-open rectangles; no added source selection |
-| Pixel-color interception and Mario click region | Interception implemented; animation omitted | MENU `0x10e66..0x10eb7`, `0x110ce..0x1111a`; low-word linear7x7 palette88 scan precedes all pointer routes; welcome sound request visible, silent |
+| Pixel-color interception and Mario click region | Interception implemented; animation omitted | MENU `0x10e66..0x10eb7`, `0x110ce..0x1111a`; low-word linear7x7 palette88 scan precedes all pointer routes; welcome VOC request blocks before the next pump; locked/muted playback is visibly omitted |
 | Menu hotkeys and world eligibility | Implemented for supported actions | C `0x111d8..0x114ce`; unsupported keys report disabled in host status |
 | Dropdown keyboard/pointer navigation | Implemented | MENU `0x10e1c..0x119f5`; source geometry, keyboard-before-pointer API, localized accelerators, row/column wrap and outside-click close without world fallthrough |
 | Dropdown commands | Implemented or explicit omission | Bridge owns starts, group/save, students, report/help/keyboard/About and option bits; Demo explicitly selects an unsaved profile; audio/print/quit requests never start substitutes |
@@ -43,15 +44,15 @@ All FILE offsets refer to `MarioTea/MARIO/MARIO.EXE`, SHA256 `6caed439b64dc3bad8
 | Demo/menu idle | Implemented | STARTUP source-specific poll sites in all4 worlds, Alt-X option10 guard, abort/FIFO flush and no saved progression; idle text/blink never launches gameplay |
 | Report card | Implemented | REPORT-HELP `0xe65b..0xe997`; RCARD, teacher pointers, original formats/coordinates and signed per-key ranking, including empty zero-error value |
 | Help/keyboard/About | Implemented, fades omitted | REPORT-HELP `0x1537f..0x1592c`, `0x145df..0x1467f`, `0x11d54..0x121ea`; original text/font/palettes, paging/focus and caller raster/pointer return; closing keys consumed |
-| Music/sound/speech menu options | State implemented, audio omitted | C DS:5038 XOR1/2/4, visible host notice; no playback claim |
-| Quit/Alt-X/OS errors | Explicit host limitation | Source quit cannot exit a browser process or close a tab; filesystem/device dialogs are not simulated; storage/resource errors remain visible |
+| Music/sound/speech menu options | Implemented, bounded transport | AUDIO DS:5038 XOR1/2/4; M starts/stops music2, S/G gate future calls, effects1/11 bypass S; browser mute separate, unsupported synthesis silent |
+| Quit/Alt-X/OS errors | Source guards plus host notice | HOST-GAPS signed KWD>=10, not audio bit0x10; disabled Alt-X consumed across startup/worlds/Demo/modals/results, ordinary menu Quit unconditional; no tab closure or simulated filesystem/device success |
 | Lesson customization/advanced reporting | Unknown UI integration | MSD20000..20201 labels retained; no functional claims |
 
 ## Outside
 
 | Original area | Status in app | Evidence and remaining limit |
 |---|---|---|
-| Resource initialization and start | Implemented subset | O `0x1272e`, `0x13dc3`; no fabricated ready duration; audio omitted |
+| Resource initialization and start | Implemented subset | O `0x1272e`, `0x13dc3`; Ready holds before the ordinary loop; exact PCM or acknowledged omission, no fabricated duration |
 | Lesson files and groups | Implemented | C `0x928b..0x9355`, O `0x093f6..0x0946b`; exact H/T/B/N/S LETTERS bytes, tilde/CR/EOF rules |
 | Group6 and random segment | Implemented shared activity stream | T `lessonPrefix`, `selectCorpusSegment`, O `makeBonus`; current-host low16 seed or query entry seed; startup/menu/fireworks callers share the same process stream, with source skip-dependent counts |
 | Obstacle allocation/type/height | Implemented | O `0x12dbb..0x12ee3`, ten slots, x>220 spawn gate, only block height57 reachable |
@@ -69,9 +70,9 @@ All FILE offsets refer to `MarioTea/MARIO/MARIO.EXE`, SHA256 `6caed439b64dc3bad8
 | Duration/early exit | Implemented | O `0x13a8e..0x13b9e`; Escape/F10 abort, repeated-timeout ending semantics retained |
 | Pause/keyboard queue | Adapted/unknown | No recovered P pause; blur suspends timer+updates; one-slot latch replaces unknown DOS queue capacity |
 | Bonus placement/countdown/key intercept | Implemented | O `makeBonus`, `updateBonus`, `0x13852..0x13975`; five draws before duration reset, observed wall-second activation, exact punctuation intercept before ordinary score |
-| Bonus cinematic | Implemented, host cadence | O `0x14298..0x1436b`, R BAN/ANI decoder and two-wait callback; OUTSKY + character OUT files, timer310/300, discarded input, scene restore; fades/audio omitted |
+| Bonus cinematic | Implemented, host cadence | O `0x14298..0x1436b`, R BAN/ANI decoder and two-wait callback; OUTSKY + character OUT files, timer310/300, discarded input, scene restore; sound7 callback requests integrated, synthesis/fades omitted |
 | Progress celebration/fireworks | Implemented | CELEBRATIONS `0x13e29..0x1413c`; OCASTLE,55 moves, source skip boundaries, up to10 low-bit RNG fireworks and two waits per packet |
-| Sound requests | Recovered-only | O ordinary correct/wrong/destruction events; no playback, repeated jump sound not emitted |
+| Sound requests | Implemented requests, synthesis silent | AUDIO correct/wrong1/11, destruction3/4, repeated jump2 at each actual update, bonus7; dispatch before later controller RNG/clocks, not replayed from a final batch |
 | Activity reentry persistent counters | Implemented for supported activities | T REENTRY: cursor/stationary/distance/idle/ground counters survive; entry resets position/scroll/objects. Bonus observed-second clock survives intervening Practice; previous duration, RNG and Practice timestamp remain shared |
 
 ## Statistics, results and progression
@@ -84,8 +85,8 @@ All FILE offsets refer to `MarioTea/MARIO/MARIO.EXE`, SHA256 `6caed439b64dc3bad8
 | Per-key errors/ranking | Implemented | C `0xe41c..0xe4ef`; signed ties/wrap/space/DEL, max5, zero-error empty rendering; report does not rewrite saved counts |
 | Eligible completion/goal update | Implemented for Outside | C `0x13d4a..0x13dac`; before results, exit gate honored, strict > cap preserved |
 | Results image/buttons/keys | Implemented | C `0x164dc..0x167bb`; inclusive Next/Menu bounds, Enter pointer semantics, Next does not increment again |
-| Result speech | Recovered-only | `resultSpeech`, previousGoal comparison; silent |
-| Water advancement | Implemented | C `0x17e24`; failure/abort gates, cached score, strict >30 completion; optional Phase5 animation explicitly skipped |
+| Result speech | Implemented bounded PCM | `resultSpeech` previousGoal predicate; congrats/toobad return before suppression reset/input initialization; muted/locked/missing acknowledged with no guessed wait |
+| Water advancement | Implemented | C `0x17e24`; failure/abort gates, cached score, strict >30 completion; source WCAS progression presentation completes before results |
 | Castle advancement | Implemented | C `0xda44`; failure/exit gates, cached WPM, lesson/goal and completion flags; ending suspends before save/results; completion follows the source presentation return |
 | Ending flags/ending art | Implemented | CELEBRATIONS `0xdf46..0xe127`; all modes show ENDF,18 mandatory waits; bit4 repeats movie until key, then sets completed before save |
 | Certificate queue | Queue implemented, printing unsupported | C `0x103d0..0x10475`; Next queues only completed/unprinted/nonpending worlds before save; printed bytes unchanged |
@@ -100,13 +101,13 @@ All FILE offsets refer to `MarioTea/MARIO/MARIO.EXE`, SHA256 `6caed439b64dc3bad8
 | Water pursuer/bubbles | Implemented | W `0x1710a`, `0x16fd4`; scripted animation, no invented collision |
 | Water inactivity/failure/sinking | Implemented | W `0x176e6`, >20 any-input inactivity, chase/sink through results/Next |
 | Water bonus | Implemented | W `0x17560`, `0x17ef9`; all three56-packet movies, two changed-tick waits, timer stop/restore/input flush |
-| Water presentation | Implemented except audio/fades | FONT9H(0,47), FONT7H bonus, BITER slots48..63, ordered dirty actors and source wave tiles; WCAS progression presentation uses56 unskippable swim updates,48 unskippable movie packets, exact clipping/fades and final input flush |
+| Water presentation | Implemented except synthesis/intermediate fades | FONT9H(0,47), FONT7H bonus, BITER slots48..63, ordered dirty actors and source wave tiles; WCAS progression presentation uses56 unskippable swim updates,48 unskippable movie packets, exact clipping/fades and final input flush |
 | Castle sentences/metadata queue | Implemented | W `0xbb06..0xbf47`; case-sensitive32..126 and completion flags |
 | Castle rockfaces/movement | Implemented | W `0xc410..0xc921`; fixed tables, stage positions, no general collision engine |
 | Castle pipes/scroll transitions | Implemented | W `0xc082`, `0xca14`, `0xd127`; timed/scripted segments |
 | Castle sand/text progress/sinking | Implemented | W `0xcd7a`, `0xc36e`; WPM position and scripted failure |
 | Castle timeout/accuracy/inactivity failure | Implemented | W `0xbc7e`, `0xbffb`; separate flags, no invented lives |
-| Castle BGS/clipping/bonus bindings | Implemented except audio/fades | R BGS and CASTLE: four320×129 scenes at y26, forty eight-pixel strips with scratch/bias and pre-scroll actor position, inclusive clips, final palettes, FONT9H metadata and exact BAN write/ANI operations for all3 movies; same-value writes preserved |
+| Castle BGS/clipping/bonus bindings | Implemented except synthesis/intermediate fades | R BGS and CASTLE: four320×129 scenes at y26, forty eight-pixel strips with scratch/bias and pre-scroll actor position, inclusive clips, final palettes, FONT9H metadata and exact BAN write/ANI operations for all3 movies; same-value writes preserved |
 | Practice corpus/expression/key acceptance | Implemented | T exact runtime cursor/input and W `practiceCorpus/practiceExpression`; all15 real corpora, case-sensitive32..127 or CR, no inactivity loss |
 | Practice line wrap/prefill | Implemented | T `0xb3e1..0xb4d3`, exact10x33 buffer/nine fills, LF early return, partial-word rewind, NUL and repeated-overlong-word quirks preserved |
 | Practice duration/exit/results | Implemented | W `0xb1e6`, `0xb5c2`, `0xb809`; default600s/configured field, Esc early exit, F10 ignored, no progression, mode4 Next preserved |
@@ -115,12 +116,12 @@ All FILE offsets refer to `MarioTea/MARIO/MARIO.EXE`, SHA256 `6caed439b64dc3bad8
 
 ### World integration and remaining gates
 
-- Water now honors pending suppression (`0x17943..0x1794c`), conditional RNG order, source waits, failure/results and bonus restoration. [Controller](analysis/worlds/WATER-CONTROLLER.md), [render evidence](analysis/render/WATER.md) and [Phase2 report](reports/PHASE-2.md) define the integration. Browser scheduling/typematic/focus and audio playback and intermediate world fades remain explicit limits.
+- Water now honors pending suppression (`0x17943..0x1794c`), conditional RNG order, source waits, failure/results and bonus restoration. [Controller](analysis/worlds/WATER-CONTROLLER.md), [render evidence](analysis/render/WATER.md) and [Phase2 report](reports/PHASE-2.md) define the integration. Browser scheduling/typematic/focus, synthesis and intermediate world fades remain explicit limits. Ready suspends before music3/lastInput, while the lesson timer already runs.
 - Castle integrates the full metadata queue and repeating scene controller (`0xbb06..0xde2d`), operation2/3 separation, old-position rock triggers, typing locks, repeated pipe RNG comparisons, sand entry/active/exit and both failure loops. Clean stationary rocks do not redraw. Source-key Chrome tests run two cycles for each character; source/pixel tests check scratch restoration and all40 strips. [Phase3](reports/PHASE-3.md) records implementation; Phase3 independent review passed and checkpoint `465129e` was pushed. [Phase4](reports/PHASE-4.md) records current local UI/HUD checks.
 - Water/Castle controllers reuse the shared RNG/corpus and BAN/ANI decoders; numeric helpers alone are not used as a substitute for their full source scene loops. Existing [worlds mechanics](analysis/worlds/MECHANICS.md), [coverage mapping](analysis/worlds/coverage.json) and [render limits](analysis/render/RENDERING.md) enumerate bounded evidence and gaps. This is not an exhaustive decompilation claim.
 
 ## Resources and proof limits
 
-A independently validates20 CRX backgrounds,567 indexed GSO/font sprites,15 lesson files,177 messages, ANI tables and archive/member hashes. R additionally validates145 GCO idle frames,628 BAN packets, nine ANI coordinate tables, exact tile and palette splice/mask/origin rules. Phase 1 adds four BGS scenes and144 Water/Castle/inline sprite records (289 total in the render manifest), world palettes and decoded ANI rasters. Phase2 adds Water resources; Phase3 adds Castle scenes/sprites/palettes, source bonus-X words and exact52-packet BAN/ANI write runs for each character to ignored app data. VOC metadata is not audio playback. No executable, driver or archive script was launched, interpreted or emulated.
+A independently validates20 CRX backgrounds,567 indexed GSO/font sprites,15 lesson files,177 messages, ANI tables and archive/member hashes. R additionally validates145 GCO idle frames,628 BAN packets, nine ANI coordinate tables, exact tile and palette splice/mask/origin rules. Phase 1 adds four BGS scenes and144 Water/Castle/inline sprite records (289 total in the render manifest), world palettes and decoded ANI rasters. Phase2 adds Water resources; Phase3 adds Castle scenes/sprites/palettes, source bonus-X words and exact52-packet BAN/ANI write runs for each character to ignored app data. Phase6 schedules all four VOC clips as real mono PCM buffers, 158,254 samples at 1,000,000/56 Hz. The supplied CNF is hash-checked and decoded, not replaced by RS defaults. All58 unsupported resources are inventoried and silent. Finger hints, mouse pixels, Practice cursor callbacks, certificate document/selector and intermediate palettes remain recoverable missing components. No executable, driver or archive script was launched, interpreted or emulated.
 
 The tests compare source-derived expectations and browser behavior, not an executed DOS reference. This matrix is bounded by the recovered reports; it is not a claim that every original routine has been decompiled.

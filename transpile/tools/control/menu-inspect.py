@@ -32,7 +32,7 @@ for name, (a, e) in ranges.items():
     p = OUT / (name + '.elf.data')
     p.write_bytes(hdr + code + names + bytes(shoff - noff - len(names)) + sh)
     r = subprocess.run(['objdump', '-d', '--triple=i386-unknown-unknown-code16', '--x86-asm-syntax=intel', str(p)], capture_output=True, text=True, check=True)
-    (OUT / (name + '.asm.txt')).write_text(r.stdout)
+    (OUT / (name + '.asm.txt')).write_text(r.stdout.replace(f'\n{p}:\tfile format ', f'\n{p.name}:\tfile format ', 1))
     p.unlink()
 base = 0x1f270
 tables = {name: list(struct.unpack('<' + 'h' * count, b[a:a + count * 2])) for name, a, count in [

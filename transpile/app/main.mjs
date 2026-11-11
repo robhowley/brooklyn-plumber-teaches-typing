@@ -5,6 +5,8 @@ import { createMenu, menuInput, createStudentUI, studentUIInput, createStudentCh
 import { openHelp, helpInput, helpPointer, modalReturn, keyboardInput } from '../recovered/control/report.mjs';
 import { mainMenuHit, canSelectMode } from '../recovered/control/flow.mjs';
 import { resultCommand, resultHit } from '../recovered/control/results.mjs';
+import { SourceAudio } from '../recovered/audio/audio.mjs';
+import { BrowserAudio } from './audio.mjs';
 
 const canvas=document.querySelector('#game'), status=document.querySelector('#status'), form=document.querySelector('#setup');
 const now=()=>Math.floor(performance.now()*BIOS_HZ/1000);
@@ -18,10 +20,36 @@ try { storage=localStorage; profiles=loadProfiles(storage); }
 catch(error) { storageWarning=`Storage unavailable or invalid (${error.message}). Students are in memory only.`; profiles={current:null,students:{}}; }
 const current=Object.hasOwn(profiles.students,profiles.current)?profiles.students[profiles.current]:null;
 const seedParam=new URLSearchParams(location.search).get('seed');
-const session=new Session(data,{bytes:current?Uint8Array.from(current):null,...(seedParam===null?{}:{seed:Number(seedParam)})});
+const audioStatus=document.querySelector('#audio-status');
+const browserAudio=new BrowserAudio({onState:()=>showAudio()});
+const sourceAudio=new SourceAudio({...data.audio.config,
+  // Explicit browser transport choices, not emulated DOS driver detection.
+  available:{music:true,effects:true,speech:typeof globalThis.AudioContext==='function'}});
+let audioWarning='', audioOutcomes=[];
+for(const [name,clip] of Object.entries(data.audio.clips)) {
+  try {browserAudio.register(name,Uint8Array.from(atob(clip.pcm),c=>c.charCodeAt(0)),clip);}
+  catch(error) {audioWarning=`${name} unavailable: ${error.message}`;}
+}
+function showAudio() {
+  audioStatus.textContent=`Browser audio: ${browserAudio.state}${browserAudio.muted?', host muted':''}. Source M/S/G bits ${sourceAudio.options}. VOC only, 58 resources unsupported and silent. ${audioWarning}`;
+  document.querySelector('#host-mute').textContent=browserAudio.muted?'Unmute browser audio':'Mute browser audio';
+}
+function handleAudio(request) {
+  const decision=sourceAudio.request({...request,type:request.type==='music-stop'?'stop-music':request.type});
+  const performed=browserAudio.perform(decision).catch(()=>[{channel:'speech',status:'failed'}]);
+  if(!decision.blocking)return {status:decision.status,actions:decision.actions};
+  performed.then(outcomes=>{
+    audioOutcomes.push({name:request.name,outcomes});
+    if(outcomes.some(o=>o.status!=='ended'))audioWarning=`${request.name} omitted (${outcomes.map(o=>o.status).join(', ')}), continuing without a guessed delay.`;
+    sourceAudio.complete(decision.token);flush();
+    session.completeAudio(outcomes,now(),Math.floor(Date.now()/1000));showAudio();draw();
+  }).catch(stop);
+  return {status:'pending',inputPolicy:decision.inputPolicy,token:decision.token,actions:decision.actions};
+}
+const session=new Session(data,{bytes:current?Uint8Array.from(current):null,audioBoundary:handleAudio,...(seedParam===null?{}:{seed:Number(seedParam)})});
 const renderer=new Renderer(canvas,data); await renderer.load();
 let pointer={x:308,y:94}, leftPressed=false, pendingKey=0, pendingMenuPointer=null, selection=0, editorReturn='menu', isNew=false;
-let menu=createMenu(), studentUI=null, chooser=null, modal=null, savedModal=null, controlPointer=null;
+let menu=createMenu({options:sourceAudio.options}), studentUI=null, chooser=null, modal=null, savedModal=null, controlPointer=null;
 let caret=createTextCursor(session.lastWaitTick);
 function notice(text) { status.textContent=[storageWarning,text].filter(Boolean).join(' '); }
 function storageError(error) { storageWarning=`Browser storage unavailable (${error.message}). Student changes remain in memory only.`; notice(''); }
@@ -48,7 +76,6 @@ function draw() {
   }
   for(const e of session.resultEffects.splice(0)) {
     if(e.type==='result-stats')renderer.results(session.result,p,session.activity);
-    else if(e.type==='speech-request')session.audio({type:'speech',name:e.name,file:0x165fc});
     else if(e.type==='flush-input')flush();
     else if(e.type==='set-result-suppression')session.student[47]=Number(e.value);
     else if(e.type==='result-pointer')pointer={x:e.x,y:e.y};
@@ -68,8 +95,9 @@ function draw() {
   else if(session.screen==='results') renderer.results(session.result,p,session.activity);
   document.querySelector('#suspend').disabled=!session.active;
   document.querySelector('#suspend').textContent=session.suspended?'Resume':'Suspend';
-  for(const id of ['new','edit','times','load','students']) document.getElementById(id).disabled=!['menu','results'].includes(session.screen)||!!modal||!!chooser||!!studentUI;
+  for(const id of ['new','edit','times','load','students']) document.getElementById(id).disabled=!['menu','results'].includes(session.screen)||!!session.audioPending||!!modal||!!chooser||!!studentUI;
   canvas.dataset.screen=session.screen; canvas.dataset.suspended=String(session.suspended);
+  canvas.dataset.audioBlocking=String(!!session.audioPending);
 }
 function flush() { pendingKey=0;pendingMenuPointer=null;session.input.flush(); }
 function focusGame() {
@@ -77,7 +105,7 @@ function focusGame() {
   if(session.screen==='menu'&&session.menuIdle&&!session.menuIdle.state.waiting)session.menuIdle.restartPump(now());
   draw();
 }
-function start(mode=1) { form.hidden=true;studentUI=null;chooser=null;menu.row=0;flush();session.start(now(),mode);notice('Match the marked target. Escape ends. Browser focus loss suspends the lesson.');focusGame(); }
+function start(mode=1) { if(session.audioPending)return;form.hidden=true;studentUI=null;chooser=null;menu.row=0;flush();session.start(now(),mode);notice('Match the marked target. Escape ends. Browser focus loss suspends the lesson.');focusGame(); }
 function next() {
   const route=session.next(now(),save);if(!route)return;draw();flush();menu.row=0;
   if(![1,2,3,4].includes(route.mode)) notice(`${data.messages[99+route.mode]} is not implemented. No substitute activity was started.`);
@@ -86,7 +114,7 @@ function next() {
 }
 function resetCaret() { caret=createTextCursor(session.lastWaitTick); }
 function openEditor(kind) {
-  if(stopped||!['menu','results'].includes(session.screen)||modal||chooser||studentUI)return;
+  if(stopped||session.audioPending||!['menu','results'].includes(session.screen)||modal||chooser||studentUI)return;
   if(kind==='edit'&&!session.profile.profilePresent) {notice('Create a student first.');return;}
   editorReturn=session.screen==='results'?'results':'menu';isNew=kind==='new';controlPointer={...pointer};
   const p=isNew?readStudent(newStudent('Student')):session.profile;
@@ -131,7 +159,7 @@ function openModal(kind,section=1) {
   session.screen=kind;flush();if(kind==='help')pointer=helpPointer(modal);notice(`${kind}. Closing input is consumed before returning.`);focusGame();
 }
 function modalEvent(event) {
-  modal=modal.kind==='help'?helpInput(modal,{key:event.key??null,x:event.pointer?.x,y:event.pointer?.y,leftButton:!!event.pointer,doneKey:data.messages[10000].charCodeAt(0)}):
+  modal=modal.kind==='help'?helpInput(modal,{key:event.key??null,x:event.pointer?.x,y:event.pointer?.y,leftButton:!!event.pointer,doneKey:data.messages[10000].charCodeAt(0),quitAllowed:session.option10}):
     (modal.kind==='keyboard'?keyboardInput:modalReturn)(modal,{key:event.key??null,pointerEnabled:true,pointerChanged:!!event.pointer});
   if(modal.closed) {
     session.screen=modal.route;modal=null;pointer=savedModal.pointer;flush();
@@ -142,12 +170,18 @@ function modalEvent(event) {
   } else {if(modal.kind==='help')pointer=helpPointer(modal);draw();}
 }
 function limitation(effect) {
+  if(effect.type.includes('quit')&&effect.type!=='quit-request'&&!session.option10)return;
   if(effect.type.includes('quit')) notice('Original Quit exits DOS. A browser page cannot quit its process or close this tab; no lesson was started.');
-  else if(effect.type==='options')notice(`Original option bits: ${effect.value}. Audio playback is not translated yet.`);
-  else if(effect.type==='sound-request') {session.audio({type:'speech',name:effect.name});notice(`Original ${effect.name} sound requested. Audio playback is not translated yet.`);}
+  else if(effect.type==='options') {
+    const musicChanged=(sourceAudio.options^effect.value)&1;sourceAudio.setOptions(effect.value);
+    if(musicChanged)session.audio(effect.value&1?{type:'music',id:2}:{type:'music-stop'});
+    showAudio();notice(`Source M/S/G bits ${effect.value}, separate from browser mute. Effects1/11 bypass S.`);
+  }
+  else if(effect.type==='sound-request') session.audio({type:'speech',name:effect.name});
   else notice(`${effect.type}${effect.command?': '+effect.command:''} is not translated. No substitute action was performed.`);
 }
 function menuEvent(event) {
+  if(session.audioPending)return;
   renderer.menuBubble=false;
   if(session.menuIdle&&!session.menuIdle.state.waiting)session.menuIdle.restartPump(now());
   const result=menuInput(menu,{...event,front:renderer.front,messages:data.messages},session.profile);menu=result.state;
@@ -168,6 +202,7 @@ function menuEvent(event) {
 }
 function pumpMenu() {
   session.menuStep(now(),menu.column===1&&menu.row>0);
+  if(session.audioPending||!session.menuIdle) {draw();return;}
   if(!session.menuIdle.state.waiting&&pendingMenuPointer) {const point=pendingMenuPointer;pendingMenuPointer=null;menuEvent({pointer:point});}
   else if(!session.menuIdle.state.waiting&&session.input.pending())menuEvent({key:session.input.consume()});
   else draw();
@@ -184,6 +219,7 @@ function resultsAction(command) {
 canvas.addEventListener('keydown',event=>{
   if(stopped)return;
   const key=dosKey(event);if(!key)return;event.preventDefault();
+  if(session.audioPending || (key===0x12d&&!session.option10&&!session.active&&!['menu','startup'].includes(session.screen))) {flush();return;}
   if(modal)modalEvent({key});
   else if(studentUI)studentEvent({key});
   else if(chooser)chooserEvent({key,pointer:leftPressed?pointer:null});
@@ -199,7 +235,11 @@ canvas.addEventListener('pointermove',event=>{
 });
 // A fresh left press, not a click synthesized after a release or a right button.
 canvas.addEventListener('pointerdown',event=>{
-  if(stopped)return;
+  if(stopped||session.audioPending)return;
+  if(event.button===0) {
+    if(!leftPressed)session.audio({type:'effect',id:8,file:0x149bc});
+    leftPressed=true;
+  }
   if(session.screen==='celebration'&&!session.suspended) {event.preventDefault();session.stepPresentation(0,now(),true);draw();return;}
   if(modal&&['report','about'].includes(modal.kind)) {event.preventDefault();modalEvent({pointer:locationInCanvas(event)});return;}
   if(event.button!==0)return;event.preventDefault();leftPressed=true;pointer=locationInCanvas(event);canvas.focus();
@@ -209,17 +249,21 @@ canvas.addEventListener('pointerdown',event=>{
 canvas.addEventListener('contextmenu',event=>event.preventDefault());
 window.addEventListener('pointerup',event=>{
   if(event.button===0)leftPressed=false;
-  if(!stopped&&!session.suspended&&session.screen==='celebration') {session.stepPresentation(0,now(),true);draw();}
+  if(!stopped&&!session.audioPending&&!session.suspended&&session.screen==='celebration') {session.stepPresentation(0,now(),true);draw();}
 });
 window.addEventListener('pointercancel',()=>{leftPressed=false;});
-function suspend() {leftPressed=false;if(!session.active&&!['startup','celebration'].includes(session.screen))return;session.suspend(true,now());flush();notice('Suspended by browser host. Focus game to resume.');draw();}
+function suspend() {browserAudio.stop('blur');leftPressed=false;if(!session.active&&!['startup','celebration'].includes(session.screen))return;session.suspend(true,now());flush();notice('Suspended by browser host. Focus game to resume.');draw();}
 canvas.addEventListener('blur',suspend);window.addEventListener('blur',suspend);
 document.addEventListener('visibilitychange',()=>{if(document.hidden)suspend();});
+// Unlock only on trusted gestures. Missed requests are never queued/replayed.
+for(const type of ['pointerdown','keydown'])document.addEventListener(type,event=>{void browserAudio.unlock(event);},true);
+document.querySelector('#audio-unlock').onclick=event=>{void browserAudio.unlock(event);};
+document.querySelector('#host-mute').onclick=()=>{browserAudio.setMuted(!browserAudio.muted);showAudio();};
 document.querySelector('#focus').onclick=focusGame;
 document.querySelector('#suspend').onpointerdown=event=>{event.preventDefault();if(session.suspended)focusGame();else suspend();};
 document.querySelector('#suspend').onclick=event=>{if(event.detail===0){if(session.suspended)focusGame();else suspend();}};
 for(const id of ['new','edit','times'])document.getElementById(id).onclick=()=>openEditor(id);
-document.querySelector('#load').onclick=()=>{if(session.active||modal||studentUI||chooser)return;const name=document.querySelector('#students').value;if(!name){notice('Choose a saved student first.');return;}loadStudent(name);session.screen='menu';focusGame();};
+document.querySelector('#load').onclick=()=>{if(session.active||session.audioPending||modal||studentUI||chooser)return;const name=document.querySelector('#students').value;if(!name){notice('Choose a saved student first.');return;}loadStudent(name);session.screen='menu';focusGame();};
 // Explicit host form fallback. It does not claim DOS text editing or selection.
 document.querySelector('#cancel').onclick=()=>{if(studentUI)studentEvent({key:27});};
 form.addEventListener('keydown',event=>{if(event.key==='Escape'){event.preventDefault();event.stopPropagation();if(studentUI)studentEvent({key:27});}});
@@ -235,9 +279,9 @@ form.addEventListener('submit',event=>{
   } catch(error) {notice(error.message);}
 });
 for(let i=1;i<=6;i++)form.elements.lesson.add(new Option(data.messages[299+i],i));
-refreshStudents();notice('Original menu: arrows/Enter, accelerators or pointer. Browser controls remain separate.');draw();
+showAudio();refreshStudents();notice('Original menu: arrows/Enter, accelerators or pointer. Browser controls remain separate.');draw();
 setInterval(()=>{
-  if(stopped)return;
+  if(stopped||session.audioPending)return;
   if(chooser&&leftPressed) {chooserEvent({pointer});return;}
   if(studentUI?.field) {
     const tick=now()&65535;
@@ -260,7 +304,9 @@ window.translationSnapshot=()=>({screen:session.screen,inputPending:session.inpu
   startup:{...structuredClone(session.startup.state)},paletteWrites:renderer.paletteWrites,
   menuIdle:session.menuIdle?structuredClone(session.menuIdle.state):null,menuTimer:{...session.menuTimer},
   celebration:session.celebration?{world:session.celebrationWorld,wait:session.celebration.wait,complete:session.celebration.complete,x:session.celebration.x,y:session.celebration.y}:null,
-  demo:session.demo?{...session.demo.state}:null,audio:session.audioLog.slice(-20),
+  demo:session.demo?{...session.demo.state}:null,audio:session.audioLog.slice(-40),
+  audioHost:{state:browserAudio.state,muted:browserAudio.muted,active:!!browserAudio.active,blocking:!!session.audioPending,
+    sourceOptions:sourceAudio.options,config:data.audio.config,available:{...sourceAudio.available},outcomes:audioOutcomes.slice(-20)},
   ticks:session.clock.ticks,seed:session.seed,initialSeed:session.initialSeed,limit:session.limit,corpusName:session.corpusName,
   bonus:structuredClone(session.bonus),cinematic:structuredClone(session.cinematic),
   practice:session.practice?{...structuredClone(session.practice),rows:Array.from(session.practice.rows),expression:session.expression(Math.floor(Date.now()/1000))}:null,

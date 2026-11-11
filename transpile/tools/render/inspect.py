@@ -16,7 +16,7 @@ def disassemble(data, start, end):
     tmp.write_bytes(header + code + names + bytes(shoff-noff-len(names)) + sections)
     result = subprocess.run(['objdump','-D','--triple=i386-unknown-unknown-code16','--x86-asm-syntax=intel',str(tmp)],capture_output=True,text=True,check=True)
     tmp.unlink()
-    return result.stdout
+    return result.stdout.replace(f'\n{tmp}:\tfile format ', f'\n{tmp.name}:\tfile format ', 1)
 
 if __name__ == '__main__':
     assert hashlib.sha256(ARCHIVE.read_bytes()).hexdigest() == SHA

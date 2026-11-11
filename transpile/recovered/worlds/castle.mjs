@@ -71,12 +71,12 @@ export class CastleQueue {
 export class CastleController {
   constructor({ stream, rng, resources, persistent = { rockSecond: 0, sandSecond: 0 },
     character = 1, minutes = 0, priorDuration = 0, previousAccuracy = 0, option10 = false,
-    fastScroll = false, profile = null, profilePresent = false, pollInput = null }) {
+    fastScroll = false, profile = null, profilePresent = false, pollInput = null, audioBoundary = () => {} }) {
     if (![1, 2, 3].includes(character)) throw new RangeError('Character must be 1..3');
     if (!resources?.idleSchedule?.length || !(resources.idlePeriod > 0) || resources.bonusXs?.length !== 3)
       throw new RangeError('Castle requires decoded idle schedule and bonus X table');
     Object.assign(this, { stream, rng, resources, persistent, character, option10,
-      fastScroll, profile, profilePresent, pollInput });
+      fastScroll, profile, profilePresent, pollInput, audioBoundary });
     this.queue = new CastleQueue(stream);
     this.stats = { attempts: 0, correct: 0, errors: 0, ticks: 0, running: false,
       lastTicks: 0, elapsedSeconds: 0, accuracy: 0, wpm: 0, previousAccuracy: i16(previousAccuracy),
@@ -95,7 +95,7 @@ export class CastleController {
     this.sequence = this.scenes();
   }
   emit(type, fields = {}) { this.effects.push({ type, ...fields }); }
-  sound(id) { this.emit('sound', { id }); }
+  sound(id) { this.emit('sound', { id });this.audioBoundary({type:'effect',id}); }
   setClip(rect, file) { this.clip = [...rect]; this.emit('clip', { rect: [...rect], file }); }
   stopped() { return this.flags.exit || this.flags.timeout; }
   clock(operation) {

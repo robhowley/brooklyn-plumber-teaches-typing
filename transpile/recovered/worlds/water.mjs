@@ -8,7 +8,10 @@ import { timer, score } from '../control/scoring.mjs';
 import { progression } from '../control/flow.mjs';
 
 const signedByte = n => (n << 24) >> 24;
-const emit = (s, type, fields = {}) => s.effects.push({ type, ...fields });
+const emit = (s, type, fields = {}) => {
+  s.effects.push({ type, ...fields });
+  if(type === 'sound') s.audioBoundary({type:'effect',id:fields.id});
+};
 const timerOp = (s, operation) => { s.timer = timer(s.timer, operation, s.clock.ticks()); };
 
 // 16e0c..16f4b: only the temporary DISPLAY copy is sanitized. DS:4c9f is
@@ -60,7 +63,7 @@ function bonusUpdate(s) {
 
 function results(s) {
   // 17e99..17ea2. Presentation and result UI are consumers, not this controller.
-  emit(s, 'cleanup'); emit(s, 'audio-reset');
+  emit(s, 'cleanup'); emit(s, 'audio-reset');s.audioBoundary({type:'music-stop',file:0x17e9d});
   emit(s, 'results', { suppressed: s.aborted, demo: s.demo, stats: { ...s.stats }, progression: s.progression });
   s.phase = 'ended';
 }
@@ -135,13 +138,13 @@ function finishIteration(s) {
 export function createWater({ stream, rng, input, clock, shortWindow = false, character = 0,
   minutes = 0, previousLimitSeconds = 0, previous = null, option10 = false, option20 = false,
   demo = false, profilePresent = false, profile = { goal: 10, lesson: 1, completed: [false, false, false] },
-  previousAccuracy = profile.accuracy ?? 0, draw = bound => boundedRandom(rng, bound), pollInput = null, audioBoundary = () => {} }) {
+  previousAccuracy = profile.accuracy ?? 0, draw = bound => boundedRandom(rng, bound), pollInput = null, audioBoundary = () => {}, deferReady = false }) {
   if (![0, 1, 2].includes(character)) throw new RangeError('Water character must be 0..2');
   // Shared initializer consumes four draws; Water, like Outside, consumes a fifth
   // delay draw even though Water's actor never reads delay (16bf5..16c3c).
   const bonus = initializeBonus(rng);
   bonus.delay = outdoorBonusDelay(rng, previousLimitSeconds, option10);
-  const s = { stream, rng, input, clock, draw, pollInput, option10, option20, demo, profilePresent,
+  const s = { stream, rng, input, clock, draw, pollInput, audioBoundary, option10, option20, demo, profilePresent,
     profile: { ...profile, completed: [...profile.completed], previousGoal: i16(profile.goal) },
     character, phase: 'active', effects: [], window: new Uint8Array(40),
     width: shortWindow ? 20 : 40, targetIndex: shortWindow ? 5 : 10,
@@ -167,10 +170,21 @@ export function createWater({ stream, rng, input, clock, shortWindow = false, ch
     shift(s, true);
   } while (s.window[s.targetIndex + 1] === 0);
   shift(s);
-  emit(s, 'ready'); audioBoundary({type:'speech',name:'ready',file:0x176c7});
-  emit(s, 'music', { operation: 3 });audioBoundary({type:'music',id:3,file:0x176d0});
-  s.lastInput = clock.seconds() | 0;
+  emit(s, 'ready');
+  s.phase = 'ready';
+  if(!deferReady) {
+    audioBoundary({type:'speech',name:'ready',file:0x176c7});
+    resumeWaterEntry(s);
+  }
   return s;
+}
+
+// FILE 0x176d0..0x176e5, only after synchronous Ready returns.
+export function resumeWaterEntry(s) {
+  if(s.phase !== 'ready') throw new Error('Water is not awaiting Ready');
+  emit(s, 'music', { operation: 3 });s.audioBoundary({type:'music',id:3,file:0x176d0});
+  s.lastInput = s.clock.seconds() | 0;
+  s.phase = 'active';
 }
 
 /** One source loop, not one animation frame. If effects contain wait-tick, host
@@ -181,7 +195,7 @@ export function createWater({ stream, rng, input, clock, shortWindow = false, ch
  */
 export function stepWater(s, { tickReady = false, bonusComplete = false, celebrationComplete = false } = {}) {
   s.effects = [];
-  if (s.phase === 'ended' || s.phase === 'quit') return s.effects;
+  if (s.phase === 'ended' || s.phase === 'quit' || s.phase === 'ready') return s.effects;
   if (s.phase === 'wait') {
     if (!tickReady) return s.effects;
     s.phase = 'active';

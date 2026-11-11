@@ -1,5 +1,5 @@
 import { CastleController } from '../recovered/worlds/castle.mjs';
-import { createWater, stepWater } from '../recovered/worlds/water.mjs';
+import { createWater, stepWater, resumeWaterEntry } from '../recovered/worlds/water.mjs';
 import { createPendingInput } from '../recovered/runtime/runtime.mjs';
 import { createOutdoor, makeBonus, tick } from '../recovered/outdoor/outdoor.mjs';
 import { seedFromTime, lessonPrefix, loadCorpus, selectCorpusSegment, createPractice, practiceInput } from '../recovered/runtime/runtime.mjs';
@@ -52,7 +52,7 @@ export function loadProfiles(storage) {
   return value;
 }
 export class Session {
-  constructor(data, { bytes = null, seed = seedFromTime(Math.floor(Date.now()/1000)), audioBoundary = null } = {}) {
+  constructor(data, { bytes = null, seed = seedFromTime(Math.floor(Date.now()/1000)), audioBoundary = null, option10 = false } = {}) {
     this.data=data; this.seed=seedFromTime(seed); this.initialSeed=this.seed;
     this.screen='menu'; this.outdoor=null; this.practice=null; this.bonus=null; this.cinematic=null;
     this.student=bytes ? normalizeStudent(bytes) : newStudent('Player');
@@ -65,18 +65,28 @@ export class Session {
     this.effects=[]; this.sampleTicks=0; this.sampleSeconds=0; this.waterMovie=null;
     const owner=this;
     this.rng={get seed(){return owner.seed;},set seed(value){owner.seed=value>>>0;}};
-    this.audioHandler=audioBoundary;this.audioLog=[];this.option10=false;
+    this.audioHandler=audioBoundary;this.audioLog=[];this.option10=option10;
     this.presentationEffects=[];this.resultEffects=[];this.menuTimer=createMenuIdleState();this.demo=null;this.practiceDemoTick=0;
     this.celebrationResources=hydrateCelebrationResources(data.celebration);
-    this.startup=createStartup({rng:this.rng,input:this.input,audioBoundary:request=>this.audio(request)});
+    this.startup=createStartup({rng:this.rng,input:this.input,option10:this.option10,audioBoundary:request=>this.audio(request)});
     this.screen='startup';this.audio({type:'music',id:1,file:0x1d8e6});
     this.presentationEffects.push(...this.startup.start());
   }
-  audio(request) {
-    // A synchronous Phase6 hook. Missing audio returns silent immediately.
-    const outcome=this.audioHandler?.(request)??{status:'pendingPhase6-silent'};
+  audio(request, continuation = () => {}) {
+    if(this.audioPending)throw new Error('Source advanced during blocking audio');
+    const outcome=this.audioHandler?.(request)??{status:'unsupported-silent'};
     if(outcome?.then) throw new Error('Audio boundary requires a synchronous acknowledgement');
-    this.audioLog.push({request:{...request},...outcome});return outcome;
+    const entry={request:{...request},...outcome};this.audioLog.push(entry);
+    if(outcome.status==='pending') {this.input.flush();this.audioPending={entry,continuation};}
+    else continuation();
+    return outcome;
+  }
+  completeAudio(outcomes, nowTicks=this.sampleTicks, wallSeconds=this.sampleSeconds) {
+    if(!this.audioPending)throw new Error('No audio continuation');
+    const {entry,continuation}=this.audioPending;
+    entry.status=outcomes.every(o=>o.status==='ended')?'ended':'omitted';entry.outcomes=outcomes;
+    this.sampleTicks=nowTicks;this.sampleSeconds=wallSeconds;
+    this.input.flush();this.audioPending=null;continuation();
   }
   audioEffect(e) {
     if(e.type==='music')this.audio({type:'music',id:e.operation});
@@ -85,17 +95,23 @@ export class Session {
   }
   takePresentationEffects() {const out=this.presentationEffects;this.presentationEffects=[];return out;}
   enterMenu(nowTicks) {
-    this.screen='menu';this.input.flush();
-    this.menuIdle=createMenuIdle({rng:this.rng,input:this.input,timer:this.menuTimer,nowTicks,demo:this.profile.demo});
+    this.screen='menu';this.input.flush();this.menuIdle=null;
     this.audio({type:'music-stop',file:0x10d7d});
-    if(!this.menuWelcomed) {this.audio({type:'speech',name:'welcome',file:0x10d8b});this.menuWelcomed=true;}
-    this.audio({type:'music',id:2,file:0x10d99});
+    const resume=()=>{
+      this.audio({type:'music',id:2,file:0x10d99});
+      this.menuIdle=createMenuIdle({rng:this.rng,input:this.input,timer:this.menuTimer,nowTicks:this.sampleTicks,demo:this.profile.demo});
+    };
+    this.sampleTicks=nowTicks;
+    if(!this.menuWelcomed) {this.menuWelcomed=true;this.audio({type:'speech',name:'welcome',file:0x10d8b},resume);}
+    else resume();
   }
   menuStep(nowTicks,fileDropdownOpen=false) {
-    if(this.screen!=='menu')return [];
+    if(this.screen!=='menu'||this.audioPending||!this.menuIdle)return [];
     const completedWaits=this.menuIdle.state.waiting&&this.changedTick(nowTicks)?1:0;
     const effects=this.menuIdle.step({nowTicks,completedWaits,demo:this.profile.demo,fileDropdownOpen});
-    this.presentationEffects.push(...effects);return effects;
+    this.presentationEffects.push(...effects);
+    if(effects.some(e=>e.type==='menu-bubble-request'))this.audio({type:'speech',name:'welcome',file:0x10eb2});
+    return effects;
   }
   rebaseHostClock(oldTicks,newTicks) {
     this.menuIdle?.rebaseClock(oldTicks,newTicks);this.sampleTicks=newTicks;this.lastWaitTick=newTicks&65535;
@@ -138,8 +154,15 @@ export class Session {
       this.resultEffects.push({type:'host-clock-reset'});this.enterMenu(this.sampleTicks);return;
     }
     this.screen='results';const p=this.profile;
-    this.resultEffects.push(...resultEntryEffects({demo:false,suppressed:!!this.activity.aborted,profilePresent:p.profilePresent,
-      world:this.mode,mode:this.mode,goal:p.goal,previousGoal:p.previousGoal,wpm:this.result.wpm}));
+    const effects=resultEntryEffects({demo:false,suppressed:!!this.activity.aborted,profilePresent:p.profilePresent,
+      world:this.mode,mode:this.mode,goal:p.goal,previousGoal:p.previousGoal,wpm:this.result.wpm});
+    const speech=effects.findIndex(e=>e.type==='speech-request');
+    if(speech<0)this.resultEffects.push(...effects);
+    else {
+      this.resultEffects.push(...effects.slice(0,speech));
+      this.audio({type:'speech',name:effects[speech].name,file:effects[speech].name==='congrats'?0x165fc:0x16603},
+        ()=>this.resultEffects.push(...effects.slice(speech+1)));
+    }
   }
   completeWater() {
     this.result={...this.water.stats};this.advance=this.water.progression;
@@ -155,8 +178,10 @@ export class Session {
   get active() { return this.screen==='outdoor'||this.screen==='practice'||this.screen==='water'||this.screen==='castle'; }
   get activity() { return this.mode===4?this.practice:this.mode===3?{...this.castle.stats,aborted:this.castle.flags.exit}:this.mode===2?{...this.water.stats,aborted:this.water.aborted}:this.outdoor; }
   start(nowTicks, mode=1, wallSeconds=Math.floor(Date.now()/1000)) {
+    if(this.audioPending)throw new Error('Complete audio before selecting a world');
     if(this.screen==='startup')throw new Error('Finish source startup before selecting a world');
     if (![1,2,3,4].includes(mode)) throw new Error('Unsupported activity');
+    if(this.screen==='menu')this.audio({type:'music-stop',file:0x11bb1});
     // Student service normalization also follows a cancelled New (zeroed bytes).
     this.student=normalizeStudent(this.student);
     const p=this.profile, rng={seed:this.seed};
@@ -181,13 +206,14 @@ export class Session {
         clock:{ticks:()=>this.sampleTicks,seconds:()=>this.sampleSeconds},
         character:p.character-1,minutes:p.durations[1],previousLimitSeconds:this.limit,
         previous:this.water,profile:p,profilePresent:p.profilePresent,pollInput,option10:this.option10,
-        audioBoundary:request=>this.audio(request)});
+        audioBoundary:request=>this.audio(request),deferReady:true});
       this.effects.push(...this.water.effects);this.seed=rng.seed;
     } else if(mode===3) {
       const schedule=this.data.idleSchedules[['m','l','p'][p.character-1]];
       this.castle=new CastleController({stream:corpus,rng,persistent:this.castlePersistent,
         character:p.character,minutes:p.durations[2],priorDuration:this.limit,
         previousAccuracy:p.accuracy,profile:p,profilePresent:p.profilePresent,pollInput,option10:this.option10,
+        audioBoundary:request=>this.audio(request),
         resources:{bonusXs:this.data.castle.bonusXs,idleSchedule:schedule.thresholds,idlePeriod:schedule.halfTickPeriod}});
       this.consumeCastle(this.castle.step({nowTicks,nowSeconds:wallSeconds,input:this.input}));
       this.seed=rng.seed;
@@ -201,7 +227,10 @@ export class Session {
     this.limit=mode===3?this.castle.stats.limitSeconds:mode===2?this.water.limitSeconds:lessonLimitSeconds(p.durations[mode-1],mode===1?2:10);
     this.clock=mode===3?this.castle.stats:mode===2?this.water.timer:timer(timer({},320,nowTicks),300,nowTicks);
     this.screen=mode===1?'outdoor':mode===2?'water':mode===3?'castle':'practice'; this.suspended=false; this.result=null;
-    if(mode===1) {this.audio({type:'music-stop',file:0x13dd7});this.audio({type:'speech',name:'ready',file:0x13e04});this.audio({type:'music',id:1,file:0x13e0d});}
+    if(mode===1) {
+      this.audio({type:'music-stop',file:0x13dd7});
+      this.audio({type:'speech',name:'ready',file:0x13e04},()=>this.audio({type:'music',id:1,file:0x13e0d}));
+    } else if(mode===2)this.audio({type:'speech',name:'ready',file:0x176c7},()=>resumeWaterEntry(this.water));
   }
   suspend(value, nowTicks) {
     if(this.screen==='startup'||this.screen==='celebration') {
@@ -228,6 +257,7 @@ export class Session {
     return practiceExpression(wallSeconds,this.practice.lastCorrect,this.profile.profilePresent,this.stats().wpm,this.profile.goal);
   }
   step(key, nowTicks, wallSeconds=Math.floor(Date.now()/1000)) {
+    if(this.audioPending) {this.input.flush();return [];}
     if(this.screen==='startup'||this.screen==='celebration') {if(!this.suspended)this.stepPresentation(key,nowTicks);return [];}
     if (!this.active || this.suspended) return [];
     this.sampleTicks=nowTicks;this.sampleSeconds=wallSeconds;
@@ -238,6 +268,7 @@ export class Session {
       if(nowTicks>=this.cinematic.nextTick) {
         this.lastWaitTick=nowTicks&65535;
         this.cinematic.frame++; this.cinematic.nextTick=nowTicks+2;
+        this.bonusAudio(1,this.cinematic.frame);
         const frames=this.data.bonusAnimations[['m','l','p'][this.profile.character-1]].frames;
         if(this.cinematic.frame>=frames.length) {
           this.cinematic=null; this.clock=timer(this.clock,300,nowTicks);
@@ -249,6 +280,7 @@ export class Session {
     this.clock=timer(this.clock,100,nowTicks);
     if(this.mode===4) {
       if(this.demo) {this.enqueue(key);key=this.pollDemo({target:this.practice.rows[33+this.practice.index]}).key;this.seed=this.demoRng.seed;}
+      if(key===0x12d) {if(this.option10)this.effects.push({type:'quit-request'});key=0;}
       if(this.stats().elapsedSeconds>=this.limit || key===27) {
         this.practice.aborted=key===27; this.finish(nowTicks); return [{type:'end'}];
       }
@@ -266,11 +298,10 @@ export class Session {
     const prefix=['m','l','p'][this.profile.character-1], schedule=this.data.idleSchedules[prefix];
     const events=tick(this.outdoor,{key,elapsed:this.stats().elapsedSeconds,limit:this.limit,
       idleSchedule:schedule.thresholds,idlePeriod:schedule.halfTickPeriod,bonus:this.bonus,second:wallSeconds,
-      exitShortcutEnabled:this.option10,pollInput:this.demo?args=>{
+      exitShortcutEnabled:this.option10,audioBoundary:request=>this.audio(request),pollInput:this.demo?args=>{
         this.demoRng.seed=this.outdoor.seed;
         const event=this.pollDemo(args);this.outdoor.seed=this.demoRng.seed;return event.key;
       }:null});
-    for(const event of events) {this.audioEffect(event);if(event.sound)this.audio({type:'effect',id:event.sound});}
     this.seed=this.outdoor.seed; this.outdoorLastSecond=this.bonus.lastSecond;
     if (events.some(e=>e.type==='wrong')) this.student=recordProblemKey(this.student,this.outdoor.obstacles[this.outdoor.targetIndex].code);
     if(events.some(e=>e.type==='bonus-cinematic-required')) {
@@ -282,10 +313,16 @@ export class Session {
     return events;
   }
   enqueue(key) {
+    if(this.audioPending)return;
     if(key>255) this.input.enqueue(0,key-256);
     else if(key) this.input.enqueue(key);
   }
   takeEffects() { const effects=this.effects; this.effects=[]; return effects; }
+  bonusAudio(mode,frame) {
+    const playback=mode===1?this.data.bonusAnimations[['m','l','p'][this.profile.character-1]].playback:
+      mode===2?this.data.water.playback:this.data.castle.playback;
+    if(playback.sound7OneBasedFrames.includes(frame+1))this.audio({type:'effect',id:7,file:playback.callbackFileOffset});
+  }
   changedTick(ticks) {
     const low=ticks&65535;
     if(low===this.lastWaitTick) return false;
@@ -297,7 +334,6 @@ export class Session {
     const consume=effects=>{
       events.push(...effects); this.effects.push(...effects);
       for(const e of effects) {
-        this.audioEffect(e);
         if(e.type==='key-error') this.student=recordProblemKey(this.student,e.code);
         if(e.type==='play-bonus') {
           this.waterMovie={frame:0,waits:0};
@@ -314,6 +350,7 @@ export class Session {
         if(++this.waterMovie.waits<2) break;
         this.waterMovie.waits=0;
         const frames=this.data.water.animations[['m','l','p'][this.profile.character-1]].frames;
+        this.bonusAudio(2,this.waterMovie.frame+1);
         if(++this.waterMovie.frame<frames.length) {
           const packet={type:'water-packet',frame:this.waterMovie.frame};
           events.push(packet); this.effects.push(packet); break;
@@ -335,9 +372,13 @@ export class Session {
   consumeCastle(effects) {
     const visible=[];
     for(let i=0;i<effects.length;i++) {
-      const e=effects[i]; visible.push(e); this.effects.push(e);this.audioEffect(e);
+      const e=effects[i]; visible.push(e); this.effects.push(e);
+      if(e.type==='audio-reset'||e.type==='music')this.audioEffect(e);
       if(e.type==='key-error') this.student=recordProblemKey(this.student,e.expected);
-      if(e.type==='ready')this.audio({type:'speech',name:'ready',file:0xc060});
+      if(e.type==='ready') {
+        this.audio({type:'speech',name:'ready',file:0xc060},()=>this.consumeCastle(effects.slice(i+1)));
+        break;
+      }
       if(e.type==='wait-changed-tick') {
         // c01c precedes clip restoration and first-entry Ready. Keep those
         // effects behind the wait, not ahead of the first changed LOW tick.
@@ -376,6 +417,7 @@ export class Session {
       if(++this.castleMovie.waits<2) return events;
       this.castleMovie.waits=0;
       const frames=this.data.castle.animations[['m','l','p'][this.profile.character-1]].frames;
+      this.bonusAudio(3,this.castleMovie.frame+1);
       if(++this.castleMovie.frame<frames.length) {
         const packet={type:'castle-packet',frame:this.castleMovie.frame};
         events.push(packet); this.effects.push(packet); return events;
@@ -388,7 +430,7 @@ export class Session {
         const tail=this.castleWait; this.castleWait=null;
         events.push(...this.consumeCastle(tail));
       }
-      events.push(...this.consumeCastle(this.castle.step({nowTicks,nowSeconds:wallSeconds,input:this.input})));
+      if(!this.audioPending)events.push(...this.consumeCastle(this.castle.step({nowTicks,nowSeconds:wallSeconds,input:this.input})));
     }
     this.clock=this.castle.stats; this.seed=this.castle.rng.seed;
     return events;
@@ -405,7 +447,7 @@ export class Session {
     else this.enterResults();
   }
   next(nowTicks,saveProfile=()=>{}) {
-    if(this.screen!=='results')return null;
+    if(this.screen!=='results'||this.audioPending)return null;
     const queued=resultNextState(this.profile),route=nextRoute(this.profile);
     this.student.set(queued.state.pending.map(Number),44);
     const view=new DataView(this.student.buffer);view.setInt16(15,route.mode,true);view.setInt16(25,route.lesson,true);

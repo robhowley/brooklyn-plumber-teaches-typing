@@ -1,6 +1,6 @@
 # Continue the static translation
 
-Checkpoint0 is published as `026f577`; Phase1 as `5d26db4`, Phase2 as `aaf2975`. Phase3 Castle passed independent verification and was pushed as `465129e` (parent-provided publication status; static second opinion LGTM). Phase4 passed verification and was pushed as `2f9ad12` (parent-provided status). Phase5 is integrated locally, with startup, explicit Demo, menu idle and source celebrations/endings. No Phase5 commit/push or independent review is claimed. Every enabled behavior must have executable-byte or resource evidence; missing evidence leaves that behavior disabled, not approximated with invented mechanics.
+Checkpoint0 is published as `026f577`; Phase1 as `5d26db4`, Phase2 as `aaf2975`. Phase3 Castle passed independent verification and was pushed as `465129e` (parent-provided publication status; static second opinion LGTM). Phase4 passed verification and was pushed as `2f9ad12` (parent-provided status). Phase5 was independently verified and pushed as `764788a` (user-provided status), with startup, explicit Demo, menu idle and source celebrations/endings. Phase6 integrates four exact VOC clips and bounded host corrections: independently verified, main checkpoint pending. Final evidence and limits: [FINAL](reports/FINAL.md). Every enabled behavior must have executable-byte or resource evidence; missing evidence leaves that behavior disabled, not approximated with invented mechanics.
 
 ## Rules and working baseline
 
@@ -10,7 +10,7 @@ Checkpoint0 is published as `026f577`; Phase1 as `5d26db4`, Phase2 as `aaf2975`.
 - Current evidence: [coverage](COVERAGE.md), [adaptations](ASSUMPTIONS.md), [Phase 1 verification](reports/PHASE-1.md); [earlier verification](reports/VERIFICATION.md) is historical. Historical worker reports can be superseded by runtime/render recovery.
 - Already integrated: shared RNG/corpus selection, exact Practice buffer/input, Outside mechanics, idle art, indexed compositor, ground tile, Outside BAN/ANI bonus, student bytes, scoring/results/Next.
 - Phase4 integrates original menu navigation, supported student editing/chooser, report/help/keyboard/About, source numeric HUDs and BLACKBRD statistics. Phase5 now connects title/menu RNG and progression presentations.
-- Phase2 integrates Water polling/order, failure/bonus orchestration, source draw snapshots and wave tiles. Phase3 integrates Castle's metadata queue, operation2/3 branches, repeating rockface/pipe/sand sequence, scratch compositor and exact BAN write runs. Intermediate world/modal fades, original mouse raster, Practice input blink and audio playback remain omitted. Student fields use source cell inversion and tick counts; the native form remains a separate host fallback. Castle ending requests now suspend before the source ending; only its real completion releases save/results. ENDF repeats until a key. Water swimming/movie playback is unskippable.
+- Phase2 integrates Water polling/order, failure/bonus orchestration, source draw snapshots and wave tiles. Phase3 integrates Castle's metadata queue, operation2/3 branches, repeating rockface/pipe/sand sequence, scratch compositor and exact BAN write runs. Intermediate world/modal fades, original mouse raster, Practice input blink, finger hints and synthesized audio remain omitted. Four VOC clips now use exact PCM and explicit blocking continuations. Student fields use source cell inversion and tick counts; the native form remains a separate host fallback. Castle ending requests now suspend before the source ending; only its real completion releases save/results. ENDF repeats until a key. Water swimming/movie playback is unskippable.
 
 ## Checkpoint 0: publish authored work only
 
@@ -56,6 +56,7 @@ python3 -B transpile/tools/control/menu-inspect.py
 python3 -B transpile/tools/control/report-inspect.py
 python3 -B transpile/tools/control/startup-inspect.py
 python3 -B transpile/tools/control/celebration-inspect.py
+python3 -B transpile/tools/audio/decode.py
 python3 -B transpile/tools/build-app-data.py
 python3 -m http.server 4179 --bind 127.0.0.1 --directory transpile
 ```
@@ -74,7 +75,8 @@ python3 -m http.server 4179 --bind 127.0.0.1 --directory transpile
 | `.tmp/{water,castle}-evidence.json` | World inspectors validate generated listings against ZIP bytes; Castle inspector stdout must stay local |
 | `.tmp/menu/`, `.tmp/report-evidence.json` | New menu/report inspectors; pinned archive bytes, source selection-X table, member hashes, help/credit/teacher resources; already covered by ignored `.tmp/` |
 | `assets/startup/`, `assets/render/celebration/bindings.json` | Startup/celebration inspectors above, inert archive decoding only |
-| `app/data.json`, `assets/app/` | App-data builder after all inputs above; includes control screens, startup scenes/sprites and celebration scene/movie/font bindings |
+| `assets/audio/` | Audio decoder above; four exact PCM files, source CNF fields and manifest inventory; no drivers are copied |
+| `app/data.json`, `assets/app/` | App-data builder after all inputs above; includes control/startup/celebration bindings, audio metadata/config and exact PCM bytes |
 
 Other excluded listings, strings, raw wrappers and worker logs are not runtime/test inputs. Listings can be regenerated by their corresponding inspectors. Historical exact annotations are not guaranteed to reproduce; authored reports retain offsets and hashes. No excluded evidence input requires executing original code. The bootstrap worker ran the original sequence twice in an isolated checkout. Phase 1 integration reran the revised sequence both in main and in an empty ignored tree containing only authored tools and empty destination directories: 2,402 generated resource/app/evidence files matched byte-for-byte. This is a fresh-input rebuild, not a fresh dependency-install experiment. See PHASE-1 for scope and commands.
 
@@ -175,24 +177,35 @@ Each bundle requires source-offset/member-hash citations, branch-boundary tests,
 From the repository root, after regenerating local inputs:
 
 ```sh
-TMPDIR="$PWD/transpile/.tmp" node --test transpile/tests/{app,control,outdoor,worlds,runtime,render}/*.test.mjs
+TMPDIR="$PWD/transpile/.tmp" node --test transpile/tests/{app,control,outdoor,worlds,runtime,render,audio}/*.test.mjs
 TMPDIR="$PWD/transpile/.tmp" python3 -B -m unittest discover -s transpile/tests/assets -p 'test_*.py'
 TMPDIR="$PWD/transpile/.tmp" python3 -B -m unittest discover -s transpile/tests/render -p 'test_*.py'
 TMPDIR="$PWD/transpile/.tmp" python3 -B -m unittest discover -s transpile/tests/app -p 'test_*.py'
+TMPDIR="$PWD/transpile/.tmp" python3 -B -m unittest discover -s transpile/tests/audio -p 'test_*.py'
 TMPDIR="$PWD/transpile/.tmp" PLAYWRIGHT_JUNIT_OUTPUT_FILE=transpile/reports/browser/results.xml \
   node_modules/.bin/playwright test -c transpile/playwright.config.mjs --reporter=junit
 ```
 
-Use `structured_return` (`node-test-text`, `unittest-text`, `junit-xml`). The app Python tests rebuild outputs, so run them in an isolated checkout when preserving current local assets matters. Browser checks currently need the existing root Playwright installation and installed Google Chrome; do not edit root configuration. Add the bundle6 audio suites explicitly when created. Check `git diff --check`, directory boundaries and the exact index before every authorized checkpoint.
+Use `structured_return` (`node-test-text`, `unittest-text`, `junit-xml`). The app Python tests rebuild outputs, so run them in an isolated checkout when preserving current local assets matters. Browser checks currently need the existing root Playwright installation and installed Google Chrome; do not edit root configuration. Audio suites are included explicitly. Phase6 used Chrome4199, preserving PID59919 on4179. Review-fix Chrome used4202. The final independent recheck passed309 Node +45 Python +42 Chrome on4203 and live4179 smoke; static audio-fix review LGTM. See `reports/PHASE-6-VERIFICATION.md`. Check `git diff --check`, directory boundaries and the exact index before every authorized checkpoint.
 
 | Bundle | Verification/checkpoint record |
 |---|---|
 | 0 | Published checkpoint `026f577` (provided by main). Docs/ignore audit; earlier verification records80 Node +25 Python +8 Chrome passes. |
-| 1 | Pushed checkpoint `5d26db4` (provided by parent). runtime/render worker handoffs `reports/continuation/phase1/{01-worker-hard,02-worker-hard}.md`; bootstrap verifier `03-verifier.md` in p1-bootstrap. Revised fresh-input regeneration:2,402 matching files;93 Node +29 Python +9 Chrome pass. Contracts: `analysis/runtime/REENTRY.md`, `analysis/render/BGS.md`; integration evidence and exact files: `reports/PHASE-1.md`. Water/Castle disabled; independent post-integration review pending, so the full review/checkpoint gate is not claimed complete. |
+| 1 | Pushed checkpoint `5d26db4` (provided by parent). runtime/render worker handoffs `reports/continuation/phase1/{01-worker-hard,02-worker-hard}.md`; bootstrap verifier `03-verifier.md` in p1-bootstrap. Revised fresh-input regeneration:2,402 matching files;93 Node +29 Python +9 Chrome pass. Contracts: `analysis/runtime/REENTRY.md`, `analysis/render/BGS.md`; integration evidence and exact files: `reports/PHASE-1.md`. Water/Castle were disabled at that checkpoint; subsequent independent review is recorded in `reports/PHASE-1-VERIFICATION.md`. |
 | 2 | Gate passed and pushed as `aaf2975` (parent checkpoint). Independent verifier PASS:137 Node +30 Python +14 Chrome, review `reports/PHASE-2-VERIFICATION.md`. Water bonus erasure/bubble snapshots fixed. Historical implementation record: `reports/PHASE-2.md`. |
 | 3 | Independently verified and pushed as `465129e` (parent status). Static second opinion: `reports/continuation/phase3/verification/02-second-opinion.md`, LGTM.178 Node +31 Python +19 Chrome; source keys drive two cycles/all3 characters. See `reports/PHASE-3.md` and `reports/PHASE-3-VERIFICATION.md`. |
 | 4 | Verified and pushed as `2f9ad12` (parent status). 213 Node +32 Python +27 Chrome. `reports/PHASE-4.md` is the historical local integration report. The subsequent second opinion identified a Phase5 Demo Alt-X guard issue, now regression-tested in both option states. |
-| 5 | Local integration. Only11 declared authored files imported from p5-startup/p5-celebration, generated resources rebuilt locally. Startup/menu/Demo and all3 source progression presentations connected. 268 Node +33 Python +32 Chrome passed (Chrome4194, preserving4179). Verification and bounded gaps: `reports/PHASE-5.md`. No commit/push or independent Phase5 approval claimed. |
-| 6 | Pending. Audio requests have explicit synchronous `pendingPhase6-silent` returns; no playback or guessed delay. |
+| 5 | Independently verified and pushed as `764788a` (user-provided status). Historical local integration:268 Node +33 Python +32 Chrome (4194, preserving4179), `reports/PHASE-5.md`; all4 live4179 typing/results flows independently passed before Phase6. |
+| 6 | Independently verified, main checkpoint pending. Four exact VOC clips,158,254 samples;58 unsupported resources silent. Final recheck:309 Node +45 Python +42 Chrome (4203), plus live4179 all-world smoke; static audio-fix second opinion LGTM. See `reports/PHASE-6-VERIFICATION.md` and `reports/continuation/phase6/final-verification/`. Fresh bootstrap:18 scripts in each of2 new snapshots; all2,543 generated files and38 listing headers match. This count includes4 regenerated tracked provenance files, unlike the earlier2,539 convention. See `reports/FINAL-BOOTSTRAP.md` for worker-relative artifact paths and limits. No Phase6 commit/push. |
 
 This ledger sequences implementation and records evidence/checkpoints. It is not a personal task store.
+
+## Remaining recoverable work, in order
+
+The six bundles are verified within their documented scope, not full-game completion. The following source components remain unimplemented; this sequence is documentation, not a personal TODO list.
+
+1. **Source cursor, finger, mouse and palette presentation:** recover Practice input blink/callbacks, finger-hint graphics, original mouse raster, menu welcome color and intermediate world/modal palette transitions. Trace source callers and wait/input boundaries before replacing host substitutes; verify indexed pixels, clipping, restoration and ordering without guessed timing.
+2. **Certificate chooser and text output:** recover certificate selection, document layout and source text-output behavior after the presentation primitives above. Preserve pending/printed flags and cancellation/save boundaries. Printer transport is separate, unsupported host work, not implied by recovering the document or chooser.
+3. **Unsupported music, effects and RS synthesis:** statically recover the remaining formats, driver/bank contracts and request/stop/option behavior. Keep unsupported resources silent until byte evidence and decoder/controller tests support them; no original driver execution or guessed replacement music. Existing four-clip PCM playback does not complete this scope.
+
+Cross-cutting host limits (browser scheduling/input, storage, timezone and device behavior) remain explicit in [ASSUMPTIONS](ASSUMPTIONS.md) and [HOST-GAPS](analysis/control/HOST-GAPS.md).

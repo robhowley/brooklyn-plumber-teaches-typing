@@ -238,7 +238,7 @@ base Y: 90
 
 Increment the index after using it. At index 12, reset to zero, override this update's Y with **85**, set first obstacle's byte +1, and change mode 1 to 0 or mode 2 to 3. The next ordinary update uses Y=90 again. Mode 2 normally retains the previous character image while advancing Y; a final transition to mode 3 bypasses that image hold. Every jump-path update requests sound 2.
 
-The JS exposes image kind and index but does not currently emit that repeated jump sound. Sound-request semantics are recovered here for the audio integrator; actual overlap/throttling is not established.
+The integrated JS emits effect2 at each actual jump-path update, before later obstacle/RNG work. Synthesis remains silent and unsupported; no invented overlap/throttling is added.
 
 ### Coordinates and character-specific offsets
 

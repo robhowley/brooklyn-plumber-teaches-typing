@@ -11,7 +11,7 @@ test('natural startup retains59 palette writes,13 RNG draws, then menu idle text
  await page.clock.runFor(16020);let s=await snap(page);
  expect(s.startup.done).toBe(true);expect(s.paletteWrites).toBe(59);expect(s.screen).toBe('menu');expect(s.ticks).toBe(0);
  await page.clock.runFor(10000);s=await snap(page);expect(s.screen).toBe('menu');expect(s.menuIdle).not.toBeNull();
- expect(s.operations.map(o=>o.text)).toHaveLength(6);expect(s.audio.every(e=>e.status==='pendingPhase6-silent')).toBe(true);expect(errors).toEqual([]);
+ expect(s.operations.map(o=>o.text)).toHaveLength(6);expect(s.audio.some(e=>e.status==='omitted'&&e.outcomes.some(o=>o.status==='locked'))).toBe(true);expect(errors).toEqual([]);
 });
 test('separate source skips reach menu without a leaked lesson key and focus does not credit missed waits',async({page})=>{
  await open(page);await page.locator('#game').press('Space');await page.clock.runFor(60);

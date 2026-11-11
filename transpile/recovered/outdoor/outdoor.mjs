@@ -112,7 +112,7 @@ export function idleFrame(ticks, schedule, period) {
 }
 
 // 0x135c9..0x13851. Schedule comes from tables.json, not invented timing.
-export function updatePlayer(s, idleSchedule, idlePeriod) {
+export function updatePlayer(s, idleSchedule, idlePeriod, audioBoundary = () => {}) {
   const previousFrame = s.frame;
   const m = motion(s);
   Object.assign(s, { followX: m.followX, x: m.x, scroll: m.scroll });
@@ -129,6 +129,7 @@ export function updatePlayer(s, idleSchedule, idlePeriod) {
     } else s.frame = { kind: 'run', index: Math.trunc(s.distance / 6) % 12 };
     s.distance = i16(s.distance + Math.abs(m.dx));
   } else if (s.mode === 1 || s.mode === 2) {
+    audioBoundary({type:'effect',id:2,file:0x13802});
     s.y = i16(90 + JUMP_Y[s.jumpIndex]);
     s.frame = { kind: 'jump', index: s.jumpIndex };
     s.jumpIndex = i16(s.jumpIndex + 1);
@@ -146,7 +147,7 @@ function drawRandom(s) {
 }
 
 // 0x13058..0x133f6. No proximity gate: spawn if all active x <= 220.
-export function updateObstacles(s) {
+export function updateObstacles(s, audioBoundary = () => {}) {
   const events = [];
   if (!s.obstacles.some(o => o.active && o.x > 220)) {
     const code = nextTarget(s.stream); // original consumes even if no free slot
@@ -164,6 +165,7 @@ export function updateObstacles(s) {
       if (o.countdown <= 0) {
         x = -1;
         events.push({ type: 'sound', id: o.type === 1 ? 4 : 3 });
+        audioBoundary({type:'effect',id:o.type === 1 ? 4 : 3});
         if (o.type === 1) {
           const ox = s.character === 3 ? 36 : 0, oy = s.character === 3 ? 30 : 0;
           for (const [dx, dy, vx, vy] of [[0, 0, -2, -6], [0, 8, -2, -3], [10, 0, 2, -6], [10, 8, 2, -3]]) {
@@ -258,12 +260,12 @@ export function requestEnd(s, aborted = false) {
  * The bonus cinematic path is deliberately returned, never silently simulated.
  */
 export function tick(s, { key = 0, elapsed = 0, limit = 120, idleSchedule, idlePeriod,
-  bonus = null, second = 0, exitShortcutEnabled = false, pollInput = null } = {}) {
+  bonus = null, second = 0, exitShortcutEnabled = false, pollInput = null, audioBoundary = () => {} } = {}) {
   if (s.ended) return [];
   s.groundPhase = i16(s.groundPhase + s.scroll) % 20; // 0x1436c, OLD scroll
   if (bonus) updateBonus(bonus, s.x, second); // before player movement, 0x139cd
-  updatePlayer(s, idleSchedule, idlePeriod);
-  const events = updateObstacles(s);
+  updatePlayer(s, idleSchedule, idlePeriod, audioBoundary);
+  const events = updateObstacles(s, audioBoundary);
   updateParticles(s);
   selectTarget(s);
   if ((elapsed | 0) >= (limit | 0)) requestEnd(s); // signed long compare, 0x13a8e..0x13aad
@@ -278,7 +280,10 @@ export function tick(s, { key = 0, elapsed = 0, limit = 120, idleSchedule, idleP
       events.push({ type: 'bonus-cinematic-required', source: '0x13bc5' });
     } else {
       const result = acceptKey(s, key);
-      if (result !== 'ignored') events.push({ type: result, sound: result === 'correct' ? 1 : 11 });
+      if (result !== 'ignored') {
+        audioBoundary({type:'effect',id:result === 'correct' ? 1 : 11});
+        events.push({ type: result, sound: result === 'correct' ? 1 : 11 });
+      }
     }
   }
   if (s.mode === 3) { s.ended = true; events.push({ type: 'end', aborted: s.aborted }); }

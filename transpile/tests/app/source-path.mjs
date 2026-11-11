@@ -31,8 +31,11 @@ export async function finishCelebrationUI(page) {
   }
   throw new Error('Source celebration did not return');
 }
-export async function skipStartupUI(page) {
+export async function skipStartupUI(page,{muted=true}={}) {
   await page.waitForFunction(()=>document.querySelector('#game')?.dataset.screen);
+  // Non-audio suites explicitly omit sound, never wait a fabricated clip duration.
+  if(muted && !await page.evaluate(()=>translationSnapshot().audioHost.muted))await page.locator('#host-mute').click();
+  await page.locator('#focus').click();
   await page.evaluate(()=>window.scrollTo(0,0));
   // Queue separate keys for each original skip site before the next sampled tick.
   for(let i=0;i<4;i++)await page.locator('#game').press('Space');
@@ -44,6 +47,7 @@ export async function skipStartupUI(page) {
     if(await page.evaluate(()=>!!window.__sourceTestClock))await page.clock.runFor(60);
     else await page.waitForTimeout(60);
   }
+  await page.waitForFunction(()=>!translationSnapshot().audioHost.blocking);
   if(await page.evaluate(()=>!!window.__sourceTestClock))await page.clock.runFor(300);
   else await page.waitForTimeout(300);
 }

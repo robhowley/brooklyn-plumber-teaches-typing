@@ -45,7 +45,7 @@ def main():
             inert=out/(name+'.elf.data'); inert.write_bytes(header+code+names+bytes(shoff-noff-len(names))+sections)
             try:
                 result=subprocess.run(['objdump','-d','--triple=i386-unknown-unknown-code16','--x86-asm-syntax=intel',str(inert)],capture_output=True,text=True,check=True)
-                (out/(name+'.asm.txt')).write_text(result.stdout)
+                (out/(name+'.asm.txt')).write_text(result.stdout.replace(f'\n{inert}:\tfile format ', f'\n{inert.name}:\tfile format ', 1))
             finally: inert.unlink()
         manifest['initialState']={}
         for ds,size in [(0x4833,4),(0x4837,4),(0x4e2c,2),(0x41ac,2)]:

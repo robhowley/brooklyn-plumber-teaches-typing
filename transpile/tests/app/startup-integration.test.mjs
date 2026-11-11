@@ -17,7 +17,9 @@ test('process entry includes natural startup13 draws or explicit source skips0, 
     assert.equal(events.filter(e=>e.type==='letter').length,13);
     assert.equal(s.input.pending(),false);
     s.menuStep(waits+1);assert.equal(s.seed,lcg(1,natural?14:1));
-    assert.equal(s.audioLog.every(e=>e.status==='pendingPhase6-silent'),true);
+    assert.equal(s.audioLog.every(e=>e.status==='unsupported-silent'),true);
+    assert.equal(s.audioLog.filter(e=>e.request.type==='effect'&&e.request.id===1).length,natural?13:0);
+    assert.deepEqual(s.audioLog.filter(e=>e.request.type==='speech').map(e=>e.request.name),['welcome']);
   }
 });
 test('source entry audio callback returns before Water last-input sample and Castle next operation',()=>{

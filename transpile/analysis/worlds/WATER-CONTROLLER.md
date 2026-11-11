@@ -54,7 +54,7 @@ Effects are new ordered records on each call; text and bubble arrays are copied.
 |---|---|
 | `scene {character}` | Fresh WATER scene/palette/resources, not a retained loaded-scene shortcut |
 | `text {bytes,targetIndex}` | Sanitized temporary display copy,20 or40 bytes; prefix/target/suffix rendering follows `0x16e8a..0x16f3d` |
-| `prompt-stop`, `prompt {code,argument:5}` | Source speech-service requests; silence is an explicit unsupported-audio policy, not invented speech |
+| `prompt-stop`, `prompt {code,argument:5}` | Graphics service1101/1103 at FILE0x18019, not speech. Finger-hint raster binding remains missing; never route these to audio |
 | `background-update` | Call-site `0x17736 -> 0x9cab`, occurs before input every loop, including motion-suppressed loops; not a generic scene redraw |
 | `stats` | Operation200's refreshed counters/elapsed/accuracy/WPM, before any actor movement; `startedAt/stoppedAt/refreshedAt` are source wall-time fields, not the elapsed timer |
 | `swimmer` | `x/y` current position, `frame`0..5, signed `counter`, horizontal `delay`, `peak/target`, `resourceIndex`; WATER0..17 swimming or34..36 sunk |
@@ -155,6 +155,6 @@ Node commands use `structured_return`, parser `node-test-text`. Final targeted r
 - **Required consumer integration remains:** Session mode2, clock wait acknowledgment, per-key error/profile persistence, Water indexed renderer, background effect, bonus packet playback/restore and results routing. No shared app files were changed.
 - **Progression presentation remains phase5:** this controller stops at `celebration` until the original presentation is implemented or an explicit host adaptation is approved. It never guesses playback length or silently skips it.
 - **No browser cadence proof:** `tickReady` is a host boundary, not DOS hardware emulation. Browser event delivery, typematic/focus, queue capacity/drop behavior and actual BIOS frequency transport remain adaptations.
-- **Unsupported presentation/device details:** intermediate fades, audio and option20 diagnostic-console rendering are emitted source requests, not implemented effects. Option10 process quit requires a host policy rather than pretending to terminate a browser process.
+- **Unsupported presentation/device details:** intermediate gameplay fades, finger-hint graphics, synthesized audio and option20 diagnostic-console rendering remain omitted. Phase6 plays exact Ready VOC at a split entry boundary before music3/lastInput; its already-started timer includes speech time. Option10 process quit requires a host policy rather than pretending to terminate a browser process.
 - **Bad original-data states fail visibly:** all-NUL prefill and unusable corpus throw instead of hanging; negative resource indices from extreme counter overflow remain an unsupported renderer memory-read case, not repaired modulo wrapping.
 - No full original-machine differential test, Water browser test or rendered-screen fidelity claim is made. These tests establish the translated controller's source-derived state/order boundaries only.
