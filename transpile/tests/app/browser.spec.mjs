@@ -5,7 +5,8 @@ test('entry/menu uses local decoded assets only; disabled controls and hover sur
  const failures=[],requests=[];page.on('pageerror',e=>failures.push(e.message));page.on('request',r=>requests.push(r.url()));
  await ready(page);expect(await page.locator('canvas').getAttribute('width')).toBe('320');
  await point(page,250,20,false);await expect(page.locator('#game')).toHaveCSS('cursor','pointer');
- await point(page,250,55,false);await expect(page.locator('#game')).toHaveCSS('cursor','not-allowed');await point(page,250,55);await expect(page.locator('#status')).toContainText('disabled');
+ await point(page,250,55,false);await expect(page.locator('#game')).toHaveCSS('cursor','pointer');
+ await point(page,250,85,false);await expect(page.locator('#game')).toHaveCSS('cursor','not-allowed');await point(page,250,85);await expect(page.locator('#status')).toContainText('disabled');
  await point(page,30,4);await expect(page.locator('#status')).toContainText('Dropdowns are disabled');
  await page.locator('#game').press('m');await expect(page.locator('#status')).toContainText('disabled');
  await page.setViewportSize({width:390,height:800});await point(page,250,20);await expect(page.locator('#game')).toHaveAttribute('data-screen','outdoor');

@@ -21,17 +21,26 @@ def sprite_record(sprite, root):
     return {**sprite, 'pixels': b64(root / sprite['indicesPath'])}
 
 for sprite in manifest['sprites']:
-    if sprite['family'] in ('WALKING', 'OUTSIDE', 'FONT5H', 'FONT7H', 'PRACTICE'):
+    if sprite['family'] in ('WALKING', 'OUTSIDE', 'FONT5H', 'FONT7H', 'FONT9H', 'PRACTICE'):
         result['sprites'][sprite['family'] + '/' + sprite['name']] = sprite_record(sprite, ASSETS)
-# Water/Castle consumers use assets/render/manifest.json (BGS.md); do not
-# duplicate their decoded resources in the currently Outside/Practice app.
+# Only Water is enabled; Castle resources remain outside the app bundle.
 for sprite in render['sprites']:
-    if sprite['family'] == 'IDLE':
-        result['sprites']['IDLE/' + sprite['name']] = sprite_record(sprite, RENDER)
+    if sprite['family'] in ('IDLE', 'WATER', 'WATER_INLINE'):
+        result['sprites'][sprite['family'] + '/' + sprite['name']] = sprite_record(sprite, RENDER)
 for palette in manifest['palettes']:
     result['palettes'][palette['name']] = json.loads((ASSETS / palette['path']).read_text())['rgb8']
 for char, palette in render['palettes'].items():
     result['palettes']['outdoor-' + char] = [c for rgb in palette['rgb8'] for c in rgb]
+water = json.loads((RENDER / 'water/bindings.json').read_text())
+result['water'] = {'waves': water['waves'], 'animations': {}, 'playback': water['playback']}
+for char, palette in water['palettes'].items():
+    result['palettes']['water-' + char] = [c for rgb in palette['rgb8'] for c in rgb]
+for char, animation in water['animations'].items():
+    result['water']['animations'][char] = {'frames': [
+        {'writes': frame['writes'], 'ani': sprite_record(frame['ani'], RENDER)}
+        for frame in animation['frames']]}
+bg = render['worlds']['water']['background']
+result['backgrounds']['WATER'] = {**bg, 'pixels': b64(RENDER / bg['indicesPath'])}
 for bg in manifest['backgrounds']:
     if bg['name'] in ('MAINMENU', 'OUTSIDE', 'OUTSKY', 'PREFS', 'LESSTIME', 'BLACKBRD', 'PRACTICE'):
         result['backgrounds'][bg['name']] = {**bg, 'pixels': b64(ASSETS / bg['indicesPath'])}

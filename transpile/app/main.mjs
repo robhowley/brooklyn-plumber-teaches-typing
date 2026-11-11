@@ -30,6 +30,7 @@ function draw() {
   if(session.screen==='menu') renderer.menu(p);
   else if(session.screen==='student'||session.screen==='times') renderer.setup(p,session.screen==='times');
   else if(session.cinematic) renderer.cinematic(p.character,session.cinematic.frame);
+  else if(session.screen==='water') renderer.water(session.takeEffects(),session.water);
   else if(session.screen==='outdoor') renderer.outdoor(session.outdoor,session.stats(),session.bonus);
   else if(session.screen==='practice') renderer.practice(session.practice,session.stats(),session.expression(Math.floor(Date.now()/1000)),session.typed);
   else if(session.screen==='results') renderer.results(session.result,p,session.activity);
@@ -39,13 +40,13 @@ function draw() {
   canvas.dataset.screen=session.screen; canvas.dataset.suspended=String(session.suspended);
 }
 function focusGame() {
-  canvas.focus(); session.suspend(false,now()); pendingKey=0;
-  notice(session.screen==='practice'?'Practice. Match case. SPACE or Enter at line ends. Escape ends the activity.':session.screen==='outdoor'?'Outside. Type the marked target. Escape or F10 ends the activity.':'1 Outside · 4 Practice · W new student · E edit · T times · N Next'); draw();
+  canvas.focus(); session.suspend(false,now()); pendingKey=0; session.input.flush();
+  notice(session.screen==='water'?'Water. Match case. Any input resets inactivity; after >20 seconds the chase begins. Escape or F10 ends.':session.screen==='practice'?'Practice. Match case. SPACE or Enter at line ends. Escape ends the activity.':session.screen==='outdoor'?'Outside. Type the marked target. Escape or F10 ends the activity.':'1 Outside · 4 Practice · W new student · E edit · T times · N Next'); draw();
 }
 function start(mode=1) { form.hidden=true; pendingKey=0; session.start(now(),mode); focusGame(); }
 function next() {
   const route=session.next(now()); pendingKey=0;
-  if(![1,4].includes(route.mode)) notice(`${data.messages[99+route.mode]} is not implemented. Next routes there at goal ${session.profile.goal}; no substitute activity was started.`);
+  if(![1,2,4].includes(route.mode)) notice(`${data.messages[99+route.mode]} is not implemented. Next routes there at goal ${session.profile.goal}; no substitute activity was started.`);
   else focusGame();
   draw();
 }
@@ -55,7 +56,7 @@ function openEditor(kind) {
   editorReturn=session.screen==='results'?'results':'menu'; isNew=kind==='new';
   const p=isNew ? new Session(data,{bytes:newStudent('Student')}).profile:session.profile;
   session.screen=kind==='times'?'times':'student'; form.hidden=false;
-  const values={name:isNew?'':p.name,lesson:p.lesson,goal:p.goal,character:p.character,minutes:p.durations[0]||2,practiceMinutes:p.durations[3]||10};
+  const values={name:isNew?'':p.name,lesson:p.lesson,goal:p.goal,character:p.character,minutes:p.durations[0]||2,waterMinutes:p.durations[1]||5,practiceMinutes:p.durations[3]||10};
   for(const [key,value] of Object.entries(values)) form.elements[key].value=value;
   for(const key of ['name','lesson','goal','character']) form.elements[key].disabled=kind==='times';
   notice('Browser editor. Values use recovered student fields; original widget behavior is not claimed.'); draw();
@@ -69,9 +70,11 @@ function menuAction(command) {
   else if(command==='edit-student') openEditor('edit');
   else if(command==='lesson-times') openEditor('times');
   else if(command==='load-student') { document.querySelector('#students').focus(); notice('Choose a saved student in the browser selector, then Load.'); }
-  else if(command==='water'||command==='castle') {
-    const mode=command==='water'?2:3;
-    notice(canSelectMode(mode,session.profile)?`${command} is disabled: not implemented.`:`${command} requires goal ${mode===2?10:30} WPM and is not implemented.`);
+  else if(command==='water') {
+    if(canSelectMode(2,session.profile)) start(2);
+    else notice('Water requires goal 10 WPM.');
+  } else if(command==='castle') {
+    notice('Castle is disabled: not implemented.');
   } else if(!['none','unrecognized','close-menu'].includes(command)) notice(`${command} is disabled in this slice. See fidelity note below.`);
   draw();
 }
@@ -88,7 +91,8 @@ canvas.addEventListener('keydown',event=>{
   const key=dosKey(event); if(!key)return;
   event.preventDefault();
   if(session.active) {
-    if(!session.suspended && !session.cinematic && !pendingKey) pendingKey=key; // one-slot host latch, not a DOS queue claim
+    if(!session.suspended && session.mode===2) session.enqueue(key);
+    else if(!session.suspended && !session.cinematic && !pendingKey) pendingKey=key; // Outside/Practice host latch
   } else if(session.screen==='menu') menuAction(mainMenuCommand(key));
   else if(session.screen==='results') resultsAction(resultCommand(key,pointer.x,pointer.y));
   else if(key===27) cancelEditor();
@@ -99,7 +103,7 @@ function locationInCanvas(event) {
 canvas.addEventListener('pointermove',event=>{
   pointer=locationInCanvas(event);
   const hit=session.screen==='menu'?mainMenuHit(pointer.x,pointer.y):-1;
-  canvas.style.cursor=session.screen==='menu'&&hit>=0?([0,3,5].includes(hit)?'pointer':'not-allowed'):session.screen==='results'&&resultHit(pointer.x,pointer.y)?'pointer':'default';
+  canvas.style.cursor=session.screen==='menu'&&hit>=0?([0,3,5].includes(hit)||(hit===1&&canSelectMode(2,session.profile))?'pointer':'not-allowed'):session.screen==='results'&&resultHit(pointer.x,pointer.y)?'pointer':'default';
 });
 canvas.addEventListener('click',event=>{
   pointer=locationInCanvas(event); canvas.focus();
@@ -111,7 +115,7 @@ canvas.addEventListener('click',event=>{
 });
 function suspend() {
   if(!session.active)return;
-  session.suspend(true,now()); pendingKey=0; notice('Suspended by browser host. Focus game to resume.'); draw();
+  session.suspend(true,now()); pendingKey=0; session.input.flush(); notice('Suspended by browser host. Focus game to resume.'); draw();
 }
 canvas.addEventListener('blur',suspend); window.addEventListener('blur',suspend);
 document.addEventListener('visibilitychange',()=>{if(document.hidden)suspend();});
@@ -162,4 +166,9 @@ window.translationSnapshot=()=>({screen:session.screen,profile:session.profile,r
   ticks:session.clock.ticks,seed:session.seed,initialSeed:session.initialSeed,limit:session.limit,corpusName:session.corpusName,
   bonus:structuredClone(session.bonus),cinematic:structuredClone(session.cinematic),
   practice:session.practice?{...structuredClone(session.practice),rows:Array.from(session.practice.rows),expression:session.expression(Math.floor(Date.now()/1000))}:null,
+  water:session.water?{phase:session.water.phase,window:Array.from(session.water.window),display:Array.from(session.water.display),
+    targetIndex:session.water.targetIndex,redrawCount:session.water.redrawCount,stats:{...session.water.stats},
+    swimmer:{...session.water.swimmer},pursuer:{...session.water.pursuer},bonus:{...session.water.bonus},
+    failed:session.water.failed,failurePhase:session.water.failurePhase,aborted:session.water.aborted,
+    lastInput:session.water.lastInput,timedOut:session.water.timedOut,movie:structuredClone(session.waterMovie)}:null,
   outdoor:session.outdoor?structuredClone(session.outdoor):null});

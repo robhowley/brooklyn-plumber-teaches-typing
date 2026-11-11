@@ -10,7 +10,7 @@ Run `python3 -B transpile/tools/render/decode.py` from the checkout root. No add
 |---|---|
 | `sprites[]` | First 145 IDLE records unchanged; appended WATER (37), CASTLE (15), WALKING (90), WATER_INLINE (2). Resolve by **family and index**, never global array index. Each has additive `headerWords`, `originX/Y`, dimensions, `indicesPath`, SHA-256. GSO records retain original checksum and member offsets. |
 | `worlds.water/castle.background` | Decoded 320×200 CRX, path and pixel hash. |
-| `worlds.water/castle.palettes.m/l/p` | Final RGB6/RGB8 palettes, `baseMember`, `characterMember`, inclusive `replacedSlots:[32,47]`. |
+| `worlds.water/castle.palettes.m/l/p` | Final RGB6/RGB8 palettes, `baseMember`, `characterMember`, inclusive character slots32..47; Water additionally splices BITER48..63 (`replacedSlots:[32,63]`). |
 | `worlds.castle.scenes[0..3]` | BGS source offsets/sizes, original indices, dimensions, explicit inclusive source/destination rectangles, local paths and pixel hashes. |
 | `worlds.*.frames` | Original resource indices, detailed below. |
 | `worlds.castle.clipChanges` | Ordered static call sites and inclusive clip rectangles, **not** an automatic time sequence. Controller branches select these changes. |
@@ -89,7 +89,7 @@ Castle operation `0xbb06` saves the scene clip at `0xbb27`, sets full screen at 
 
 Castle sand bonus temporarily expands scene0 at `0xde9c`, then after movie playback and resource reload the caller expands scene2 at `0xbe28`. Both target rows26..154. Return path marks all three rockfaces dirty (`0xbdea..0xbe07`), redraws background, restores palette at `0xbe56`, and later restores the caller's saved clip at `0xc02d`.
 
-Castle palette starts from CASTLE.CRX: FILE `0xd635..0xd64e` copies768 bytes, `0xd808` applies character slots32..47. Water applies the same splice to WATER.CRX at `0x16ac7`. Original helper is `0x14a8c..0x14b65`. No scene-specific palette replacement or turtle palette was found in these paths. Intermediate fades and persistent reentry palette state remain outside these final-palette exports.
+Castle palette starts from CASTLE.CRX: FILE `0xd635..0xd64e` copies768 bytes, `0xd808` applies character slots32..47. Water applies the same character splice to WATER.CRX at `0x16ac7`, then loads BITER.GPO and copies slots48..63 at `0x16ace..0x16b74`. This corrects the Phase1 omission; no TURTLE palette is used for Water. Original character helper is `0x14a8c..0x14b65`. See WATER.md for BITER member hash and tests. Intermediate fades and persistent reentry palette state remain outside these final-palette exports.
 
 Water bonus FILE `0x17ef9..0x17fa3` selects MSWM/LSWM/PSWM BAN+ANI. Castle `0xde6c..0xdf45` selects MCAS/LCAS/PCAS. Both callbacks (`0x17ebb`, `0xde2e`) call the two-wait helper `0x14725`, rather than assuming Outside timing. Sound7 tables are FILE `0x21d29` and `0x21430`, eleven one-based packet numbers each. BAN retains its existing persistent-write semantics; ANI rasters are overlaid at signed table coordinates using their additive origins. Full bonus orchestration and intermediate fades are not implemented here.
 

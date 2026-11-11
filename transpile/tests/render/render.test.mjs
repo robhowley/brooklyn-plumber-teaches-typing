@@ -110,14 +110,15 @@ test('BGS opaque row placement and forty exact eight-pixel visible strips',()=>{
  assert.throws(()=>drawCastleScene(front,zero.subarray(1)),RangeError);
 });
 
-test('Water/Castle palettes replace only character slots, without outdoor turtle splice',()=>{
+test('world palette primitive splices characters; Water export also splices BITER',()=>{
  const base=new Uint8Array(768).fill(7),character=new Uint8Array(768).fill(9);
  const result=worldPalette(base,character);
  for(let i=0;i<768;i++) assert.equal(result[i],i>=96&&i<144?9:7);
  assert.equal(base[96],7);
  assert.throws(()=>worldPalette(base.subarray(1),character),RangeError);
  for(const world of ['water','castle']) for(const char of 'mlp') {
-  const p=manifest.worlds[world].palettes[char];assert.deepEqual(p.replacedSlots,[32,47]);
+  const p=manifest.worlds[world].palettes[char];assert.deepEqual(p.replacedSlots,world==='water'?[32,63]:[32,47]);
+  if(world==='water') assert.equal(p.pursuerMember,'BITER.GPO');
  }
 });
 

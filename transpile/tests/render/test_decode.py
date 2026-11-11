@@ -75,6 +75,7 @@ class DecodeTests(unittest.TestCase):
                 for char in 'mlp':
                     palette=bytearray(z.read('MarioTea/MARIO/'+world.upper()+'.CRX')[:768])
                     palette[96:144]=z.read('MarioTea/MARIO/'+char.upper()+'PALLET.GPO')[96:144]
+                    if world=='water': palette[144:192]=z.read('MarioTea/MARIO/BITER.GPO')[144:192]
                     actual=manifest['worlds'][world]['palettes'][char]['rgb6']
                     self.assertEqual(bytes(v for rgb in actual for v in rgb),palette)
 

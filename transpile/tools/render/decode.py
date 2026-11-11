@@ -220,9 +220,11 @@ def main():
             world_palettes={}
             for char in 'MLP':
                 palette=bytearray(data[:768]); palette[96:144]=get(char+'PALLET.GPO')[96:144]
+                if world=='WATER': palette[144:192]=get('BITER.GPO')[144:192]
                 world_palettes[char.lower()]={'rgb6':[list(palette[i:i+3]) for i in range(0,768,3)],
                     'rgb8':[[round(c*255/63) for c in palette[i:i+3]] for i in range(0,768,3)],
-                    'baseMember':world+'.CRX','characterMember':char+'PALLET.GPO','replacedSlots':[32,47]}
+                    'baseMember':world+'.CRX','characterMember':char+'PALLET.GPO','replacedSlots':[32,63] if world=='WATER' else [32,47],
+                    **({'pursuerMember':'BITER.GPO'} if world=='WATER' else {})}
             worlds[world.lower()]={'background':{'width':320,'height':200,'indicesPath':path,
                 'indicesSha256':hashlib.sha256(pixels).hexdigest()},'palettes':world_palettes,
                 'bonus':{c:{'ban':c.upper()+('SWM' if world=='WATER' else 'CAS')+'.BAN',

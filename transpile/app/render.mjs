@@ -1,4 +1,5 @@
 import { blitSprite, drawGround, characterFrame, updateSprite, spriteRect, clipRect } from '../recovered/render/render.mjs';
+import { waterActorOperations, drawWaterOperations, drawWaterText, waterBonusSprite, drawWaterBonusPacket } from './water-render.mjs';
 const bytes = text => Uint8Array.from(atob(text), c=>c.charCodeAt(0));
 // Indexed full-scene redraw is a host adaptation; origins, masks, tile, palette
 // ranges and resource selection use recovered APIs. No PNG palette guessing.
@@ -7,6 +8,7 @@ export class Renderer {
     this.canvas=canvas; this.ctx=canvas.getContext('2d'); this.data=data;
     this.front=new Uint8Array(64000); this.pixels={}; this.backgrounds={}; this.animations={};
     this.image=this.ctx.createImageData(320,200);
+    this.waveCounter=-1; // DS:0302 / FILE0x1f572 initial FFFF; retained across entries.
   }
   async load() {
     for(const [name,s] of Object.entries(this.data.sprites)) {
@@ -19,6 +21,15 @@ export class Renderer {
       if(this.backgrounds[name].length!==64000) throw new Error(`Invalid background: ${name}`);
     }
     this.ground=bytes(this.data.ground);
+    const records=family=>Object.entries(this.data.sprites).filter(([,s])=>s.family===family)
+      .sort((a,b)=>a[1].index-b[1].index).map(([name,sprite])=>({sprite,pixels:this.pixels[name]}));
+    this.waterResources={water:records('WATER'),bubbles:records('WATER_INLINE')};
+    this.font9=records('FONT9H'); this.font7=records('FONT7H');
+    this.waves=this.data.water.waves.map(bytes);
+    this.waterAnimations=Object.fromEntries(Object.entries(this.data.water.animations).map(([char,a])=>[char,a.frames.map(f=>({
+      writes:f.writes.map(w=>({offset:w.offset,pixels:bytes(w.pixels)})),
+      current:{x:f.ani.x,y:f.ani.y,sprite:f.ani,pixels:bytes(f.ani.pixels)}
+    }))]));
     await Promise.all(Object.entries(this.data.bonusAnimations).map(async([char,a])=>{
       const response=await fetch('./'+a.backgroundsPath);
       if(!response.ok) throw new Error(`Missing bonus frames: ${a.backgroundsPath}`);
@@ -78,6 +89,7 @@ export class Renderer {
     this.background(duration?'LESSTIME':'PREFS');
     if(duration) {
       this.text(`Outside: ${profile.durations[0]} min`,64,76);
+      this.text(`Water: ${profile.durations[1]} min`,64,93);
       this.text(`Practice: ${profile.durations[3]} min`,64,110);
     } else {
       this.text(`Student Name: ${profile.name}`,40,80);
@@ -141,6 +153,44 @@ export class Renderer {
     // Every BAN packet modifies background first. Recovered compositor adds ANI
     // signed coordinates and raster origins. Full background copy is host redraw.
     updateSprite(this.front,background,{...current,sprite:current.sprite},null);
+    this.present();
+  }
+  water(effects,state) {
+    const scene=this.backgrounds.WATER;
+    for(const e of effects) {
+      if(e.type==='scene') {
+        this.background('WATER','water-'+['m','l','p'][e.character]);
+        this.waterDraw={character:e.character+1};
+        this.waterResources.bonus=waterBonusSprite(this.waterResources.water[33],this.font7[state.bonus.code-32]);
+      } else if(e.type==='background-update') {
+        // 0x9cab..0x9d3f: twenty16x14 tiles at y65, zero restores scene.
+        this.waveCounter=(this.waveCounter+1)%50;
+        for(let tile=0;tile<20;tile++) {
+          const raster=this.waves[(Math.floor(this.waveCounter/2)+tile)%25];
+          for(let y=0;y<14;y++) for(let x=0;x<16;x++) {
+            const dest=(65+y)*320+tile*16+x;
+            this.front[dest]=raster[y*16+x]||scene[dest];
+          }
+        }
+      } else if(e.type==='text') drawWaterText(this.front,scene,this.font9,e.bytes,e.targetIndex);
+      else if(['swimmer','pursuer','bubbles','bonus','bonus-erase'].includes(e.type)) {
+        const actor=e.type==='bonus-erase'?'bonus':e.type;
+        const before={character:this.waterDraw.character,[actor]:actor==='bubbles'?e.previous:this.waterDraw[actor]};
+        const current=actor==='bubbles'?e.bubbles:e.type==='bonus-erase'?{...this.waterDraw.bonus,mode:3}:e;
+        const after={character:this.waterDraw.character,[actor]:current};
+        const operations=waterActorOperations(this.waterResources,after,before)
+          .filter(op=>actor==='bubbles'?op.actor.startsWith('bubble-'):op.actor===actor);
+        drawWaterOperations(this.front,scene,operations);
+        this.waterDraw[actor]=current;
+      } else if(e.type==='play-bonus') {
+        this.front.set(scene); this.movieBackground=scene.slice(); this.moviePrevious=null;
+      } else if(e.type==='water-packet') {
+        const packet=this.waterAnimations[['m','l','p'][state.character]][e.frame];
+        this.moviePrevious=drawWaterBonusPacket(this.front,this.movieBackground,packet.writes,packet.current,this.moviePrevious);
+      } else if(e.type==='restore-scene') this.front.set(scene);
+      else if(e.type==='restore-palette') this.palette='water-'+['m','l','p'][state.character];
+      // Audio/fades and optional Phase5 presentation are explicitly disabled.
+    }
     this.present();
   }
   results(result,profile,activity) {

@@ -17,6 +17,11 @@
 /analysis/runtime/corpora.json
 /analysis/worlds/strings.json
 /analysis/worlds/tables.json
+# Water static traces/evidence remain local, including future focused listings.
+/analysis/worlds/water-*.txt
+/analysis/worlds/water-evidence.json
+/analysis/render/water-*.txt
+/analysis/render/water-evidence.json
 /recovered/worlds/tables.mjs
 # Worker checkouts and host scratch must stay on disk, outside accidental adds.
 /node_modules/

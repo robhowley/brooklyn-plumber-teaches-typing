@@ -1,6 +1,6 @@
 # Coverage of the integrated two-activity slice
 
-**Outside and Practice are playable through results and Next. Water and Castle remain disabled.** “Implemented” below means used by this browser app; “recovered-only” means evidence or tested helpers exist but the feature is not exposed. “Unknown” means a consequential detail is not established, not permission to invent it.
+**Outside, Water and Practice are playable through results and Next. Castle remains disabled.** “Implemented” below means used by this browser app; “recovered-only” means evidence or tested helpers exist but the feature is not exposed. “Unknown” means a consequential detail is not established, not permission to invent it.
 
 ## Evidence map
 
@@ -82,20 +82,22 @@ All FILE offsets refer to `MarioTea/MARIO/MARIO.EXE`, SHA256 `6caed439b64dc3bad8
 | Eligible completion/goal update | Implemented for Outside | C `0x13d4a..0x13dac`; before results, exit gate honored, strict > cap preserved |
 | Results image/buttons/keys | Implemented | C `0x164dc..0x167bb`; inclusive Next/Menu bounds, Enter pointer semantics, Next does not increment again |
 | Result speech | Recovered-only | `resultSpeech`, previousGoal comparison; silent |
-| Water/Castle advancement | Recovered-only | C `0x17e24`, `0xda44`; no enabled activity |
+| Water advancement | Implemented | C `0x17e24`; failure/abort gates, cached score, strict >30 completion; optional Phase5 animation explicitly skipped |
+| Castle advancement | Recovered-only | C `0xda44`; Castle disabled |
 | Ending flags/ending art | Recovered-only/unknown playback | C `0xdf46`, A ENDF; not presented |
 | Certificate queue | Recovered-only | C `0x103d0..0x103f0`; separate completion/printed/pending bytes retained; queue/print commands disabled |
 | Printer and certificate output | Unknown transport | CERTIF artwork decoded, no browser print substitute |
 
-## Water and Castle (visibly disabled), Practice (implemented)
+## Water and Practice (implemented), Castle (disabled)
 
 | Original area | Status | Evidence and limit |
 |---|---|---|
-| Water words/window/input | Recovered-only | W `0x16a04`, `0x174b3`, `0x17892`; case-sensitive, normalized whitespace/window rules |
-| Water swimmer/peak-WPM positioning | Recovered-only | W `0x172d9..0x17453`; tested arithmetic, no host loop |
-| Water pursuer/bubbles | Recovered-only | W `0x1710a`, `0x16fd4`; scripted animation, no invented collision |
-| Water inactivity/failure/sinking | Recovered-only | W `0x176e6`, >20 any-input inactivity; no playable failure UI |
-| Water bonus/music/cutscenes | Recovered-only/unknown | W `0x17560`, `0x17ef9`; T shared key producer and R decoded ANI/BAN now available, but Water-specific scheduling/restore/audio remains unintegrated |
+| Water words/window/input | Implemented | W `0x16a04`, `0x174b3`, `0x17892`; case-sensitive, normalized whitespace/window rules |
+| Water swimmer/peak-WPM positioning | Implemented | W `0x172d9..0x17453`; source-ordered controller, draw-time snapshots |
+| Water pursuer/bubbles | Implemented | W `0x1710a`, `0x16fd4`; scripted animation, no invented collision |
+| Water inactivity/failure/sinking | Implemented | W `0x176e6`, >20 any-input inactivity, chase/sink through results/Next |
+| Water bonus | Implemented | W `0x17560`, `0x17ef9`; all three56-packet movies, two changed-tick waits, timer stop/restore/input flush |
+| Water presentation | Implemented except HUD/audio/fades | FONT9H(0,47), FONT7H bonus, BITER slots48..63, ordered dirty actors and source wave tiles; optional celebration disabled until Phase5 |
 | Castle sentences/metadata queue | Recovered-only | W `0xbb06..0xbf47`; case-sensitive32..126 and completion flags |
 | Castle rockfaces/movement | Recovered-only | W `0xc410..0xc921`; fixed tables, stage positions, no general collision engine |
 | Castle pipes/scroll transitions | Recovered-only | W `0xc082`, `0xca14`, `0xd127`; timed/scripted segments |
@@ -108,14 +110,14 @@ All FILE offsets refer to `MarioTea/MARIO/MARIO.EXE`, SHA256 `6caed439b64dc3bad8
 
 | Practice art/font/face | Implemented, partial presentation adaptation | PRACTICE.CRX/GSO indices0..2, FONT5H; face142,21, rows30,96+10*r; host HUD and static cursor replace unintegrated text callbacks |
 
-### Why Water and Castle stay disabled
+### Water integration and Castle gate
 
-- Water has tested numeric motion/pursuer/bubble functions, but its main loop skips animation when input remains pending (`0x17943..0x1794c`). Full input-pump/update scheduling, random bubble draw sequence, failure-to-results orchestration and world-specific bonus restoration are not integrated. A fixed-rate generic loop would invent behavior.
+- Water now honors pending suppression (`0x17943..0x1794c`), conditional RNG order, source waits, failure/results and bonus restoration. [Controller](analysis/worlds/WATER-CONTROLLER.md), [render evidence](analysis/render/WATER.md) and [Phase2 report](reports/PHASE-2.md) define the integration. Browser scheduling/typematic/focus and omitted audio/celebrations remain explicit limits.
 - Castle requires the metadata text queue, operation2/3 separation, rockface stages,40-step scrolls, pipe delays with repeated random draws, sand entrance/exit, failure loops and repeated scene cycle (`0xbb06..0xde2d`). Numeric helpers are not a complete controller. CASTLE.BGS packing, visible strips and clip call sites are now recovered (R BGS); transition scratch-background/special-compositor integration and controller-selected ordering remain pending. No substitute backgrounds or scene schedule are fabricated.
 - Shared RNG/corpus and BAN/ANI decoding resolve dependencies, not these activity controllers. Existing [worlds mechanics](analysis/worlds/MECHANICS.md), [coverage mapping](analysis/worlds/coverage.json) and [render limits](analysis/render/RENDERING.md) enumerate bounded evidence and gaps. This is not an exhaustive decompilation claim.
 
 ## Resources and proof limits
 
-A independently validates20 CRX backgrounds,567 indexed GSO/font sprites,15 lesson files,177 messages, ANI tables and archive/member hashes. R additionally validates145 GCO idle frames,628 BAN packets, nine ANI coordinate tables, exact tile and palette splice/mask/origin rules. Phase 1 adds four BGS scenes and144 Water/Castle/inline sprite records (289 total in the render manifest), world palettes and decoded ANI rasters. These remain available to later world consumers without enabling their routes or enlarging app data. VOC metadata is not audio playback. No executable, driver or archive script was launched, interpreted or emulated.
+A independently validates20 CRX backgrounds,567 indexed GSO/font sprites,15 lesson files,177 messages, ANI tables and archive/member hashes. R additionally validates145 GCO idle frames,628 BAN packets, nine ANI coordinate tables, exact tile and palette splice/mask/origin rules. Phase 1 adds four BGS scenes and144 Water/Castle/inline sprite records (289 total in the render manifest), world palettes and decoded ANI rasters. Phase2 adds only Water resources to app data; Castle remains disabled. VOC metadata is not audio playback. No executable, driver or archive script was launched, interpreted or emulated.
 
 The tests compare source-derived expectations and browser behavior, not an executed DOS reference. This matrix is bounded by the recovered reports; it is not a claim that every original routine has been decompiled.

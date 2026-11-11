@@ -37,13 +37,35 @@ class AppDataTests(unittest.TestCase):
         self.assertEqual(sum(k.startswith('IDLE/') for k in data['sprites']), 145)
         for key, sprite in data['sprites'].items():
             self.assertEqual(key, sprite['family'] + '/' + sprite['name'])
-        self.assertNotIn('worlds', data)  # next phase consumes the render manifest directly
+        self.assertNotIn('worlds', data)  # only enabled Water fields enter the app
+        self.assertIn('water', data)
+        self.assertFalse(any(s['family']=='CASTLE' for s in data['sprites'].values()))
         self.assertEqual(set(manifest['worlds']), {'water', 'castle'})
         for world in manifest['worlds'].values():
             for record in [world['background'], *world.get('scenes', [])]:
                 pixels = (ROOT / 'assets/render' / record['indicesPath']).read_bytes()
                 self.assertEqual(len(pixels), record['width'] * record['height'])
                 self.assertEqual(hashlib.sha256(pixels).hexdigest(), record['indicesSha256'])
+
+    def test_water_bindings_reach_consumer_without_repacking(self):
+        data = json.loads((ROOT / 'app/data.json').read_text())
+        bindings = json.loads((ROOT / 'assets/render/water/bindings.json').read_text())
+        exe = (ROOT / 'assets/original/raw/MarioTea/MARIO/MARIO.EXE.data').read_bytes()
+        self.assertEqual(struct.unpack_from('<h', exe, 0x1f572)[0], -1)
+        self.assertEqual(exe[0x9cde:0x9ce1], bytes.fromhex('055604'))
+        self.assertEqual(exe[0x9cd9:0x9cdc], bytes.fromhex('b9e400'))
+        for i, tile in enumerate(data['water']['waves']):
+            self.assertEqual(base64.b64decode(tile), exe[0x1f6c6+i*228:0x1f6c6+i*228+224])
+        self.assertEqual(len(data['water']['waves']), 25)
+        self.assertEqual(sum(s['family']=='FONT9H' for s in data['sprites'].values()), 96)
+        self.assertEqual(sum(s['family']=='WATER' for s in data['sprites'].values()), 37)
+        for char in 'mlp':
+            self.assertEqual(data['palettes']['water-'+char], [v for rgb in bindings['palettes'][char]['rgb8'] for v in rgb])
+            frames = data['water']['animations'][char]['frames']
+            self.assertEqual(len(frames), 56)
+            for frame, source in zip(frames, bindings['animations'][char]['frames'], strict=True):
+                self.assertEqual(frame['writes'], source['writes'])
+                self.assertEqual(base64.b64decode(frame['ani']['pixels']), (ROOT/'assets/render'/source['ani']['indicesPath']).read_bytes())
 
     def test_rebuild_is_identical(self):
         paths = [ROOT / 'app/data.json', *sorted((ROOT / 'assets/app').glob('*.indices'))]

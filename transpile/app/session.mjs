@@ -1,3 +1,5 @@
+import { createWater, stepWater } from '../recovered/worlds/water.mjs';
+import { createPendingInput } from '../recovered/runtime/runtime.mjs';
 import { createOutdoor, makeBonus, tick } from '../recovered/outdoor/outdoor.mjs';
 import { seedFromTime, lessonPrefix, loadCorpus, selectCorpusSegment, createPractice, practiceInput } from '../recovered/runtime/runtime.mjs';
 import { practiceCorpus, practiceExpression } from '../recovered/worlds/routines.mjs';
@@ -15,7 +17,7 @@ export function dosKey(event) {
     F1:0x13b, F2:0x13c, F10:0x144, ArrowUp:0x148, ArrowLeft:0x14b, ArrowRight:0x14d, ArrowDown:0x150 };
   return special[event.key] ?? (event.key.length === 1 && event.key.charCodeAt(0) < 128 ? event.key.charCodeAt(0) : 0);
 }
-export function editStudent(bytes, { name, lesson, goal, character, minutes, practiceMinutes }) {
+export function editStudent(bytes, { name, lesson, goal, character, minutes, waterMinutes, practiceMinutes }) {
   const out = bytes.slice(), v = new DataView(out.buffer);
   if (name !== undefined) {
     newStudent(name);
@@ -29,6 +31,7 @@ export function editStudent(bytes, { name, lesson, goal, character, minutes, pra
   }
   if (character !== undefined) out[29]=character;
   if (minutes !== undefined) v.setInt16(30,clampLessonMinutes(minutes),true);
+  if (waterMinutes !== undefined) v.setInt16(32,clampLessonMinutes(waterMinutes),true);
   if (practiceMinutes !== undefined) v.setInt16(36,clampLessonMinutes(practiceMinutes),true);
   return normalizeStudent(out);
 }
@@ -49,52 +52,68 @@ export class Session {
     if (!bytes) this.student[28]=0;
     this.clock=timer({},320,0); this.suspended=false; this.result=null;
     this.limit=0; this.lastPracticeCorrect=0; this.outdoorLastSecond=0;
+    this.water=null; this.input=createPendingInput(); this.lastWaitTick=0;
+    this.effects=[]; this.sampleTicks=0; this.sampleSeconds=0; this.waterMovie=null;
   }
   get profile() { return readStudent(this.student); }
-  get active() { return this.screen==='outdoor'||this.screen==='practice'; }
-  get activity() { return this.mode===4?this.practice:this.outdoor; }
-  start(nowTicks, mode=1) {
-    if (![1,4].includes(mode)) throw new Error('Unsupported activity');
+  get active() { return this.screen==='outdoor'||this.screen==='practice'||this.screen==='water'; }
+  get activity() { return this.mode===4?this.practice:this.mode===2?{...this.water.stats,aborted:this.water.aborted}:this.outdoor; }
+  start(nowTicks, mode=1, wallSeconds=Math.floor(Date.now()/1000)) {
+    if (![1,2,4].includes(mode)) throw new Error('Unsupported activity');
     const p=this.profile, rng={seed:this.seed};
-    const prefix=lessonPrefix(p.lesson,rng), kind=mode===4?practiceCorpus(p.goal):'letters';
+    const prefix=lessonPrefix(p.lesson,rng), kind=mode===4?practiceCorpus(p.goal):mode===2?'words':'letters';
     this.corpusName=(prefix+kind).toUpperCase();
     const raw=this.data.lessons[this.corpusName];
     if (!raw) throw new Error(`Missing original corpus: ${this.corpusName}.LEE`);
-    const corpus=loadCorpus(raw); selectCorpusSegment(corpus,rng);
+    const corpus=loadCorpus(raw,this.water?.stream.previousWater ?? 0); selectCorpusSegment(corpus,rng);
+    this.sampleTicks=nowTicks; this.sampleSeconds=wallSeconds; this.input.flush(); this.effects=[]; this.waterMovie=null;
     // FILE 0x12c07..0x12cbc: five bonus draws BEFORE reset/assignment of duration.
     this.bonus=mode===1?makeBonus(rng.seed,this.limit,false,this.outdoorLastSecond):null;
     if (this.bonus) rng.seed=this.bonus.seed;
     this.seed=rng.seed; this.mode=mode; this.cinematic=null;
     // REENTRY.md: the last Outside object survives intervening Practice entries.
     if (mode===1) this.outdoor=createOutdoor({bytes:raw,seed:this.seed,character:p.character,lessonIndex:corpus.index,previous:this.outdoor});
-    else {
+    else if(mode===2) {
+      this.water=createWater({stream:corpus,rng,input:this.input,
+        clock:{ticks:()=>this.sampleTicks,seconds:()=>this.sampleSeconds},
+        character:p.character-1,minutes:p.durations[1],previousLimitSeconds:this.limit,
+        previous:this.water,profile:p,profilePresent:p.profilePresent});
+      this.effects.push(...this.water.effects); this.seed=rng.seed;
+    } else {
       this.practice=createPractice(corpus,this.lastPracticeCorrect);
       this.practice.aborted=false; this.typed='';
     }
     // Student operation0xaf9 at 0x128d8/0xb1ca, body 0xe3f1..0xe419.
     this.student.fill(0,68); this.student[47]=0;
     new DataView(this.student.buffer).setInt16(15,mode,true);
-    this.limit=lessonLimitSeconds(p.durations[mode-1],mode===1?2:10);
-    this.clock=timer(timer({},320,nowTicks),300,nowTicks);
-    this.screen=mode===1?'outdoor':'practice'; this.suspended=false; this.result=null;
+    this.limit=mode===2?this.water.limitSeconds:lessonLimitSeconds(p.durations[mode-1],mode===1?2:10);
+    this.clock=mode===2?this.water.timer:timer(timer({},320,nowTicks),300,nowTicks);
+    this.screen=mode===1?'outdoor':mode===2?'water':'practice'; this.suspended=false; this.result=null;
   }
   suspend(value, nowTicks) {
     if (!this.active || this.suspended===value) return;
     // Host focus suspension also freezes cinematic frame scheduling.
     if(value) this.suspendedAt=nowTicks;
     else if(this.cinematic) this.cinematic.nextTick+=nowTicks-this.suspendedAt;
-    if(!this.cinematic) this.clock=timer(this.clock,value?310:300,nowTicks);
+    if(this.mode===2) {
+      if(value) { this.waterWasRunning=this.water.timer.running; this.water.timer=timer(this.water.timer,310,nowTicks); }
+      else if(this.waterWasRunning) this.water.timer=timer(this.water.timer,300,nowTicks);
+      this.clock=this.water.timer;
+      this.input.flush();
+    } else if(!this.cinematic) this.clock=timer(this.clock,value?310:300,nowTicks);
     this.suspended=value;
   }
-  stats() { return score({...this.activity,ticks:this.clock.ticks,limitSeconds:this.limit,previousAccuracy:this.profile.accuracy}); }
+  stats() { if(this.mode===2) return this.water.stats; return score({...this.activity,ticks:this.clock.ticks,limitSeconds:this.limit,previousAccuracy:this.profile.accuracy}); }
   expression(wallSeconds) {
     return practiceExpression(wallSeconds,this.practice.lastCorrect,this.profile.profilePresent,this.stats().wpm,this.profile.goal);
   }
   step(key, nowTicks, wallSeconds=Math.floor(Date.now()/1000)) {
     if (!this.active || this.suspended) return [];
+    if(this.mode===2) return this.stepWaterHost(key,nowTicks,wallSeconds);
     if(this.cinematic) {
       // FILE 0x1425a callback: two changed BIOS ticks per BAN/ANI packet.
       if(nowTicks>=this.cinematic.nextTick) {
+        this.lastWaitTick=nowTicks&65535;
         this.cinematic.frame++; this.cinematic.nextTick=nowTicks+2;
         const frames=this.data.bonusAnimations[['m','l','p'][this.profile.character-1]].frames;
         if(this.cinematic.frame>=frames.length) {
@@ -127,7 +146,63 @@ export class Session {
       this.clock=timer(this.clock,310,nowTicks);
       this.cinematic={frame:0,nextTick:nowTicks+2};
     }
+    if(!this.cinematic) this.lastWaitTick=nowTicks&65535; // shared Outside wait observation
     if (this.outdoor.ended) this.finish(nowTicks);
+    return events;
+  }
+  enqueue(key) {
+    if(key>255) this.input.enqueue(0,key-256);
+    else if(key) this.input.enqueue(key);
+  }
+  takeEffects() { const effects=this.effects; this.effects=[]; return effects; }
+  changedTick(ticks) {
+    const low=ticks&65535;
+    if(low===this.lastWaitTick) return false;
+    this.lastWaitTick=low; return true;
+  }
+  stepWaterHost(key,nowTicks,wallSeconds) {
+    this.sampleTicks=nowTicks; this.sampleSeconds=wallSeconds; this.enqueue(key);
+    const events=[];
+    const consume=effects=>{
+      events.push(...effects); this.effects.push(...effects);
+      for(const e of effects) {
+        if(e.type==='key-error') this.student=recordProblemKey(this.student,e.code);
+        if(e.type==='play-bonus') {
+          this.waterMovie={frame:0,waits:0};
+          const packet={type:'water-packet',frame:0}; events.push(packet); this.effects.push(packet);
+        }
+      }
+    };
+    // Drain source polling, not one key per host frame. A wait consumes a
+    // changed LOW tick once; delayed browser callbacks never catch up ticks.
+    while(this.water.phase!=='ended' && this.water.phase!=='quit') {
+      const phase=this.water.phase;
+      if(phase==='bonus') {
+        if(!this.changedTick(nowTicks)) break;
+        if(++this.waterMovie.waits<2) break;
+        this.waterMovie.waits=0;
+        const frames=this.data.water.animations[['m','l','p'][this.profile.character-1]].frames;
+        if(++this.waterMovie.frame<frames.length) {
+          const packet={type:'water-packet',frame:this.waterMovie.frame};
+          events.push(packet); this.effects.push(packet); break;
+        }
+        this.waterMovie=null; consume(stepWater(this.water,{bonusComplete:true}));
+      } else if(phase==='celebration') {
+        // Declared Phase5 omission, no guessed duration or blocked progression.
+        consume(stepWater(this.water,{celebrationComplete:true}));
+      } else if(phase==='wait') {
+        if(!this.changedTick(nowTicks)) break;
+        consume(stepWater(this.water,{tickReady:true}));
+      } else consume(stepWater(this.water));
+    }
+    this.clock=this.water.timer; this.seed=this.water.rng.seed;
+    if(this.water.phase==='ended') {
+      this.result={...this.water.stats}; this.advance=this.water.progression;
+      const v=new DataView(this.student.buffer), p=this.advance.state;
+      v.setInt16(17,this.result.wpm,true); v.setInt16(19,this.result.profileAccuracy,true);
+      v.setInt16(21,p.previousGoal,true); v.setInt16(23,p.goal,true); v.setInt16(25,p.lesson,true);
+      this.student.set(p.completed.map(Number),38); this.screen='results';
+    }
     return events;
   }
   finish(nowTicks) {
@@ -141,7 +216,7 @@ export class Session {
   }
   next(nowTicks) {
     const route=nextRoute(this.profile);
-    if (![1,4].includes(route.mode)) return route;
+    if (![1,2,4].includes(route.mode)) return route;
     new DataView(this.student.buffer).setInt16(25,route.lesson,true);
     this.start(nowTicks,route.mode); return route;
   }

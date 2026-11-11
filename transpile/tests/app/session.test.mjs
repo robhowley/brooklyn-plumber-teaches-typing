@@ -22,13 +22,13 @@ test('Escape early exit results suppress advancement and Next does not increment
  const s=session();s.start(0);s.step(27,10);assert.equal(s.screen,'results');assert.equal(s.advance.advanced,false);
  assert.equal(s.profile.lesson,1);assert.equal(s.result.elapsedSeconds,0);s.next(20);assert.equal(s.screen,'outdoor');assert.equal(s.profile.lesson,1);
 });
-test('timeout finalizes score then advances exactly once; Next routes unsupported worlds honestly',()=>{
+test('timeout finalizes score then advances exactly once; Next enters Water without a second advancement',()=>{
  const s=session();s.start(0);s.outdoor.attempts=60;s.outdoor.correct=60;s.step(0,1092);
  assert.equal(s.screen,'results');assert.equal(s.result.wpm,10);assert.equal(s.result.elapsedSeconds,60);assert.equal(s.profile.lesson,2);
  s.next(2000);assert.equal(s.profile.lesson,2);
  s.student=editStudent(s.student,{lesson:6,goal:5});s.start(3000);s.outdoor.attempts=60;s.outdoor.correct=60;s.step(0,4092);
  assert.equal(s.profile.goal,10);assert.equal(s.profile.completed[0],1);
- assert.deepEqual(s.next(5000),{mode:2,lesson:1});assert.equal(s.screen,'results');
+ assert.deepEqual(s.next(5000),{mode:2,lesson:1});assert.equal(s.screen,'water');
 });
 test('student edits clamp durations and groups; save does not touch old app namespace',()=>{
  const s=session();s.student=editStudent(s.student,{lesson:99,minutes:99});assert.equal(s.profile.lesson,6);assert.equal(s.profile.durations[0],60);
@@ -57,7 +57,6 @@ test('Outside reentry retains counters and observed seconds across Practice, not
  assert.equal(s.bonus.lastSecond,second);
  s.step(27,10,102);s.start(11,4);
  assert.equal(s.practice.lastCorrect,practiceTime);
- assert.throws(()=>s.start(12,2),/Unsupported/);
  assert.throws(()=>s.start(12,3),/Unsupported/);
 });
 test('DOS keyboard boundary rejects modified, non-ASCII and composition events',()=>{
