@@ -21,6 +21,7 @@ playwright-report/
 /app/data.json
 /analysis/**/*.data
 /analysis/**/*.elf
+/analysis/**/*.md
 # Static listings/byte evidence and generated original text/numeric resources.
 /analysis/**/*.asm.txt
 /analysis/**/disassembly.txt
@@ -64,6 +65,7 @@ playwright-report/
 *.pyc
 *.log
 # Local worker transcripts, status bundles, browser screenshots and test artifacts.
+/reports/**/*.md
 /reports/**/*.json
 /reports/**/*.jsonl
 /reports/**/*.xml

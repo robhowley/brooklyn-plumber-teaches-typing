@@ -1,4 +1,4 @@
-// Static translation only. FILE offsets/member hashes and limits: analysis/control/MENU.md.
+// Static translation only. FILE offsets/member hashes: tools/control/menu-inspect.py.
 import { mainMenuCommand, mainMenuHit, menuNavigation, canSelectMode, nextRoute } from './flow.mjs';
 import { newStudent, normalizeStudent, readStudent, STUDENT_SIZE } from './student.mjs';
 import { s16 } from './scoring.mjs';

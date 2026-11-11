@@ -199,7 +199,7 @@ export class Session {
     this.demo=p.demo?createDemo({student:this.student,rng,input:this.input,mode,lowTick:this.practiceDemoTick,option10:this.option10}):null;
     const pollInput=this.demo?args=>this.pollDemo(args):null;
     this.castleMovie=null; this.castleWait=null; this.castleEnding=null; this.castleEndingAck=null;
-    // REENTRY.md: the last Outside object survives intervening Practice entries.
+    // The last Outside object survives intervening Practice entries.
     if (mode===1) this.outdoor=createOutdoor({bytes:raw,seed:this.seed,character:p.character,lessonIndex:corpus.index,previous:this.outdoor});
     else if(mode===2) {
       this.water=createWater({stream:corpus,rng,input:this.input,

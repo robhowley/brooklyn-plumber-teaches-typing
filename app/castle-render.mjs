@@ -1,4 +1,4 @@
-// Indexed Castle presentation only. FILE offsets and contracts: analysis/render/CASTLE.md.
+// Indexed Castle presentation only. FILE evidence: tools/worlds/castle-inspect.py.
 import {blitSprite, clipRect, spriteRect, updateSprite, drawCastleScene,
   scrollCastleStrip} from '../recovered/render/render.mjs';
 

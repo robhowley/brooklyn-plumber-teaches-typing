@@ -1,4 +1,4 @@
-// Indexed Water presentation, no controller, timer or DOM. FILE evidence: analysis/render/WATER.md.
+// Indexed Water presentation, no controller, timer or DOM. FILE evidence: tools/worlds/water-inspect.py.
 import { updateSprite, worldPalette } from '../recovered/render/render.mjs';
 
 // 0x16ac7 then 0x16b38..0x16b74. BITER, not TURTLE, supplies slots 48..63.

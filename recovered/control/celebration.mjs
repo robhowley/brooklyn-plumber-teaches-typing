@@ -1,4 +1,4 @@
-// Static source sequencing, FILE offsets in analysis/control/CELEBRATIONS.md.
+// Static source sequencing, FILE evidence in tools/control/celebration-inspect.py.
 import { fireworkVariant, s16 } from '../runtime/runtime.mjs';
 
 const FULL = {left:0,top:0,right:319,bottom:199};

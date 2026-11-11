@@ -7,5 +7,5 @@
 - Keep the original ZIP, extracted members, raw bytes, listings, numerical tables and other generated data ignored. Never force-add them or apply MIT to game material. Public deployment of the required runtime subset is authorized, not a copyright license. See NOTICE.
 - Preserve the exact `mtt-static-translation.students.v1` save format. Leave `typing-kingdom-v1` and `typing-kingdom-v2` untouched; do not invent conversion or deletion.
 - Only main may commit/push with explicit authorization. Workers never stage, commit or push. Audit exact changed paths and ignores before publication.
-- Build/test with README commands and `structured_return`. Browser checks target built dist at root and project prefix, using isolated contexts. Do not disturb a user server without explicit authorization.
-- Historical reports preserve pre-promotion paths/commands. They are evidence, not current setup instructions. Current entrypoints are README and PLAN.
+- Build/test with `docs/DEVELOPMENT.md` commands and `structured_return`. Browser checks target built dist at root and project prefix, using isolated contexts. Do not disturb a user server without explicit authorization.
+- Keep working plans, research writeups and verification reports out of Git. Maintain only repository instructions and build/play documentation; retain source citations in code and machine-readable evidence.

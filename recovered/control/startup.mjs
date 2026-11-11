@@ -1,4 +1,4 @@
-// MARIO.EXE FILE offsets. Static recovery and host boundaries: analysis/control/STARTUP.md.
+// MARIO.EXE FILE offsets. Static evidence: tools/control/startup-inspect.py.
 import { titleDelay, menuRandomTimer, boundedRandom, s16 } from '../runtime/runtime.mjs';
 import { normalizeStudent, readStudent } from './student.mjs';
 

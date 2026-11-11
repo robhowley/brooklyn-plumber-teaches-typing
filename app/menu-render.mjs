@@ -1,4 +1,4 @@
-// Indexed widget helpers, not a replacement main screen. Evidence: analysis/control/MENU.md.
+// Indexed widget helpers, not a replacement main screen. Evidence: tools/control/menu-inspect.py.
 // glyphs use existing decoded {sprite,pixels} FONT5H/FONT3H records, ASCII32..127.
 function raster(front) {if(!(front instanceof Uint8Array)||front.length!==64000) throw new RangeError('320x200 indexed raster');}
 function glyph(front,fonts,code,x,y,foreground,background) {

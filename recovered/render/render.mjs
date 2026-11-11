@@ -1,4 +1,4 @@
-// Source mapping and limits: analysis/render/RENDERING.md.
+// Source FILE evidence: tools/render/inspect.py; resource decoding: tools/render/decode.py.
 const s16 = n => (n << 16) >> 16;
 
 // FILE 0x7a69..0x7a93: header origins ADD to logical coordinates.
