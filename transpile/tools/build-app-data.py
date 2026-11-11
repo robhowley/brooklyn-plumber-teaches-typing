@@ -23,8 +23,11 @@ def sprite_record(sprite, root):
 for sprite in manifest['sprites']:
     if sprite['family'] in ('WALKING', 'OUTSIDE', 'FONT5H', 'FONT7H', 'PRACTICE'):
         result['sprites'][sprite['family'] + '/' + sprite['name']] = sprite_record(sprite, ASSETS)
+# Water/Castle consumers use assets/render/manifest.json (BGS.md); do not
+# duplicate their decoded resources in the currently Outside/Practice app.
 for sprite in render['sprites']:
-    result['sprites']['IDLE/' + sprite['name']] = sprite_record(sprite, RENDER)
+    if sprite['family'] == 'IDLE':
+        result['sprites']['IDLE/' + sprite['name']] = sprite_record(sprite, RENDER)
 for palette in manifest['palettes']:
     result['palettes'][palette['name']] = json.loads((ASSETS / palette['path']).read_text())['rgb8']
 for char, palette in render['palettes'].items():

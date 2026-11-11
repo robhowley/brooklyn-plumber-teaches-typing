@@ -17,6 +17,70 @@ const span = (offset, length) => {
   return Buffer.from(record.hex, 'hex').subarray(offset - parseInt(record.start), offset - parseInt(record.start) + length);
 };
 
+test('reentry keeps only surviving counters and uses old scroll before new movement', () => {
+  const runtime = JSON.parse(readFileSync(new URL('../../analysis/runtime/evidence.json', import.meta.url)));
+  assert.equal(runtime.data['0x487e'].hex, '00'.repeat(14));
+  assert.equal(runtime.data['0x51ac'].hex, '0000');
+  // Direct stores are INC cursor, ADD distance and ADD ground, not entry resets.
+  assert.equal(span(0x1340c, 4).toString('hex'), 'ff067e48');
+  assert.equal(span(0x1378a, 4).toString('hex'), '01068448');
+  assert.equal(span(0x1437d, 4).toString('hex'), '0106ac51');
+  let previous = state();
+  Object.assign(previous, { cursorCounter: 11, groundPhase: 19, stillTicks: 10,
+    idleTicks: 8, distance: 32767, mode: 3, x: 200, scroll: 9,
+    attempts: 44, ended: true });
+  for (let entry = 0; entry < 2; entry++) {
+    const next = createOutdoor({ bytes: Buffer.from('B'), seed: 5, previous });
+    assert.equal(next.cursorCounter, previous.cursorCounter);
+    assert.equal(next.distance, previous.distance);
+    assert.equal(next.groundPhase, previous.groundPhase);
+    assert.equal(next.stillTicks, previous.stillTicks);
+    assert.equal(next.idleTicks, previous.idleTicks);
+    assert.equal(next.mode, 0);
+    assert.equal(next.scroll, 1);
+    assert.equal(next.x, 20);
+    assert.equal(next.attempts, 0);
+    assert.equal(next.ended, false);
+    assert.ok(next.obstacles.every(o => !o.active));
+    tick(next, options);
+    assert.equal(next.groundPhase, (previous.groundPhase + 1) % 20);
+    assert.equal(next.scroll, 9); // calculated only after ground used initial scroll 1
+    assert.equal(next.cursorCounter, entry === 0 ? 0 : 1);
+    assert.equal(next.idleTicks, previous.idleTicks + 1);
+    previous = next;
+  }
+  const moving = state();
+  Object.assign(moving, { distance: 32767, cursorX: 100 });
+  updatePlayer(moving, idleSchedule, idlePeriod);
+  assert.equal(moving.distance, -32761); // 0x1378a wraps ADD word, no renderer repair
+});
+
+test('bonus observed-second clock survives entry and compares signed32 time words', () => {
+  const old = makeBonus(1, 120);
+  old.countdown = 10;
+  updateBonus(old, 20, 0xffffffff);
+  assert.equal(old.lastSecond, -1);
+  assert.equal(old.countdown, 9);
+  const again = makeBonus(old.seed, 120, false, old.lastSecond);
+  const delay = again.countdown;
+  updateBonus(again, 20, 0xffffffff);
+  assert.equal(again.countdown, delay);
+  updateBonus(again, 20, 0);
+  assert.equal(again.countdown, delay - 1);
+});
+
+test('timeout compares signed32 values, including the wrap boundary', () => {
+  assert.equal(span(0x13aa0, 2).toString('hex'), '7c0b'); // signed high word
+  assert.equal(span(0x13aa8, 2).toString('hex'), '7203'); // unsigned low word on equal high
+  const s = state();
+  tick(s, { ...options, elapsed: 0x80000000, limit: 120 });
+  assert.equal(s.ended, false);
+  tick(s, { ...options, elapsed: 119, limit: 120 });
+  assert.equal(s.ended, false);
+  tick(s, { ...options, elapsed: 120, limit: 120 });
+  assert.equal(s.ended, true);
+});
+
 test('tables and lowercase classification match copied executable bytes', () => {
   for (const [name, translated] of [['jumpY', JUMP_Y], ['cursorFrames', CURSOR_FRAMES], ['blockHeights', BLOCK_HEIGHTS]]) {
     const t = tables.tables[name], b = span(parseInt(t.fileOffset), translated.length * 2);

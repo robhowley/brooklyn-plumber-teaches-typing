@@ -191,6 +191,31 @@ export function practiceInput(state, key, nowSeconds) {
   return result;
 }
 
+/** Host test transport for the source's separate pending/read/flush operations.
+ * Unbounded FIFO capacity is an adaptation, NOT the DOS keyboard buffer size.
+ * Supply raw bytes (extended keys as [0,scan] or [0xe0,scan]), not normalized keys.
+ * 0x4ddb checks without consuming; 0x19241 normalizes only when another byte
+ * is pending; 0x19221 drains raw bytes. Empty consume throws instead of blocking.
+ */
+export function createPendingInput() {
+  const bytes = [];
+  return {
+    enqueue(...input) {
+      if (input.some(b => !Number.isInteger(b) || b < 0 || b > 255))
+        throw new RangeError('Expected raw keyboard bytes');
+      bytes.push(...input);
+    },
+    pending() { return bytes.length !== 0; },
+    consume() {
+      if (!bytes.length) throw new RangeError('Original read would block');
+      const first = bytes.shift();
+      return (first === 0 || first === 0xe0) && bytes.length
+        ? 0x100 + bytes.shift() : first;
+    },
+    flush() { bytes.length = 0; },
+  };
+}
+
 // 0xff2a..0xff61: title consumes a delay draw only if no key is pending.
 export const titleDelay = (rng, keyPending) => keyPending ? null : 4 + boundedRandom(rng, 4);
 

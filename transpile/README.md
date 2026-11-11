@@ -28,7 +28,9 @@ Guest `Player` is unsaved, not the original automatic Demo. New students default
 
 `?seed=1` fixes the **entry seed of this slice**, not an original startup replay. The original title/menu consume timing-dependent draws; these omitted presentations do not secretly consume fabricated draws. State is retained across supported activities. There is no source-selector interstitial or three-second countdown.
 
-See [coverage](COVERAGE.md), [adaptations](ASSUMPTIONS.md) and [integration results](reports/INTEGRATION.md). Missing assets stop visibly; blocked/corrupt storage produces a persistent memory-only warning. No generic art or generated corpus fallback is used.
+Outside counters and its observed-second bonus clock now survive repeated entry and intervening Practice. Source contracts: [reentry/FONT7H](analysis/runtime/REENTRY.md) and [decoded Water/Castle foundations](analysis/render/BGS.md). Water/Castle remain disabled.
+
+See [coverage](COVERAGE.md), [adaptations](ASSUMPTIONS.md) and [Phase 1 results](reports/PHASE-1.md). Missing assets stop visibly; blocked/corrupt storage produces a persistent memory-only warning. No generic art or generated corpus fallback is used.
 
 ## Files and evidence
 
@@ -39,14 +41,15 @@ See [coverage](COVERAGE.md), [adaptations](ASSUMPTIONS.md) and [integration resu
 | `app/render.mjs` | Calls recovered indexed renderer; isolates host drawing choices |
 | `app/data.json`, `assets/app/` | Local generated resources, ignored by Git |
 | `tools/build-app-data.py` | Bundles inert resources; applies tested Python BAN decoder |
-| `recovered/{control,outdoor,worlds,runtime,render}/` | Source-cited, independently tested APIs, unchanged by integration |
+| `recovered/{control,outdoor,worlds,runtime,render}/` | Source-cited, tested APIs, including Phase 1 retained-state and world-render primitives |
+| `assets/render/manifest.json` | Local next-phase world API: `worlds`, family/index sprite records, palettes, scenes and ANI paths; all paths relative to this manifest |
 | `analysis/*/` | Executable FILE offsets, hashes, resource indices and limits |
 
 The browser fetches only authored modules, JSON and decoded bonus backgrounds. It never fetches executable/archive/raw files or imports the old app. All analysis reads original bytes as inert data; no original machine code is executed, interpreted or emulated.
 
 ## Rebuild and verify
 
-Decoded assets already exist locally. If missing, run the separately documented safe extraction and render-decoding pipelines first. After decoded inputs change:
+A clean clone has no assets. Supply the hash-pinned local ZIP and run the [ordered regeneration recipe](PLAN.md#fresh-clone-local-inputs), which uses only authored static tools. Control evidence accepts only the freshly generated worlds listing and verifies its bytes, never an external research fallback. After decoded inputs change:
 
 ```sh
 python3 -B transpile/tools/build-app-data.py
@@ -59,6 +62,6 @@ TMPDIR="$PWD/transpile/.tmp" PLAYWRIGHT_JUNIT_OUTPUT_FILE=transpile/reports/brow
   node_modules/.bin/playwright test -c transpile/playwright.config.mjs --reporter=junit
 ```
 
-Run checks through `structured_return` in Pi (`node-test-text`, `unittest-text`, `junit-xml`). Browser tests use the existing root Playwright installation and installed Google Chrome, start their own localhost server on4179, and write artifacts under `transpile/`. Root configuration is unchanged. Python resource validation requires the original ZIP; running the built app does not.
+Run checks through `structured_return` in Pi (`node-test-text`, `unittest-text`, `junit-xml`). Browser tests use the existing root Playwright installation and installed Google Chrome and write artifacts under `transpile/`. The checked-in config starts port4179 and refuses an existing listener. If4179 is already your server, leave it running and use an ignored temporary config with a distinct port (Phase 1 used4181; see its report). In worker checkouts the supplied `transpile/node_modules` symlink may be the CLI location; it is ignored, not a vendored dependency. Root configuration is unchanged. Python resource validation requires the original ZIP; running the built app does not.
 
 Passing checks establish authored integration and byte-derived expectations, not pixel-perfect or runtime equivalence to an executed DOS reference. `.gitignore` keeps worktrees, scratch, local binary bundles and browser/worker artifacts on disk but out of accidental adds.

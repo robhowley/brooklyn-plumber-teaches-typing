@@ -1,12 +1,14 @@
-# Outdoor rendering and animation recovery
+# Indexed rendering and animation recovery
+
+Water/Castle additions, exact BGS packing, source rectangles, clip save/restore sites and integration fields are in [BGS.md](BGS.md). The same render manifest now includes 289 sprite records, four Castle scenes, both world backgrounds/palettes and decoded ANI raster paths.
 
 **Use additive sprite origins, transparent index 0, character palette slots 32–47, turtle slots 48–63, and the decoded IDLE frames.** The background does not scroll; only the 20×16 ground tile at rows 140–155 does. BAN packets and ANI coordinates are now decoded independently of original-code execution.
 
 ## Integration entrypoint
 
-- `assets/render/manifest.json`: 145 decoded IDLE frames (166,926 pixels), three assembled outdoor palettes, the exact EXE ground tile, source hashes, GSK bindings, and idle schedules.
+- `assets/render/manifest.json`: 145 decoded IDLE frames (166,926 pixels), 144 additional world/inline sprites, four Castle BGS scenes, world backgrounds/palettes, three assembled outdoor palettes, the exact EXE ground tile, source hashes, GSK bindings, and idle schedules.
 - `recovered/render/render.mjs`: dependency-free indexed rendering primitives, character name selection, ANI entry interpretation.
-- `assets/render/ani-tables.json`: nine ordered coordinate/frame tables; referenced raster pixels remain available from `assets/original/animations/`.
+- `assets/render/ani-tables.json`: nine ordered coordinate/frame tables with decoded raster paths relative to the render manifest; no dependency on the original-assets animation directory.
 - `assets/render/ban-packets.json`: 628 packet descriptions across all 13 BAN members, including member byte offsets and command counts. `tools/render/decode.py::decode_ban` can apply their actual pixel changes to a supplied framebuffer.
 - Paths in the render manifest resolve relative to **that manifest**, not the original-assets manifest. No original pipeline files changed.
 
@@ -84,7 +86,7 @@ FILE `0x12acd..0x12ad8` passes OUTSIDE's palette to FILE `0x14a8c`. Character se
 
 Outdoor then reads `turtle.gpo` (`0x12adf..0x12b26`) and copies **only indices 48..63** into that same palette (`0x12b49..0x12b85`). All other final slots remain OUTSIDE.CRX's embedded values. This is not a whole-character-palette replacement.
 
-The subsequent palette upload uses the assembled background palette at FILE `0x12b96..0x12bad`, followed by a transition path. The generated palettes describe the final scene palette, not intermediate fade colors or duration. An already-initialized background can take another branch, so activity reentry and transition persistence are not fully modeled here.
+The subsequent palette upload uses the assembled background palette at FILE `0x12b96..0x12bad`, followed by a transition path. The generated palettes describe the final scene palette, not intermediate fade colors or duration. An already-initialized background can take another branch. Ordinary Outside cleanup frees/resets its descriptor; [REENTRY.md](../runtime/REENTRY.md) supersedes the earlier lifetime uncertainty. Intermediate transitions remain unmodeled.
 
 ## 3. IDLE.GCO format and playback
 
@@ -161,8 +163,8 @@ Thus the bonus normally waits two observed BIOS tick changes per packet, not one
 
 - **Recovered and translated:** additive origins, zero mask, clipping, indexed dirty compositing, final outdoor palette, raw ground tile and phase drawing, all IDLE decompression, character resource name binding, ANI coordinates, all BAN chunky pixel commands.
 - **Recovered but not wired into an app:** outdoor bonus's two-wait cadence, callback sound indices, BAN background/visible updates plus ANI overlay.
-- **Still unresolved:** CASTLE.BGS packing; planar BAN header fields and VGA presentation; complete palette fade/reentry behavior; exact font-family binding for DS:`4fc0`; any hardware-level tearing/timing.
-- **Known separately:** outdoor glyph placement `(6,3)` for brick and `(15,3)` for turtle, mapping `[0,15,31]`, FILE `0x1413d..0x14259`. Do not silently choose a font family merely because it fits those dimensions.
+- **Still unresolved:** Castle transition scratch-background/special-compositor integration (packing and visible-strip decoding are now translated, see BGS.md); planar BAN header fields and VGA presentation; intermediate palette fades; any hardware-level tearing/timing. DS:`4fc0` is now proven FONT7H by [REENTRY.md](../runtime/REENTRY.md).
+- **Known separately:** outdoor glyph placement `(6,3)` for brick and `(15,3)` for turtle, mapping `[0,15,31]`, FILE `0x1413d..0x14259`. FONT7H indices0..95 bind codes32..127 through startup descriptor DS:4fb5+0xb, not visual fit (REENTRY.md).
 - **Not tested:** browser integration, original-runtime differential comparison, sound playback. No original program was run.
 
 Reproduce from this worker checkout root (after merge, omit the leading `transpile/` when already in main `transpile/`):
@@ -174,4 +176,4 @@ node --test transpile/tests/render/render.test.mjs
 python3 -B -m unittest discover -s transpile/tests/render -p 'test_*.py'
 ```
 
-The inspection script requires trusted `objdump` with LLVM code16 flags. Decode/tests use only Python stdlib and Node built-ins. Tests verify fresh archive hash, member hashes, exact evidence bytes, every IDLE frame, every BAN packet, all ANI table entries, palette splice ranges, signed origins, clipping, dirty erasure, zero/255 behavior, all 20 ground phases, and every run/jump/idle name binding. Exact test results are recorded in `checks.json`; both suites run through `structured_return`.
+The inspection script requires trusted `objdump` with LLVM code16 flags. Decode/tests use only Python stdlib and Node built-ins. Tests verify fresh archive hash, member hashes, exact evidence bytes, every IDLE frame, every BAN packet, all ANI table entries, palette splice ranges, signed origins, clipping, dirty erasure, zero/255 behavior, all 20 ground phases, and every run/jump/idle name binding. Historical outdoor-only test results are recorded in `checks.json`; current expanded-suite results and limits are in BGS.md. Both suites run through `structured_return`.

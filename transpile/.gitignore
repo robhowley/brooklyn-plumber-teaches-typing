@@ -19,6 +19,9 @@
 /analysis/worlds/tables.json
 /recovered/worlds/tables.mjs
 # Worker checkouts and host scratch must stay on disk, outside accidental adds.
+/node_modules/
+# Git's directory-only pattern does not match worker symlinks.
+/node_modules
 /.worktrees/
 /.tmp/
 /.pi/

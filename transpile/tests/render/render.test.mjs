@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {spriteRect,clipRect,blitSprite,updateSprite,drawGround,outdoorPalette,characterFrame,aniEntry} from '../../recovered/render/render.mjs';
+import {spriteRect,clipRect,blitSprite,updateSprite,drawGround,outdoorPalette,characterFrame,aniEntry,drawCastleScene,scrollCastleStrip,worldPalette} from '../../recovered/render/render.mjs';
 const manifest=JSON.parse(readFileSync(new URL('../../assets/render/manifest.json',import.meta.url)));
 
 test('origins add, signed words, inclusive clipping and transparent zero',()=>{
@@ -60,6 +60,88 @@ test('all selected run/jump/idle names resolve to actual GSK/GCK indices',()=>{
  }
  assert.throws(()=>characterFrame(1,'run',-1),RangeError);
  assert.throws(()=>characterFrame(1,'jump',12),RangeError);
+});
+
+test('all recovered Castle clips include their last pixel and exclude adjacent pixels',()=>{
+ const sprite={headerWords:[0,0,3,3],width:3,height:3},pixels=new Uint8Array(9).fill(9);
+ const clips=manifest.worlds.castle.clipChanges.map(e=>e.clip);
+ clips.push({left:0,top:69,right:319,bottom:199},{left:0,top:37,right:319,bottom:199});
+ for(const clip of clips) for(const [x,y] of [[clip.left-1,clip.top-1],[clip.right-1,clip.bottom-1]]) {
+  const front=new Uint8Array(64000).fill(7),bg=new Uint8Array(64000).fill(3);
+  blitSprite(front,sprite,pixels,x,y,clip);
+  for(let dy=0;dy<200;dy++) for(let dx=0;dx<320;dx++) {
+   const inside=dx>=x&&dx<=x+2&&dy>=y&&dy<=y+2&&dx>=clip.left&&dx<=clip.right&&dy>=clip.top&&dy<=clip.bottom;
+   assert.equal(front[dy*320+dx],inside?9:7);
+  }
+  updateSprite(front,bg,null,{sprite,x,y},clip);
+  assert.equal(front[Math.max(y,clip.top)*320+Math.max(x,clip.left)],3);
+ }
+ const front=new Uint8Array(64000).fill(7);
+ for(const clip of [{left:-1,top:0,right:319,bottom:199},{left:0,top:0,right:320,bottom:199},
+                   {left:0,top:-1,right:319,bottom:199},{left:0,top:0,right:319,bottom:200}])
+  assert.throws(()=>blitSprite(front,sprite,pixels,0,0,clip),RangeError);
+ assert.throws(()=>blitSprite(front,sprite,pixels.subarray(1),500,500),RangeError);
+ assert.throws(()=>updateSprite(front,new Uint8Array(64000),{sprite,pixels:pixels.subarray(1),x:0,y:0},null),RangeError);
+ assert.ok(front.every(v=>v===7)); // invalid current raster must not erase first
+});
+
+test('BGS opaque row placement and forty exact eight-pixel visible strips',()=>{
+ const scenes=manifest.worlds.castle.scenes.map(s=>new Uint8Array(readFileSync(new URL('../../assets/render/'+s.indicesPath,import.meta.url))));
+ for(const pixels of scenes) {
+  const front=new Uint8Array(64000).fill(255);
+  drawCastleScene(front,pixels);
+  assert.deepEqual(front.subarray(26*320,155*320),pixels);
+  assert.ok(front.subarray(0,26*320).every(v=>v===255));
+  assert.ok(front.subarray(155*320).every(v=>v===255));
+ }
+ const front=new Uint8Array(64000).fill(255);drawCastleScene(front,scenes[0]);
+ for(let step=0;step<40;step++) {
+  scrollCastleStrip(front,scenes[1],step);
+  const n=(step+1)*8;
+  for(let y=0;y<129;y++) {
+   assert.deepEqual(front.subarray((y+26)*320,(y+26)*320+320-n),scenes[0].subarray(y*320+n,(y+1)*320));
+   assert.deepEqual(front.subarray((y+26)*320+320-n,(y+27)*320),scenes[1].subarray(y*320,y*320+n));
+  }
+ }
+ assert.ok(front.subarray(0,26*320).every(v=>v===255));
+ assert.ok(front.subarray(155*320).every(v=>v===255));
+ const zero=new Uint8Array(41280);drawCastleScene(front,zero);assert.equal(front[26*320],0);
+ for(const n of [-1,40,0.5]) assert.throws(()=>scrollCastleStrip(front,scenes[0],n),RangeError);
+ assert.throws(()=>drawCastleScene(front,zero.subarray(1)),RangeError);
+});
+
+test('Water/Castle palettes replace only character slots, without outdoor turtle splice',()=>{
+ const base=new Uint8Array(768).fill(7),character=new Uint8Array(768).fill(9);
+ const result=worldPalette(base,character);
+ for(let i=0;i<768;i++) assert.equal(result[i],i>=96&&i<144?9:7);
+ assert.equal(base[96],7);
+ assert.throws(()=>worldPalette(base.subarray(1),character),RangeError);
+ for(const world of ['water','castle']) for(const char of 'mlp') {
+  const p=manifest.worlds[world].palettes[char];assert.deepEqual(p.replacedSlots,[32,47]);
+ }
+});
+
+test('world frame maps resolve original indices and per-character names',()=>{
+ const find=(family,index)=>manifest.sprites.find(s=>s.family===family&&s.index===index);
+ for(const char of 'mlp') {
+  const water=manifest.worlds.water.frames,castle=manifest.worlds.castle.frames;
+  water.swim[char].forEach((index,i)=>assert.equal(find('WATER',index).name,`${char}swm000${i+1}_1`));
+  assert.equal(find('WATER',water.sunk[char]).name,`sunk_${char}swm`);
+  castle.sink[char].forEach((index,i)=>assert.equal(find('WALKING',index).name,`${char}sin000${i+1}_1`));
+  castle.failureIdle[char].forEach(index=>assert.ok(find('IDLE',index).name.startsWith(char+'std')));
+  assert.equal(castle.jump[char].length,13); // includes 0020, unlike Outside's twelve selected jumps
+ }
+ assert.equal(find('WATER',manifest.worlds.water.frames.bonus).name,'bonbub_1');
+ assert.equal(find('CASTLE',manifest.worlds.castle.frames.bonus).name,'brick1_cblock');
+});
+
+test('dirty compositing is call-ordered, not retained alpha layering',()=>{
+ const sprite={headerWords:[0,0,2,2],width:2,height:2},bg=new Uint8Array(64000).fill(5),front=bg.slice();
+ const a={sprite,pixels:new Uint8Array(4).fill(8),x:0,y:0};
+ const b={sprite,pixels:new Uint8Array(4).fill(9),x:1,y:0};
+ updateSprite(front,bg,a,null);updateSprite(front,bg,b,null);
+ assert.equal(front[1],9);
+ updateSprite(front,bg,null,a);assert.equal(front[1],5);assert.equal(front[2],9);
 });
 
 test('ANI coordinates signed and zero raster sentinel',()=>{

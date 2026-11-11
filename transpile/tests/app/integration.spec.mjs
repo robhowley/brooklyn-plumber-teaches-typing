@@ -51,6 +51,30 @@ test('outside naturally activates bonus and BAN/ANI playback freezes mechanics a
  await page.clock.runFor(5000);expect((await snapshot(page)).cinematic).toBeNull();expect((await snapshot(page)).ticks).toBeGreaterThan(ticks);
  expect(errors).toEqual([]);
 });
+test('Outside to Practice to Outside keeps source counters and clock with fresh entry state',async({page})=>{
+ const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ await page.clock.install();await ready(page);await page.locator('#game').press('1');
+ await page.clock.runFor(180);await page.locator('#game').press('Escape');await page.clock.runFor(60);
+ const old=await snapshot(page);expect(old.screen).toBe('results');
+ const fields=['cursorCounter','groundPhase','stillTicks','idleTicks','distance'];
+ await page.locator('#game').press('n');let s=await snapshot(page);
+ expect(fields.map(k=>s.outdoor[k])).toEqual(fields.map(k=>old.outdoor[k]));
+ expect(s.bonus.lastSecond).toBe(old.bonus.lastSecond);expect(s.outdoor.x).toBe(20);
+ await page.locator('#game').press('Escape');await page.clock.runFor(60);
+ const retained=await snapshot(page);
+ await page.locator('#game').press('m');await page.locator('#game').press('4');
+ s=await snapshot(page);await page.locator('#game').press(String.fromCharCode(s.practice.rows[33]));await page.clock.runFor(60);
+ await page.locator('#game').press('Escape');await page.clock.runFor(60);
+ const practice=await snapshot(page);
+ await page.locator('#game').press('m');await page.locator('#game').press('1');s=await snapshot(page);
+ expect(fields.map(k=>s.outdoor[k])).toEqual(fields.map(k=>retained.outdoor[k]));
+ expect(s.bonus.lastSecond).toBe(retained.bonus.lastSecond);
+ expect(s.outdoor.attempts).toBe(0);expect(s.outdoor.scroll).toBe(1);
+ await page.locator('#game').press('Escape');await page.clock.runFor(60);
+ await page.locator('#game').press('m');await page.locator('#game').press('4');
+ expect((await snapshot(page)).practice.lastCorrect).toBe(practice.practice.lastCorrect);
+ expect(errors).toEqual([]);
+});
 test('guest mode, profile gating and unavailable assets/storage are visible',async({page})=>{
  await ready(page);expect((await snapshot(page)).profile.profilePresent).toBe(false);
  await page.locator('#game').press('4');await page.locator('#game').press('Escape');await expect(page.locator('#game')).toHaveAttribute('data-screen','results');

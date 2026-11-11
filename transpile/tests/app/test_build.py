@@ -5,6 +5,8 @@ import json
 from pathlib import Path
 import runpy
 import struct
+import subprocess
+import tempfile
 import sys
 import unittest
 ROOT = Path(__file__).resolve().parents[2]
@@ -12,6 +14,37 @@ sys.path.insert(0, str(ROOT / 'tools/render'))
 from decode import decode_ban
 
 class AppDataTests(unittest.TestCase):
+    def test_missing_fresh_listing_has_actionable_error_without_research_fallback(self):
+        with tempfile.TemporaryDirectory(dir=ROOT / '.tmp') as tmp:
+            root = Path(tmp)
+            script = root / 'tools/control/evidence.py'
+            script.parent.mkdir(parents=True)
+            script.write_bytes((ROOT / 'tools/control/evidence.py').read_bytes())
+            # Even a stale verified output must not substitute for fresh input.
+            old = root / 'analysis/control/verified-disassembly.txt'
+            old.parent.mkdir(parents=True)
+            old.write_text('stale listing')
+            result = subprocess.run([sys.executable, '-B', str(script)], capture_output=True, text=True)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn('Missing generated listing:', result.stderr)
+            self.assertIn('python3 -B transpile/tools/worlds/inspect.py', result.stderr)
+            self.assertNotIn('Traceback', result.stderr)
+            self.assertEqual(old.read_text(), 'stale listing')
+
+    def test_render_manifest_family_boundary_and_world_contract(self):
+        data = json.loads((ROOT / 'app/data.json').read_text())
+        manifest = json.loads((ROOT / 'assets/render/manifest.json').read_text())
+        self.assertEqual(sum(k.startswith('IDLE/') for k in data['sprites']), 145)
+        for key, sprite in data['sprites'].items():
+            self.assertEqual(key, sprite['family'] + '/' + sprite['name'])
+        self.assertNotIn('worlds', data)  # next phase consumes the render manifest directly
+        self.assertEqual(set(manifest['worlds']), {'water', 'castle'})
+        for world in manifest['worlds'].values():
+            for record in [world['background'], *world.get('scenes', [])]:
+                pixels = (ROOT / 'assets/render' / record['indicesPath']).read_bytes()
+                self.assertEqual(len(pixels), record['width'] * record['height'])
+                self.assertEqual(hashlib.sha256(pixels).hexdigest(), record['indicesSha256'])
+
     def test_rebuild_is_identical(self):
         paths = [ROOT / 'app/data.json', *sorted((ROOT / 'assets/app').glob('*.indices'))]
         before = {p: hashlib.sha256(p.read_bytes()).hexdigest() for p in paths}
@@ -47,6 +80,9 @@ class AppDataTests(unittest.TestCase):
         self.assertEqual(exe[0x21ae9:0x21b02], b'outsky\x00mout.ban\x00mout.ani\x00')
         data = json.loads((ROOT / 'app/data.json').read_text())
         self.assertEqual(len(data['lessons']), 15)
+        glyphs = sorted((s for s in data['sprites'].values() if s['family'] == 'FONT7H'), key=lambda s: s['index'])
+        self.assertEqual([s['name'] for s in glyphs], [f'font7_{i}' for i in range(32, 128)])
+        self.assertTrue(all(s['memberSha256'] == 'b2287d630e98c5fa4547eeac92355715be660ab5a06281d343eb0a95ce668918' for s in glyphs))
         for name, sprite in data['sprites'].items():
             if name.startswith('FONT5H/'):
                 self.assertTrue(set(base64.b64decode(sprite['pixels'])) <= {0,1})

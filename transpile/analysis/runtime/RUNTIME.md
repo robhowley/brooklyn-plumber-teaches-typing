@@ -2,6 +2,8 @@
 
 **The RNG seed is the low 16 bits of DOS `time(NULL)`. Practice wrapping can repeat an overlong word forever. Bonus punctuation comes from one shared four-draw initializer.** These are static-byte findings, not substitutes based on browser conventions.
 
+Reentry, keyboard pending/consume, FONT7H binding and scene cleanup are detailed in [REENTRY.md](REENTRY.md). Outside now accepts `createOutdoor({previous})` and `makeBonus(seed, previousDuration, fast, lastSecond)`; omission still means fresh-process defaults. Keep the previous Outside object and its bonus clock across other worlds. `createPendingInput()` supplies an explicitly host-adapted raw-byte FIFO for source-order tests.
+
 Use `../../recovered/runtime/runtime.mjs` for the newly translated routines. Existing outdoor RNG/bonus arithmetic is already correct; the main integration changes are seed ownership, shared consumption order, practice's actual line builder and cursor helpers. Do not replace the original line builder with generic word wrapping.
 
 ## Evidence and reproduction
@@ -15,6 +17,7 @@ Use `../../recovered/runtime/runtime.mjs` for the newly translated routines. Exi
 - `evidence.json` contains copied byte spans, their hashes, initialized state bytes and the two source identities. `*.asm.txt` contains focused static disassembly with original instruction bytes and far-call FILE destinations.
 - `corpora.json` contains exact bytes and hashes of all 15 `MarioTea/MARIO/{H,T,B,N,S}{LETTERS,WORDS,SENTENC}.LEE` members. No corpus is replaced by generated text.
 - `references.asm.txt` records direct RNG calls, seed writes and bonus-key references found by a whole-code linear scan. This is a useful reference inventory, not proof against indirect addressing or embedded-data misalignment.
+- Phase1 adds focused keyboard, timer, Outside motion/cleanup, font loader and RIX-service spans plus their initialized-state evidence. `fonts` records FONT7H member identities and inert FNT/GSK metadata.
 - Focused extraction restarts at `0x928b` and `0xb391`, avoiding the previous workers' jump-table misalignment at those entries. LLVM labels 16-bit opcodes 98/99 as `cwde/cdq`; interpret them as CBW/CWD.
 - No original program was executed, interpreted or emulated. The ELF wrapper is temporary inert data for trusted `objdump`, never loaded as a program. It is removed after analysis.
 - Copied original data and disassembly remain private and are not covered by the repository MIT license.
@@ -221,15 +224,18 @@ const prefix = lessonPrefix(lessonNumber, rng);
 const raw = await readLocalCorpus(`${prefix}letters.LEE`); // host asset lookup
 const corpus = loadCorpus(raw);
 selectCorpusSegment(corpus, rng);
-const bonus = makeBonus(rng.seed, statistics.limitSeconds, option10);
+const bonus = makeBonus(rng.seed, statistics.limitSeconds, option10, outdoorLastSecond);
 rng.seed = bonus.seed;
 const game = createOutdoor({ bytes: raw, seed: rng.seed,
-  character, lessonIndex: corpus.index });
+  character, lessonIndex: corpus.index, previous: lastOutdoor });
+lastOutdoor = game;
 // Only now assign the outdoor statistics duration/reset in the control layer.
 const events = tick(game, { key, elapsed, limit, idleSchedule, idlePeriod,
   bonus, second: wallSeconds });
 // After each step or on exit, retain this state for the next activity/menu.
 rng.seed = game.seed;
+outdoorLastSecond = bonus.lastSecond;
+// lastOutdoor=null and outdoorLastSecond=0 are initialized once per session.
 ```
 
 The host lookup is intentionally not a fake corpus generator. `readLocalCorpus` must return the extracted named member's bytes. `timeSeconds`, input, ticks, renderer and resource access are host inputs, not hidden emulation. `createOutdoor` already normalizes `raw`; do not pass `corpus.bytes` there or it will prepend another tilde.
@@ -260,7 +266,7 @@ Checks cover byte-span hashes/constants, seed truncation,500 LCG transitions aga
 
 - **Recovered and translated:** LCG/srand/bounded arithmetic; valid-calendar conversion with resolved TZ/DST inputs; prefix selection; corpus normalize/read/rewind/segment helpers; practice lines/buffer/input; shared bonus producer/predicate; title/menu draw predicates; fireworks variant.
 - **Recovered and reused:** outdoor ordinary RNG/type/bonus code and practice face selection already in merged main modules.
-- **Not translated:** DOS environment parser/daylight predicate, file/heap error UI, keyboard callback scheduling, complete title/menu animations, practice drawing/audio dispatch, bonus/progression ANI/BAN playback.
+- **Not translated here:** DOS environment parser/daylight predicate, file/heap error UI, keyboard callback scheduling, complete title/menu animations, practice drawing/audio dispatch, bonus/progression ANI/BAN playback. The pending-input harness models operation semantics, not DOS hardware or queue capacity. KWD option-query and font/palette lifetimes are traced in REENTRY.md.
 - **Not established:** an original historical seed, measured frame pacing, complete hidden-indirect RNG consumption, pixel-perfect browser output or behavior under corrupt files/out-of-range DOS dates.
 - **Host adaptations:** explicit state objects, supplied clocks/keys, finite-scan errors instead of hangs, resource access/drawing. Long-word repeat behavior is deliberately preserved, not repaired.
 - No app or other lane files were changed. This is a dependency artifact set for later integration, not a claim that the browser app now uses it.

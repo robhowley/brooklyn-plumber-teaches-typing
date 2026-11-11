@@ -36,6 +36,30 @@ test('student edits clamp durations and groups; save does not touch old app name
  assert.throws(()=>loadProfiles(storage),SyntaxError);s.save(storage,{students:{}});assert.equal(calls[0][0],SAVE_KEY);
  assert.throws(()=>editStudent(s.student,{goal:0}));assert.throws(()=>editStudent(s.student,{name:'TOO-LONG-NAME'}));
 });
+test('Outside reentry retains counters and observed seconds across Practice, not entry objects',()=>{
+ const s=session();s.start(0);
+ s.step(0,1,100);s.step(27,2,100);
+ const old=s.outdoor, fields=['cursorCounter','groundPhase','stillTicks','idleTicks','distance'];
+ const retained=fields.map(k=>old[k]), second=s.bonus.lastSecond;
+ assert.equal(second,100);
+ s.next(3);
+ assert.deepEqual(fields.map(k=>s.outdoor[k]),retained);
+ assert.notEqual(s.outdoor,old);assert.equal(s.outdoor.attempts,0);
+ assert.equal(s.outdoor.x,20);assert.equal(s.outdoor.scroll,1);
+ assert.equal(s.bonus.lastSecond,second);
+ const countdown=s.bonus.countdown;s.step(0,4,100);
+ assert.equal(s.bonus.countdown,countdown); // same observed second, no decrement
+ s.step(27,5,100);const outside=s.outdoor;
+ s.start(6,4);s.step(s.practice.rows[33],7,101);s.step(27,8,101);
+ const practiceTime=s.practice.lastCorrect;
+ s.start(9);
+ assert.deepEqual(fields.map(k=>s.outdoor[k]),fields.map(k=>outside[k]));
+ assert.equal(s.bonus.lastSecond,second);
+ s.step(27,10,102);s.start(11,4);
+ assert.equal(s.practice.lastCorrect,practiceTime);
+ assert.throws(()=>s.start(12,2),/Unsupported/);
+ assert.throws(()=>s.start(12,3),/Unsupported/);
+});
 test('DOS keyboard boundary rejects modified, non-ASCII and composition events',()=>{
  assert.equal(dosKey({key:'F10'}),0x144);assert.equal(dosKey({key:'x',altKey:true}),0x12d);
  assert.equal(dosKey({key:'a',ctrlKey:true}),0);assert.equal(dosKey({key:'é'}),0);assert.equal(dosKey({key:'a',isComposing:true}),0);

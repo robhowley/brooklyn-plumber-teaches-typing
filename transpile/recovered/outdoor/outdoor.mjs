@@ -69,17 +69,19 @@ export function makeObstacle(code, typeDraw, heightDraw = 0) {
 
 const emptyObstacle = () => ({ active: false, code: 0 });
 
-// Initialization from 0x12902, 0x12a21..0x12a8c; zero-initialized counters
-// represent a fresh process. Reentering an activity may retain original counters.
-export function createOutdoor({ bytes, seed, character = 1, lessonIndex = 0 }) {
+// 0x12a21..0x12a8c resets entry state, NOT DS:487e/4882/4884/4886/51ac.
+// Retain the last Outdoor object across other worlds and pass it as previous.
+// Omission means a new process, not an activity restart.
+export function createOutdoor({ bytes, seed, character = 1, lessonIndex = 0, previous = null }) {
   if (seed === undefined) throw new TypeError('Supply RNG seed, original startup seed is host-dependent');
   character = character >= 1 && character <= 3 ? character : 1; // 0x1d622
   return { character, seed: seed >>> 0, stream: { bytes: lessonBytes(bytes), index: lessonIndex },
     obstacles: Array.from({ length: 10 }, emptyObstacle), particles: [],
     x: 20, y: 90, mode: 0, jumpIndex: 0, followX: 0,
-    cursorX: -1, cursorCounter: 0, cursorFrame: 0, targetIndex: -1,
-    speed: 5, scroll: 1, groundPhase: 0, stillTicks: 0, idleTicks: 0,
-    distance: 0, frame: { kind: 'idle', index: 0 },
+    cursorX: -1, cursorCounter: previous?.cursorCounter ?? 0, cursorFrame: 0, targetIndex: -1,
+    speed: 5, scroll: 1, groundPhase: previous?.groundPhase ?? 0,
+    stillTicks: previous?.stillTicks ?? 0, idleTicks: previous?.idleTicks ?? 0,
+    distance: previous?.distance ?? 0, frame: { kind: 'idle', index: 0 },
     attempts: 0, correct: 0, errors: 0, aborted: false, ended: false };
 }
 
@@ -219,18 +221,19 @@ export function acceptKey(s, code) {
 // 0x14e95..0x14f38, then outdoor override 0x12c0c..0x12c4e.
 // Draw #3 is consumed even though outdoor immediately replaces that timer.
 // priorDuration is statistics +0x1f BEFORE outdoor's duration reset.
-export function makeBonus(rngState, priorDuration, fast = false) {
+export function makeBonus(rngState, priorDuration, fast = false, lastSecond = 0) {
   const draws = [];
   for (let i = 0; i < 5; i++) { const r = random15(rngState); rngState = r.seed; draws.push(r.value); }
   return { seed: rngState, mode: 1, x: 20 + Math.trunc(draws[0] * 250 / 32768),
     y: 5 + Math.trunc(draws[1] * 30 / 32768), code: 33 + Math.trunc(draws[3] * 15 / 32768),
     countdown: fast ? 15 : i16(15 + Math.trunc(Math.imul(draws[4], (priorDuration - 30) | 0) / 32768)),
-    lastSecond: 0 };
+    lastSecond: lastSecond | 0 }; // DS:4888 survives bonus/world initialization
 }
 
 // 0x13852..0x13975. State 1 counts OBSERVED second changes, state 2 counts
 // game iterations. Once expired there is no rearm in this routine.
 export function updateBonus(bonus, playerX, second) {
+  second |= 0; // 0x13894..0x138af compares/stores the complete 32-bit time word
   if (bonus.mode === 1 && second !== bonus.lastSecond) {
     bonus.lastSecond = second;
     bonus.countdown = i16(bonus.countdown - 1);
@@ -263,7 +266,7 @@ export function tick(s, { key = 0, elapsed = 0, limit = 120, idleSchedule, idleP
   const events = updateObstacles(s);
   updateParticles(s);
   selectTarget(s);
-  if (elapsed >= limit) requestEnd(s);
+  if ((elapsed | 0) >= (limit | 0)) requestEnd(s); // signed long compare, 0x13a8e..0x13aad
   else if (key === 27 || key === 0x144) requestEnd(s, true);
   else if (key === 0x12d) {
     if (exitShortcutEnabled) events.push({ type: 'exit-program' });

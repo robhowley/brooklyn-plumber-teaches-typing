@@ -1,21 +1,20 @@
-"""Read ZIP as inert data; verify prior disassembly bytes, never execute game code."""
+"""Read ZIP as inert data; verify freshly generated listing bytes, never execute game code."""
 from pathlib import Path
 import hashlib, json, re, zipfile
 ROOT = Path(__file__).resolve().parents[2]
 OUT = ROOT / 'analysis/control'
-OLD = Path('/Users/roberthowley/src/github.com/brooklyn-plumber-teaches-typing/research/executable-1992/logic')
 ARCHIVE = Path.home() / 'Downloads/Mario_Teaches_Typing_1992.zip'
 EXPECTED = 'b59886a6f7b48b0057c8db1c099ed598c8a3581245b0f8884316203de55784bd'
+source = ROOT / 'analysis/worlds/disassembly.txt'
+if not source.is_file():
+    raise SystemExit('Missing generated listing: ' + str(source) +
+                     '\nRun python3 -B transpile/tools/worlds/inspect.py from the repository root first.')
 OUT.mkdir(parents=True, exist_ok=True)
 h = hashlib.sha256(ARCHIVE.read_bytes()).hexdigest()
 assert h == EXPECTED
 with zipfile.ZipFile(ARCHIVE) as z:
     b = z.read('MarioTea/MARIO/MARIO.EXE')
     members = [{ 'name': n, 'size': len(z.read(n)), 'sha256': hashlib.sha256(z.read(n)).hexdigest() } for n in z.namelist() if not n.endswith('/')]
-if (OLD / 'MARIO.EXE.data').exists():
-    assert b == (OLD / 'MARIO.EXE.data').read_bytes()
-source = OUT / 'verified-disassembly.txt'
-if not source.exists(): source = OLD / 'annotated.txt'
 lines = source.read_text().split('Disassembly of section .shstrtab:')[0].splitlines()
 checked = 0
 for line in lines:
@@ -25,6 +24,8 @@ for line in lines:
         if off < 0x2e00: continue
         assert b[off:off+len(raw)] == raw, hex(off)
         checked += 1
+if not checked:
+    raise SystemExit('Generated listing contains no instruction bytes; rerun transpile/tools/worlds/inspect.py.')
 (OUT / 'verified-disassembly.txt').write_text('\n'.join(lines)+'\n')
 (OUT / 'identity.json').write_text(json.dumps({'archiveSha256':h,'member':'MarioTea/MARIO/MARIO.EXE','exeSha256':hashlib.sha256(b).hexdigest(),'size':len(b),'verifiedInstructionLines':checked,'members':members},indent=2)+'\n')
 # Keep only requested byte slices, not an executable or a loadable image.

@@ -100,6 +100,13 @@ test('renderer uses exact indexed palettes, origin, masks, ground, idle and deco
   const pixel=r.pixels['IDLE/mstd0001_1'].findIndex(v=>v!==0),x=pixel%idle.width,y=Math.floor(pixel/idle.width);
   assert.equal(r.front[(98+y)*320+23+x],r.pixels['IDLE/mstd0001_1'][pixel]);
   assert.equal(r.front[140*320+21],r.ground[1]);
+  // FILE0x1413d..0x14259: brick glyph at +6,+3, FONT7H slot(code-32), map0/15/31.
+  s.outdoor.obstacles[0]={active:true,type:1,x:200,y:90,code:65};
+  r.outdoor(s.outdoor,s.stats(),s.bonus);
+  const glyph=data.sprites['FONT7H/font7_65'], mask=r.pixels['FONT7H/font7_65'];
+  assert.equal(glyph.index,65-32);
+  const rect=spriteRect(glyph,206,93);
+  mask.forEach((v,i)=>{if(v)assert.equal(r.front[(rect.top+Math.floor(i/glyph.width))*320+rect.left+i%glyph.width],v===1?15:31);});
   for(const char of [1,2,3]){s.student=editStudent(s.student,{character:char});s.start(0);r.outdoor(s.outdoor,s.stats(),s.bonus);r.cinematic(char,0);r.cinematic(char,data.bonusAnimations[['m','l','p'][char-1]].frames.length-1);}
   s.start(0,4);r.practice(s.practice,s.stats(),0,'');
   // Nonzero font-mask pixels must be able to write palette index zero (black).

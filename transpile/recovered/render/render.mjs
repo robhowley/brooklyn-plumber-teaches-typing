@@ -10,6 +10,7 @@ export function spriteRect(sprite, x, y) {
 
 // FILE 0x7878..0x7942: inclusive signed rectangle intersection.
 export function clipRect(rect, clip = {left: 0, top: 0, right: 319, bottom: 199}) {
+  if (rect.left > rect.right || rect.top > rect.bottom || clip.left > clip.right || clip.top > clip.bottom) return null;
   if (rect.left > clip.right || rect.right < clip.left || rect.top > clip.bottom || rect.bottom < clip.top) return null;
   return {left: Math.max(rect.left, clip.left), top: Math.max(rect.top, clip.top), right: Math.min(rect.right, clip.right), bottom: Math.min(rect.bottom, clip.bottom)};
 }
@@ -17,9 +18,10 @@ export function clipRect(rect, clip = {left: 0, top: 0, right: 319, bottom: 199}
 // FILE 0x9e5f..0x9e91: source index zero is transparent, NOT 255.
 // This primitive writes to an already-prepared destination, not DOS dirty rectangles.
 export function blitSprite(destination, sprite, pixels, x, y, clip) {
-  const rect = spriteRect(sprite, x, y), visible = clipRect(rect, clip);
+  validateSprite(sprite, pixels);
+  if (destination.length !== 64000) throw new RangeError('indexed raster size');
+  const rect = spriteRect(sprite, x, y), visible = clipRect(rect, screenClip(clip));
   if (!visible) return;
-  if (destination.length !== 64000 || pixels.length !== sprite.width * sprite.height) throw new RangeError('indexed raster size');
   for (let dy = visible.top; dy <= visible.bottom; dy++) {
     for (let dx = visible.left; dx <= visible.right; dx++) {
       const value = pixels[(dy - rect.top) * sprite.width + dx - rect.left];
@@ -33,6 +35,8 @@ export function blitSprite(destination, sprite, pixels, x, y, clip) {
 // current/previous are null or {sprite,pixels,x,y}; previous does not need pixels.
 export function updateSprite(front, background, current, previous, clip) {
   if (front.length !== 64000 || background.length !== 64000 || front === background) throw new RangeError('distinct 320x200 buffers required');
+  clip = screenClip(clip);
+  if (current) validateSprite(current.sprite,current.pixels);
   const a = current && clipRect(spriteRect(current.sprite,current.x,current.y),clip);
   const b = previous && clipRect(spriteRect(previous.sprite,previous.x,previous.y),clip);
   const regions = a && b && clipRect(a,b)
@@ -43,6 +47,48 @@ export function updateSprite(front, background, current, previous, clip) {
     front.set(background.subarray(start,y*320+r.right+1),start);
   }
   if (a) blitSprite(front,current.sprite,current.pixels,current.x,current.y,clip);
+}
+
+function validateSprite(sprite, pixels) {
+  const [, , width, height] = sprite.headerWords;
+  if (!Number.isInteger(width) || !Number.isInteger(height) || width <= 0 || height <= 0 ||
+      width > 320 || height > 200 || width !== sprite.width || height !== sprite.height ||
+      pixels.length !== width*height) throw new RangeError('indexed raster size');
+}
+
+function screenClip(clip = {left:0,top:0,right:319,bottom:199}) {
+  if (![clip.left,clip.top,clip.right,clip.bottom].every(Number.isInteger) || clip.left < 0 || clip.top < 0 ||
+      clip.right > 319 || clip.bottom > 199 || clip.left > clip.right || clip.top > clip.bottom)
+    throw new RangeError('physical clip bounds');
+  return clip;
+}
+
+// FILE 0xd68f, 0xc202..0xc21e: opaque BGS rows, not transparent sprites.
+export function drawCastleScene(destination, pixels) {
+  if (destination.length !== 64000 || pixels.length !== 41280) throw new RangeError('castle scene size');
+  destination.set(pixels,26*320);
+}
+
+// FILE 0x9a25..0x9a57 then 0xb959..0xb9bf, called by 0xc17b..0xc182.
+// This modifies the visible buffer only. Background/sprite transition handling
+// at 0xc0bf..0xc160 and 0x7f1f remains the controller/presentation caller's job.
+export function scrollCastleStrip(front, nextScene, step) {
+  if (front.length !== 64000 || nextScene.length !== 41280 ||
+      !Number.isInteger(step) || step < 0 || step >= 40 || front.buffer === nextScene.buffer)
+    throw new RangeError('castle strip bounds');
+  for (let y=0;y<129;y++) {
+    const start=(y+26)*320;
+    front.copyWithin(start,start+8,start+320);
+    front.set(nextScene.subarray(y*320+step*8,y*320+step*8+8),start+312);
+  }
+}
+
+// FILE 0x14a8c..0x14b65, Water 0x16ac7, Castle 0xd808.
+export function worldPalette(background, character) {
+  if (background.length !== 768 || character.length !== 768) throw new RangeError('palette length');
+  const result=Uint8Array.from(background);
+  result.set(character.subarray(96,144),96);
+  return result;
 }
 
 // FILE 0x994d..0x99f9, tile FILE 0x1f582, phase from 0x1436c.

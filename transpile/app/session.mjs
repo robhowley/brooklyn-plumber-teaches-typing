@@ -48,7 +48,7 @@ export class Session {
     this.student=bytes ? normalizeStudent(bytes) : newStudent('Player');
     if (!bytes) this.student[28]=0;
     this.clock=timer({},320,0); this.suspended=false; this.result=null;
-    this.limit=0; this.lastPracticeCorrect=0;
+    this.limit=0; this.lastPracticeCorrect=0; this.outdoorLastSecond=0;
   }
   get profile() { return readStudent(this.student); }
   get active() { return this.screen==='outdoor'||this.screen==='practice'; }
@@ -62,10 +62,11 @@ export class Session {
     if (!raw) throw new Error(`Missing original corpus: ${this.corpusName}.LEE`);
     const corpus=loadCorpus(raw); selectCorpusSegment(corpus,rng);
     // FILE 0x12c07..0x12cbc: five bonus draws BEFORE reset/assignment of duration.
-    this.bonus=mode===1?makeBonus(rng.seed,this.limit):null;
+    this.bonus=mode===1?makeBonus(rng.seed,this.limit,false,this.outdoorLastSecond):null;
     if (this.bonus) rng.seed=this.bonus.seed;
     this.seed=rng.seed; this.mode=mode; this.cinematic=null;
-    if (mode===1) this.outdoor=createOutdoor({bytes:raw,seed:this.seed,character:p.character,lessonIndex:corpus.index});
+    // REENTRY.md: the last Outside object survives intervening Practice entries.
+    if (mode===1) this.outdoor=createOutdoor({bytes:raw,seed:this.seed,character:p.character,lessonIndex:corpus.index,previous:this.outdoor});
     else {
       this.practice=createPractice(corpus,this.lastPracticeCorrect);
       this.practice.aborted=false; this.typed='';
@@ -120,7 +121,7 @@ export class Session {
     const prefix=['m','l','p'][this.profile.character-1], schedule=this.data.idleSchedules[prefix];
     const events=tick(this.outdoor,{key,elapsed:this.stats().elapsedSeconds,limit:this.limit,
       idleSchedule:schedule.thresholds,idlePeriod:schedule.halfTickPeriod,bonus:this.bonus,second:wallSeconds});
-    this.seed=this.outdoor.seed;
+    this.seed=this.outdoor.seed; this.outdoorLastSecond=this.bonus.lastSecond;
     if (events.some(e=>e.type==='wrong')) this.student=recordProblemKey(this.student,this.outdoor.obstacles[this.outdoor.targetIndex].code);
     if(events.some(e=>e.type==='bonus-cinematic-required')) {
       this.clock=timer(this.clock,310,nowTicks);

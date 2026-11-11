@@ -11,8 +11,8 @@ All FILE offsets refer to `MarioTea/MARIO/MARIO.EXE`, SHA256 `6caed439b64dc3bad8
 - **W**: [Water/Castle/Practice report](analysis/worlds/MECHANICS.md), [resource indices](analysis/worlds/sprites.json), [numeric tables](analysis/worlds/tables.json).
 - **A**: [resource formats](analysis/assets/RESOURCE-FORMATS.md), [asset manifest](assets/original/manifest.json), [archive manifest](assets/original/archive-manifest.json).
 
-- **R**: [render report](analysis/render/RENDERING.md), [decoded bindings](assets/render/manifest.json), indexed compositor/ground/idle/BAN/ANI evidence.
-- **T**: [runtime report](analysis/runtime/RUNTIME.md), exact RNG/corpus/Practice/bonus APIs and byte spans. R/T supersede historical research gaps only where explicitly integrated below.
+- **R**: [render report](analysis/render/RENDERING.md), [BGS/world contracts](analysis/render/BGS.md), [decoded bindings](assets/render/manifest.json), indexed compositor/ground/idle/BAN/ANI evidence.
+- **T**: [runtime report](analysis/runtime/RUNTIME.md), [reentry contracts](analysis/runtime/REENTRY.md), exact RNG/corpus/Practice/bonus APIs and byte spans. These supersede historical BGS, font-binding and retained-counter gaps; [Phase 1 checks](reports/PHASE-1.md) cover current integration.
 
 ## Boot, menu and student UI
 
@@ -69,7 +69,7 @@ All FILE offsets refer to `MarioTea/MARIO/MARIO.EXE`, SHA256 `6caed439b64dc3bad8
 | Bonus cinematic | Implemented, host cadence | O `0x14298..0x1436b`, R BAN/ANI decoder and two-wait callback; OUTSKY + character OUT files, timer310/300, discarded input, scene restore; fades/audio omitted |
 | Progress celebration/fireworks | Recovered-only | O `0x13e29`, OCASTLE; numeric progression applied without animation |
 | Sound requests | Recovered-only | O ordinary correct/wrong/destruction events; no playback, repeated jump sound not emitted |
-| Activity reentry persistent counters | Unknown integration | O constructor fresh-process reset differs from original surviving DS counters |
+| Activity reentry persistent counters | Implemented for supported activities | T REENTRY: cursor/stationary/distance/idle/ground counters survive; entry resets position/scroll/objects. Bonus observed-second clock survives intervening Practice; previous duration, RNG and Practice timestamp remain shared |
 
 ## Statistics, results and progression
 
@@ -101,7 +101,7 @@ All FILE offsets refer to `MarioTea/MARIO/MARIO.EXE`, SHA256 `6caed439b64dc3bad8
 | Castle pipes/scroll transitions | Recovered-only | W `0xc082`, `0xca14`, `0xd127`; timed/scripted segments |
 | Castle sand/text progress/sinking | Recovered-only | W `0xcd7a`, `0xc36e`; WPM position and scripted failure |
 | Castle timeout/accuracy/inactivity failure | Recovered-only | W `0xbc7e`, `0xbffb`; separate flags, no invented lives |
-| Castle BGS/clipping/bonus/ending playback | Unknown integration | W asset/callee traces, not enabled |
+| Castle BGS/clipping/bonus bindings | Recovered-only, decoded/tested | R BGS: four320×129 scenes at y26, forty eight-pixel strips, inclusive clips, world palettes and exact frame/ANI bindings; controller-selected clips, transition scratch compositor and bonus restoration remain unintegrated |
 | Practice corpus/expression/key acceptance | Implemented | T exact runtime cursor/input and W `practiceCorpus/practiceExpression`; all15 real corpora, case-sensitive32..127 or CR, no inactivity loss |
 | Practice line wrap/prefill | Implemented | T `0xb3e1..0xb4d3`, exact10x33 buffer/nine fills, LF early return, partial-word rewind, NUL and repeated-overlong-word quirks preserved |
 | Practice duration/exit/results | Implemented | W `0xb1e6`, `0xb5c2`, `0xb809`; default600s/configured field, Esc early exit, F10 ignored, no progression, mode4 Next preserved |
@@ -111,11 +111,11 @@ All FILE offsets refer to `MarioTea/MARIO/MARIO.EXE`, SHA256 `6caed439b64dc3bad8
 ### Why Water and Castle stay disabled
 
 - Water has tested numeric motion/pursuer/bubble functions, but its main loop skips animation when input remains pending (`0x17943..0x1794c`). Full input-pump/update scheduling, random bubble draw sequence, failure-to-results orchestration and world-specific bonus restoration are not integrated. A fixed-rate generic loop would invent behavior.
-- Castle requires the metadata text queue, operation2/3 separation, rockface stages,40-step scrolls, pipe delays with repeated random draws, sand entrance/exit, failure loops and repeated scene cycle (`0xbb06..0xde2d`). Numeric helpers are not a complete controller. CASTLE.BGS packing and clipping remain unresolved; no substitute backgrounds or scene schedule are fabricated.
+- Castle requires the metadata text queue, operation2/3 separation, rockface stages,40-step scrolls, pipe delays with repeated random draws, sand entrance/exit, failure loops and repeated scene cycle (`0xbb06..0xde2d`). Numeric helpers are not a complete controller. CASTLE.BGS packing, visible strips and clip call sites are now recovered (R BGS); transition scratch-background/special-compositor integration and controller-selected ordering remain pending. No substitute backgrounds or scene schedule are fabricated.
 - Shared RNG/corpus and BAN/ANI decoding resolve dependencies, not these activity controllers. Existing [worlds mechanics](analysis/worlds/MECHANICS.md), [coverage mapping](analysis/worlds/coverage.json) and [render limits](analysis/render/RENDERING.md) enumerate bounded evidence and gaps. This is not an exhaustive decompilation claim.
 
 ## Resources and proof limits
 
-A independently validates20 CRX backgrounds,567 indexed GSO/font sprites,15 lesson files,177 messages, ANI tables and archive/member hashes. R additionally validates145 GCO idle frames,628 BAN packets, nine ANI coordinate tables, exact tile and palette splice/mask/origin rules. Those are used for Outside; BGS remains unresolved. VOC metadata is not audio playback. No executable, driver or archive script was launched, interpreted or emulated.
+A independently validates20 CRX backgrounds,567 indexed GSO/font sprites,15 lesson files,177 messages, ANI tables and archive/member hashes. R additionally validates145 GCO idle frames,628 BAN packets, nine ANI coordinate tables, exact tile and palette splice/mask/origin rules. Phase 1 adds four BGS scenes and144 Water/Castle/inline sprite records (289 total in the render manifest), world palettes and decoded ANI rasters. These remain available to later world consumers without enabling their routes or enlarging app data. VOC metadata is not audio playback. No executable, driver or archive script was launched, interpreted or emulated.
 
 The tests compare source-derived expectations and browser behavior, not an executed DOS reference. This matrix is bounded by the recovered reports; it is not a claim that every original routine has been decompiled.
