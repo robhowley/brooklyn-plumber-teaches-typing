@@ -4,7 +4,7 @@ async function point(page,x,y,click=true) {const r=await page.locator('#game').b
 async function ready(page) {await page.goto('./?seed=1');await skipStartupUI(page);await expect(page.locator('#game')).toHaveAttribute('data-screen','menu');}
 test('only the original canvas UI is shown and keyboard works on load and focus return',async({page})=>{
  await page.goto('./?seed=1');await expect(page.locator('#game')).toBeFocused();
- await expect(page.locator('main > :visible')).toHaveCount(2);
+ await expect(page.locator('main > :visible')).toHaveCount(1);
  await expect(page.locator('button,form,select,input,details,a,section')).toHaveCount(0);
  await skipStartupUI(page);await page.keyboard.press('w');
  await expect(page.locator('#game')).toHaveAttribute('data-screen','student');
@@ -19,6 +19,28 @@ test('only the original canvas UI is shown and keyboard works on load and focus 
  await expect(page.locator('#game')).toBeFocused();await expect(page.locator('#game')).toHaveAttribute('data-suspended','false');
  await page.keyboard.press('Escape');await expect(page.locator('#game')).toHaveAttribute('data-screen','results');
  await expect(page.locator('#status')).toBeHidden();
+});
+test('game fills the available viewport without stretching, cropping or scrolling',async({page})=>{
+ await page.goto('./?seed=1');await expect(page.locator('#game')).toBeFocused();
+ for(const viewport of [{width:1920,height:1080},{width:1440,height:900},{width:390,height:844},{width:844,height:390}]) {
+  await page.setViewportSize(viewport);
+  const scale=Math.min(viewport.width/320,viewport.height/200);
+  const bounds=await page.locator('#game').boundingBox();
+  expect(bounds.width).toBeCloseTo(320*scale,1);
+  expect(bounds.height).toBeCloseTo(200*scale,1);
+  expect(bounds.x).toBeCloseTo((viewport.width-bounds.width)/2,1);
+  expect(bounds.y).toBeCloseTo((viewport.height-bounds.height)/2,1);
+  expect(await page.evaluate(()=>({width:document.documentElement.scrollWidth,height:document.documentElement.scrollHeight}))).toEqual(viewport);
+ }
+ await expect(page.locator('#game')).toHaveAttribute('width','320');
+ await expect(page.locator('#game')).toHaveAttribute('height','200');
+ await expect(page.locator('#game')).toHaveCSS('image-rendering','pixelated');
+ const bounds=await page.locator('#game').boundingBox();
+ await page.addInitScript(()=>{Storage.prototype.getItem=function(){throw new Error('test storage blocked');};});
+ await page.reload();await expect(page.locator('#status')).toContainText('Storage unavailable');
+ await expect(page.locator('#status')).toBeInViewport();
+ expect(await page.locator('#game').boundingBox()).toEqual(bounds);
+ expect(await page.evaluate(()=>({width:document.documentElement.scrollWidth,height:document.documentElement.scrollHeight}))).toEqual(page.viewportSize());
 });
 test('entry/menu uses local decoded assets only; disabled controls and hover survive scale',async({page},testInfo)=>{
  test.skip(testInfo.project.name==='pages-prefix','Welcome speech can drain the queued click.');
