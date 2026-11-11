@@ -21,7 +21,7 @@ Open http://127.0.0.1:4179/. `npm run dev` builds and serves the same `dist/`; i
 
 The ZIP and MARIO.EXE hashes are pinned in `tools/source.py`. Downloads have bounded retries, time and size limits. The build reads original members only as inert data; never execute or emulate archive programs, scripts or drivers.
 
-`tools/build.py` runs all 18 static conversion steps and publishes a runtime-only allowlist to `dist/`. Missing or stale generated inputs should be rebuilt, not copied from another checkout. Logs are in `.tmp/build/`. Source FILE offsets remain in code and generated evidence under `analysis/`; those are executable file offsets, not runtime addresses. Original-derived game material is not MIT-licensed: see [NOTICE](../NOTICE).
+`tools/build.py` runs all 18 static conversion steps and publishes a runtime-only allowlist to `dist/`. Missing or stale generated inputs should be rebuilt, not copied from another checkout. Logs are in `.tmp/build/`. Source FILE offsets remain in code and generated evidence under `analysis/`; those are executable file offsets, not runtime addresses. Original-derived game material is not MIT-licensed.
 
 ## Checks
 

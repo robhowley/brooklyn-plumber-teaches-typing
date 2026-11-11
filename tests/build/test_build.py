@@ -102,7 +102,7 @@ class PublishTests(unittest.TestCase):
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)
         self.expected = {'index.html', 'app/data.json', 'app/main.mjs', 'app/style.css',
-                         'recovered/worlds/tables.mjs', 'LICENSE', 'NOTICE', 'CNAME', *build.BACKGROUND_FILES}
+                         'recovered/worlds/tables.mjs', 'LICENSE', 'CNAME', *build.BACKGROUND_FILES}
         for name in self.expected | {'assets/raw/MARIO.EXE', 'assets/app/unapproved.indices',
                                       'tools/private.py', 'research/notes.txt', 'app/private.json'}:
             p = self.root / name; p.parent.mkdir(parents=True, exist_ok=True); p.write_text(name)
@@ -154,7 +154,7 @@ class PublishTests(unittest.TestCase):
         self.assertEqual(self.snapshot(), previous)
 
     def test_symlink_input_is_not_published(self):
-        path = self.root / 'app/main.mjs'; path.unlink(); path.symlink_to(self.root / 'NOTICE')
+        path = self.root / 'app/main.mjs'; path.unlink(); path.symlink_to(self.root / 'LICENSE')
         with self.assertRaises(ValueError):
             build.publish(self.root)
 

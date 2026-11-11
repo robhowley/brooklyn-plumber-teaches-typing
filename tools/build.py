@@ -19,7 +19,7 @@ BACKGROUND_FILES = tuple(f'assets/app/{char}OUT.backgrounds.indices' for char in
 
 
 def runtime_files(root):
-    files = ['index.html', 'app/data.json', *BACKGROUND_FILES, 'LICENSE', 'NOTICE', 'CNAME']
+    files = ['index.html', 'app/data.json', *BACKGROUND_FILES, 'LICENSE', 'CNAME']
     files += [str(p.relative_to(root)) for p in sorted((root / 'app').glob('*.mjs'))]
     files += [str(p.relative_to(root)) for p in sorted((root / 'app').glob('*.css'))]
     files += [str(p.relative_to(root)) for p in sorted((root / 'recovered').rglob('*.mjs'))]
