@@ -6,6 +6,7 @@ import subprocess
 import sys
 import tempfile
 from source import ROOT, ensure_archive, objdump
+from site_art import generate as generate_site_art
 
 STEPS = (
     'worlds/inspect.py', 'control/evidence.py', 'control/tables.py', 'worlds/tables.py',
@@ -16,10 +17,11 @@ STEPS = (
     'build-app-data.py',
 )
 BACKGROUND_FILES = tuple(f'assets/app/{char}OUT.backgrounds.indices' for char in 'LMP')
+SITE_FILES = ('assets/site/social-preview.png', 'assets/site/favicon.png')
 
 
 def runtime_files(root):
-    files = ['index.html', 'app/data.json', *BACKGROUND_FILES, 'LICENSE', 'CNAME']
+    files = ['index.html', 'app/data.json', *BACKGROUND_FILES, *SITE_FILES, 'LICENSE', 'CNAME']
     files += [str(p.relative_to(root)) for p in sorted((root / 'app').glob('*.mjs'))]
     files += [str(p.relative_to(root)) for p in sorted((root / 'app').glob('*.css'))]
     files += [str(p.relative_to(root)) for p in sorted((root / 'recovered').rglob('*.mjs'))]
@@ -68,6 +70,7 @@ def main():
         with output.open('w') as log:
             subprocess.run([sys.executable, '-B', str(ROOT / 'tools' / step)], cwd=ROOT,
                            env=env, stdout=log, check=True, timeout=120)
+    generate_site_art()
     print(f'Published {len(publish())} runtime files to dist/')
 
 

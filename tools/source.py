@@ -15,6 +15,11 @@ SHA256 = 'b59886a6f7b48b0057c8db1c099ed598c8a3581245b0f8884316203de55784bd'
 EXE_MEMBER = 'MarioTea/MARIO/MARIO.EXE'
 EXE_SHA256 = '6caed439b64dc3bad8de4f9df53b63ae5712bf3c54b0bbfc00603557e4720f5e'
 MAX_BYTES = 32 * 1024 * 1024
+TITLE_URL = ('https://raw.githubusercontent.com/robhowley/brooklyn-plumber-teaches-typing/'
+             '1e1bfce9e17d57a6e443704387ba471072c8fcfc/src/assets/title/title.png')
+TITLE_SHA256 = 'a6eca993e16a9b0f4043c085f662829d8e8a2d8576be8f681f91ec6c7b0fa089'
+TITLE_SIZE = (720, 450)
+TITLE_MAX_BYTES = 1024 * 1024
 
 
 def verify_archive(path):
@@ -68,6 +73,35 @@ def ensure_archive():
             if attempt == 2:
                 raise
             time.sleep(1)
+
+
+def ensure_title():
+    """Fetch the README still as inert data; only verified bytes enter the cache."""
+    cache = ROOT / '.cache/source/readme-title.png'
+
+    def verify(path):
+        if path.stat().st_size > TITLE_MAX_BYTES or hashlib.sha256(path.read_bytes()).hexdigest() != TITLE_SHA256:
+            raise ValueError('README title SHA-256 mismatch')
+        return path
+
+    if cache.exists():
+        return verify(cache)
+    cache.parent.mkdir(parents=True, exist_ok=True)
+    partial = cache.with_suffix('.png.part')
+    try:
+        deadline = time.monotonic() + 30
+        with urllib.request.urlopen(TITLE_URL, timeout=15) as response, partial.open('wb') as output:
+            size = 0
+            while chunk := response.read(64 * 1024):
+                size += len(chunk)
+                if size > TITLE_MAX_BYTES or time.monotonic() > deadline:
+                    raise ValueError('README title download exceeded size/time limit')
+                output.write(chunk)
+        verify(partial)
+        partial.replace(cache)
+        return cache
+    finally:
+        partial.unlink(missing_ok=True)
 
 
 def objdump():

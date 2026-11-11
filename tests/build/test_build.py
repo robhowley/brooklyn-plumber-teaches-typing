@@ -102,9 +102,11 @@ class PublishTests(unittest.TestCase):
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)
         self.expected = {'index.html', 'app/data.json', 'app/main.mjs', 'app/style.css',
-                         'recovered/worlds/tables.mjs', 'LICENSE', 'CNAME', *build.BACKGROUND_FILES}
+                         'recovered/worlds/tables.mjs', 'LICENSE', 'CNAME', *build.BACKGROUND_FILES,
+                         'assets/site/social-preview.png', 'assets/site/favicon.png'}
         for name in self.expected | {'assets/raw/MARIO.EXE', 'assets/app/unapproved.indices',
-                                      'tools/private.py', 'research/notes.txt', 'app/private.json'}:
+                                      'tools/private.py', 'research/notes.txt', 'app/private.json',
+                                      'assets/site/unapproved.png'}:
             p = self.root / name; p.parent.mkdir(parents=True, exist_ok=True); p.write_text(name)
 
     def snapshot(self):
@@ -138,7 +140,7 @@ class PublishTests(unittest.TestCase):
         self.assertTrue(expected_docs.isdisjoint(hrefs))
         shipped = set(build.runtime_files(root))
         for href in hrefs:
-            if href.startswith('data:'):
+            if href.startswith(('data:', 'https://')):
                 continue
             self.assertIn(href.removeprefix('./'), shipped)
         self.assertTrue(set(docs).isdisjoint(shipped))
@@ -148,6 +150,22 @@ class PublishTests(unittest.TestCase):
         (self.root / build.BACKGROUND_FILES[0]).unlink()
         with self.assertRaises(ValueError):
             build.publish(self.root)
+        self.assertEqual(self.snapshot(), previous)
+
+    def test_missing_site_art_preserves_previous_dist(self):
+        build.publish(self.root); previous = self.snapshot()
+        (self.root / build.SITE_FILES[0]).unlink()
+        with self.assertRaises(ValueError):
+            build.publish(self.root)
+        self.assertEqual(self.snapshot(), previous)
+
+    def test_art_generation_failure_preserves_previous_dist(self):
+        build.publish(self.root); previous = self.snapshot()
+        with patch.object(build, 'ROOT', self.root), patch.object(build, 'ensure_archive'), \
+                patch.object(build, 'objdump'), patch.object(build.subprocess, 'run'), \
+                patch.object(build, 'generate_site_art', side_effect=ValueError('bad artwork hash')):
+            with self.assertRaisesRegex(ValueError, 'bad artwork hash'):
+                build.main()
         self.assertEqual(self.snapshot(), previous)
 
     def test_symlink_input_is_not_published(self):

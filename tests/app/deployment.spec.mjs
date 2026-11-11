@@ -52,7 +52,7 @@ test('built runtime: four activities, clean fetches and unchanged storage keys',
   const consoleErrors=evidence.console.filter(m=>m.type==='error');
   if(process.env.LIVE_DIAGNOSE!=='1') {
    assert.deepEqual(bad,[]);assert.deepEqual(consoleErrors,[]);
-   assert.equal(await page.locator('link[rel="icon"]').getAttribute('href'),'data:,');
+   assert.equal(await page.locator('link[rel="icon"]').getAttribute('href'),'./assets/site/favicon.png');
    assert.equal(evidence.responses.some(r=>new URL(r.url).pathname==='/favicon.ico'),false);
   }
   const saved=await page.evaluate(()=>localStorage.getItem('mtt-static-translation.students.v1'));
