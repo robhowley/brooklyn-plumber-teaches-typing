@@ -1,0 +1,11 @@
+.pi/
+node_modules/
+.tmp/
+test-results/
+playwright-report/
+.DS_Store
+*.log
+
+# Local source research and generated validation evidence (not runtime assets).
+/research/
+/dist/
