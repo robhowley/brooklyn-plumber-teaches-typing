@@ -1,12 +1,9 @@
 import {test,expect} from '@playwright/test';
-import {skipStartupUI,finishCelebrationUI} from './source-path.mjs';
+import {skipStartupUI,finishCelebrationUI,createStudentUI} from './source-path.mjs';
 const snap=page=>page.evaluate(()=>translationSnapshot());
 async function ready(page,character=1,lesson=1,goal=10) {
  await page.clock.install();await page.addInitScript(()=>{window.__sourceTestClock=true;});await page.goto('./?seed=1');await skipStartupUI(page);await expect(page.locator('#game')).toHaveAttribute('data-screen','menu');
- await page.locator('#game').press('w');await page.locator('[name=name]').fill('Swimmer');
- await page.locator('[name=character]').selectOption(String(character));await page.locator('[name=goal]').fill(String(goal));
- await page.locator('[name=lesson]').selectOption(String(lesson));await page.locator('[name=waterMinutes]').fill('1');
- await page.locator('#setup button[type=submit]').click();await page.locator('#game').press('2');
+ await createStudentUI(page,{name:'SWIMMER',character,goal,lesson,durations:[undefined,1]});await page.locator('#game').press('2');
  await expect(page.locator('#game')).toHaveAttribute('data-screen','water');
 }
 async function burst(page,codes) {await page.evaluate(codes=>{
@@ -36,8 +33,8 @@ for(const character of [1,2,3]) test(`Water character${character}: real canvas, 
  await page.clock.pauseAt(new Date(await page.evaluate(()=>Date.now()+1000)));
  s=await snap(page);const counter=s.water.swimmer.counter;await page.locator('#game').press('n');s=await snap(page);
  expect(s.screen).toBe('water');expect(s.water.swimmer.counter).toBe(counter);expect(s.water.stats.attempts).toBe(0);
- await page.locator('#focus').focus();const before=await snap(page);await page.clock.runFor(1000);expect((await snap(page)).ticks).toBe(before.ticks);
- await page.locator('#focus').click();await page.locator('#game').press('Escape');await page.clock.runFor(120);
+ await page.locator('#game').evaluate(c=>c.blur());const before=await snap(page);await page.clock.runFor(1000);expect((await snap(page)).ticks).toBe(before.ticks);
+ await page.locator('#game').focus();await page.locator('#game').press('Escape');await page.clock.runFor(120);
  await page.reload();await skipStartupUI(page);await expect(page.locator('#game')).toHaveAttribute('data-screen','menu');
  s=await snap(page);expect(s.profile.character).toBe(character);expect(s.profile.durations[1]).toBe(1);
  expect(errors).toEqual([]);expect(bad).toEqual([]);
@@ -63,5 +60,5 @@ test('Water normal timeout advances once, Next retains group; Castle eligibility
  expect(s.screen).toBe('results');expect(s.water.timedOut).toBe(true);expect(s.water.failed).toBe(false);expect(s.profile.lesson).toBe(2);
  await page.locator('#game').press('n');expect((await snap(page)).profile.lesson).toBe(2);expect((await snap(page)).screen).toBe('water');
  await page.locator('#game').press('Escape');await page.clock.runFor(120);await page.locator('#game').press('m');
- await page.clock.runFor(300);await page.locator('#game').press('3');await page.clock.runFor(300);await expect(page.locator('#status')).toContainText('Castle requires goal 30');
+ await page.clock.runFor(300);await page.locator('#game').press('3');await page.clock.runFor(300);expect((await snap(page)).screen).toBe('menu');expect((await snap(page)).profile.goal).toBeLessThan(30);
 });

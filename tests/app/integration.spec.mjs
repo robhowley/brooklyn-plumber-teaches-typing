@@ -1,13 +1,12 @@
 import { test, expect } from '@playwright/test';
-import {skipStartupUI} from './source-path.mjs';
+import {skipStartupUI,createStudentUI} from './source-path.mjs';
 async function ready(page){await page.addInitScript(()=>{window.__sourceTestClock=true;});await page.goto('./?seed=1');await skipStartupUI(page);await expect(page.locator('#game')).toHaveAttribute('data-screen','menu');}
 async function point(page,x,y){const r=await page.locator('#game').boundingBox();await page.mouse.click(r.x+x*r.width/320,r.y+y*r.height/200);}
 const snapshot=page=>page.evaluate(()=>translationSnapshot());
 test('Practice original menu hit, case, ignored keys, exact line change, face and early Next',async({page})=>{
  const errors=[];page.on('pageerror',e=>errors.push(e.message));
  await page.clock.install();await ready(page);
- await page.locator('#game').press('w');await page.locator('[name=name]').fill('Practice');await page.locator('[name=goal]').fill('10');
- await page.locator('[name=practiceMinutes]').fill('1');await page.locator('#setup button[type=submit]').click();
+ await createStudentUI(page,{name:'PRACTICE',goal:10,durations:[undefined,undefined,undefined,1]});
  await point(page,250,116);await expect(page.locator('#game')).toHaveAttribute('data-screen','practice');
  let s=await snapshot(page);expect(s.corpusName).toBe('HWORDS');expect(s.practice.expression).toBe(0);expect(s.limit).toBe(60);
  const first=s.practice.rows[33];expect(first).toBeGreaterThanOrEqual(97);
@@ -31,11 +30,10 @@ test('Practice original menu hit, case, ignored keys, exact line change, face an
  expect((await snapshot(page)).profile.mode).toBe(4);expect(errors).toEqual([]);
 });
 test('Practice focus pause excludes time; duration ends with zero accuracy and no invented failure',async({page})=>{
- await page.clock.install();await ready(page);await page.locator('#game').press('w');await page.locator('[name=name]').fill('Timer');
- await page.locator('[name=practiceMinutes]').fill('1');await page.locator('#setup button[type=submit]').click();await page.locator('#game').press('4');
- await page.clock.runFor(10000);await page.locator('#focus').focus();
+ await page.clock.install();await ready(page);await createStudentUI(page,{name:'TIMER',durations:[undefined,undefined,undefined,1]});await page.locator('#game').press('4');
+ await page.clock.runFor(10000);await page.locator('#game').evaluate(c=>c.blur());
  const before=await snapshot(page);await page.clock.runFor(90000);expect((await snapshot(page)).ticks).toBe(before.ticks);
- await page.locator('#focus').click();await page.clock.runFor(51000);
+ await page.locator('#game').focus();await page.clock.runFor(51000);
  await expect(page.locator('#game')).toHaveAttribute('data-screen','results');const s=await snapshot(page);
  expect(s.result.elapsedSeconds).toBe(60);expect(s.practice.aborted).toBe(false);expect(s.result.wpm).toBe(0);expect(s.profile.lesson).toBe(1);
 });
@@ -80,8 +78,7 @@ test('guest mode, profile gating and unavailable assets/storage are visible',asy
  await page.clock.install();await ready(page);expect((await snapshot(page)).profile.profilePresent).toBe(false);
  await page.locator('#game').press('4');await page.locator('#game').press('Escape');await page.clock.runFor(60);await expect(page.locator('#game')).toHaveAttribute('data-screen','results');
  expect(await page.evaluate(()=>localStorage.getItem('mtt-static-translation.students.v1'))).toBeNull();
- await page.locator('#game').press('m');await page.locator('#game').press('w');await page.locator('[name=name]').fill('Gate');
- await page.locator('#setup button[type=submit]').click();await page.locator('#game').press('2');await expect(page.locator('#status')).toContainText('requires goal 10');
+ await page.locator('#game').press('m');await createStudentUI(page,{name:'GATE'});await page.locator('#game').press('2');expect((await snapshot(page)).screen).toBe('menu');expect((await snapshot(page)).profile.goal).toBe(5);
  await page.addInitScript(()=>{Storage.prototype.getItem=function(){throw new Error('test storage blocked');};});
  await page.reload();await skipStartupUI(page);await expect(page.locator('#game')).toHaveAttribute('data-screen','menu');await expect(page.locator('#status')).toContainText('Storage unavailable');
  await page.locator('#game').press('4');await expect(page.locator('#status')).toContainText('Storage unavailable');

@@ -1,6 +1,6 @@
 import {test} from '@playwright/test';
 import assert from 'node:assert/strict';
-import {skipStartupUI} from './source-path.mjs';
+import {skipStartupUI,createStudentUI} from './source-path.mjs';
 
 test('built runtime: four activities, clean fetches and unchanged storage keys', async({page,baseURL})=>{
  test.setTimeout(90000);
@@ -31,10 +31,8 @@ test('built runtime: four activities, clean fetches and unchanged storage keys',
   assert.equal(await page.evaluate(()=>localStorage.getItem('mtt-static-translation.students.v1')),null);
   evidence.steps.push({screen:'startup',url:page.url()});
   await skipStartupUI(page);await screen('menu');evidence.steps.push({screen:'menu',via:'source startup skip keys'});
-  // Only native UI controls and real key events, never controller/storage writes.
-  await key('w');await page.locator('[name=name]').fill('Live');
-  await page.locator('[name=goal]').fill('30');
-  await page.locator('#setup button[type=submit]').click();await screen('menu');
+  // Original canvas controls and real key events, never controller/storage writes.
+  await createStudentUI(page,{name:'LIVE',goal:30});await screen('menu');
   for(const [mode,name] of [[1,'outdoor'],[2,'water'],[3,'castle'],[4,'practice']]) {
    await page.waitForTimeout(350);await key(String(mode));let s=await screen(name);
    s=await until(s=>name==='outdoor'?s.outdoor.targetIndex>=0:name==='castle'?s.castle.stats.running&&!s.audioHost.blocking&&!s.castle.locked&&['rockfaces','sand'].includes(s.castle.phase):name==='water'?s.water.phase!=='ready'&&!s.audioHost.blocking&&!s.audio.some(e=>e.request.name==='ready'&&e.status==='pending'):!s.audioHost.blocking,`${name} target`);
@@ -59,7 +57,7 @@ test('built runtime: four activities, clean fetches and unchanged storage keys',
   }
   const saved=await page.evaluate(()=>localStorage.getItem('mtt-static-translation.students.v1'));
   const parsed=JSON.parse(saved);assert.deepEqual(Object.keys(parsed).sort(),['current','students']);
-  assert.equal(parsed.students.Live.length,260);
+  assert.equal(parsed.students.LIVE.length,260);
   for(const key of ['typing-kingdom-v1','typing-kingdom-v2'])assert.equal(await page.evaluate(key=>localStorage.getItem(key),key),'legacy-'+key);
   await page.reload();await page.waitForFunction(()=>!!window.translationSnapshot);
   assert.equal(await page.evaluate(()=>localStorage.getItem('mtt-static-translation.students.v1')),saved);

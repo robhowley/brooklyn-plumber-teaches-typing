@@ -34,8 +34,8 @@ export async function finishCelebrationUI(page) {
 export async function skipStartupUI(page,{muted=true}={}) {
   await page.waitForFunction(()=>document.querySelector('#game')?.dataset.screen);
   // Non-audio suites explicitly omit sound, never wait a fabricated clip duration.
-  if(muted && !await page.evaluate(()=>translationSnapshot().audioHost.muted))await page.locator('#host-mute').click();
-  await page.locator('#focus').click();
+  if(muted)await page.evaluate(()=>{AudioContext.prototype.resume=()=>Promise.reject(new Error('Audio omitted by non-audio test'));});
+  await page.locator('#game').focus();
   await page.evaluate(()=>window.scrollTo(0,0));
   // Queue separate keys for each original skip site before the next sampled tick.
   for(let i=0;i<4;i++)await page.locator('#game').press('Space');
@@ -50,4 +50,32 @@ export async function skipStartupUI(page,{muted=true}={}) {
   await page.waitForFunction(()=>!translationSnapshot().audioHost.blocking);
   if(await page.evaluate(()=>!!window.__sourceTestClock))await page.clock.runFor(300);
   else await page.waitForTimeout(300);
+}
+export async function setDurationsUI(page,durations) {
+  const key=k=>page.locator('#game').press(k);
+  await key('t');
+  for(let i=0;i<4;i++) {
+    await key('Tab');
+    if(durations[i]===undefined)continue;
+    await key('Enter');await key('Home');await key('Delete');await key('Delete');
+    await page.keyboard.type(String(durations[i]));await key('Enter');
+  }
+  await key('Escape');
+}
+export async function createStudentUI(page,{name,goal,character,lesson=1,durations=[]}) {
+  const key=k=>page.locator('#game').press(k);
+  await key('w');await page.keyboard.type(name);await key('Enter');
+  if(goal!==undefined||character!==undefined) {
+    await key('Tab');await key('Tab');await key('Enter');await key('Home');
+    for(let i=0;i<3;i++)await key('Delete');
+    await page.keyboard.type(String(goal??5));await key('Enter');
+    if(character!==undefined) {for(let i=0;i<character;i++)await key('Tab');await key('Enter');}
+  }
+  await key('Escape');
+  if(durations.some(n=>n!==undefined))await setDurationsUI(page,durations);
+  if(lesson!==1) {
+    await key('Enter');await key('ArrowRight');await key('ArrowRight');
+    for(let i=1;i<lesson;i++)await key('ArrowDown');
+    await key('Enter');
+  }
 }

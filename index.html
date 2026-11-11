@@ -5,26 +5,6 @@
 <main>
   <h1>Mario Teaches Typing</h1>
   <canvas id="game" width="320" height="200" tabindex="0" aria-label="Original game canvas. 1 Outside, 2 Water, 3 Castle, 4 Practice, W new student, E edit student, T lesson times, N Next. Escape exits activity."></canvas>
-  <p id="status" role="status">Loading decoded resources...</p>
-  <section aria-label="Browser host controls">
-    <p class="caption">Browser host controls (not original game UI)</p>
-    <div class="controls"><button id="focus">Focus game</button><button id="suspend" disabled>Suspend</button><button id="new">W · New student</button><button id="edit">E · Edit student</button><button id="times">T · Lesson times</button><label>Saved student <select id="students"><option value="">Choose...</option></select></label><button id="load">L · Load</button></div>
-    <div class="controls"><button id="audio-unlock">Enable browser audio</button><button id="host-mute">Mute browser audio</button></div>
-    <p id="audio-status" role="status">Browser audio locked. Source M/S/G options are separate from host mute.</p>
-    <form id="setup" hidden>
-      <p id="editor-label">Separate browser-form fallback. Canvas fields use recovered editing keys and bounds. This form uses native validation and does not reproduce the original text editor.</p>
-      <label>Name <input name="name" maxlength="8" required pattern="[ -~]{1,8}" autocomplete="off"></label>
-      <label>Group <select name="lesson"></select></label>
-      <label>Goal WPM <input name="goal" type="number" min="5" max="150" required></label>
-      <label>Teacher <select name="character"><option value="1">Mario</option><option value="2">Luigi</option><option value="3">Princess</option></select></label>
-      <label>Outside minutes <input name="minutes" type="number" min="1" max="60" required></label>
-      <label>Water minutes <input name="waterMinutes" type="number" min="1" max="60" required></label>
-      <label>Castle minutes <input name="castleMinutes" type="number" min="1" max="60" required></label>
-      <label>Practice minutes <input name="practiceMinutes" type="number" min="1" max="60" required></label>
-      <button type="submit">Done</button><button id="cancel" type="button">Return (source Escape)</button>
-    </form>
-    <p>Click the canvas, then type. Outside accepts the next target immediately, even at a distance. Escape or F10 ends the activity; results: N Next, M Menu, arrows/Tab select, Enter uses pointer position.</p>
-    <details open><summary>Fidelity and disabled commands</summary><p>Playable: Outside, Water, Castle and Practice with original art, recovered corpus cursors, movement, scoring, early exit and Next routing. Practice preserves case and accepts SPACE or Enter at line ends. No invented lives, countdown or Practice failure.</p><p>Original dropdowns, canvas student fields and chooser, report, help, keyboard and About are enabled. W creates, E edits, T edits four durations, L chooses a saved student. In the chooser D means Done/load, never delete. Rename deletes the old saved name only after acceptance; Escape cancels the field first. Whole-editor Escape saves and returns. All four numeric HUDs and BLACKBRD statistics use recovered fonts, positions and formats. Help and keyboard return to their caller without leaking a key into a lesson.</p><p>Startup, explicit D Demo, menu idle and source progression celebrations/endings are enabled. Idle never launches gameplay. Water celebration is unskippable; Castle graduation repeats ENDF until a key. Four exact PCM VOC clips play after a trusted browser gesture. Music, effects and RS speech (58 resources) remain silent and labeled unsupported. Source M/S/G bits are separate from browser mute; correct/wrong effects bypass S. Speech drains input until completion. Locked, denied, missing or interrupted speech is acknowledged omitted without a guessed delay or later replay. Actual printing and intermediate world/modal fades remain unsupported; no printer output or tab closure is claimed. Quit cannot exit a browser process or close this tab. Bonus BAN/ANI uses stopped lesson time. Source pointer imagery, welcome text color mapping and the Practice input cursor remain host adaptations. The toolbar and native form remain separate browser controls, not original widgets.</p><p>Focus loss suspends updates and active time. Click Focus game to resume. No original pause key is claimed. Default seed is low16 of current host epoch seconds (DOS timezone rules are not reproduced). Reproducible process seed (startup/menu skips and input timing affect later draws): <code>?seed=1</code>. Saves use only <code>mtt-static-translation.students.v1</code>.</p><p><a href="https://github.com/robhowley/brooklyn-plumber-teaches-typing/blob/main/README.md">Run locally</a> · <a href="https://github.com/robhowley/brooklyn-plumber-teaches-typing/blob/main/docs/DEVELOPMENT.md">Build and checks</a> · <a href="https://github.com/robhowley/brooklyn-plumber-teaches-typing/blob/main/docs/PLAYING.md">Controls and limitations</a></p></details>
-  </section>
+  <p id="status" role="alert" hidden></p>
 </main><script type="module" src="./app/main.mjs"></script>
 </body></html>

@@ -119,7 +119,7 @@ class PublishTests(unittest.TestCase):
         self.assertEqual(self.snapshot(), first)
         self.assertEqual(set(first), self.expected)
 
-    def test_shipped_html_links_resolve_without_publishing_docs(self):
+    def test_shipped_html_links_resolve_and_docs_stay_off_the_game_page(self):
         root = Path(__file__).resolve().parents[2]
         docs = ('README.md', 'docs/DEVELOPMENT.md', 'docs/PLAYING.md')
         for name in docs:
@@ -135,15 +135,12 @@ class PublishTests(unittest.TestCase):
                 hrefs.extend(value for key, value in attrs if key == 'href')
 
         Links().feed((root / 'index.html').read_text())
-        self.assertTrue(expected_docs.issubset(hrefs))
+        self.assertTrue(expected_docs.isdisjoint(hrefs))
         shipped = set(build.runtime_files(root))
         for href in hrefs:
             if href.startswith('data:'):
                 continue
-            if href.startswith('https:'):
-                self.assertIn(href, expected_docs)
-            else:
-                self.assertIn(href.removeprefix('./'), shipped)
+            self.assertIn(href.removeprefix('./'), shipped)
         self.assertTrue(set(docs).isdisjoint(shipped))
 
     def test_missing_runtime_input_preserves_previous_dist(self):

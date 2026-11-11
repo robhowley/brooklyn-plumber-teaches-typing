@@ -1,5 +1,5 @@
 import {test,expect} from '@playwright/test';
-import {skipStartupUI} from './source-path.mjs';
+import {skipStartupUI,createStudentUI} from './source-path.mjs';
 const snap=page=>page.evaluate(()=>translationSnapshot());
 async function open(page) {
  await page.clock.install();await page.addInitScript(()=>{window.__sourceTestClock=true;});await page.goto('./?seed=1');
@@ -15,13 +15,13 @@ test('natural startup retains59 palette writes,13 RNG draws, then menu idle text
 });
 test('separate source skips reach menu without a leaked lesson key and focus does not credit missed waits',async({page})=>{
  await open(page);await page.locator('#game').press('Space');await page.clock.runFor(60);
- await page.locator('#focus').focus();const before=await snap(page);await page.clock.runFor(10000);expect((await snap(page)).startup).toEqual(before.startup);
- await page.locator('#focus').click();await skipStartupUI(page);let s=await snap(page);expect(s.screen).toBe('menu');expect(s.outdoor).toBeNull();expect(s.paletteWrites).toBe(59);
+ await page.locator('#game').evaluate(c=>c.blur());const before=await snap(page);await page.clock.runFor(10000);expect((await snap(page)).startup).toEqual(before.startup);
+ await page.locator('#game').focus();await skipStartupUI(page);let s=await snap(page);expect(s.screen).toBe('menu');expect(s.outdoor).toBeNull();expect(s.paletteWrites).toBe(59);
  await page.locator('#game').press('4');await page.clock.runFor(300);s=await snap(page);expect(s.screen).toBe('practice');expect(s.practice.attempts).toBe(0);
 });
 for(const character of [1,2,3])test(`character${character} explicit Demo uses all4 world pollers and returns unsaved`,async({page})=>{
  const errors=[];page.on('pageerror',e=>errors.push(e.message));await open(page);await skipStartupUI(page);
- await page.locator('#game').press('w');await page.locator('[name=name]').fill('DemoBase');await page.locator('[name=goal]').fill('30');await page.locator('[name=character]').selectOption(String(character));await page.locator('#setup button[type=submit]').click();
+ await createStudentUI(page,{name:'DEMOBASE',goal:30,character});
  const saved=await page.evaluate(()=>localStorage.getItem('mtt-static-translation.students.v1'));
  for(const mode of [1,2,3,4]) {
   await page.clock.runFor(300);await page.locator('#game').press('d');await page.clock.runFor(300);expect((await snap(page)).profile.demo).toBe(true);
