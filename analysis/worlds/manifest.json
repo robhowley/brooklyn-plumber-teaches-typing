@@ -1,0 +1,872 @@
+[
+  {
+    "member": "MarioTea/floppy/DIRA.LST",
+    "sha256": "ef95ed33bc2ca51eabe142d71bd3312ab303eb5bd28e2315acbe2db7d9fc7fe9",
+    "size": 2268
+  },
+  {
+    "member": "MarioTea/floppy/DIRB.LST",
+    "sha256": "6306f002b93ea4fd3375866df0d6ca394d080a485801ea47caf65b36be64d519",
+    "size": 2268
+  },
+  {
+    "member": "MarioTea/floppy/INSTALL.DAT",
+    "sha256": "531de46d8286a4b05a00dee9e4a05cab6956e3e416986f41fd766e60a0ee101c",
+    "size": 4702
+  },
+  {
+    "member": "MarioTea/floppy/INSTALL.EXE",
+    "sha256": "9c4ee39d039f0bb58fb19e6af49a6c1ca95aec620ffe7113277405f37197f736",
+    "size": 45643
+  },
+  {
+    "member": "MarioTea/floppy/INSTALL.INI",
+    "sha256": "b424bb9378e579d56976db7c190bb06970c9a576b367a2e62b9d3541cb218a6b",
+    "size": 161
+  },
+  {
+    "member": "MarioTea/floppy/PRE1.CMP",
+    "sha256": "fedd1ba63534c7d96386ee94189d6b9f93bea1f8cbb0c08fbb76762b0bbe2746",
+    "size": 663000
+  },
+  {
+    "member": "MarioTea/floppy/PRE2.CMP",
+    "sha256": "a956eb10087303a6fea94725aaca8e6ed178d6d6f91644dd378da1e924046200",
+    "size": 450653
+  },
+  {
+    "member": "MarioTea/floppy/README.INS",
+    "sha256": "9f4d09f4e811436c09c09fe1961e51d83aee3460ff68e9ef9c149d1e8483579e",
+    "size": 599
+  },
+  {
+    "member": "MarioTea/Mario Teaches Typing (1992).ba1",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "size": 0
+  },
+  {
+    "member": "MarioTea/MARIO/ADLIB.ADV",
+    "sha256": "1dcf6608859073e972e39ed675f36f2dec5fdbc6b30384b7577fc1c951650289",
+    "size": 14693
+  },
+  {
+    "member": "MarioTea/MARIO/ATYP1.PC",
+    "sha256": "a2d41870b84c718eb766c3da4d254ac67089644991c28c0e70f0cc40361f25c4",
+    "size": 920
+  },
+  {
+    "member": "MarioTea/MARIO/ATYP1.XMI",
+    "sha256": "872040c8a84daf8820edf532d40cad9b9efc383ea79f4e2ea726dc1e9c64d88c",
+    "size": 2896
+  },
+  {
+    "member": "MarioTea/MARIO/ATYP2.PC",
+    "sha256": "68f0bf5b44ecfa0fbc34960c9291310c395ad40d1192b00385fb208563e5d886",
+    "size": 434
+  },
+  {
+    "member": "MarioTea/MARIO/ATYP2.XMI",
+    "sha256": "251f67b54e9f5b4917202f310f62e59171f65b08de7f4f9ab78cfd84218e91a5",
+    "size": 758
+  },
+  {
+    "member": "MarioTea/MARIO/ATYP3.PC",
+    "sha256": "163d5e9ce5c036fbba9a32ee60c8e81694c73c6400f63e4472391b85594a5acb",
+    "size": 776
+  },
+  {
+    "member": "MarioTea/MARIO/ATYP3.XMI",
+    "sha256": "152c9e214264c825590d4d955c6fe47251aa0846a7c67dd791d6d97d27aa18e8",
+    "size": 2786
+  },
+  {
+    "member": "MarioTea/MARIO/ATYP4.PC",
+    "sha256": "d40e8a503b10c9467ed379b2a697eafdfc7879761dde3cff5a67b806a20c220a",
+    "size": 1928
+  },
+  {
+    "member": "MarioTea/MARIO/ATYP4.XMI",
+    "sha256": "bd35138076ff9498e8be5e5caa16acf0226ec99998f48f9830b210d524e15204",
+    "size": 5654
+  },
+  {
+    "member": "MarioTea/MARIO/BITER.GPO",
+    "sha256": "f82b0c1c9846dc2b55330dd023c9043a7610ee0e4e6841393ea21ecfaf7107e2",
+    "size": 768
+  },
+  {
+    "member": "MarioTea/MARIO/BLACKBRD.CRX",
+    "sha256": "46c8460d71078ad458349bde48fdcef272355eed6020f290da84e6165de3cfa2",
+    "size": 14480
+  },
+  {
+    "member": "MarioTea/MARIO/BLETTERS.LEE",
+    "sha256": "46248d1375a1f755bc6a2c3161e517bc1cab18fb24f235ce3615df276de9f5f0",
+    "size": 1082
+  },
+  {
+    "member": "MarioTea/MARIO/BSENTENC.LEE",
+    "sha256": "a303b33f863bc5082523db99b9013325a234aca06fd9eef7e2446a2a1e5eede9",
+    "size": 1775
+  },
+  {
+    "member": "MarioTea/MARIO/BWORDS.LEE",
+    "sha256": "7abe27bc7e798438c40168a3403204ee0bae0ff17de900e8301e3a6e91845083",
+    "size": 1811
+  },
+  {
+    "member": "MarioTea/MARIO/CASTLE.BGS",
+    "sha256": "b4674d24c215486663d5fe0fcf17f38672fc2c160e914c868d555a062a1450df",
+    "size": 48244
+  },
+  {
+    "member": "MarioTea/MARIO/CASTLE.CRX",
+    "sha256": "c295095534fdbb637e845a83adc7095950ce11b843fcaf56d1193cecda2835c7",
+    "size": 10432
+  },
+  {
+    "member": "MarioTea/MARIO/CASTLE.GSK",
+    "sha256": "0ccec8312f971005b635314d5b739a9c0f086ad601fa5d453d2081434116b77a",
+    "size": 304
+  },
+  {
+    "member": "MarioTea/MARIO/CASTLE.GSO",
+    "sha256": "dc62d4fcfbe8499ac6da2a6e78fcecbad0a0611f3774eae90351c9f8bd177a62",
+    "size": 13642
+  },
+  {
+    "member": "MarioTea/MARIO/CERTIF.CRX",
+    "sha256": "03fd9c5f92756d72b8013a7d60fdc5ba691b01d594b9b08e80d4d221370ae970",
+    "size": 9858
+  },
+  {
+    "member": "MarioTea/MARIO/CONGRATS.RS",
+    "sha256": "59187be25a433a68e58b09c7d3ba6a1d6662152a02a419ae9ace40a3ff8cfd0c",
+    "size": 15779
+  },
+  {
+    "member": "MarioTea/MARIO/CONGRATS.VOC",
+    "sha256": "2a57a28b94ae6858fe74fd1defd121b4019ec9b9e3f8c44c45e79247fb13189f",
+    "size": 34041
+  },
+  {
+    "member": "MarioTea/MARIO/CPALLET.GPO",
+    "sha256": "69d567c5dca99e0ba0e1112b2c18924e2610f462300adca37876488a2a964304",
+    "size": 768
+  },
+  {
+    "member": "MarioTea/MARIO/DIR.LST",
+    "sha256": "8e3a2acf053d91b20b3e217bbc7d45bbb5b21202fd17666a489bdc48a3813bd5",
+    "size": 5687
+  },
+  {
+    "member": "MarioTea/MARIO/DISKID.1",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "size": 0
+  },
+  {
+    "member": "MarioTea/MARIO/ENDF.BAN",
+    "sha256": "4a686304e9e07a1bf36542d5c6d97ef9a2e800224000c8a3483dd47d4c081da6",
+    "size": 169642
+  },
+  {
+    "member": "MarioTea/MARIO/ENDF.CRX",
+    "sha256": "1ca0f6d02074b3af8f0c6cd35f2f7a1603e270ee09bcfb4aa5ca0fcf098dc53a",
+    "size": 12400
+  },
+  {
+    "member": "MarioTea/MARIO/ENGLISH.MSD",
+    "sha256": "fd2168878e19b1b85ae0c6ce8e14ad4386a801e7c460ed134bde5f181cb29e15",
+    "size": 3436
+  },
+  {
+    "member": "MarioTea/MARIO/FINGER.GPO",
+    "sha256": "788037b4e93977472921e1c1a104abbe77ec7c21d87a9e29ee09092a2a9c3036",
+    "size": 768
+  },
+  {
+    "member": "MarioTea/MARIO/FINGER.GSK",
+    "sha256": "5959d392c045be861a95e28efb440d3945afb181588e6135e91e223db1f6bf7a",
+    "size": 176
+  },
+  {
+    "member": "MarioTea/MARIO/FINGER.GSO",
+    "sha256": "2ff6f12ad9491f3e8f12060451ba2aec9de8b6cdf9695b4f07ea0a04ca0a1688",
+    "size": 4918
+  },
+  {
+    "member": "MarioTea/MARIO/FIR1.BAN",
+    "sha256": "23e34376dc3eec47e8b4004b2aaac92ab1b7120485e71e069c09790ca0868dcd",
+    "size": 22378
+  },
+  {
+    "member": "MarioTea/MARIO/FIR2.BAN",
+    "sha256": "c76c7299a7688bf41f422f519bf6451ebad320f4754c2b38fe821a755d309525",
+    "size": 26132
+  },
+  {
+    "member": "MarioTea/MARIO/FONT3H.FNT",
+    "sha256": "211983fe788422b4202f5f2d1b7309e0b1c870cae364c48e05c92f2550dcb7f6",
+    "size": 19
+  },
+  {
+    "member": "MarioTea/MARIO/FONT3H.GSK",
+    "sha256": "d3ccfec083e604fa81226861dc8d783768ced9728f62c0ffe64873dbbe43fff4",
+    "size": 1456
+  },
+  {
+    "member": "MarioTea/MARIO/FONT3H.GSO",
+    "sha256": "f7199c90c36d547d8d2f6ec464157cf529e3138cf0cd5d6714c027ffd6b9ba2f",
+    "size": 8674
+  },
+  {
+    "member": "MarioTea/MARIO/FONT5H.FNT",
+    "sha256": "ef34a85146592dfd325e7eb303c3da797cdbe9ff306fd209a1bb09824bf6514f",
+    "size": 18
+  },
+  {
+    "member": "MarioTea/MARIO/FONT5H.GSK",
+    "sha256": "583e44cc746eea226175ae3810d69f185c951236d206cb91d824558672837598",
+    "size": 1453
+  },
+  {
+    "member": "MarioTea/MARIO/FONT5H.GSO",
+    "sha256": "aa9b883273bf0997b4e128c4a72eb7028c534656d1c284948cf51cae74968464",
+    "size": 7138
+  },
+  {
+    "member": "MarioTea/MARIO/FONT7H.FNT",
+    "sha256": "2c2442ff73c44bfccb4fc879ce62e01b13e0b589485c588066569332c49b68c8",
+    "size": 20
+  },
+  {
+    "member": "MarioTea/MARIO/FONT7H.GSK",
+    "sha256": "d011ba960556d56b29644a4cda97496513f5a4306e1fa105b94e552c5854bd6d",
+    "size": 1463
+  },
+  {
+    "member": "MarioTea/MARIO/FONT7H.GSO",
+    "sha256": "b2287d630e98c5fa4547eeac92355715be660ab5a06281d343eb0a95ce668918",
+    "size": 10594
+  },
+  {
+    "member": "MarioTea/MARIO/FONT9H.FNT",
+    "sha256": "405f17b73b45a04e077088b89d462f4a74ca8b2e7038df10eab58145d10a72e0",
+    "size": 19
+  },
+  {
+    "member": "MarioTea/MARIO/FONT9H.GSK",
+    "sha256": "31c5f7ce539abf9000572f896acb8233d3b5986056c2dad63f3c4e37143e2ba8",
+    "size": 1466
+  },
+  {
+    "member": "MarioTea/MARIO/FONT9H.GSO",
+    "sha256": "b2f13b6118d901f364713716b6180246572c5cd27cd8c26a2aebddb873c5ea0f",
+    "size": 10978
+  },
+  {
+    "member": "MarioTea/MARIO/GREET.CRX",
+    "sha256": "aec63e4a09f877e81b9b106ee3f3ce58f1c2b92608d556affc31f1704e265a1c",
+    "size": 28106
+  },
+  {
+    "member": "MarioTea/MARIO/GREET.GSK",
+    "sha256": "1eeac5507467bddf1f4ffa3fc362e4629235518b6e9e19aeb95fa935160997ad",
+    "size": 226
+  },
+  {
+    "member": "MarioTea/MARIO/GREET.GSO",
+    "sha256": "457e68b10c33c8ac12f13fce155423610a2d414b3712f087062c22fbed0c5a31",
+    "size": 48020
+  },
+  {
+    "member": "MarioTea/MARIO/GREET2.GSK",
+    "sha256": "57aff92c9e1d58b6a626bb68f5dce90df49f84a05aca2fc5ab1e63a54368ebc7",
+    "size": 94
+  },
+  {
+    "member": "MarioTea/MARIO/GREET2.GSO",
+    "sha256": "2cae0e3a843eb1efad570ec51f9e8ce64d5b174b3c9ce2b7f746419df9784e21",
+    "size": 10154
+  },
+  {
+    "member": "MarioTea/MARIO/GREETBG.CRX",
+    "sha256": "0092d90b2cf4173dd2224d81e66960512f500cc5d5fd63d1c660b5dee28f944e",
+    "size": 10152
+  },
+  {
+    "member": "MarioTea/MARIO/HELP.CRX",
+    "sha256": "88d441957d279142a6efc277a5b097f0a4bed3054c3db4442aec60dfbdb87fb8",
+    "size": 8859
+  },
+  {
+    "member": "MarioTea/MARIO/HLETTERS.LEE",
+    "sha256": "f88a87845e17856c63192813208f67a29fea46c41f8fde164ff972eff15e71ba",
+    "size": 1060
+  },
+  {
+    "member": "MarioTea/MARIO/HSENTENC.LEE",
+    "sha256": "9f849288ff5d40ec858ca1a8eaf8bcc12b334caa7ff4092f8798196a82ea6aef",
+    "size": 1784
+  },
+  {
+    "member": "MarioTea/MARIO/HWORDS.LEE",
+    "sha256": "4850ea6c75791905a9fdceb052f528d5d3b01514177a37d87c5bdd8ba79fbde2",
+    "size": 1801
+  },
+  {
+    "member": "MarioTea/MARIO/IDLE.GCK",
+    "sha256": "9e533e049d4646f7daf29907ecacee3eb729fddc2dce9bd146f752d472ed6086",
+    "size": 2589
+  },
+  {
+    "member": "MarioTea/MARIO/IDLE.GCO",
+    "sha256": "76d661e591f6f7ad531a12e3fa7d07e88e7ffa14acf3153154cd8609add8c45f",
+    "size": 91222
+  },
+  {
+    "member": "MarioTea/MARIO/KEYBOARD.CRX",
+    "sha256": "e78ab753ff75965d9827401db97798c3cd4b5edbb2b3a7c5cb5a911439b23d68",
+    "size": 14673
+  },
+  {
+    "member": "MarioTea/MARIO/LCAS.ANI",
+    "sha256": "bd57afa5c1f15d6bd1dbe671d7bba0f2b308d27774203e3437379fe41887ba10",
+    "size": 31465
+  },
+  {
+    "member": "MarioTea/MARIO/LCAS.BAN",
+    "sha256": "26dccfb9feff55fce5ca80ad8c8602f3c5f9bed04e1c5b5bb5a3538a8514257b",
+    "size": 48180
+  },
+  {
+    "member": "MarioTea/MARIO/LESSTIME.CRX",
+    "sha256": "3e9e4880370563faa2f7074d1d44d64b2146b5bc5908ee52d81851d5a8429bd2",
+    "size": 9804
+  },
+  {
+    "member": "MarioTea/MARIO/LOAD.CRX",
+    "sha256": "217cc9c889b74625329eab8f3e7d359aea20edc7b36d54e17f551eab249ddd05",
+    "size": 9713
+  },
+  {
+    "member": "MarioTea/MARIO/LOGO.CRX",
+    "sha256": "505414a551bfeaf27b0d02bbc0c9626ad8b7a7858389ce9c20ea378c519f38b2",
+    "size": 12488
+  },
+  {
+    "member": "MarioTea/MARIO/LOUT.ANI",
+    "sha256": "b21af130ba549d3cace679e776809a99848b6c954aae2d0d06e344d3add1bd40",
+    "size": 38051
+  },
+  {
+    "member": "MarioTea/MARIO/LOUT.BAN",
+    "sha256": "d266e2fefce8a0586602708141a8e3077f1b5feb92d63f1d224e299e825c3908",
+    "size": 53442
+  },
+  {
+    "member": "MarioTea/MARIO/LPALLET.GPO",
+    "sha256": "909f370fd6d555e34732d8260e344ae0544b72170a92667e82974539bebeee46",
+    "size": 768
+  },
+  {
+    "member": "MarioTea/MARIO/LSWM.ANI",
+    "sha256": "be3160728bcadcaf8bd78a97205909270ada0a5805eff46c4ab0ef65c1651928",
+    "size": 22689
+  },
+  {
+    "member": "MarioTea/MARIO/LSWM.BAN",
+    "sha256": "835f8040cf1fe46e6c0403a10c6a37b224f92115ce22b618279d696e7a124a77",
+    "size": 45144
+  },
+  {
+    "member": "MarioTea/MARIO/MAINMENU.CRX",
+    "sha256": "e0edec09499acafc89a18e52421da0188a973acef5af1a751c576e55bd934b94",
+    "size": 19096
+  },
+  {
+    "member": "MarioTea/MARIO/MARIO.CNF",
+    "sha256": "e3805d4f4692d3e70d0e9f3bcbaacbc859127cc175bf8447561682206a0aeacc",
+    "size": 38
+  },
+  {
+    "member": "MarioTea/MARIO/MARIO.EXE",
+    "sha256": "6caed439b64dc3bad8de4f9df53b63ae5712bf3c54b0bbfc00603557e4720f5e",
+    "size": 151024
+  },
+  {
+    "member": "MarioTea/MARIO/MARIO1.HLP",
+    "sha256": "cba397d1225e52cfcaaa2c264d02b9468a1b48649041a3d6bb98ca89a26c44df",
+    "size": 1445
+  },
+  {
+    "member": "MarioTea/MARIO/MARIO2.HLP",
+    "sha256": "84434cc70f5f0398f2ac03fca881c39b4fe057f83c475ff296ed1c1d3b508719",
+    "size": 206
+  },
+  {
+    "member": "MarioTea/MARIO/MCAS.ANI",
+    "sha256": "dbecdac386295105488d24d4867ec4c35bb66bf81402db5e8bb4ab6cdda383e0",
+    "size": 29550
+  },
+  {
+    "member": "MarioTea/MARIO/MCAS.BAN",
+    "sha256": "c00755b4b2a9264b07113d4542716d7c7b369b6054226f4318632e737cd1aaef",
+    "size": 48250
+  },
+  {
+    "member": "MarioTea/MARIO/MOUT.ANI",
+    "sha256": "cb1396c2e5ec2e7aecb43410083ac0a1fc5c6a71adedf86e82a2c9e20cd6780c",
+    "size": 36442
+  },
+  {
+    "member": "MarioTea/MARIO/MOUT.BAN",
+    "sha256": "a9aeba7fe20bf8378ee5e763e2a9ea1986dd37b601864b080bafdf722f65418b",
+    "size": 53368
+  },
+  {
+    "member": "MarioTea/MARIO/MPALLET.GPO",
+    "sha256": "6d8dad24a60ea912f3b67444bcdc1b24400d892c4384085f00dda9db8f49ee65",
+    "size": 768
+  },
+  {
+    "member": "MarioTea/MARIO/MSWM.ANI",
+    "sha256": "56104e5f8e64672f81fea028cf3e23441e881e8b790afb6d827c39afb4f088ad",
+    "size": 33771
+  },
+  {
+    "member": "MarioTea/MARIO/MSWM.BAN",
+    "sha256": "3ec24b2801d79f2ff75d7a83c4dc515dd4c277d43ddd803595618cda7f831809",
+    "size": 45372
+  },
+  {
+    "member": "MarioTea/MARIO/MT32MPU.ADV",
+    "sha256": "2b16c60799ae0126345574d8d81cacd1238c5c4b50787a0f1228ec7af5d0b69b",
+    "size": 10625
+  },
+  {
+    "member": "MarioTea/MARIO/NLETTERS.LEE",
+    "sha256": "68930cfead2bd446cb61a6381390cf112cfe73abb2d1886e8cbabcfdb0b3acf9",
+    "size": 1342
+  },
+  {
+    "member": "MarioTea/MARIO/NSENTENC.LEE",
+    "sha256": "10914b3d4f69a52c8fd7a2275b24fa51707a46d2ccaa931b66be189f3c8f126e",
+    "size": 1842
+  },
+  {
+    "member": "MarioTea/MARIO/NWORDS.LEE",
+    "sha256": "29509b1925d75c2b1a8a5d9ba7f419d1218641ec4064b89863570e4b58dfe8f2",
+    "size": 1747
+  },
+  {
+    "member": "MarioTea/MARIO/OCASTLE.CRX",
+    "sha256": "b662e82dd9d64ecd75b2d761f11315d817711609987f85dca6067e4f37295da8",
+    "size": 17347
+  },
+  {
+    "member": "MarioTea/MARIO/OUTSIDE.CRX",
+    "sha256": "a61479731c970e0ab5e7b0f3c52e58d55276321b82405f861a949c06573971b4",
+    "size": 12847
+  },
+  {
+    "member": "MarioTea/MARIO/OUTSIDE.GSK",
+    "sha256": "28f2df90726c3c6a44c2a8811cab88c7de35f1d6490f7eef3437defa41789497",
+    "size": 114
+  },
+  {
+    "member": "MarioTea/MARIO/OUTSIDE.GSO",
+    "sha256": "180f1ac87f11814ebc5f53898556fb8df79dda0546c0963e361eb7e39e4294a6",
+    "size": 1889
+  },
+  {
+    "member": "MarioTea/MARIO/OUTSKY.CRX",
+    "sha256": "88d001b2d1495527f67b09d12beb7d6e9d390a30e76c56829a804b0f03db464f",
+    "size": 12357
+  },
+  {
+    "member": "MarioTea/MARIO/PASDIG.ADV",
+    "sha256": "142c597367f13b14ce5d03328f0debf62bd3bf91517135669a3542a0a5b2ab06",
+    "size": 4293
+  },
+  {
+    "member": "MarioTea/MARIO/PASFM.ADV",
+    "sha256": "8d589d7ba387facd8e505ea3e75957d3c573af39331695d75b45086fb71a4de3",
+    "size": 15160
+  },
+  {
+    "member": "MarioTea/MARIO/PCAS.ANI",
+    "sha256": "eb5e21132447393818d5fa927e6497b9aa985f29d4135ddb8419140ea240b0ac",
+    "size": 37854
+  },
+  {
+    "member": "MarioTea/MARIO/PCAS.BAN",
+    "sha256": "ddd988ed0fe57e53049215ae998431c9776b6f894fa5905ed1252883d97fa967",
+    "size": 49313
+  },
+  {
+    "member": "MarioTea/MARIO/PCSPKR48.ADV",
+    "sha256": "cef56dbefcc68fcba664edd662d524e9a9e8b7ac7e3e428b683096a2e5cae7c3",
+    "size": 8254
+  },
+  {
+    "member": "MarioTea/MARIO/POUT.ANI",
+    "sha256": "a2caf10b843cd48f36eb02d7109d3055ba544d24b98267d7785ff9ab2cb49b9f",
+    "size": 38532
+  },
+  {
+    "member": "MarioTea/MARIO/POUT.BAN",
+    "sha256": "bf4cd641376cdc4b5209b1faeb94917b617304bdb8e44bc42fff17f9102edddf",
+    "size": 54012
+  },
+  {
+    "member": "MarioTea/MARIO/PPALLET.GPO",
+    "sha256": "f43b3fd2a0c26f46f1b7e72a0d1805567fd4106e24356fe30f69f9f9e6c9accf",
+    "size": 768
+  },
+  {
+    "member": "MarioTea/MARIO/PRACTICE.CRX",
+    "sha256": "1fff59ac3f9597e75ba80217321cede47f24f952e775aa02bb7cae8f9e05afb7",
+    "size": 11265
+  },
+  {
+    "member": "MarioTea/MARIO/PRACTICE.GSK",
+    "sha256": "cfc51d1612ab2991e5af5570622cee786fbdd5420852b546150e129bb1bbd190",
+    "size": 49
+  },
+  {
+    "member": "MarioTea/MARIO/PRACTICE.GSO",
+    "sha256": "2cb053fb1e016d3bd322e09a64406a521a5c903a33df535c8da4acb05a3976b1",
+    "size": 9604
+  },
+  {
+    "member": "MarioTea/MARIO/PREFS.CRX",
+    "sha256": "aff25eaa9c084e28c4f0e61e4856b18a38ede57cf81930ab6c9b835a08a73132",
+    "size": 18128
+  },
+  {
+    "member": "MarioTea/MARIO/PSWM.ANI",
+    "sha256": "a5f4d4ee48c6febe65250cf8a232fcfa7c581c4a2cf100fa0411b3033214df04",
+    "size": 14187
+  },
+  {
+    "member": "MarioTea/MARIO/PSWM.BAN",
+    "sha256": "5cb7ab78e714054a1a65ee107f17d794d5a4b9aaf45cc9f77a358d52ec7f0bff",
+    "size": 45231
+  },
+  {
+    "member": "MarioTea/MARIO/RCARD.CRX",
+    "sha256": "ab3316a7c23f0e55119340a3166f42b05c82b12c7a22fb6f2f72a11527ed379f",
+    "size": 10556
+  },
+  {
+    "member": "MarioTea/MARIO/READY.RS",
+    "sha256": "f3d07411a5eec0a751ca8c8b5e3b99815f7ffc61b134cdd743c6d9400da8b6bf",
+    "size": 18073
+  },
+  {
+    "member": "MarioTea/MARIO/READY.VOC",
+    "sha256": "38b01d0f3ac24f74f1931a9abfa2be039d301f918f5c9b75b5d434ef87dfe5e5",
+    "size": 40132
+  },
+  {
+    "member": "MarioTea/MARIO/RTYP1.XMI",
+    "sha256": "2b5fbab1dc2438910e448952e9c2f2dd90a433e3e365b798a6b1ccb113ba82ed",
+    "size": 2890
+  },
+  {
+    "member": "MarioTea/MARIO/RTYP2.XMI",
+    "sha256": "0fc7d82a7d98dd44189731a15dbd3c183529f8bd134045752aaca7c6a1924ceb",
+    "size": 760
+  },
+  {
+    "member": "MarioTea/MARIO/RTYP3.XMI",
+    "sha256": "cd1e0838559e0e4766802f96be7d73ab010067a8798e11546afd9914e2d6604b",
+    "size": 2942
+  },
+  {
+    "member": "MarioTea/MARIO/RTYP4.XMI",
+    "sha256": "0617f3b63f61a967f1db405baf16ccd42c907ac757f010661092644177741e7c",
+    "size": 5646
+  },
+  {
+    "member": "MarioTea/MARIO/SAMPLE",
+    "sha256": "d31f13c6a1922ac03c49b5c0df5f1e2d65aeb3242151e9015d25f8d2dd09b681",
+    "size": 702
+  },
+  {
+    "member": "MarioTea/MARIO/SAMPLE.AD",
+    "sha256": "d31f13c6a1922ac03c49b5c0df5f1e2d65aeb3242151e9015d25f8d2dd09b681",
+    "size": 702
+  },
+  {
+    "member": "MarioTea/MARIO/SAMPLE.MT",
+    "sha256": "92a4cfb8f4bad54ca529945330bfcd40ab96708d47664822e4ab807550d46f0b",
+    "size": 32514
+  },
+  {
+    "member": "MarioTea/MARIO/SAMPLE.OPL",
+    "sha256": "d31f13c6a1922ac03c49b5c0df5f1e2d65aeb3242151e9015d25f8d2dd09b681",
+    "size": 702
+  },
+  {
+    "member": "MarioTea/MARIO/SBDIG.ADV",
+    "sha256": "095310637f321a29fae697fd65f03ed75573666f4fe6731c7c97f6bc63022fb4",
+    "size": 4632
+  },
+  {
+    "member": "MarioTea/MARIO/SBFM.ADV",
+    "sha256": "c84b443fd83a1e6418aec48496cd4a2560c7cb238619b74b51b9c83e964b1739",
+    "size": 14743
+  },
+  {
+    "member": "MarioTea/MARIO/SBPDIG.ADV",
+    "sha256": "dd92c10ae85d82edfbc3424728a7c31f9c6fef1f851d50dcd2578838bee24a86",
+    "size": 4847
+  },
+  {
+    "member": "MarioTea/MARIO/SETUP.EXE",
+    "sha256": "6aa6b4a9569b5a95f192bc14e915ab29fe73ab36858cbe4e6525f99afafb4d70",
+    "size": 15819
+  },
+  {
+    "member": "MarioTea/MARIO/SFX01.ADL",
+    "sha256": "fbae44def2cf6b2a7b6d9bec22621f493eee2038f557762af4218f1385b63926",
+    "size": 274
+  },
+  {
+    "member": "MarioTea/MARIO/SFX01.PCS",
+    "sha256": "63ac3ffa865a1bd882428be1e6e71e660978b091a98438280e4ca364281522dc",
+    "size": 178
+  },
+  {
+    "member": "MarioTea/MARIO/SFX01.RLD",
+    "sha256": "843f236351bd77629c7984aff516b4b4a6eba33a123d5f1004f8eabddb4c8765",
+    "size": 304
+  },
+  {
+    "member": "MarioTea/MARIO/SFX02.ADL",
+    "sha256": "91d61cef3fd1035d11de05841e3597fd20110d56e7dee2d975ce0a2492133550",
+    "size": 420
+  },
+  {
+    "member": "MarioTea/MARIO/SFX02.PCS",
+    "sha256": "1e0651d2d705d835ae160b4047a308bc431a95aa3d02b030b90e42ca6a716039",
+    "size": 340
+  },
+  {
+    "member": "MarioTea/MARIO/SFX02.RLD",
+    "sha256": "2c3deaeeab406dfa32a3cddb05e2d899c1fbd8a3772d44bcbd77bcfe03958395",
+    "size": 424
+  },
+  {
+    "member": "MarioTea/MARIO/SFX03.ADL",
+    "sha256": "49aa86aae009d53be6542215b3471b8203d578bfc9bec3178842272db537002d",
+    "size": 166
+  },
+  {
+    "member": "MarioTea/MARIO/SFX03.PCS",
+    "sha256": "1f9319892c8acd010f90e178421d4f661e777143ff04db08c38abc2fdbb76580",
+    "size": 130
+  },
+  {
+    "member": "MarioTea/MARIO/SFX03.RLD",
+    "sha256": "4472d0a02ac86e70a18be79dbabe3f9e4a256287fbc9d07674ca73548b81b8ce",
+    "size": 130
+  },
+  {
+    "member": "MarioTea/MARIO/SFX04.ADL",
+    "sha256": "d7195f7e6a86b33b618f9f803fa616167eb3a1b2cf6c5084362c7c32d9c6b458",
+    "size": 262
+  },
+  {
+    "member": "MarioTea/MARIO/SFX04.PCS",
+    "sha256": "d77025991e2c4957d8c1c90f0f86f3f2ea7b99a8f776efab74063d0a9527795e",
+    "size": 814
+  },
+  {
+    "member": "MarioTea/MARIO/SFX04.RLD",
+    "sha256": "969405e4ea554107c84322fffc0665a919b033da3ac61e164ad7c5b4fd35952c",
+    "size": 198
+  },
+  {
+    "member": "MarioTea/MARIO/SFX05.ADL",
+    "sha256": "9182946027a60efa6678dc8df183a7046fc05825315ccd44d6ce106cde85a2f0",
+    "size": 970
+  },
+  {
+    "member": "MarioTea/MARIO/SFX05.PCS",
+    "sha256": "2636e2c2407feb330ff5180cb21ba73f9bced27aef22cd512c54ae858a4f67b8",
+    "size": 336
+  },
+  {
+    "member": "MarioTea/MARIO/SFX05.RLD",
+    "sha256": "6d8a4ef5cf18643c6b7c5a9665505b4052afcc85bb933c43a7a0c7cf91e3c813",
+    "size": 970
+  },
+  {
+    "member": "MarioTea/MARIO/SFX06.ADL",
+    "sha256": "3c3ddb421fd550f506dcc99b55bf27150408eca880f48047d8894c821530cb42",
+    "size": 472
+  },
+  {
+    "member": "MarioTea/MARIO/SFX06.PCS",
+    "sha256": "463a631ad623222f883de7684d525632b56435e9478779010f18c20982616d95",
+    "size": 302
+  },
+  {
+    "member": "MarioTea/MARIO/SFX06.RLD",
+    "sha256": "47753b64fb05e5f541bd2e493175d1e44e10b3e33d3f5d685ce080fa4f3923e1",
+    "size": 198
+  },
+  {
+    "member": "MarioTea/MARIO/SFX07.ADL",
+    "sha256": "ca0d223917fcb71807f8fcdddcb29a292e64c27b5f96696cf946c2ed4ca66d70",
+    "size": 268
+  },
+  {
+    "member": "MarioTea/MARIO/SFX07.PCS",
+    "sha256": "0fa33ffbce3526a9e24f4c244330388c81b92e1b0aff382426713001de25138b",
+    "size": 222
+  },
+  {
+    "member": "MarioTea/MARIO/SFX07.RLD",
+    "sha256": "42ff19d05b6b65b77cafc6f60f887a6e0a5e68a6dcbeb2d5388ab35ea0d880c8",
+    "size": 272
+  },
+  {
+    "member": "MarioTea/MARIO/SFX08.ADL",
+    "sha256": "b335993e9bd8c3bce8b2993c72032ee70ba18d8b65f70d313c6f61d6f6a87542",
+    "size": 128
+  },
+  {
+    "member": "MarioTea/MARIO/SFX08.PCS",
+    "sha256": "b5db6f07db9e7704210bc76362c1c214fc141254e221292fe0cd246a1257496b",
+    "size": 96
+  },
+  {
+    "member": "MarioTea/MARIO/SFX08.RLD",
+    "sha256": "38899d011a4e6e499b98c66915e42b0dee5413d3ee701705ca5d6b4ae51b23bf",
+    "size": 132
+  },
+  {
+    "member": "MarioTea/MARIO/SFX09.ADL",
+    "sha256": "da946a07c9036c4fde5439ffafd2cb0f7c62948a23104fff7149e31b3c61b96c",
+    "size": 194
+  },
+  {
+    "member": "MarioTea/MARIO/SFX09.PCS",
+    "sha256": "1dd83be64671098e382213a157ca1f19d8c3d6a0e9c7609a30c17c3be42be351",
+    "size": 980
+  },
+  {
+    "member": "MarioTea/MARIO/SFX09.RLD",
+    "sha256": "007530dab28facc53b5d5ff20cd09bc8f496ebd16fa03e43d27c8fce33cf902f",
+    "size": 198
+  },
+  {
+    "member": "MarioTea/MARIO/SFX10.ADL",
+    "sha256": "0784a758b20baec8f7080f323f998cec4015372b0a3802be2bdfd4e0070fc4e9",
+    "size": 136
+  },
+  {
+    "member": "MarioTea/MARIO/SFX10.PCS",
+    "sha256": "69c489a5553556072a6169e57f163ce1534d771b46680c1457fbf5be40fde480",
+    "size": 158
+  },
+  {
+    "member": "MarioTea/MARIO/SFX10.RLD",
+    "sha256": "853a14dc2bad781a28d9b7314aec28734de3771141da19b1fda3c389bbffa093",
+    "size": 196
+  },
+  {
+    "member": "MarioTea/MARIO/SLETTERS.LEE",
+    "sha256": "0f84e57b29424c0ae8e8a5fd2838c9c70fc600e07889a40248280087341f322b",
+    "size": 1806
+  },
+  {
+    "member": "MarioTea/MARIO/SSENTENC.LEE",
+    "sha256": "025cca858b5997b32be4c7954f2d638b2acb317d9579b36a7b178f5a17616dd1",
+    "size": 1827
+  },
+  {
+    "member": "MarioTea/MARIO/SWORDS.LEE",
+    "sha256": "29cfcdeedfc195733c96e154ed37a9d34f22e13ca025e8a126b304e3e89fc77b",
+    "size": 1788
+  },
+  {
+    "member": "MarioTea/MARIO/TLETTERS.LEE",
+    "sha256": "57d5d3f2731062630bc4c7a58fedb5da163fb3bbf92419f311c9862d8b7dd91f",
+    "size": 846
+  },
+  {
+    "member": "MarioTea/MARIO/TOOBAD.RS",
+    "sha256": "6a9d5fcb05444551407b2514c3173781d8801fc4b8ce97f5529f2403a6dce98c",
+    "size": 21545
+  },
+  {
+    "member": "MarioTea/MARIO/TOOBAD.VOC",
+    "sha256": "a9a2c471ac5dcce2fa860fc7c7313baa7662be0009aacd342b62abf49f44d0f2",
+    "size": 46495
+  },
+  {
+    "member": "MarioTea/MARIO/TSENTENC.LEE",
+    "sha256": "e22bc97051a48aad235461a357db7aa32c60e9430d2c5c5cb82790ff93e5ad7c",
+    "size": 1771
+  },
+  {
+    "member": "MarioTea/MARIO/TURTLE.GPO",
+    "sha256": "36e3fffd72f4873cdaa1ffcc5ae6d0963d04c3d4eccc630d59b271e1aa2dc9c8",
+    "size": 768
+  },
+  {
+    "member": "MarioTea/MARIO/TWORDS.LEE",
+    "sha256": "58a2839fbe46ecac594f4fc8bfeb99eed2c21d91b3e7528fd677027fe043d5cb",
+    "size": 1808
+  },
+  {
+    "member": "MarioTea/MARIO/WALKING.GSK",
+    "sha256": "338adf9d19ea1b49c544d00351e20a5ba75905578e3c555ae8b115a652e02d33",
+    "size": 1653
+  },
+  {
+    "member": "MarioTea/MARIO/WALKING.GSO",
+    "sha256": "3d5864c62f7ff7cb0c774cb2cbbb00f411fa4c156ad6e257788e1eff60de7aa0",
+    "size": 180934
+  },
+  {
+    "member": "MarioTea/MARIO/WATER.CRX",
+    "sha256": "49cf8c922e2b195395b31bdc7866acd68119c3b58aa0e5282c827627c8d2e0c7",
+    "size": 18022
+  },
+  {
+    "member": "MarioTea/MARIO/WATER.GSK",
+    "sha256": "5bdd499152114e541dcbc1f3636c334f9eb5c6f513245b4e20ab65becfe96edb",
+    "size": 654
+  },
+  {
+    "member": "MarioTea/MARIO/WATER.GSO",
+    "sha256": "1d61258b81c917bfd48a7bd7d22905ae8181e114d1154389853b63bd06836aae",
+    "size": 76112
+  },
+  {
+    "member": "MarioTea/MARIO/WCAS.BAN",
+    "sha256": "0fc6559f155419eb042c2470b60e3a53175e267a44313bf0fa004261efeacc6e",
+    "size": 13646
+  },
+  {
+    "member": "MarioTea/MARIO/WCAS0001.CRX",
+    "sha256": "04a41dff9af45ef4bddd0647a029299b612ca69aea200fb6410c608ee44a830b",
+    "size": 17077
+  },
+  {
+    "member": "MarioTea/MARIO/WELCOME.RS",
+    "sha256": "b3def42639e479bd08e3e64f1199a83d89ba9b075fb8897b991a82b583674231",
+    "size": 17293
+  },
+  {
+    "member": "MarioTea/MARIO/WELCOME.VOC",
+    "sha256": "3f74e59c7f9d809610be67b2d61051febf83f0f395b8093166002fc1c05883ff",
+    "size": 37718
+  }
+]

@@ -1,0 +1,10 @@
+{
+  "commands": [
+    {"command":"python3 transpile/tools/control/evidence.py","result":"passed", "archiveSha256Verified":true,"instructionByteLinesVerified":44994,"archiveMembersHashed":174},
+    {"command":"python3 transpile/tools/control/tables.py > transpile/analysis/control/table-decoding.log","result":"passed", "decoded":"MSD index, menu/results/student/statistics dispatch tables, menu/duration rectangles, corpus-group jump table"},
+    {"command":"python3 transpile/tools/control/disassemble.py","result":"passed", "decodedSlices":11,"method":"trusted objdump static disassembly; temporary ELF data deleted"},
+    {"command":"node --test transpile/tests/control/*.test.mjs","tool":"structured_return","parseAs":"node-test-text","result":"passed","passed":16,"failed":0}
+  ],
+  "limits":["Only newly authored JavaScript tests ran", "No original executable, script, driver or machine code executed/emulated/interpreted", "No browser integration or visual rendering check", "Tests prove recovered predicates/arithmetic, not complete DOS behavioral equivalence"],
+  "writeScope":["transpile/analysis/control/","transpile/recovered/control/","transpile/tests/control/","transpile/tools/control/"]
+}

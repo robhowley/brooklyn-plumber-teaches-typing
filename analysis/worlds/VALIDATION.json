@@ -1,0 +1,27 @@
+{
+  "checks": [
+    {
+      "command": "python3 transpile/tools/worlds/inspect.py",
+      "result": "passed",
+      "details": "Expected ZIP SHA256 matched; original MARIO.EXE SHA256 recorded; every instruction byte printed for the .text region matched its original member FILE offset. Only static objdump was invoked."
+    },
+    {
+      "command": "python3 transpile/tools/worlds/tables.py",
+      "result": "passed",
+      "details": "Expected ZIP SHA256 matched; 7 numeric tables decoded; all 55 WATER/CASTLE/PRACTICE GSO record boundaries and additive checksums verified against original GSK indices."
+    },
+    {
+      "command": "node --test transpile/tests/worlds/*.test.mjs",
+      "runner": "structured_return, parseAs=node-test-text",
+      "result": "12 passed, 0 failed",
+      "details": "Authored JavaScript only: word overflow, exact key ranges/case, CR/SPACE end-of-line, expression thresholds, corpus selection, failure gates, water swimmer/pursuer/bubbles, castle acceleration/rockface/sand/text-progress formulas."
+    }
+  ],
+  "limits": [
+    "No original archive program or machine code was run, emulated, loaded as code or interpreted.",
+    "Static byte matching does not prove linear disassembly distinguishes all embedded data from instructions.",
+    "Tests prove statically specified JavaScript branches, not runtime equivalence to the original DOS game.",
+    "No browser app, rendering integration, wall-clock pacing, shared RNG, keyboard driver, full line wrapping or BAN/ANI playback validation.",
+    "No files outside assigned transpile subtrees modified; no commit or push."
+  ]
+}

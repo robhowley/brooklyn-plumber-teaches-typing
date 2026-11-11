@@ -1,1 +1,20 @@
-{"name":"typing-kingdom","version":"0.1.0","private":true,"type":"module","scripts":{"dev":"vite --host 0.0.0.0","build":"vite build","preview":"vite preview --host 127.0.0.1","preview:restart":"bash scripts/restart-preview.sh","test":"node --test tests/*.test.js","test:browser":"playwright test"},"devDependencies":{"vite":"^6.1.0","@playwright/test":"^1.51.0"}}
+{
+  "name": "brooklyn-plumber-teaches-typing",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev": "npm run build && python3 -B tools/serve.py",
+    "build": "python3 -B tools/build.py",
+    "preview": "python3 -B tools/serve.py",
+    "test": "node --test tests/{app,control,outdoor,worlds,runtime,render,audio}/*.test.mjs",
+    "test:python": "python3 -B tools/test-python.py",
+    "test:browser": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.51.0"
+  }
+}

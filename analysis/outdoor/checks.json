@@ -1,0 +1,28 @@
+{
+  "staticAnalysis": {
+    "command": "python3 transpile/tools/outdoor/inspect.py",
+    "result": "passed",
+    "archiveHashVerified": true,
+    "executableHash": "6caed439b64dc3bad8de4f9df53b63ae5712bf3c54b0bbfc00603557e4720f5e",
+    "focusedInstructionLines": 2612,
+    "directOutdoorCallEdges": 227,
+    "resourceEntries": 228,
+    "executionPolicy": "Only newly authored Python and trusted objdump ran; archive members were inert data"
+  },
+  "tests": {
+    "command": "node --test transpile/tests/outdoor/outdoor.test.mjs",
+    "tool": "structured_return",
+    "parseAs": "node-test-text",
+    "passed": 15,
+    "failed": 0,
+    "scope": "Authored outdoor JS, source-byte/table assertions, copied lesson integrity, boundary and end-to-end logical-loop tests"
+  },
+  "limits": [
+    "No original executable execution, emulation or differential runtime comparison",
+    "No browser app, pixel renderer or audio tested",
+    "Bonus/progression cinematics and shared statistics dispatch remain outside translated ordinary slice",
+    "Static decoder restarts at routine entries; embedded tables inside ranges are still data, not executable instructions",
+    "BIOS nominal tick pacing is architectural context, not a measured runtime",
+    "Only assigned transpile subtrees changed; no commits or pushes"
+  ]
+}

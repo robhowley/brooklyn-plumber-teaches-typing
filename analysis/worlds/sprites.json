@@ -1,0 +1,882 @@
+[
+  {
+    "member": "MarioTea/MARIO/WATER.GSO",
+    "sha256": "1d61258b81c917bfd48a7bd7d22905ae8181e114d1154389853b63bd06836aae",
+    "indexMember": "MarioTea/MARIO/WATER.GSK",
+    "index": 0,
+    "name": "mswm0001_1",
+    "fileOffset": "0x22",
+    "origin": [
+      0,
+      0
+    ],
+    "size": [
+      55,
+      42
+    ]
+  },
+  {
+    "member": "MarioTea/MARIO/WATER.GSO",
+    "sha256": "1d61258b81c917bfd48a7bd7d22905ae8181e114d1154389853b63bd06836aae",
+    "indexMember": "MarioTea/MARIO/WATER.GSK",
+    "index": 1,
+    "name": "mswm0002_1",
+    "fileOffset": "0x932",
+    "origin": [
+      0,
+      0
+    ],
+    "size": [
+      55,
+      42
+    ]
+  },
+  {
+    "member": "MarioTea/MARIO/WATER.GSO",
+    "sha256": "1d61258b81c917bfd48a7bd7d22905ae8181e114d1154389853b63bd06836aae",
+    "indexMember": "MarioTea/MARIO/WATER.GSK",
+    "index": 2,
+    "name": "mswm0003_1",
+    "fileOffset": "0x1242",
+    "origin": [
+      0,
+      0
+    ],
+    "size": [
+      55,
+      42
+    ]
+  },
+  {
+    "member": "MarioTea/MARIO/WATER.GSO",
+    "sha256": "1d61258b81c917bfd48a7bd7d22905ae8181e114d1154389853b63bd06836aae",
+    "indexMember": "MarioTea/MARIO/WATER.GSK",
+    "index": 3,
+    "name": "mswm0004_1",
+    "fileOffset": "0x1b52",
+    "origin": [
+      0,
+      0
+    ],
+    "size": [
+      55,
+      42
+    ]
+  },
+  {
+    "member": "MarioTea/MARIO/WATER.GSO",
+    "sha256": "1d61258b81c917bfd48a7bd7d22905ae8181e114d1154389853b63bd06836aae",
+    "indexMember": "MarioTea/MARIO/WATER.GSK",
+    "index": 4,
+    "name": "mswm0005_1",
+    "fileOffset": "0x2462",
+    "origin": [
+      0,
+      0
+    ],
+    "size": [
+      55,
+      42
+    ]
+  },
+  {
+    "member": "MarioTea/MARIO/WATER.GSO",
+    "sha256": "1d61258b81c917bfd48a7bd7d22905ae8181e114d1154389853b63bd06836aae",
+    "indexMember": "MarioTea/MARIO/WATER.GSK",
+    "index": 5,
+    "name": "mswm0006_1",
+    "fileOffset": "0x2d72",
+    "origin": [
+      0,
+      0
+    ],
+    "size": [
+      55,
+      42
+    ]
+  },
+  {
+    "member": "MarioTea/MARIO/WATER.GSO",
+    "sha256": "1d61258b81c917bfd48a7bd7d22905ae8181e114d1154389853b63bd06836aae",
+    "indexMember": "MarioTea/MARIO/WATER.GSK",
+    "index": 6,
+    "name": "lswm0001_1",
+    "fileOffset": "0x3682",
+    "origin": [
+      0,
+      0
+    ],
+    "size": [
+      55,
+      43
+    ]
+  },
+  {
+    "member": "MarioTea/MARIO/WATER.GSO",
+    "sha256": "1d61258b81c917bfd48a7bd7d22905ae8181e114d1154389853b63bd06836aae",
+    "indexMember": "MarioTea/MARIO/WATER.GSK",
+    "index": 7,
+    "name": "lswm0002_1",
+    "fileOffset": "0x3fc9",
+    "origin": [
+      0,
+      0
+    ],
+    "size": [
+      55,
+      43
+    ]
+  },
+  {
+    "member": "MarioTea/MARIO/WATER.GSO",
+    "sha256": "1d61258b81c917bfd48a7bd7d22905ae8181e114d1154389853b63bd06836aae",
+    "indexMember": "MarioTea/MARIO/WATER.GSK",
+    "index": 8,
+    "name": "lswm0003_1",
+    "fileOffset": "0x4910",
+    "origin": [
+      0,
+      0
+    ],
+    "size": [
+      55,
+      43
+    ]
+  },
+  {
+    "member": "MarioTea/MARIO/WATER.GSO",
+    "sha256": "1d61258b81c917bfd48a7bd7d22905ae8181e114d1154389853b63bd06836aae",
+    "indexMember": "MarioTea/MARIO/WATER.GSK",
+    "index": 9,
+    "name": "lswm0004_1",
+    "fileOffset": "0x5257",
+    "origin": [
+      0,
+      0
+    ],
+    "size": [
+      55,
+      43
+    ]
+  },
+  {
+    "member": "MarioTea/MARIO/WATER.GSO",
+    "sha256": "1d61258b81c917bfd48a7bd7d22905ae8181e114d1154389853b63bd06836aae",
+    "indexMember": "MarioTea/MARIO/WATER.GSK",
+    "index": 10,
+    "name": "lswm0005_1",
+    "fileOffset": "0x5b9e",
+    "origin": [
+      0,
+      0
+    ],
+    "size": [
+      55,
+      43
+    ]
+  },
+  {
+    "member": "MarioTea/MARIO/WATER.GSO",
+    "sha256": "1d61258b81c917bfd48a7bd7d22905ae8181e114d1154389853b63bd06836aae",
+    "indexMember": "MarioTea/MARIO/WATER.GSK",
+    "index": 11,
+    "name": "lswm0006_1",
+    "fileOffset": "0x64e5",
+    "origin": [
+      0,
+      0
+    ],
+    "size": [
+      55,
+      43
+    ]
+  },
+  {
+    "member": "MarioTea/MARIO/WATER.GSO",
+    "sha256": "1d61258b81c917bfd48a7bd7d22905ae8181e114d1154389853b63bd06836aae",
+    "indexMember": "MarioTea/MARIO/WATER.GSK",
+    "index": 12,
+    "name": "pswm0001_1",
+    "fileOffset": "0x6e2c",
+    "origin": [
+      0,
+      0
+    ],
+    "size": [
+      55,
+      35
+    ]
+  },
+  {
+    "member": "MarioTea/MARIO/WATER.GSO",
+    "sha256": "1d61258b81c917bfd48a7bd7d22905ae8181e114d1154389853b63bd06836aae",
+    "indexMember": "MarioTea/MARIO/WATER.GSK",
+    "index": 13,
+    "name": "pswm0002_1",
+    "fileOffset": "0x75bb",
+    "origin": [
+      0,
+      0
+    ],
+    "size": [
+      55,
+      35
+    ]
+  },
+  {
+    "member": "MarioTea/MARIO/WATER.GSO",
+    "sha256": "1d61258b81c917bfd48a7bd7d22905ae8181e114d1154389853b63bd06836aae",
+    "indexMember": "MarioTea/MARIO/WATER.GSK",
+    "index": 14,
+    "name": "pswm0003_1",
+    "fileOffset": "0x7d4a",
+    "origin": [
+      0,
+      0
+    ],
+    "size": [
+      55,
+      35
+    ]
+  },
+  {
+    "member": "MarioTea/MARIO/WATER.GSO",
+    "sha256": "1d61258b81c917bfd48a7bd7d22905ae8181e114d1154389853b63bd06836aae",
+    "indexMember": "MarioTea/MARIO/WATER.GSK",
+    "index": 15,
+    "name": "pswm0004_1",
+    "fileOffset": "0x84d9",
+    "origin": [
+      0,
+      0
+    ],
+    "size": [
+      55,
+      35
+    ]
+  },
+  {
+    "member": "MarioTea/MARIO/WATER.GSO",
+    "sha256": "1d61258b81c917bfd48a7bd7d22905ae8181e114d1154389853b63bd06836aae",
+    "indexMember": "MarioTea/MARIO/WATER.GSK",
+    "index": 16,
+    "name": "pswm0005_1",
+    "fileOffset": "0x8c68",
+    "origin": [
+      0,
+      0
+    ],
+    "size": [
+      55,
+      35
+    ]
+  },
+  {
+    "member": "MarioTea/MARIO/WATER.GSO",
+    "sha256": "1d61258b81c917bfd48a7bd7d22905ae8181e114d1154389853b63bd06836aae",
+    "indexMember": "MarioTea/MARIO/WATER.GSK",
+    "index": 17,
+    "name": "pswm0006_1",
+    "fileOffset": "0x93f7",
+    "origin": [
+      0,
+      0
+    ],
+    "size": [
+      55,
+      35
+    ]
+  },
+  {
+    "member": "MarioTea/MARIO/WATER.GSO",
+    "sha256": "1d61258b81c917bfd48a7bd7d22905ae8181e114d1154389853b63bd06836aae",
+    "indexMember": "MarioTea/MARIO/WATER.GSK",
+    "index": 18,
+    "name": "bite0001_1",
+    "fileOffset": "0x9b86",
+    "origin": [
+      0,
+      0
+    ],
+    "size": [
+      57,
+      45
+    ]
+  },
+  {
+    "member": "MarioTea/MARIO/WATER.GSO",
+    "sha256": "1d61258b81c917bfd48a7bd7d22905ae8181e114d1154389853b63bd06836aae",
+    "indexMember": "MarioTea/MARIO/WATER.GSK",
+    "index": 19,
+    "name": "bite0002_1",
+    "fileOffset": "0xa595",
+    "origin": [
+      0,
+      0
+    ],
+    "size": [
+      57,
+      45
+    ]
+  },
+  {
+    "member": "MarioTea/MARIO/WATER.GSO",
+    "sha256": "1d61258b81c917bfd48a7bd7d22905ae8181e114d1154389853b63bd06836aae",
+    "indexMember": "MarioTea/MARIO/WATER.GSK",
+    "index": 20,
+    "name": "bite0003_1",
+    "fileOffset": "0xafa4",
+    "origin": [
+      0,
+      0
+    ],
+    "size": [
+      57,
+      45
+    ]
+  },
+  {
+    "member": "MarioTea/MARIO/WATER.GSO",
+    "sha256": "1d61258b81c917bfd48a7bd7d22905ae8181e114d1154389853b63bd06836aae",
+    "indexMember": "MarioTea/MARIO/WATER.GSK",
+    "index": 21,
+    "name": "bite0004_1",
+    "fileOffset": "0xb9b3",
+    "origin": [
+      0,
+      0
+    ],
+    "size": [
+      57,
+      45
+    ]
+  },
+  {
+    "member": "MarioTea/MARIO/WATER.GSO",
+    "sha256": "1d61258b81c917bfd48a7bd7d22905ae8181e114d1154389853b63bd06836aae",
+    "indexMember": "MarioTea/MARIO/WATER.GSK",
+    "index": 22,
+    "name": "bite0005_1",
+    "fileOffset": "0xc3c2",
+    "origin": [
+      0,
+      0
+    ],
+    "size": [
+      57,
+      45
+    ]
+  },
+  {
+    "member": "MarioTea/MARIO/WATER.GSO",
+    "sha256": "1d61258b81c917bfd48a7bd7d22905ae8181e114d1154389853b63bd06836aae",
+    "indexMember": "MarioTea/MARIO/WATER.GSK",
+    "index": 23,
+    "name": "octo0001_1",
+    "fileOffset": "0xcdd1",
+    "origin": [
+      0,
+      0
+    ],
+    "size": [
+      48,
+      35
+    ]
+  },
+  {
+    "member": "MarioTea/MARIO/WATER.GSO",
+    "sha256": "1d61258b81c917bfd48a7bd7d22905ae8181e114d1154389853b63bd06836aae",
+    "indexMember": "MarioTea/MARIO/WATER.GSK",
+    "index": 24,
+    "name": "octo0002_1",
+    "fileOffset": "0xd46b",
+    "origin": [
+      0,
+      0
+    ],
+    "size": [
+      48,
+      35
+    ]
+  },
+  {
+    "member": "MarioTea/MARIO/WATER.GSO",
+    "sha256": "1d61258b81c917bfd48a7bd7d22905ae8181e114d1154389853b63bd06836aae",
+    "indexMember": "MarioTea/MARIO/WATER.GSK",
+    "index": 25,
+    "name": "octo0003_1",
+    "fileOffset": "0xdb05",
+    "origin": [
+      0,
+      0
+    ],
+    "size": [
+      48,
+      35
+    ]
+  },
+  {
+    "member": "MarioTea/MARIO/WATER.GSO",
+    "sha256": "1d61258b81c917bfd48a7bd7d22905ae8181e114d1154389853b63bd06836aae",
+    "indexMember": "MarioTea/MARIO/WATER.GSK",
+    "index": 26,
+    "name": "octo0004_1",
+    "fileOffset": "0xe19f",
+    "origin": [
+      0,
+      0
+    ],
+    "size": [
+      48,
+      35
+    ]
+  },
+  {
+    "member": "MarioTea/MARIO/WATER.GSO",
+    "sha256": "1d61258b81c917bfd48a7bd7d22905ae8181e114d1154389853b63bd06836aae",
+    "indexMember": "MarioTea/MARIO/WATER.GSK",
+    "index": 27,
+    "name": "octo0005_1",
+    "fileOffset": "0xe839",
+    "origin": [
+      0,
+      0
+    ],
+    "size": [
+      48,
+      35
+    ]
+  },
+  {
+    "member": "MarioTea/MARIO/WATER.GSO",
+    "sha256": "1d61258b81c917bfd48a7bd7d22905ae8181e114d1154389853b63bd06836aae",
+    "indexMember": "MarioTea/MARIO/WATER.GSK",
+    "index": 28,
+    "name": "octo0006_1",
+    "fileOffset": "0xeed3",
+    "origin": [
+      0,
+      0
+    ],
+    "size": [
+      48,
+      35
+    ]
+  },
+  {
+    "member": "MarioTea/MARIO/WATER.GSO",
+    "sha256": "1d61258b81c917bfd48a7bd7d22905ae8181e114d1154389853b63bd06836aae",
+    "indexMember": "MarioTea/MARIO/WATER.GSK",
+    "index": 29,
+    "name": "octo0007_1",
+    "fileOffset": "0xf56d",
+    "origin": [
+      0,
+      0
+    ],
+    "size": [
+      48,
+      35
+    ]
+  },
+  {
+    "member": "MarioTea/MARIO/WATER.GSO",
+    "sha256": "1d61258b81c917bfd48a7bd7d22905ae8181e114d1154389853b63bd06836aae",
+    "indexMember": "MarioTea/MARIO/WATER.GSK",
+    "index": 30,
+    "name": "octo0008_1",
+    "fileOffset": "0xfc07",
+    "origin": [
+      0,
+      0
+    ],
+    "size": [
+      48,
+      35
+    ]
+  },
+  {
+    "member": "MarioTea/MARIO/WATER.GSO",
+    "sha256": "1d61258b81c917bfd48a7bd7d22905ae8181e114d1154389853b63bd06836aae",
+    "indexMember": "MarioTea/MARIO/WATER.GSK",
+    "index": 31,
+    "name": "octo0009_1",
+    "fileOffset": "0x102a1",
+    "origin": [
+      0,
+      0
+    ],
+    "size": [
+      48,
+      35
+    ]
+  },
+  {
+    "member": "MarioTea/MARIO/WATER.GSO",
+    "sha256": "1d61258b81c917bfd48a7bd7d22905ae8181e114d1154389853b63bd06836aae",
+    "indexMember": "MarioTea/MARIO/WATER.GSK",
+    "index": 32,
+    "name": "octo0010_1",
+    "fileOffset": "0x1093b",
+    "origin": [
+      0,
+      0
+    ],
+    "size": [
+      48,
+      35
+    ]
+  },
+  {
+    "member": "MarioTea/MARIO/WATER.GSO",
+    "sha256": "1d61258b81c917bfd48a7bd7d22905ae8181e114d1154389853b63bd06836aae",
+    "indexMember": "MarioTea/MARIO/WATER.GSK",
+    "index": 33,
+    "name": "bonbub_1",
+    "fileOffset": "0x10fd5",
+    "origin": [
+      0,
+      0
+    ],
+    "size": [
+      23,
+      21
+    ]
+  },
+  {
+    "member": "MarioTea/MARIO/WATER.GSO",
+    "sha256": "1d61258b81c917bfd48a7bd7d22905ae8181e114d1154389853b63bd06836aae",
+    "indexMember": "MarioTea/MARIO/WATER.GSK",
+    "index": 34,
+    "name": "sunk_mswm",
+    "fileOffset": "0x111c2",
+    "origin": [
+      0,
+      0
+    ],
+    "size": [
+      40,
+      50
+    ]
+  },
+  {
+    "member": "MarioTea/MARIO/WATER.GSO",
+    "sha256": "1d61258b81c917bfd48a7bd7d22905ae8181e114d1154389853b63bd06836aae",
+    "indexMember": "MarioTea/MARIO/WATER.GSK",
+    "index": 35,
+    "name": "sunk_lswm",
+    "fileOffset": "0x1199c",
+    "origin": [
+      0,
+      0
+    ],
+    "size": [
+      40,
+      50
+    ]
+  },
+  {
+    "member": "MarioTea/MARIO/WATER.GSO",
+    "sha256": "1d61258b81c917bfd48a7bd7d22905ae8181e114d1154389853b63bd06836aae",
+    "indexMember": "MarioTea/MARIO/WATER.GSK",
+    "index": 36,
+    "name": "sunk_pswm",
+    "fileOffset": "0x12176",
+    "origin": [
+      0,
+      0
+    ],
+    "size": [
+      40,
+      50
+    ]
+  },
+  {
+    "member": "MarioTea/MARIO/CASTLE.GSO",
+    "sha256": "dc62d4fcfbe8499ac6da2a6e78fcecbad0a0611f3774eae90351c9f8bd177a62",
+    "indexMember": "MarioTea/MARIO/CASTLE.GSK",
+    "index": 0,
+    "name": "rockface_1",
+    "fileOffset": "0x22",
+    "origin": [
+      0,
+      0
+    ],
+    "size": [
+      49,
+      42
+    ]
+  },
+  {
+    "member": "MarioTea/MARIO/CASTLE.GSO",
+    "sha256": "dc62d4fcfbe8499ac6da2a6e78fcecbad0a0611f3774eae90351c9f8bd177a62",
+    "indexMember": "MarioTea/MARIO/CASTLE.GSK",
+    "index": 1,
+    "name": "rockface_2",
+    "fileOffset": "0x836",
+    "origin": [
+      0,
+      0
+    ],
+    "size": [
+      49,
+      42
+    ]
+  },
+  {
+    "member": "MarioTea/MARIO/CASTLE.GSO",
+    "sha256": "dc62d4fcfbe8499ac6da2a6e78fcecbad0a0611f3774eae90351c9f8bd177a62",
+    "indexMember": "MarioTea/MARIO/CASTLE.GSK",
+    "index": 2,
+    "name": "rockface_3",
+    "fileOffset": "0x104a",
+    "origin": [
+      0,
+      0
+    ],
+    "size": [
+      51,
+      41
+    ]
+  },
+  {
+    "member": "MarioTea/MARIO/CASTLE.GSO",
+    "sha256": "dc62d4fcfbe8499ac6da2a6e78fcecbad0a0611f3774eae90351c9f8bd177a62",
+    "indexMember": "MarioTea/MARIO/CASTLE.GSK",
+    "index": 3,
+    "name": "rockface_4",
+    "fileOffset": "0x187f",
+    "origin": [
+      0,
+      0
+    ],
+    "size": [
+      57,
+      41
+    ]
+  },
+  {
+    "member": "MarioTea/MARIO/CASTLE.GSO",
+    "sha256": "dc62d4fcfbe8499ac6da2a6e78fcecbad0a0611f3774eae90351c9f8bd177a62",
+    "indexMember": "MarioTea/MARIO/CASTLE.GSK",
+    "index": 4,
+    "name": "pip10002_bump1",
+    "fileOffset": "0x21aa",
+    "origin": [
+      0,
+      0
+    ],
+    "size": [
+      19,
+      20
+    ]
+  },
+  {
+    "member": "MarioTea/MARIO/CASTLE.GSO",
+    "sha256": "dc62d4fcfbe8499ac6da2a6e78fcecbad0a0611f3774eae90351c9f8bd177a62",
+    "indexMember": "MarioTea/MARIO/CASTLE.GSK",
+    "index": 5,
+    "name": "pip10002_bump2",
+    "fileOffset": "0x2330",
+    "origin": [
+      0,
+      0
+    ],
+    "size": [
+      28,
+      23
+    ]
+  },
+  {
+    "member": "MarioTea/MARIO/CASTLE.GSO",
+    "sha256": "dc62d4fcfbe8499ac6da2a6e78fcecbad0a0611f3774eae90351c9f8bd177a62",
+    "indexMember": "MarioTea/MARIO/CASTLE.GSK",
+    "index": 6,
+    "name": "pip10002_bump3",
+    "fileOffset": "0x25be",
+    "origin": [
+      0,
+      0
+    ],
+    "size": [
+      23,
+      20
+    ]
+  },
+  {
+    "member": "MarioTea/MARIO/CASTLE.GSO",
+    "sha256": "dc62d4fcfbe8499ac6da2a6e78fcecbad0a0611f3774eae90351c9f8bd177a62",
+    "indexMember": "MarioTea/MARIO/CASTLE.GSK",
+    "index": 7,
+    "name": "pip10002_bump4",
+    "fileOffset": "0x2794",
+    "origin": [
+      0,
+      0
+    ],
+    "size": [
+      17,
+      20
+    ]
+  },
+  {
+    "member": "MarioTea/MARIO/CASTLE.GSO",
+    "sha256": "dc62d4fcfbe8499ac6da2a6e78fcecbad0a0611f3774eae90351c9f8bd177a62",
+    "indexMember": "MarioTea/MARIO/CASTLE.GSK",
+    "index": 8,
+    "name": "pip10002_bump5",
+    "fileOffset": "0x28f2",
+    "origin": [
+      0,
+      0
+    ],
+    "size": [
+      25,
+      19
+    ]
+  },
+  {
+    "member": "MarioTea/MARIO/CASTLE.GSO",
+    "sha256": "dc62d4fcfbe8499ac6da2a6e78fcecbad0a0611f3774eae90351c9f8bd177a62",
+    "indexMember": "MarioTea/MARIO/CASTLE.GSK",
+    "index": 9,
+    "name": "pip20002_bump1",
+    "fileOffset": "0x2ad7",
+    "origin": [
+      0,
+      0
+    ],
+    "size": [
+      13,
+      22
+    ]
+  },
+  {
+    "member": "MarioTea/MARIO/CASTLE.GSO",
+    "sha256": "dc62d4fcfbe8499ac6da2a6e78fcecbad0a0611f3774eae90351c9f8bd177a62",
+    "indexMember": "MarioTea/MARIO/CASTLE.GSK",
+    "index": 10,
+    "name": "pip20002_bump2",
+    "fileOffset": "0x2bff",
+    "origin": [
+      0,
+      0
+    ],
+    "size": [
+      25,
+      18
+    ]
+  },
+  {
+    "member": "MarioTea/MARIO/CASTLE.GSO",
+    "sha256": "dc62d4fcfbe8499ac6da2a6e78fcecbad0a0611f3774eae90351c9f8bd177a62",
+    "indexMember": "MarioTea/MARIO/CASTLE.GSK",
+    "index": 11,
+    "name": "pip20002_bump3",
+    "fileOffset": "0x2dcb",
+    "origin": [
+      0,
+      0
+    ],
+    "size": [
+      15,
+      20
+    ]
+  },
+  {
+    "member": "MarioTea/MARIO/CASTLE.GSO",
+    "sha256": "dc62d4fcfbe8499ac6da2a6e78fcecbad0a0611f3774eae90351c9f8bd177a62",
+    "indexMember": "MarioTea/MARIO/CASTLE.GSK",
+    "index": 12,
+    "name": "pip20002_bump4",
+    "fileOffset": "0x2f01",
+    "origin": [
+      0,
+      0
+    ],
+    "size": [
+      16,
+      15
+    ]
+  },
+  {
+    "member": "MarioTea/MARIO/CASTLE.GSO",
+    "sha256": "dc62d4fcfbe8499ac6da2a6e78fcecbad0a0611f3774eae90351c9f8bd177a62",
+    "indexMember": "MarioTea/MARIO/CASTLE.GSK",
+    "index": 13,
+    "name": "pip20002_bump5",
+    "fileOffset": "0x2ffb",
+    "origin": [
+      0,
+      0
+    ],
+    "size": [
+      34,
+      21
+    ]
+  },
+  {
+    "member": "MarioTea/MARIO/CASTLE.GSO",
+    "sha256": "dc62d4fcfbe8499ac6da2a6e78fcecbad0a0611f3774eae90351c9f8bd177a62",
+    "indexMember": "MarioTea/MARIO/CASTLE.GSK",
+    "index": 14,
+    "name": "brick1_cblock",
+    "fileOffset": "0x32cf",
+    "origin": [
+      0,
+      0
+    ],
+    "size": [
+      25,
+      25
+    ]
+  },
+  {
+    "member": "MarioTea/MARIO/PRACTICE.GSO",
+    "sha256": "2cb053fb1e016d3bd322e09a64406a521a5c903a33df535c8da4acb05a3976b1",
+    "indexMember": "MarioTea/MARIO/PRACTICE.GSK",
+    "index": 0,
+    "name": "prac0001_1",
+    "fileOffset": "0x22",
+    "origin": [
+      0,
+      0
+    ],
+    "size": [
+      53,
+      60
+    ]
+  },
+  {
+    "member": "MarioTea/MARIO/PRACTICE.GSO",
+    "sha256": "2cb053fb1e016d3bd322e09a64406a521a5c903a33df535c8da4acb05a3976b1",
+    "indexMember": "MarioTea/MARIO/PRACTICE.GSK",
+    "index": 1,
+    "name": "prac0002_1",
+    "fileOffset": "0xc98",
+    "origin": [
+      0,
+      0
+    ],
+    "size": [
+      53,
+      60
+    ]
+  },
+  {
+    "member": "MarioTea/MARIO/PRACTICE.GSO",
+    "sha256": "2cb053fb1e016d3bd322e09a64406a521a5c903a33df535c8da4acb05a3976b1",
+    "indexMember": "MarioTea/MARIO/PRACTICE.GSK",
+    "index": 2,
+    "name": "prac0003_1",
+    "fileOffset": "0x190e",
+    "origin": [
+      0,
+      0
+    ],
+    "size": [
+      53,
+      60
+    ]
+  }
+]

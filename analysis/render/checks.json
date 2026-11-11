@@ -1,0 +1,10 @@
+{
+  "safety": "Original archive members read only as data. Only authored Python/JavaScript and trusted objdump executed.",
+  "cwd": "isolated render checkout root",
+  "checks": [
+    {"command": "node --test transpile/tests/render/render.test.mjs", "tool": "structured_return", "parseAs": "node-test-text", "passed": 6, "failed": 0},
+    {"command": "python3 -B -m unittest discover -s transpile/tests/render -p 'test_*.py'", "tool": "structured_return", "parseAs": "unittest-text", "passed": 3, "failed": 0}
+  ],
+  "conversion": {"idleFrames": 145, "idlePixels": 166926, "banMembers": 13, "banPackets": 628, "aniMembers": 9, "outdoorPalettes": 3},
+  "limits": ["No original execution or differential oracle", "No browser integration test", "CASTLE.BGS unresolved", "Planar hardware and intermediate palette fades not translated", "Font family binding unresolved"]
+}
