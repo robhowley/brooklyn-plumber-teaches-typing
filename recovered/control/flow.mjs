@@ -1,11 +1,5 @@
 import { s16 } from './scoring.mjs';
 
-// FILE 0x11465..0x114ce. Profile present is DS:50c4, not a difficulty toggle.
-export function canSelectMode(mode, { profilePresent, goal }) {
-  if (![1, 2, 3, 4].includes(mode)) return false;
-  return !profilePresent || mode === 1 || mode === 4 || s16(goal) >= (mode === 2 ? 10 : 30);
-}
-
 // FILE 0x10412..0x10457. Going DOWN to outdoor does not reset lesson.
 export function nextRoute({ mode, goal, lesson }) {
   mode = s16(mode); goal = s16(goal); lesson = s16(lesson);

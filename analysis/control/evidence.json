@@ -8,7 +8,7 @@
   "routines": [
     {"export":"score", "module":"scoring.mjs", "ranges":[["0x15bac","0x15d77"]], "status":"direct arithmetic translation", "criticalBranches":["0x15ca0 signed attempts <= 0 skips profile accuracy write", "0x15d53 low-word store precedes signed negative clamp"]},
     {"export":"timer", "module":"scoring.mjs", "ranges":[["0x15afb","0x15b8c"],["0x15bee","0x15c2f"]], "status":"direct transition predicates, explicit supplied tick sample"},
-    {"export":"canSelectMode", "module":"flow.mjs", "ranges":[["0x11465","0x114d2"]], "status":"direct predicates"},
+    {"export":"menuInput", "module":"menu.mjs", "ranges":[["0x11465","0x114d2"]], "status":"browser adaptation: all activities selectable regardless of profile goal; original goal gates intentionally omitted"},
     {"export":"nextRoute", "module":"flow.mjs", "ranges":[["0x10412","0x10457"]], "status":"direct branch translation"},
     {"export":"progression", "module":"flow.mjs", "ranges":[["0x13d4a","0x13db2"],["0x17e24","0x17e99"],["0xda44","0xdae6"]], "status":"direct progression arithmetic and gate predicates; animations/save side effects returned as decisions", "criticalBranches":["0x13d96 JLE skips completion at exactly 10", "0x17e7e JLE skips completion at exactly 30", "0xdab2 JL selects ending2 below45, castle goal uncapped"]},
     {"export":"queueCertificates", "module":"flow.mjs", "ranges":[["0x103be","0x103f8"]], "status":"direct pending predicate; no printing"},

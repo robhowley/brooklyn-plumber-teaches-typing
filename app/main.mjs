@@ -3,7 +3,7 @@ import { Renderer } from './render.mjs';
 import { normalizeStudent } from '../recovered/control/student.mjs';
 import { createMenu, menuInput, createStudentUI, studentUIInput, createStudentChooser, studentChooserInput, createTextCursor, textCursorTick } from '../recovered/control/menu.mjs';
 import { openHelp, helpInput, helpPointer, modalReturn, keyboardInput } from '../recovered/control/report.mjs';
-import { mainMenuHit, canSelectMode } from '../recovered/control/flow.mjs';
+import { mainMenuHit } from '../recovered/control/flow.mjs';
 import { resultCommand, resultHit } from '../recovered/control/results.mjs';
 import { SourceAudio } from '../recovered/audio/audio.mjs';
 import { BrowserAudio } from './audio.mjs';
@@ -202,7 +202,7 @@ canvas.addEventListener('keydown',event=>{
 function locationInCanvas(event) {const r=canvas.getBoundingClientRect();return {x:Math.floor((event.clientX-r.left)*320/r.width),y:Math.floor((event.clientY-r.top)*200/r.height)};}
 canvas.addEventListener('pointermove',event=>{
   pointer=locationInCanvas(event);const hit=session.screen==='menu'?mainMenuHit(pointer.x,pointer.y):-1;
-  canvas.style.cursor=session.screen==='menu'&&(pointer.y<8||hit>=0)?(hit>=0&&[1,2].includes(hit)&&!canSelectMode(hit+1,session.profile)?'not-allowed':'pointer'):'default';
+  canvas.style.cursor=session.screen==='menu'&&(pointer.y<8||hit>=0)?'pointer':'default';
 });
 // A fresh left press, not a click synthesized after a release or a right button.
 canvas.addEventListener('pointerdown',event=>{

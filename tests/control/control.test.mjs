@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { score, timer } from '../../recovered/control/scoring.mjs';
-import { nextRoute, progression, canSelectMode, queueCertificates, corpusRoute, mainMenuHit, mainMenuCommand, menuNavigation } from '../../recovered/control/flow.mjs';
+import { nextRoute, progression, queueCertificates, corpusRoute, mainMenuHit, mainMenuCommand, menuNavigation } from '../../recovered/control/flow.mjs';
 import { resultHit, resultCommand, resultSpeech, clampLessonMinutes, lessonLimitSeconds } from '../../recovered/control/results.mjs';
 import { newStudent, readStudent, normalizeStudent, studentForSave, recordProblemKey, problemKeys } from '../../recovered/control/student.mjs';
 
@@ -31,15 +31,11 @@ test('timer pause/resume excludes paused ticks and does not double-count',()=>{
  assert.equal(timer(s,320,500).ticks,0);
  assert.equal(timer({ticks:0,lastTicks:0x7fffffff,running:true},100,0x80000001).ticks,2);
 });
-test('mode thresholds, demo bypass, practice exemption, asymmetrical lesson reset',()=>{
+test('Next preserves goal thresholds, practice exemption and asymmetrical lesson reset',()=>{
  for(const [goal,mode] of [[9,1],[10,2],[29,2],[30,3]]) assert.equal(nextRoute({mode:1,lesson:6,goal}).mode,mode);
  assert.deepEqual(nextRoute({mode:3,lesson:6,goal:5}),{mode:1,lesson:6});
  assert.deepEqual(nextRoute({mode:4,lesson:6,goal:30}),{mode:4,lesson:6});
  assert.deepEqual(nextRoute({mode:1,lesson:6,goal:10}),{mode:2,lesson:1});
- assert.equal(canSelectMode(2,{profilePresent:true,goal:9}),false);
- assert.equal(canSelectMode(2,{profilePresent:true,goal:10}),true);
- assert.equal(canSelectMode(3,{profilePresent:false,goal:5}),true);
- assert.equal(canSelectMode(3,{profilePresent:true,goal:29}),false);
 });
 const state=(goal=5,lesson=6)=>({goal,lesson,previousGoal:0,completed:[false,false,false]});
 const advance=(s,mode,resultWpm,extra={})=>progression(s,{mode,resultWpm,profilePresent:true,...extra});

@@ -48,7 +48,7 @@ test('Water inactivity resets on wrong/ignored input, strict >20 chases then sin
  await page.clock.runFor(15000);let s=await snap(page);expect(s.screen).toBe('results');expect(s.profile.lesson).toBe(1);
  await page.locator('#game').press('n');s=await snap(page);expect(s.screen).toBe('water');expect(s.water.failed).toBe(false);
 });
-test('Water normal timeout advances once, Next retains group; Castle eligibility remains gated',async({page})=>{
+test('Water normal timeout advances once, Next retains group; Castle is selectable below goal 30',async({page})=>{
  await ready(page);let s=await snap(page);
  // At least60 net correct in one minute reaches goal10. Remaining input is
  // ignored but resets inactivity, avoiding failure while the real clock runs.
@@ -60,5 +60,5 @@ test('Water normal timeout advances once, Next retains group; Castle eligibility
  expect(s.screen).toBe('results');expect(s.water.timedOut).toBe(true);expect(s.water.failed).toBe(false);expect(s.profile.lesson).toBe(2);
  await page.locator('#game').press('n');expect((await snap(page)).profile.lesson).toBe(2);expect((await snap(page)).screen).toBe('water');
  await page.locator('#game').press('Escape');await page.clock.runFor(120);await page.locator('#game').press('m');
- await page.clock.runFor(300);await page.locator('#game').press('3');await page.clock.runFor(300);expect((await snap(page)).screen).toBe('menu');expect((await snap(page)).profile.goal).toBeLessThan(30);
+ await page.clock.runFor(300);await page.locator('#game').press('3');await page.clock.runFor(300);expect((await snap(page)).screen).toBe('castle');expect((await snap(page)).profile.goal).toBeLessThan(30);
 });

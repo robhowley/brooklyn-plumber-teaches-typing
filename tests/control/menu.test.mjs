@@ -79,9 +79,20 @@ test('88 intercepts entire 7x7 before bar, dropdown and world; linear source wra
   assert.deepEqual(menuInput(createMenu(),{key:49,pointer:{x:20,y:0},front},p).effects,[{type:'start',mode:1}]);
 });
 
+test('every activity is selectable by key or pointer without changing student progress',()=>{
+  for(const profile of [p,{...p,profilePresent:false},{...p,profilePresent:false,demo:true}]) {
+    const before=structuredClone(profile);
+    for(let mode=1;mode<=4;mode++) {
+      const expected=[{type:'start',mode}];
+      assert.deepEqual(menuInput(createMenu(),{key:48+mode},profile).effects,expected);
+      assert.deepEqual(menuInput(createMenu(),{pointer:{x:250,y:20+(mode-1)*31},front:blank()},profile).effects,expected);
+    }
+    assert.deepEqual(profile,before);
+  }
+});
+
 test('localized accelerators run before English fallback; source profile gates and XOR bits',()=>{
   assert.deepEqual(menuInput(createMenu(),{key:90,messages:{10008:'Zabout'}}).effects,[{type:'about'}]);
-  assert.deepEqual(menuInput(createMenu(),{key:50},p).effects,[{type:'world-warning',mode:2}]);
   assert.deepEqual(menuInput(createMenu(),{key:53},{profilePresent:false}).effects,[]);
   assert.deepEqual(menuInput(createMenu(),{key:78},{...p,demo:true}).effects,[]);
   let s={...createMenu(),row:5};for(const key of [77,83,71])s=menuInput(s,{key}).state;

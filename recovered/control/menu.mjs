@@ -1,5 +1,5 @@
 // Static translation only. FILE offsets/member hashes: tools/control/menu-inspect.py.
-import { mainMenuCommand, mainMenuHit, menuNavigation, canSelectMode, nextRoute } from './flow.mjs';
+import { mainMenuCommand, mainMenuHit, menuNavigation, nextRoute } from './flow.mjs';
 import { newStudent, normalizeStudent, readStudent, STUDENT_SIZE } from './student.mjs';
 import { s16 } from './scoring.mjs';
 
@@ -68,8 +68,9 @@ export function menuInput(state,{key=0,pointer=null,front=null,messages={}}={},p
   }
   const mode=['outdoor','water','castle','practice'].indexOf(command)+1;
   if(mode) {
-    if(canSelectMode(mode,profile)) effects.push({type:'start',mode});
-    else effects.push({type:'world-warning',mode});
+    // Browser adaptation: all activities are selectable at any goal.
+    // Intentionally omit MARIO.EXE FILE 0x11465..0x114ce goal gates.
+    effects.push({type:'start',mode});
   } else if(command==='next') {
     if(!profile.demo) effects.push({type:'start',...nextRoute(profile)});
   } else if(command.startsWith('lesson-') && command!=='lesson-times') {

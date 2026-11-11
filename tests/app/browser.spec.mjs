@@ -42,7 +42,7 @@ test('game fills the available viewport without stretching, cropping or scrollin
  expect(await page.locator('#game').boundingBox()).toEqual(bounds);
  expect(await page.evaluate(()=>({width:document.documentElement.scrollWidth,height:document.documentElement.scrollHeight}))).toEqual(page.viewportSize());
 });
-test('entry/menu uses local decoded assets only; disabled controls and hover survive scale',async({page},testInfo)=>{
+test('entry/menu uses local decoded assets only; selection and hover survive scale',async({page},testInfo)=>{
  test.skip(testInfo.project.name==='pages-prefix','Welcome speech can drain the queued click.');
  const failures=[],requests=[];page.on('pageerror',e=>failures.push(e.message));page.on('request',r=>requests.push(r.url()));
  await ready(page);expect(await page.locator('canvas').getAttribute('width')).toBe('320');

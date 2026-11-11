@@ -74,11 +74,27 @@ test('Outside to Practice to Outside keeps source counters and clock with fresh 
  expect((await snapshot(page)).practice.lastCorrect).toBe(practice.practice.lastCorrect);
  expect(errors).toEqual([]);
 });
-test('guest mode, profile gating and unavailable assets/storage are visible',async({page})=>{
+test('new and reloaded students can select every activity at the default goal',async({page})=>{
+ await page.clock.install();await ready(page);await createStudentUI(page,{name:'OPEN'});
+ const game=page.locator('#game');
+ for(const reloaded of [false,true]) {
+  if(reloaded) {await page.reload();await skipStartupUI(page);}
+  for(const [index,screen] of ['outdoor','water','castle','practice'].entries()) {
+   await page.clock.runFor(300);
+   const bounds=await game.boundingBox(),x=bounds.x+250*bounds.width/320,y=bounds.y+(20+index*31)*bounds.height/200;
+   await page.mouse.move(x,y);await expect(game).toHaveCSS('cursor','pointer');
+   if(reloaded)await page.mouse.click(x,y);else await game.press(String(index+1));
+   await page.clock.runFor(300);await expect(game).toHaveAttribute('data-screen',screen);
+   expect((await snapshot(page)).profile).toMatchObject({name:'OPEN',goal:5,lesson:1,character:1,completed:[0,0,0],durations:[2,5,5,10]});
+   await game.press('Escape');await page.clock.runFor(180);await expect(game).toHaveAttribute('data-screen','results');
+   await game.press('m');await expect(game).toHaveAttribute('data-screen','menu');
+  }
+ }
+});
+test('guest mode and unavailable assets/storage are visible',async({page})=>{
  await page.clock.install();await ready(page);expect((await snapshot(page)).profile.profilePresent).toBe(false);
  await page.locator('#game').press('4');await page.locator('#game').press('Escape');await page.clock.runFor(60);await expect(page.locator('#game')).toHaveAttribute('data-screen','results');
  expect(await page.evaluate(()=>localStorage.getItem('mtt-static-translation.students.v1'))).toBeNull();
- await page.locator('#game').press('m');await createStudentUI(page,{name:'GATE'});await page.locator('#game').press('2');expect((await snapshot(page)).screen).toBe('menu');expect((await snapshot(page)).profile.goal).toBe(5);
  await page.addInitScript(()=>{Storage.prototype.getItem=function(){throw new Error('test storage blocked');};});
  await page.reload();await skipStartupUI(page);await expect(page.locator('#game')).toHaveAttribute('data-screen','menu');await expect(page.locator('#status')).toContainText('Storage unavailable');
  await page.locator('#game').press('4');await expect(page.locator('#status')).toContainText('Storage unavailable');

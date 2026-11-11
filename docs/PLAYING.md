@@ -5,6 +5,7 @@ For local setup and tests, see [DEVELOPMENT.md](DEVELOPMENT.md).
 ## Controls
 
 - The canvas receives keyboard focus on load. Press **1 Outside**, **2 Water**, **3 Castle** or **4 Practice**, or click the menu pictures.
+- All four activities are available immediately for new and existing students, regardless of goal or progress. This browser version deliberately removes the original world-selection locks; scoring and Next routing are unchanged.
 - Startup keys skip individual sequences, not the entire introduction. **D** selects an unsaved Demo profile; then choose a world. Guest `Player` is also unsaved but never plays automatically.
 - Outside accepts the marked letter immediately, including its lowercase equivalent. Water and Castle require matching case. Displayed bonus punctuation starts a sequence with lesson time stopped.
 - Practice preserves case. Copy the second text row into the first; finish a line with **SPACE or Enter**. Practice has no inactivity failure or progression, and Next stays in Practice.
