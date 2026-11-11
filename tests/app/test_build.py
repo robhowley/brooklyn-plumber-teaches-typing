@@ -2,6 +2,7 @@
 import base64
 import hashlib
 import json
+import os
 from pathlib import Path
 import runpy
 import struct
@@ -11,12 +12,20 @@ import sys
 import unittest
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / 'tools/render'))
+sys.path.insert(0, str(ROOT / 'tools'))
 from decode import decode_ban
+from source import archive_path
 
 class AppDataTests(unittest.TestCase):
     def test_missing_fresh_listing_has_actionable_error_without_research_fallback(self):
+        archive = archive_path()
         with tempfile.TemporaryDirectory(dir=ROOT / '.tmp') as tmp:
             root = Path(tmp)
+            home = root / 'home'
+            home.mkdir()
+            cache = root / '.cache/source' / archive.name
+            cache.parent.mkdir(parents=True)
+            cache.symlink_to(archive)
             script = root / 'tools/control/evidence.py'
             script.parent.mkdir(parents=True)
             script.write_bytes((ROOT / 'tools/control/evidence.py').read_bytes())
@@ -25,12 +34,21 @@ class AppDataTests(unittest.TestCase):
             old = root / 'analysis/control/verified-disassembly.txt'
             old.parent.mkdir(parents=True)
             old.write_text('stale listing')
-            result = subprocess.run([sys.executable, '-B', str(script)], capture_output=True, text=True)
-            self.assertNotEqual(result.returncode, 0)
-            self.assertIn('Missing generated listing:', result.stderr)
-            self.assertIn('python3 -B tools/worlds/inspect.py', result.stderr)
-            self.assertNotIn('Traceback', result.stderr)
-            self.assertEqual(old.read_text(), 'stale listing')
+            # Both explicit input and the fixture cache work without Downloads.
+            for selection in ('explicit', 'cache'):
+                with self.subTest(selection=selection):
+                    env = {**os.environ, 'HOME': str(home), 'MTT_ARCHIVE': str(archive)}
+                    if selection == 'cache':
+                        env.pop('MTT_ARCHIVE')
+                    result = subprocess.run(
+                        [sys.executable, '-B', str(script)], env=env,
+                        capture_output=True, text=True, timeout=10)
+                    self.assertNotEqual(result.returncode, 0)
+                    self.assertIn('Missing generated listing:', result.stderr)
+                    self.assertIn('python3 -B tools/worlds/inspect.py', result.stderr)
+                    self.assertNotIn('Traceback', result.stderr)
+                    self.assertEqual(old.read_text(), 'stale listing')
+            self.assertFalse((home / 'Downloads').exists())
 
     def test_render_manifest_family_boundary_and_world_contract(self):
         data = json.loads((ROOT / 'app/data.json').read_text())
