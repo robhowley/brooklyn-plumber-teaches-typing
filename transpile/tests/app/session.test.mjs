@@ -4,7 +4,8 @@ import fs from 'node:fs';
 import { Session, editStudent, dosKey, SAVE_KEY, loadProfiles } from '../../app/session.mjs';
 import { newStudent } from '../../recovered/control/student.mjs';
 const data=JSON.parse(fs.readFileSync(new URL('../../app/data.json',import.meta.url)));
-const session=()=>new Session(data,{bytes:editStudent(newStudent('Tester'),{minutes:1}),seed:1});
+import {skipStartup,finishCelebration} from './source-path.mjs';
+const session=()=>skipStartup(new Session(data,{bytes:editStudent(newStudent('Tester'),{minutes:1}),seed:1}));
 test('outside target accepts immediate distant lowercase, errors record expected key',()=>{
  const s=session();s.start(0);s.step(0,1);
  const target=s.outdoor.obstacles[s.outdoor.targetIndex];assert.ok(target.x>220);
@@ -23,10 +24,10 @@ test('Escape early exit results suppress advancement and Next does not increment
  assert.equal(s.profile.lesson,1);assert.equal(s.result.elapsedSeconds,0);s.next(20);assert.equal(s.screen,'outdoor');assert.equal(s.profile.lesson,1);
 });
 test('timeout finalizes score then advances exactly once; Next enters Water without a second advancement',()=>{
- const s=session();s.start(0);s.outdoor.attempts=60;s.outdoor.correct=60;s.step(0,1092);
+ const s=session();s.start(0);s.outdoor.attempts=60;s.outdoor.correct=60;s.step(0,1092);assert.equal(s.screen,'celebration');finishCelebration(s);
  assert.equal(s.screen,'results');assert.equal(s.result.wpm,10);assert.equal(s.result.elapsedSeconds,60);assert.equal(s.profile.lesson,2);
  s.next(2000);assert.equal(s.profile.lesson,2);
- s.student=editStudent(s.student,{lesson:6,goal:5});s.start(3000);s.outdoor.attempts=60;s.outdoor.correct=60;s.step(0,4092);
+ s.student=editStudent(s.student,{lesson:6,goal:5});s.start(3000);s.outdoor.attempts=60;s.outdoor.correct=60;s.step(0,4092);finishCelebration(s);
  assert.equal(s.profile.goal,10);assert.equal(s.profile.completed[0],1);
  assert.deepEqual(s.next(5000),{mode:2,lesson:1});assert.equal(s.screen,'water');
 });

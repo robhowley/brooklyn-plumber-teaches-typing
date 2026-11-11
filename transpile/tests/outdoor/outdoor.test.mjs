@@ -2,6 +2,10 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
+import { spawnSync } from 'node:child_process';
+import { createPendingInput } from '../../recovered/runtime/runtime.mjs';
+import { createDemo, demoStudent } from '../../recovered/control/startup.mjs';
+import { newStudent } from '../../recovered/control/student.mjs';
 import { i16, upperCode, random15, lessonBytes, nextTarget, selectLessonSegment,
   makeObstacle, motion, idleFrame, createOutdoor, updatePlayer, updateObstacles,
   updateParticles, selectTarget, acceptKey, tick, makeBonus, updateBonus, JUMP_Y, CURSOR_FRAMES, BLOCK_HEIGHTS } from '../../recovered/outdoor/outdoor.mjs';
@@ -79,6 +83,63 @@ test('timeout compares signed32 values, including the wrap boundary', () => {
   assert.equal(s.ended, false);
   tick(s, { ...options, elapsed: 120, limit: 120 });
   assert.equal(s.ended, true);
+});
+
+test('pinned archive timeout branches bypass the input poll and reach original ending states', () => {
+  // Read original bytes only, never execute or emulate the archive member.
+  const proof = spawnSync('python3', ['-B', '-c', `import zipfile,pathlib,hashlib
+p=pathlib.Path.home()/'Downloads/Mario_Teaches_Typing_1992.zip'
+assert hashlib.sha256(p.read_bytes()).hexdigest()=='b59886a6f7b48b0057c8db1c099ed598c8a3581245b0f8884316203de55784bd'
+with zipfile.ZipFile(p) as z: b=z.read('MarioTea/MARIO/MARIO.EXE')
+assert hashlib.sha256(b).hexdigest()=='6caed439b64dc3bad8de4f9df53b63ae5712bf3c54b0bbfc00603557e4720f5e'
+print(b[0x13a9c:0x13ab4].hex(),b[0x13b89:0x13b9e].hex())`], { encoding: 'utf8' });
+  assert.equal(proof.status, 0, proof.stderr);
+  const [compare, ending] = proof.stdout.trim().split(' ').map(hex => Buffer.from(hex, 'hex'));
+  assert.equal(compare.toString('hex'), '263b47217c0b7506263b571f7203e9dc0033f69adb1f0000');
+  assert.equal(ending.toString('hex'), '833ef84f017508c706f84f0200eb06c706f84f0300');
+  assert.equal(0x13aa2 + compare.readInt8(5), 0x13aad); // signed high less: poll path
+  assert.equal(0x13aa4 + compare.readInt8(7), 0x13aaa); // high greater: end path
+  assert.equal(0x13aaa + compare.readInt8(13), 0x13aad); // equal high, low less: poll
+  assert.equal(0x13aad + compare.readInt16LE(15), 0x13b89); // equal or greater: bypass
+  assert.equal(compare.subarray(19).toString('hex'), '9adb1f0000'); // poll at FILE 0x13aaf
+});
+
+for (const elapsed of [119, 120, 121]) test(`elapsed ${elapsed} polls only below limit after updates, preserving Demo RNG and queued keys on bypass`, () => {
+  for (const countdown of [0, 2]) {
+    const s = state(), input = createPendingInput(), rng = { seed: s.seed };
+    s.obstacles[0] = makeObstacle(65, 32767); // no spawn RNG draw during this tick
+    Object.assign(s, { attempts: 7, correct: 5, errors: 2 });
+    const demo = createDemo({ student: demoStudent(newStudent('A')), rng, input, mode: 1 });
+    demo.state.countdown = countdown;
+    input.enqueue(27, 66);
+    let polls = 0;
+    const events = tick(s, { ...options, elapsed, limit: 120, pollInput(args) {
+      polls++;
+      assert.equal(s.groundPhase, 1);
+      assert.equal(s.scroll, 9);
+      assert.equal(s.obstacles[0].x, 274);
+      assert.deepEqual(args, { target: 65, targetPresent: true });
+      rng.seed = s.seed;
+      const event = demo.poll(args);
+      s.seed = rng.seed;
+      return event.key;
+    } });
+    const below = elapsed < 120, synthetic = below && countdown === 0;
+    assert.equal(polls, below ? 1 : 0);
+    assert.equal(s.groundPhase, 1); // timeout still follows world updates
+    assert.equal(s.obstacles[0].x, 274);
+    assert.equal(s.cursorCounter, 1);
+    assert.equal(s.seed, synthetic ? random15(1).seed : 1);
+    assert.equal(rng.seed, s.seed);
+    assert.equal(demo.state.countdown, below ? (synthetic ? 10 + Math.trunc(random15(1).value * 10 / 32768) : 1) : countdown);
+    assert.deepEqual([s.attempts, s.correct, s.errors], synthetic ? [8, 6, 2] : [7, 5, 2]);
+    assert.equal(s.ended, !synthetic);
+    assert.equal(s.aborted, below && !synthetic);
+    assert.equal(events.some(e => e.type === 'end'), !synthetic);
+    assert.equal(input.consume(), below ? 66 : 27);
+    if (!below) assert.equal(input.consume(), 66);
+    assert.equal(input.pending(), false);
+  }
 });
 
 test('tables and lowercase classification match copied executable bytes', () => {
@@ -205,10 +266,21 @@ test('end-to-end loop starts moving before input and keeps old ground scroll', (
 
 test('timeout is checked after updates; pending jump state is overwritten next timeout', () => {
   const s = state(); tick(s, { ...options, key: 97 });
-  tick(s, { ...options, elapsed: 120, key: 115 });
+  const input = createPendingInput(), rng = { seed: s.seed };
+  const demo = createDemo({ student: demoStudent(newStudent('A')), rng, input, mode: 1 });
+  demo.state.countdown = 0; input.enqueue(27, 66);
+  const seed = s.seed, expired = { ...options, elapsed: 120, key: 115,
+    pollInput: args => { const event = demo.poll(args); s.seed = rng.seed; return event.key; } };
+  tick(s, expired);
   assert.equal(s.mode, 2); assert.equal(s.ended, false); assert.equal(s.attempts, 1);
-  tick(s, { ...options, elapsed: 120 });
+  const jumpIndex = s.jumpIndex;
+  assert.ok(tick(s, expired).some(e => e.type === 'end' && !e.aborted));
+  assert.equal(s.jumpIndex, jumpIndex + 1); // second timeout still advances the unfinished jump
   assert.equal(s.mode, 3); assert.equal(s.ended, true);
+  assert.deepEqual([s.attempts, s.correct, s.errors], [1, 1, 0]);
+  assert.equal(s.seed, seed); assert.equal(rng.seed, seed); assert.equal(demo.state.countdown, 0);
+  assert.equal(input.consume(), 27); assert.equal(input.consume(), 66);
+  assert.deepEqual(tick(s, expired), []); // already ended remains inert
   const aborted = state(); tick(aborted, { ...options, key: 27 });
   assert.equal(aborted.ended, true); assert.equal(aborted.aborted, true);
 });

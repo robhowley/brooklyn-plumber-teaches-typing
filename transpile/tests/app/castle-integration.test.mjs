@@ -4,16 +4,17 @@ import fs from 'node:fs';
 import {Session,editStudent} from '../../app/session.mjs';
 import {Renderer} from '../../app/render.mjs';
 import {newStudent} from '../../recovered/control/student.mjs';
+import {skipStartup,finishCelebration} from './source-path.mjs';
 const data=JSON.parse(fs.readFileSync(new URL('../../app/data.json',import.meta.url)));
 function make(character=1,goal=30,lesson=1) {
- const s=new Session(data,{bytes:editStudent(newStudent('Castle'),{character,goal,lesson,castleMinutes:60}),seed:1});
+ const s=skipStartup(new Session(data,{bytes:editStudent(newStudent('Castle'),{character,goal,lesson,castleMinutes:60}),seed:1}));
  s.start(0,3,100);return s;
 }
 function auto(s,t) {
  const c=s.castle;
  return s.step(!c.locked&&['rockfaces','sand'].includes(c.phase)?c.queue.target:0,t,100);
 }
-function acknowledge(s) {if(s.castleEnding)s.acknowledgeCastleEnding({omitted:true,reason:'Phase5 omitted in this test'});}
+function acknowledge(s) {if(s.castleEnding)finishCelebration(s);}
 async function renderer() {
  const r=new Renderer({getContext:()=>({createImageData:()=>({data:new Uint8ClampedArray(256000)}),putImageData(){}})},data);
  const before=globalThis.fetch;
@@ -99,14 +100,15 @@ test('failure, timeout, explicit exit stay distinct and ending requires explicit
  // Source timeout is checked from refreshed score, never set flags directly.
  s.castle.stats.limitSeconds=1;s.step(9,20,101);s.step(0,21,101);
  assert.equal(s.castle.flags.timeout,true);assert.equal(s.castle.flags.failed,false);
- assert.equal(s.castleEnding.event.mode,4);assert.equal(s.screen,'castle');assert.equal(s.profile.completed[2],0);
- assert.throws(()=>s.acknowledgeCastleEnding({omitted:true}),/explicit/);
+ assert.equal(s.castleEnding.event.mode,4);assert.equal(s.screen,'celebration');assert.equal(s.profile.completed[2],0);
+ assert.throws(()=>s.acknowledgeCastleEnding(),/Complete/);
  acknowledge(s);assert.equal(s.screen,'results');assert.equal(s.profile.completed[2],1);
  assert.ok(s.profile.goal>=45);assert.equal(s.next(22).mode,3);assert.equal(s.screen,'castle');
 });
 test('Next and reentry span1/2/3/4 for all characters, source Castle duration field3',()=>{
  for(const char of [1,2,3]) {
   const s=make(char);assert.equal(s.limit,3600);assert.equal(s.profile.durations[2],60);
+  s.step(27,1,100);s.step(0,2,100);
   for(const [goal,mode] of [[5,1],[10,2],[30,3],[50,4],[30,3]]) {
    s.student=editStudent(s.student,{goal,character:char});
    if(mode===4)s.start(0,4,100);else {new DataView(s.student.buffer).setInt16(15,1,true);s.next(0);}

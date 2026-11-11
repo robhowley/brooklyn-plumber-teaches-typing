@@ -71,13 +71,12 @@ export class CastleQueue {
 export class CastleController {
   constructor({ stream, rng, resources, persistent = { rockSecond: 0, sandSecond: 0 },
     character = 1, minutes = 0, priorDuration = 0, previousAccuracy = 0, option10 = false,
-    fastScroll = false, profile = null, profilePresent = false, demo = false }) {
-    if (demo) throw new RangeError('Castle demo input scheduling is not enabled');
+    fastScroll = false, profile = null, profilePresent = false, pollInput = null }) {
     if (![1, 2, 3].includes(character)) throw new RangeError('Character must be 1..3');
     if (!resources?.idleSchedule?.length || !(resources.idlePeriod > 0) || resources.bonusXs?.length !== 3)
       throw new RangeError('Castle requires decoded idle schedule and bonus X table');
     Object.assign(this, { stream, rng, resources, persistent, character, option10,
-      fastScroll, profile, profilePresent });
+      fastScroll, profile, profilePresent, pollInput });
     this.queue = new CastleQueue(stream);
     this.stats = { attempts: 0, correct: 0, errors: 0, ticks: 0, running: false,
       lastTicks: 0, elapsedSeconds: 0, accuracy: 0, wpm: 0, previousAccuracy: i16(previousAccuracy),
@@ -176,8 +175,9 @@ export class CastleController {
       this.flags.failed = castleFailure({ operation, failed: this.flags.failed,
         attempts: this.stats.attempts, accuracy: this.stats.accuracy,
         now: this.nowSeconds, lastInput: this.lastInput });
-      if (input.pending()) {
-        const key = i16(input.consume());
+      const polled=this.pollInput?.({target:expected});
+      if (polled ? polled.physicalKeyRead || polled.key!==0 : input.pending()) {
+        const key = i16(polled ? polled.key : input.consume());
         this.lastInput = this.nowSeconds; // even wrong, ignored, locked, transition keys
         if (key === 27) { this.flags.exit = true; this.emit('global-abort'); }
         else if (key === 0x12d) { if (this.option10) this.emit('conditional-quit', { file: 0x149fc }); }

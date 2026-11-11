@@ -258,7 +258,7 @@ export function requestEnd(s, aborted = false) {
  * The bonus cinematic path is deliberately returned, never silently simulated.
  */
 export function tick(s, { key = 0, elapsed = 0, limit = 120, idleSchedule, idlePeriod,
-  bonus = null, second = 0, exitShortcutEnabled = false } = {}) {
+  bonus = null, second = 0, exitShortcutEnabled = false, pollInput = null } = {}) {
   if (s.ended) return [];
   s.groundPhase = i16(s.groundPhase + s.scroll) % 20; // 0x1436c, OLD scroll
   if (bonus) updateBonus(bonus, s.x, second); // before player movement, 0x139cd
@@ -267,15 +267,19 @@ export function tick(s, { key = 0, elapsed = 0, limit = 120, idleSchedule, idleP
   updateParticles(s);
   selectTarget(s);
   if ((elapsed | 0) >= (limit | 0)) requestEnd(s); // signed long compare, 0x13a8e..0x13aad
-  else if (key === 27 || key === 0x144) requestEnd(s, true);
-  else if (key === 0x12d) {
-    if (exitShortcutEnabled) events.push({ type: 'exit-program' });
-  } else if (key >= 32 && key < 128 && bonus?.mode === 2 && key === bonus.code) {
-    bonus.countdown = 0;
-    events.push({ type: 'bonus-cinematic-required', source: '0x13bc5' });
-  } else {
-    const result = acceptKey(s, key);
-    if (result !== 'ignored') events.push({ type: result, sound: result === 'correct' ? 1 : 11 });
+  else {
+    // FILE 0x13aaa bypasses the 0x13aaf poll on timeout, including Demo RNG/key reads.
+    if (pollInput) key=pollInput({target:s.obstacles[s.targetIndex]?.code,targetPresent:s.targetIndex>=0});
+    if (key === 27 || key === 0x144) requestEnd(s, true);
+    else if (key === 0x12d) {
+      if (exitShortcutEnabled) events.push({ type: 'exit-program' });
+    } else if (key >= 32 && key < 128 && bonus?.mode === 2 && key === bonus.code) {
+      bonus.countdown = 0;
+      events.push({ type: 'bonus-cinematic-required', source: '0x13bc5' });
+    } else {
+      const result = acceptKey(s, key);
+      if (result !== 'ignored') events.push({ type: result, sound: result === 'correct' ? 1 : 11 });
+    }
   }
   if (s.mode === 3) { s.ended = true; events.push({ type: 'end', aborted: s.aborted }); }
   return events;

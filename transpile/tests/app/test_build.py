@@ -115,6 +115,19 @@ class AppDataTests(unittest.TestCase):
         self.assertEqual(sum(s['family']=='FONT3H' for s in data['sprites'].values()), 96)
         self.assertIn('GREET2/prefbox_1', data['sprites'])
 
+    def test_startup_and_celebration_bindings_reach_consumers(self):
+        data = json.loads((ROOT / 'app/data.json').read_text())
+        startup_root = ROOT / 'assets/startup'
+        startup = json.loads((startup_root / 'manifest.json').read_text())
+        self.assertEqual(data['startup']['letterX'], startup['letterX'])
+        self.assertEqual(data['startup']['letters'], startup['letters'])
+        for name, scene in startup['scenes'].items():
+            self.assertEqual(base64.b64decode(data['startup']['scenes'][name]['pixels']), (startup_root / scene['indicesPath']).read_bytes())
+            self.assertEqual(base64.b64decode(data['startup']['scenes'][name]['palette']), (startup_root / scene['palettePath']).read_bytes())
+        celebration = json.loads((ROOT / 'assets/render/celebration/bindings.json').read_text())
+        self.assertEqual(data['celebration'], celebration)
+        self.assertEqual({k: len(v['frames']) for k, v in celebration['movies'].items()}, {'FIR1': 26, 'FIR2': 25, 'WCAS': 48, 'ENDF': 40})
+
     def test_rebuild_is_identical(self):
         paths = [ROOT / 'app/data.json', *sorted((ROOT / 'assets/app').glob('*.indices'))]
         before = {p: hashlib.sha256(p.read_bytes()).hexdigest() for p in paths}

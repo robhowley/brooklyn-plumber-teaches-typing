@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
-async function ready(page){await page.goto('/?seed=1');await expect(page.locator('#game')).toHaveAttribute('data-screen','menu');}
+import {skipStartupUI} from './source-path.mjs';
+async function ready(page){await page.addInitScript(()=>{window.__sourceTestClock=true;});await page.goto('/?seed=1');await skipStartupUI(page);await expect(page.locator('#game')).toHaveAttribute('data-screen','menu');}
 async function point(page,x,y){const r=await page.locator('#game').boundingBox();await page.mouse.click(r.x+x*r.width/320,r.y+y*r.height/200);}
 const snapshot=page=>page.evaluate(()=>translationSnapshot());
 test('Practice original menu hit, case, ignored keys, exact line change, face and early Next',async({page})=>{
@@ -66,7 +67,7 @@ test('Outside to Practice to Outside keeps source counters and clock with fresh 
  s=await snapshot(page);await page.locator('#game').press(String.fromCharCode(s.practice.rows[33]));await page.clock.runFor(60);
  await page.locator('#game').press('Escape');await page.clock.runFor(60);
  const practice=await snapshot(page);
- await page.locator('#game').press('m');await page.locator('#game').press('1');s=await snapshot(page);
+ await page.locator('#game').press('m');await page.clock.runFor(300);await page.locator('#game').press('1');s=await snapshot(page);
  expect(fields.map(k=>s.outdoor[k])).toEqual(fields.map(k=>retained.outdoor[k]));
  expect(s.bonus.lastSecond).toBe(retained.bonus.lastSecond);
  expect(s.outdoor.attempts).toBe(0);expect(s.outdoor.scroll).toBe(1);
@@ -76,13 +77,13 @@ test('Outside to Practice to Outside keeps source counters and clock with fresh 
  expect(errors).toEqual([]);
 });
 test('guest mode, profile gating and unavailable assets/storage are visible',async({page})=>{
- await ready(page);expect((await snapshot(page)).profile.profilePresent).toBe(false);
- await page.locator('#game').press('4');await page.locator('#game').press('Escape');await expect(page.locator('#game')).toHaveAttribute('data-screen','results');
+ await page.clock.install();await ready(page);expect((await snapshot(page)).profile.profilePresent).toBe(false);
+ await page.locator('#game').press('4');await page.locator('#game').press('Escape');await page.clock.runFor(60);await expect(page.locator('#game')).toHaveAttribute('data-screen','results');
  expect(await page.evaluate(()=>localStorage.getItem('mtt-static-translation.students.v1'))).toBeNull();
  await page.locator('#game').press('m');await page.locator('#game').press('w');await page.locator('[name=name]').fill('Gate');
  await page.locator('#setup button[type=submit]').click();await page.locator('#game').press('2');await expect(page.locator('#status')).toContainText('requires goal 10');
  await page.addInitScript(()=>{Storage.prototype.getItem=function(){throw new Error('test storage blocked');};});
- await page.reload();await expect(page.locator('#game')).toHaveAttribute('data-screen','menu');await expect(page.locator('#status')).toContainText('Storage unavailable');
+ await page.reload();await skipStartupUI(page);await expect(page.locator('#game')).toHaveAttribute('data-screen','menu');await expect(page.locator('#status')).toContainText('Storage unavailable');
  await page.locator('#game').press('4');await expect(page.locator('#status')).toContainText('Storage unavailable');
  await page.route('**/assets/app/MOUT.backgrounds.indices',route=>route.fulfill({status:404,body:'missing'}));
  await page.reload();await expect(page.locator('#status')).toContainText('Missing bonus frames');

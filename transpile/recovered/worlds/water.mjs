@@ -135,13 +135,13 @@ function finishIteration(s) {
 export function createWater({ stream, rng, input, clock, shortWindow = false, character = 0,
   minutes = 0, previousLimitSeconds = 0, previous = null, option10 = false, option20 = false,
   demo = false, profilePresent = false, profile = { goal: 10, lesson: 1, completed: [false, false, false] },
-  previousAccuracy = profile.accuracy ?? 0, draw = bound => boundedRandom(rng, bound) }) {
+  previousAccuracy = profile.accuracy ?? 0, draw = bound => boundedRandom(rng, bound), pollInput = null, audioBoundary = () => {} }) {
   if (![0, 1, 2].includes(character)) throw new RangeError('Water character must be 0..2');
   // Shared initializer consumes four draws; Water, like Outside, consumes a fifth
   // delay draw even though Water's actor never reads delay (16bf5..16c3c).
   const bonus = initializeBonus(rng);
   bonus.delay = outdoorBonusDelay(rng, previousLimitSeconds, option10);
-  const s = { stream, rng, input, clock, draw, option10, option20, demo, profilePresent,
+  const s = { stream, rng, input, clock, draw, pollInput, option10, option20, demo, profilePresent,
     profile: { ...profile, completed: [...profile.completed], previousGoal: i16(profile.goal) },
     character, phase: 'active', effects: [], window: new Uint8Array(40),
     width: shortWindow ? 20 : 40, targetIndex: shortWindow ? 5 : 10,
@@ -156,7 +156,7 @@ export function createWater({ stream, rng, input, clock, shortWindow = false, ch
     stats: { attempts: 0, correct: 0, errors: 0, elapsedSeconds: 0, accuracy: 0,
       profileAccuracy: i16(previousAccuracy), wpm: 0, startedAt: 0, stoppedAt: 0, refreshedAt: 0 },
     timer: { ticks: 0, elapsedSeconds: 0, running: false, lastTicks: 0 } };
-  emit(s, 'audio-reset'); emit(s, 'scene', { character });
+  emit(s, 'audio-reset');audioBoundary({type:'music-stop',file:0x17e17});emit(s, 'scene', { character });
   s.stats.startedAt = clock.seconds() | 0; // operation120, 15a58
   timerOp(s, 300); // operation120 before window fill, 16d06
   redraw(s);
@@ -167,7 +167,8 @@ export function createWater({ stream, rng, input, clock, shortWindow = false, ch
     shift(s, true);
   } while (s.window[s.targetIndex + 1] === 0);
   shift(s);
-  emit(s, 'ready'); emit(s, 'music', { operation: 3 });
+  emit(s, 'ready'); audioBoundary({type:'speech',name:'ready',file:0x176c7});
+  emit(s, 'music', { operation: 3 });audioBoundary({type:'music',id:3,file:0x176d0});
   s.lastInput = clock.seconds() | 0;
   return s;
 }
@@ -211,12 +212,15 @@ export function stepWater(s, { tickReady = false, bonusComplete = false, celebra
   emit(s, 'background-update'); // 09cab, presentation owns the raster effect
   const expected = signedByte(s.window[s.targetIndex]);
   let key = 0, handled = false;
-  if (s.demo) {
+  if (s.pollInput) {
+    const event=s.pollInput({target:expected});key=event.key;
+    handled=event.physicalKeyRead || key!==0;
+  } else if (s.demo) {
     if (s.demoDelay === 0) { key = expected; s.demoDelay = i16(1 + s.draw(5)); }
     else s.demoDelay = i16(s.demoDelay - 1);
     handled = key !== 0;
   }
-  if (!handled && s.input.pending()) {
+  if (!s.pollInput && !handled && s.input.pending()) {
     key = i16(s.input.consume()); handled = true;
     if (s.option20) emit(s, 'debug-key', { key });
   }

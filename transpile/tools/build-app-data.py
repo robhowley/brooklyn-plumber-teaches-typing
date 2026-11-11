@@ -104,5 +104,16 @@ for char in 'MLP':
         decode_ban(ban[packet['offset']:packet['end']] + b'\xff\xff', writes)
         frames.append({'writes': writes.rows, 'ani': sprite_record(entry, RENDER)})
     result['castle']['animations'][char.lower()] = {'frames': frames}
+# Phase5 inputs are decoded locally, never copied from worker generated output.
+startup_root = ROOT / 'assets/startup'
+startup = json.loads((startup_root / 'manifest.json').read_text())
+result['startup'] = {
+    'scenes': {name: {'pixels': b64(startup_root / scene['indicesPath']),
+                      'palette': b64(startup_root / scene['palettePath'])}
+               for name, scene in startup['scenes'].items()},
+    'sprites': {family: {s['name']: sprite_record(s, startup_root) for s in rows}
+                for family, rows in startup['sprites'].items()},
+    'letters': startup['letters'], 'letterX': startup['letterX'], 'members': startup['members']}
+result['celebration'] = json.loads((RENDER / 'celebration/bindings.json').read_text())
 (ROOT / 'app/data.json').write_text(json.dumps(result, separators=(',', ':')) + '\n')
 print('Built app/data.json and assets/app/* from inert resources; no original execution')

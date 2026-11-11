@@ -7,7 +7,10 @@ import { practiceCorpus, practiceExpression } from '../recovered/worlds/routines
 import { newStudent, readStudent, normalizeStudent, studentForSave, recordProblemKey } from '../recovered/control/student.mjs';
 import { progression, nextRoute } from '../recovered/control/flow.mjs';
 import { score, timer } from '../recovered/control/scoring.mjs';
-import { lessonLimitSeconds, clampLessonMinutes } from '../recovered/control/results.mjs';
+import { lessonLimitSeconds, clampLessonMinutes, resultEntryEffects, resultNextState } from '../recovered/control/results.mjs';
+import { createStartup, createMenuIdle, createMenuIdleState, createDemo, demoStudent } from '../recovered/control/startup.mjs';
+import { Celebration } from '../recovered/control/celebration.mjs';
+import { hydrateCelebrationResources } from './celebration-render.mjs';
 
 export const SAVE_KEY = 'mtt-static-translation.students.v1';
 export const BIOS_HZ = 18.2; // Host clock conversion, not measured DOS timing.
@@ -49,7 +52,7 @@ export function loadProfiles(storage) {
   return value;
 }
 export class Session {
-  constructor(data, { bytes = null, seed = seedFromTime(Math.floor(Date.now()/1000)) } = {}) {
+  constructor(data, { bytes = null, seed = seedFromTime(Math.floor(Date.now()/1000)), audioBoundary = null } = {}) {
     this.data=data; this.seed=seedFromTime(seed); this.initialSeed=this.seed;
     this.screen='menu'; this.outdoor=null; this.practice=null; this.bonus=null; this.cinematic=null;
     this.student=bytes ? normalizeStudent(bytes) : newStudent('Player');
@@ -60,11 +63,99 @@ export class Session {
     this.castleMovie=null; this.castleWait=null; this.castleEnding=null;
     this.water=null; this.input=createPendingInput(); this.lastWaitTick=0;
     this.effects=[]; this.sampleTicks=0; this.sampleSeconds=0; this.waterMovie=null;
+    const owner=this;
+    this.rng={get seed(){return owner.seed;},set seed(value){owner.seed=value>>>0;}};
+    this.audioHandler=audioBoundary;this.audioLog=[];this.option10=false;
+    this.presentationEffects=[];this.resultEffects=[];this.menuTimer=createMenuIdleState();this.demo=null;this.practiceDemoTick=0;
+    this.celebrationResources=hydrateCelebrationResources(data.celebration);
+    this.startup=createStartup({rng:this.rng,input:this.input,audioBoundary:request=>this.audio(request)});
+    this.screen='startup';this.audio({type:'music',id:1,file:0x1d8e6});
+    this.presentationEffects.push(...this.startup.start());
+  }
+  audio(request) {
+    // A synchronous Phase6 hook. Missing audio returns silent immediately.
+    const outcome=this.audioHandler?.(request)??{status:'pendingPhase6-silent'};
+    if(outcome?.then) throw new Error('Audio boundary requires a synchronous acknowledgement');
+    this.audioLog.push({request:{...request},...outcome});return outcome;
+  }
+  audioEffect(e) {
+    if(e.type==='music')this.audio({type:'music',id:e.operation});
+    else if(e.type==='sound')this.audio({type:'effect',id:e.id});
+    else if(e.type==='audio-reset')this.audio({type:'music-stop'});
+  }
+  takePresentationEffects() {const out=this.presentationEffects;this.presentationEffects=[];return out;}
+  enterMenu(nowTicks) {
+    this.screen='menu';this.input.flush();
+    this.menuIdle=createMenuIdle({rng:this.rng,input:this.input,timer:this.menuTimer,nowTicks,demo:this.profile.demo});
+    this.audio({type:'music-stop',file:0x10d7d});
+    if(!this.menuWelcomed) {this.audio({type:'speech',name:'welcome',file:0x10d8b});this.menuWelcomed=true;}
+    this.audio({type:'music',id:2,file:0x10d99});
+  }
+  menuStep(nowTicks,fileDropdownOpen=false) {
+    if(this.screen!=='menu')return [];
+    const completedWaits=this.menuIdle.state.waiting&&this.changedTick(nowTicks)?1:0;
+    const effects=this.menuIdle.step({nowTicks,completedWaits,demo:this.profile.demo,fileDropdownOpen});
+    this.presentationEffects.push(...effects);return effects;
+  }
+  rebaseHostClock(oldTicks,newTicks) {
+    this.menuIdle?.rebaseClock(oldTicks,newTicks);this.sampleTicks=newTicks;this.lastWaitTick=newTicks&65535;
+  }
+  selectDemo() {this.student=demoStudent(this.student);}
+  pollDemo(args) {
+    const event=this.demo.poll({...args,lowTick:this.sampleTicks&65535});
+    if(event.quitRequest)this.effects.push({type:'quit-request'});
+    return event;
+  }
+  enterCelebration(world,advance,endMode=0) {
+    const p=advance.state;
+    this.celebration=new Celebration({world,character:this.profile.character,goal:p.goal,lesson:p.lesson,endMode,
+      swimFrame:world===2?this.water.swimmer.frame:undefined,rng:this.rng,resources:this.celebrationResources});
+    this.screen='celebration';this.celebrationWorld=world;
+    this.presentationEffects.push(...this.celebration.step({input:this.input}));
+  }
+  stepPresentation(key,nowTicks,pointerChanged=false) {
+    this.enqueue(key);
+    if(this.screen==='startup') {
+      if(this.changedTick(nowTicks))this.presentationEffects.push(...this.startup.step({completedWaits:1}));
+      if(this.startup.state.done)this.enterMenu(nowTicks);
+      return;
+    }
+    if(this.screen!=='celebration')return;
+    const effects=this.celebration.step({input:this.input,tickReady:this.changedTick(nowTicks),pointerChanged});
+    this.presentationEffects.push(...effects);
+    for(const e of effects)if(e.type==='set-completed')this.student[38+e.index]=1;
+    if(!this.celebration.complete)return;
+    if(this.celebrationWorld===2) {
+      this.water.swimmer.frame=this.celebration.swimFrame;
+      this.effects.push(...stepWater(this.water,{celebrationComplete:true}));this.completeWater();
+    } else if(this.celebrationWorld===3)this.acknowledgeCastleEnding();
+    else this.enterResults();
+  }
+  enterResults() {
+    if(this.demo) {
+      if(this.mode===4)this.practiceDemoTick=this.demo.state.lastLowTick;
+      const returned=this.demo.finish();this.student=returned.student;this.demo=null;
+      this.resultEffects.push({type:'host-clock-reset'});this.enterMenu(this.sampleTicks);return;
+    }
+    this.screen='results';const p=this.profile;
+    this.resultEffects.push(...resultEntryEffects({demo:false,suppressed:!!this.activity.aborted,profilePresent:p.profilePresent,
+      world:this.mode,mode:this.mode,goal:p.goal,previousGoal:p.previousGoal,wpm:this.result.wpm}));
+  }
+  completeWater() {
+    this.result={...this.water.stats};this.advance=this.water.progression;
+    this.applyProgression();this.enterResults();
+  }
+  applyProgression() {
+    const v=new DataView(this.student.buffer),p=this.advance.state;
+    v.setInt16(17,this.result.wpm,true);v.setInt16(19,this.result.profileAccuracy,true);
+    v.setInt16(21,p.previousGoal,true);v.setInt16(23,p.goal,true);v.setInt16(25,p.lesson,true);
+    this.student.set(p.completed.map(Number),38);
   }
   get profile() { return readStudent(this.student); }
   get active() { return this.screen==='outdoor'||this.screen==='practice'||this.screen==='water'||this.screen==='castle'; }
   get activity() { return this.mode===4?this.practice:this.mode===3?{...this.castle.stats,aborted:this.castle.flags.exit}:this.mode===2?{...this.water.stats,aborted:this.water.aborted}:this.outdoor; }
   start(nowTicks, mode=1, wallSeconds=Math.floor(Date.now()/1000)) {
+    if(this.screen==='startup')throw new Error('Finish source startup before selecting a world');
     if (![1,2,3,4].includes(mode)) throw new Error('Unsupported activity');
     // Student service normalization also follows a cancelled New (zeroed bytes).
     this.student=normalizeStudent(this.student);
@@ -79,6 +170,9 @@ export class Session {
     this.bonus=mode===1?makeBonus(rng.seed,this.limit,false,this.outdoorLastSecond):null;
     if (this.bonus) rng.seed=this.bonus.seed;
     this.seed=rng.seed; this.mode=mode; this.cinematic=null;
+    this.demoRng=rng;
+    this.demo=p.demo?createDemo({student:this.student,rng,input:this.input,mode,lowTick:this.practiceDemoTick,option10:this.option10}):null;
+    const pollInput=this.demo?args=>this.pollDemo(args):null;
     this.castleMovie=null; this.castleWait=null; this.castleEnding=null; this.castleEndingAck=null;
     // REENTRY.md: the last Outside object survives intervening Practice entries.
     if (mode===1) this.outdoor=createOutdoor({bytes:raw,seed:this.seed,character:p.character,lessonIndex:corpus.index,previous:this.outdoor});
@@ -86,13 +180,14 @@ export class Session {
       this.water=createWater({stream:corpus,rng,input:this.input,
         clock:{ticks:()=>this.sampleTicks,seconds:()=>this.sampleSeconds},
         character:p.character-1,minutes:p.durations[1],previousLimitSeconds:this.limit,
-        previous:this.water,profile:p,profilePresent:p.profilePresent});
-      this.effects.push(...this.water.effects); this.seed=rng.seed;
+        previous:this.water,profile:p,profilePresent:p.profilePresent,pollInput,option10:this.option10,
+        audioBoundary:request=>this.audio(request)});
+      this.effects.push(...this.water.effects);this.seed=rng.seed;
     } else if(mode===3) {
       const schedule=this.data.idleSchedules[['m','l','p'][p.character-1]];
       this.castle=new CastleController({stream:corpus,rng,persistent:this.castlePersistent,
         character:p.character,minutes:p.durations[2],priorDuration:this.limit,
-        previousAccuracy:p.accuracy,profile:p,profilePresent:p.profilePresent,
+        previousAccuracy:p.accuracy,profile:p,profilePresent:p.profilePresent,pollInput,option10:this.option10,
         resources:{bonusXs:this.data.castle.bonusXs,idleSchedule:schedule.thresholds,idlePeriod:schedule.halfTickPeriod}});
       this.consumeCastle(this.castle.step({nowTicks,nowSeconds:wallSeconds,input:this.input}));
       this.seed=rng.seed;
@@ -106,8 +201,12 @@ export class Session {
     this.limit=mode===3?this.castle.stats.limitSeconds:mode===2?this.water.limitSeconds:lessonLimitSeconds(p.durations[mode-1],mode===1?2:10);
     this.clock=mode===3?this.castle.stats:mode===2?this.water.timer:timer(timer({},320,nowTicks),300,nowTicks);
     this.screen=mode===1?'outdoor':mode===2?'water':mode===3?'castle':'practice'; this.suspended=false; this.result=null;
+    if(mode===1) {this.audio({type:'music-stop',file:0x13dd7});this.audio({type:'speech',name:'ready',file:0x13e04});this.audio({type:'music',id:1,file:0x13e0d});}
   }
   suspend(value, nowTicks) {
+    if(this.screen==='startup'||this.screen==='celebration') {
+      this.suspended=value;this.lastWaitTick=nowTicks&65535;this.input.flush();return;
+    }
     if (!this.active || this.suspended===value) return;
     // Host focus suspension also freezes cinematic frame scheduling.
     if(value) this.suspendedAt=nowTicks;
@@ -129,7 +228,9 @@ export class Session {
     return practiceExpression(wallSeconds,this.practice.lastCorrect,this.profile.profilePresent,this.stats().wpm,this.profile.goal);
   }
   step(key, nowTicks, wallSeconds=Math.floor(Date.now()/1000)) {
+    if(this.screen==='startup'||this.screen==='celebration') {if(!this.suspended)this.stepPresentation(key,nowTicks);return [];}
     if (!this.active || this.suspended) return [];
+    this.sampleTicks=nowTicks;this.sampleSeconds=wallSeconds;
     if(this.mode===3) return this.stepCastleHost(key,nowTicks,wallSeconds);
     if(this.mode===2) return this.stepWaterHost(key,nowTicks,wallSeconds);
     if(this.cinematic) {
@@ -147,11 +248,13 @@ export class Session {
     }
     this.clock=timer(this.clock,100,nowTicks);
     if(this.mode===4) {
+      if(this.demo) {this.enqueue(key);key=this.pollDemo({target:this.practice.rows[33+this.practice.index]}).key;this.seed=this.demoRng.seed;}
       if(this.stats().elapsedSeconds>=this.limit || key===27) {
         this.practice.aborted=key===27; this.finish(nowTicks); return [{type:'end'}];
       }
       const expected=this.practice.rows[33+this.practice.index];
       const result=practiceInput(this.practice,key,wallSeconds);
+      if(['advance-one-byte','next-line','retain-target'].includes(result))this.audio({type:'effect',id:result==='retain-target'?11:1});
       // Practice wrong branch 0xb7be..0xb7d2 calls the same student error service.
       if(result==='retain-target') this.student=recordProblemKey(this.student,expected);
       if(result==='advance-one-byte') this.typed+=String.fromCharCode(key);
@@ -159,9 +262,15 @@ export class Session {
       this.lastPracticeCorrect=this.practice.lastCorrect;
       return [{type:result}];
     }
+    if(this.demo)this.enqueue(key);
     const prefix=['m','l','p'][this.profile.character-1], schedule=this.data.idleSchedules[prefix];
     const events=tick(this.outdoor,{key,elapsed:this.stats().elapsedSeconds,limit:this.limit,
-      idleSchedule:schedule.thresholds,idlePeriod:schedule.halfTickPeriod,bonus:this.bonus,second:wallSeconds});
+      idleSchedule:schedule.thresholds,idlePeriod:schedule.halfTickPeriod,bonus:this.bonus,second:wallSeconds,
+      exitShortcutEnabled:this.option10,pollInput:this.demo?args=>{
+        this.demoRng.seed=this.outdoor.seed;
+        const event=this.pollDemo(args);this.outdoor.seed=this.demoRng.seed;return event.key;
+      }:null});
+    for(const event of events) {this.audioEffect(event);if(event.sound)this.audio({type:'effect',id:event.sound});}
     this.seed=this.outdoor.seed; this.outdoorLastSecond=this.bonus.lastSecond;
     if (events.some(e=>e.type==='wrong')) this.student=recordProblemKey(this.student,this.outdoor.obstacles[this.outdoor.targetIndex].code);
     if(events.some(e=>e.type==='bonus-cinematic-required')) {
@@ -188,6 +297,7 @@ export class Session {
     const consume=effects=>{
       events.push(...effects); this.effects.push(...effects);
       for(const e of effects) {
+        this.audioEffect(e);
         if(e.type==='key-error') this.student=recordProblemKey(this.student,e.code);
         if(e.type==='play-bonus') {
           this.waterMovie={frame:0,waits:0};
@@ -210,28 +320,24 @@ export class Session {
         }
         this.waterMovie=null; consume(stepWater(this.water,{bonusComplete:true}));
       } else if(phase==='celebration') {
-        // Declared Phase5 omission, no guessed duration or blocked progression.
-        consume(stepWater(this.water,{celebrationComplete:true}));
+        this.seed=this.water.rng.seed;this.enterCelebration(2,this.water.progression);break;
       } else if(phase==='wait') {
         if(!this.changedTick(nowTicks)) break;
         consume(stepWater(this.water,{tickReady:true}));
       } else consume(stepWater(this.water));
     }
     this.clock=this.water.timer; this.seed=this.water.rng.seed;
-    if(this.water.phase==='ended') {
-      this.result={...this.water.stats}; this.advance=this.water.progression;
-      const v=new DataView(this.student.buffer), p=this.advance.state;
-      v.setInt16(17,this.result.wpm,true); v.setInt16(19,this.result.profileAccuracy,true);
-      v.setInt16(21,p.previousGoal,true); v.setInt16(23,p.goal,true); v.setInt16(25,p.lesson,true);
-      this.student.set(p.completed.map(Number),38); this.screen='results';
+    if(this.water.phase==='ended' && this.screen!=='menu') {
+      this.completeWater();
     }
     return events;
   }
   consumeCastle(effects) {
     const visible=[];
     for(let i=0;i<effects.length;i++) {
-      const e=effects[i]; visible.push(e); this.effects.push(e);
+      const e=effects[i]; visible.push(e); this.effects.push(e);this.audioEffect(e);
       if(e.type==='key-error') this.student=recordProblemKey(this.student,e.expected);
+      if(e.type==='ready')this.audio({type:'speech',name:'ready',file:0xc060});
       if(e.type==='wait-changed-tick') {
         // c01c precedes clip restoration and first-entry Ready. Keep those
         // effects behind the wait, not ahead of the first changed LOW tick.
@@ -242,22 +348,23 @@ export class Session {
         const packet={type:'castle-packet',frame:0}; visible.push(packet); this.effects.push(packet);
       }
       if(e.type==='ending') {
-        this.castleEnding={event:e,after:effects.slice(i+1)}; break;
+        this.castleEnding={event:e,after:effects.slice(i+1)};
+        this.seed=this.castle.rng.seed;this.enterCelebration(3,this.castle.result,e.mode);break;
       }
       if(e.type==='results') {
         this.result={...this.castle.stats}; this.advance=this.castle.result;
         const v=new DataView(this.student.buffer), p=this.advance.state;
         v.setInt16(17,this.result.wpm,true); v.setInt16(19,this.result.profileAccuracy,true);
         v.setInt16(21,p.previousGoal,true); v.setInt16(23,p.goal,true); v.setInt16(25,p.lesson,true);
-        this.student.set(p.completed.map(Number),38); this.screen='results';
+        this.student.set(p.completed.map(Number),38);this.enterResults();
       }
     }
     return visible;
   }
-  acknowledgeCastleEnding({omitted=false,reason=''}={}) {
-    if(!this.castleEnding || (omitted && !reason)) throw new Error('Castle ending requires an explicit completion or omission reason');
+  acknowledgeCastleEnding() {
+    if(!this.castleEnding || !this.celebration?.complete) throw new Error('Complete the source Castle ending before acknowledgement');
     const after=this.castleEnding.after; this.castleEnding=null;
-    const ack={type:'ending-acknowledged',omitted,reason}; this.castleEndingAck=ack; this.effects.push(ack);
+    const ack={type:'ending-acknowledged',omitted:false}; this.castleEndingAck=ack; this.effects.push(ack);
     return [ack,...this.consumeCastle(after)];
   }
   stepCastleHost(key,nowTicks,wallSeconds) {
@@ -293,10 +400,16 @@ export class Session {
     this.advance=progression(p,{mode:this.mode,resultWpm:this.result.wpm,profilePresent:p.profilePresent,exitGate:this.activity.aborted});
     const s=this.advance.state;
     v.setInt16(21,s.previousGoal,true); v.setInt16(23,s.goal,true); v.setInt16(25,s.lesson,true);
-    this.student.set(s.completed.map(Number),38); this.screen='results';
+    this.student.set(s.completed.map(Number),38);
+    if(this.advance.advanced&&this.mode===1)this.enterCelebration(1,this.advance);
+    else this.enterResults();
   }
-  next(nowTicks) {
-    const route=nextRoute(this.profile);
+  next(nowTicks,saveProfile=()=>{}) {
+    if(this.screen!=='results')return null;
+    const queued=resultNextState(this.profile),route=nextRoute(this.profile);
+    this.student.set(queued.state.pending.map(Number),44);
+    const view=new DataView(this.student.buffer);view.setInt16(15,route.mode,true);view.setInt16(25,route.lesson,true);
+    this.resultEffects.push(queued.effects[0]);saveProfile();
     if (![1,2,3,4].includes(route.mode)) return route;
     new DataView(this.student.buffer).setInt16(25,route.lesson,true);
     this.start(nowTicks,route.mode); return route;

@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
+import {skipStartupUI} from './source-path.mjs';
 async function point(page,x,y,click=true) {const r=await page.locator('#game').boundingBox();const p=[r.x+x*r.width/320,r.y+y*r.height/200];if(click)await page.mouse.click(...p);else await page.mouse.move(...p);}
-async function ready(page) {await page.goto('/?seed=1');await expect(page.locator('#game')).toHaveAttribute('data-screen','menu');}
+async function ready(page) {await page.goto('/?seed=1');await skipStartupUI(page);await expect(page.locator('#game')).toHaveAttribute('data-screen','menu');}
 test('entry/menu uses local decoded assets only; disabled controls and hover survive scale',async({page})=>{
  const failures=[],requests=[];page.on('pageerror',e=>failures.push(e.message));page.on('request',r=>requests.push(r.url()));
  await ready(page);expect(await page.locator('canvas').getAttribute('width')).toBe('320');
@@ -22,7 +23,7 @@ test('student setup, group, duration, persistence and ordinary typing through ex
  await page.locator('[name=name]').fill('Ada');await page.locator('[name=lesson]').selectOption('2');await page.locator('[name=goal]').fill('7');await page.locator('[name=minutes]').fill('1');
  await page.locator('#setup button[type=submit]').click();await expect(page.locator('#game')).toHaveAttribute('data-screen','menu');
  expect((await page.evaluate(()=>translationSnapshot())).profile.name).toBe('Ada');
- await page.reload();await expect(page.locator('#game')).toHaveAttribute('data-screen','menu');expect((await page.evaluate(()=>translationSnapshot())).profile.lesson).toBe(2);
+ await page.reload();await skipStartupUI(page);await expect(page.locator('#game')).toHaveAttribute('data-screen','menu');expect((await page.evaluate(()=>translationSnapshot())).profile.lesson).toBe(2);
  await page.locator('#game').press('t');await expect(page.locator('#game')).toHaveAttribute('data-screen','times');
  await page.locator('[name=minutes]').fill('2');await page.locator('#setup button[type=submit]').click();
  expect((await page.evaluate(()=>translationSnapshot())).profile.durations[0]).toBe(2);
@@ -40,7 +41,7 @@ test('student setup, group, duration, persistence and ordinary typing through ex
  await page.screenshot({path:'transpile/reports/browser/menu.png'});
 });
 test('configured duration reaches results without input or an invented failure',async({page})=>{
- await page.clock.install();await ready(page);
+ await page.clock.install();await page.addInitScript(()=>{window.__sourceTestClock=true;});await ready(page);
  await page.locator('#game').press('w');await page.locator('[name=name]').fill('Clock');await page.locator('[name=minutes]').fill('1');await page.locator('#setup button[type=submit]').click();
  await page.locator('#game').press('1');await page.clock.runFor(5000);
  const moving=await page.evaluate(()=>translationSnapshot());expect(moving.outdoor.x).toBeGreaterThan(20);expect(moving.outdoor.attempts).toBe(0);

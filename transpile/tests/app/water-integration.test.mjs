@@ -4,9 +4,10 @@ import fs from 'node:fs';
 import {Session,editStudent} from '../../app/session.mjs';
 import {Renderer} from '../../app/render.mjs';
 import {newStudent} from '../../recovered/control/student.mjs';
+import {skipStartup,finishCelebration} from './source-path.mjs';
 const data=JSON.parse(fs.readFileSync(new URL('../../app/data.json',import.meta.url)));
 function make(character=1,goal=10,lesson=1) {
- const s=new Session(data,{bytes:editStudent(newStudent('Water'),{character,goal,lesson,waterMinutes:1}),seed:1});
+ const s=skipStartup(new Session(data,{bytes:editStudent(newStudent('Water'),{character,goal,lesson,waterMinutes:1}),seed:1}));
  s.start(0,2,100);return s;
 }
 function end(s,t=10,key=27) {s.step(key,t,100);s.step(0,t+1,100);assert.equal(s.screen,'results');}
@@ -71,12 +72,13 @@ test('host preserves pending abort tail and bonus-during-failure timer semantics
  assert.equal(s.clock.running,true); // source failure-exit is empty, not normal stop
  assert.equal(s.advance.advanced,false);
 });
-test('cached timeout and final wait precede results; celebration omission does not suppress strict >30 progression',()=>{
+test('cached timeout and final wait precede results; unskippable celebration precedes results and preserves strict >30 progression',()=>{
  for(const [correct,completed] of [[150,0],[156,1]]) {
   const s=make(1,25,6);s.water.stats.correct=correct;s.water.stats.attempts=correct;
   s.water.lastInput=160;s.step(0,1092,160); // refresh crosses limit, next loop observes it
   assert.equal(s.water.timedOut,true);assert.equal(s.screen,'water');
-  s.step(0,1093,160);assert.equal(s.screen,'results');assert.equal(s.advance.advanced,true);
+  s.step(0,1093,160);assert.equal(s.screen,'celebration');finishCelebration(s);
+  assert.equal(s.screen,'results');assert.equal(s.advance.advanced,true);
   assert.equal(s.profile.goal,30);assert.equal(s.profile.completed[1],completed);
   assert.equal(s.result.elapsedSeconds,60);assert.equal(s.clock.ticks,1093);
   assert.equal(s.next(1200).mode,3);assert.equal(s.screen,'castle'); // Water progression now routes into Castle

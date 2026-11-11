@@ -8,9 +8,11 @@ import { tick } from '../../recovered/outdoor/outdoor.mjs';
 import { Renderer } from '../../app/render.mjs';
 import { spriteRect } from '../../recovered/render/render.mjs';
 const data=JSON.parse(fs.readFileSync(new URL('../../app/data.json',import.meta.url)));
-const configured=(settings={})=>new Session(data,{bytes:editStudent(newStudent('Ada'),settings),seed:1});
+import {skipStartup} from './source-path.mjs';
+const configured=(settings={})=>skipStartup(new Session(data,{bytes:editStudent(newStudent('Ada'),settings),seed:1}));
 test('shared RNG consumes prefix, segment, four bonus draws then pre-reset delay, persists across activities',()=>{
- const s=configured({lesson:6}); const rng={seed:1};
+ const s=configured({lesson:6}); const rng={seed:s.seed};
+ assert.equal(rng.seed,22695478); // source skipped startup0 draws, first menu callback1 draw
  const prefix=lessonPrefix(6,rng), stream=loadCorpus(data.lessons[prefix.toUpperCase()+'LETTERS']);selectCorpusSegment(stream,rng);
  const bonus=initializeBonus(rng), delay=outdoorBonusDelay(rng,0);
  s.start(0);assert.equal(s.seed,rng.seed);assert.equal(s.outdoor.stream.index,stream.index);
@@ -47,8 +49,8 @@ test('bonus raw punctuation intercept stops timer, ignores keys, uses two ticks 
 });
 test('practice selects original goal corpus and exact nine rows without generic wrapping',()=>{
  for(const [goal,kind] of [[5,'LETTERS'],[10,'WORDS'],[30,'SENTENC']]){
-  const s=configured({goal});s.start(0,4);assert.equal(s.corpusName,'H'+kind);assert.equal(s.limit,600);
-  const rng={seed:1},stream=loadCorpus(data.lessons['H'+kind]);selectCorpusSegment(stream,rng);
+  const s=configured({goal}),rng={seed:s.seed};s.start(0,4);assert.equal(s.corpusName,'H'+kind);assert.equal(s.limit,600);
+  const stream=loadCorpus(data.lessons['H'+kind]);selectCorpusSegment(stream,rng);
   const expected=createPractice(stream);assert.deepEqual(s.practice.rows,expected.rows);assert.equal(s.practice.stream.index,expected.stream.index);
  }
 });
@@ -79,7 +81,7 @@ test('practice duration, focus suspension, no failure, early results and Next re
  s.next(1603);assert.equal(s.practice.lastCorrect,301);assert.equal(s.profile.lesson,1);
 });
 test('guest is never persisted; storage corruption/unavailability is reported, not silently reset',()=>{
- const s=new Session(data,{seed:1});s.start(0,4);s.step(27,1,100);let saved=false;
+ const s=skipStartup(new Session(data,{seed:1}));s.start(0,4);s.step(27,1,100);let saved=false;
  s.save({setItem(){saved=true;}},{students:{}});assert.equal(saved,false);
  assert.throws(()=>loadProfiles({getItem(){throw new Error('blocked');}}),/blocked/);
  assert.throws(()=>loadProfiles({getItem:()=>'{bad'}));

@@ -1,4 +1,5 @@
 import { s16 } from './scoring.mjs';
+import { nextRoute, queueCertificates } from './flow.mjs';
 
 // FILE 0x16648..0x16680. Unlike main-menu boxes, these bounds are INCLUSIVE.
 export function resultHit(x,y) {
@@ -26,6 +27,27 @@ export function resultSpeech({ suppressed, profilePresent, world, mode, goal, pr
   if (suppressed||!profilePresent||mode===4||(world===1&&s16(goal)>10)||(world===2&&s16(goal)>30)) return null;
   return s16(wpm)>=s16(previousGoal) ? 'congrats' : 'toobad';
 }
+// FILE 0x16507..0x16627. Requests, not a promise of audible host playback.
+// Demo bypasses even the suppression reset. Stats drawing precedes speech.
+export function resultEntryEffects(state) {
+  if(state.demo) return [{type:'set-next',value:false},{type:'flush-input'},{type:'results-bypassed'}];
+  const effects=[{type:'result-stats',operation:210}];
+  const request=resultSpeech(state);
+  if(request) effects.push({type:'speech-request',name:request});
+  effects.push({type:'set-result-suppression',value:false},{type:'flush-input'},
+    {type:'result-pointer',x:78,y:184},{type:'set-next',value:false});
+  return effects;
+}
+
+// FILE 0x10412..0x10475, only when Next is dispatched, NOT lesson completion.
+// Receives the already-advanced profile. Never calls progression a second time.
+export function resultNextState(profile) {
+  const state={...profile,...nextRoute(profile)};
+  state.pending=queueCertificates(state);
+  return {state,effects:[{type:'queue-certificates',pending:[...state.pending]},
+    {type:'save-profile'}]};
+}
+
 // FILE 0x90e1..0x90f5: edit values clamp 1..60 after atoi and signed-word assignment.
 export const clampLessonMinutes = value => Math.max(1,Math.min(60,s16(value)));
 // FILE 0x12c90..0x12cb3 (outdoor; analogous water/castle/practice sites documented).

@@ -1,3 +1,5 @@
+import { createStartupRenderer } from './startup-render.mjs';
+import { hydrateCelebrationResources, CelebrationRenderer } from './celebration-render.mjs';
 import { CASTLE_CLIPS, drawCastleText, beginCastleTransition, stepCastleTransition,
   finishCastleTransition, drawCastleBonusActor, castleBonusBlock, beginCastleBonus,
   finishCastleBonus, drawCastleBonusPacket } from './castle-render.mjs';
@@ -31,6 +33,12 @@ export class Renderer {
       if(this.backgrounds[name].length!==64000) throw new Error(`Invalid background: ${name}`);
     }
     this.ground=bytes(this.data.ground);
+    const raw=this.data.startup;
+    const scenes=Object.fromEntries(Object.entries(raw.scenes).map(([name,s])=>[name,{pixels:bytes(s.pixels),palette:bytes(s.palette)}]));
+    this.startupSprites=Object.fromEntries(Object.entries(raw.sprites).map(([family,rows])=>[family,Object.fromEntries(Object.entries(rows).map(([name,s])=>[name,{sprite:s,pixels:bytes(s.pixels)}]))]));
+    this.startupRenderer=createStartupRenderer({front:this.front,background:new Uint8Array(64000),scenes,sprites:this.startupSprites,letters:raw.letters,letterX:raw.letterX});
+    this.celebrationResources=hydrateCelebrationResources(this.data.celebration);
+    this.presentationPalette=new Uint8Array(768);this.paletteWrites=0;
     const records=family=>Object.entries(this.data.sprites).filter(([,s])=>s.family===family)
       .sort((a,b)=>a[1].index-b[1].index).map(([name,sprite])=>({sprite,pixels:this.pixels[name]}));
     this.waterResources={water:records('WATER'),bubbles:records('WATER_INLINE')};
@@ -56,12 +64,27 @@ export class Renderer {
       this.animations[char]={backgrounds,frames:a.frames.map(f=>({...f,pixels:bytes(f.sprite.pixels)}))};
     }));
   }
+  presentation(effects,character) {
+    if(effects.some(e=>e.type==='scene'&&['OCASTLE','WCAS0001','ENDF'].includes(e.name)))
+      this.celebrationRenderer=new CelebrationRenderer(this.celebrationResources,character,{front:this.front,palette:this.presentationPalette});
+    for(const e of effects) {
+      if(e.type==='menu-bubble-request') {this.menuBubble=true;continue;}
+      if(e.type==='sprite'&&e.family==='GREET2') {this.menuEyes=e.name;continue;}
+      let writes=[];
+      if(this.celebrationRenderer && !['LOGO','GREETBG','GREET'].includes(e.name))writes=this.celebrationRenderer.apply([e]);
+      else if(['scene','sprite','letter','palette','fade'].includes(e.type))writes=this.startupRenderer.apply(e);
+      if(writes.length) {this.presentationPalette.set(writes.at(-1));this.paletteWrites+=writes.length;}
+    }
+    if(effects.some(e=>['scene','sprite','letter','palette','fade','palette-black','palette-scene','palette-fade','actor','movie-packet','text','clear-screen'].includes(e.type)&&e.family!=='GREET2')) {
+      this.palette='presentation';this.present();
+    }
+  }
   background(name,palette=name+'.CRX') {
     if(!this.backgrounds[name]) throw new Error(`Missing background: ${name}`);
     this.front.set(this.backgrounds[name]); this.palette=palette;
   }
   present() {
-    const pal=this.data.palettes[this.palette];
+    const pal=this.palette==='presentation'?Array.from(this.presentationPalette,v=>Math.round(v*255/63)):this.data.palettes[this.palette];
     if(!pal || pal.length!==768) throw new Error(`Missing palette: ${this.palette}`);
     for(let i=0;i<64000;i++) {
       const p=this.front[i]*3;
@@ -132,6 +155,14 @@ export class Renderer {
       this.text(this.data.messages[1150],144,34,{color:12,shadow:55});
       this.text(profile.name+'!',136+Math.floor((8-profile.name.length)/2)*8,49,{color:12,shadow:55});
     } else for(let i=0;i<5;i++) this.text(this.data.messages[1250+i],136,24+i*10,{color:12,shadow:55});
+    if(this.menuEyes) {const r=this.startupSprites.GREET2[this.menuEyes];blitSprite(this.front,r.sprite,r.pixels,50,47);}
+    if(this.menuBubble) {
+      // FILE 0x10742..0x108ed, 2-pixel frame and rows20..23, color14.
+      for(let y=142;y<194;y++)for(let x=6;x<186;x++)if(x<8||x>=184||y<144||y>=192)this.front[y*320+x]=8;
+      const base=profile.demo?1200:profile.profilePresent?1210:1220;
+      const ops=Array.from({length:6},(_,i)=>({text:sourceFormat(' %-20.20s ',i===0||i===5?'':this.data.messages[base+i-1]),x:8,y:144+i*8,font:'FONT5H',color:14,shadow:0,background:0,opaque:true}));
+      drawSourceText(this.front,this.fonts,ops);this.operations=ops;
+    }
     if(state) drawMenuWidgets(this.front,this.fonts.FONT5H,this.data.messages,state,profile.lesson);
     this.present();
   }
