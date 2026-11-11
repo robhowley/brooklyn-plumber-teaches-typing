@@ -1,0 +1,14 @@
+Mario Teaches Typing game material remains copyrighted by its respective owners.
+The repository's MIT license covers authored translation/tooling code only, not
+original game art, audio, text, lessons, tables, or other original-derived data.
+No ownership, permission from the rights holders, or additional license is claimed.
+
+The build obtains a hash-pinned archive as inert data and regenerates resources.
+Only the runtime allowlist (decoded app/data.json, three bonus background files,
+and generated numerical tables alongside authored modules) is included in dist.
+Public deployment of that runtime subset is an explicit project decision, not a
+copyright license. The source ZIP, extracted members, static byte listings, and
+other derived research outputs are neither committed nor deployed.
+
+Some deterministic generated metadata retains historical "local-only" wording
+from the pre-promotion analysis. This records provenance, not a rights grant.
