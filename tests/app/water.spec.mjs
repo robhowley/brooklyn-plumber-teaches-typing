@@ -52,9 +52,15 @@ test('Water normal timeout advances once, Next retains group; Castle is selectab
  await ready(page);let s=await snap(page);
  // At least60 net correct in one minute reaches goal10. Remaining input is
  // ignored but resets inactivity, avoiding failure while the real clock runs.
- for(let i=0;i<8;i++){await burst(page,s.water.window.slice(10,18));s=await snap(page);}
+ for(let i=0;i<8;i++) {
+  await burst(page,s.water.window.slice(10,18));s=await snap(page);
+  // A host callback can sample the same BIOS tick and leave the burst queued.
+  // Drain it before reading targets, otherwise the next burst repeats stale bytes.
+  if(s.inputPending) {await page.clock.runFor(60);s=await snap(page);}
+  expect(s.inputPending).toBe(false);expect(s.water.stats.correct).toBe((i+1)*8);expect(s.water.stats.errors).toBe(0);
+ }
  for(let i=0;i<4;i++){await page.clock.runFor(15000);await page.locator('#game').press('Tab');await page.clock.runFor(60);}
- s=await snap(page);expect(s.screen).toBe('celebration');
+ s=await snap(page);expect(s.water.stats.wpm).toBeGreaterThanOrEqual(s.profile.goal);expect(s.screen).toBe('celebration');
  await page.locator('#game').press('Escape');await page.clock.runFor(120);expect((await snap(page)).screen).toBe('celebration');
  await finishCelebrationUI(page);s=await snap(page);
  expect(s.screen).toBe('results');expect(s.water.timedOut).toBe(true);expect(s.water.failed).toBe(false);expect(s.profile.lesson).toBe(2);

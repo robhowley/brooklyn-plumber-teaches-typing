@@ -52,7 +52,10 @@ test('outside naturally activates bonus and BAN/ANI playback freezes mechanics a
 });
 test('Outside to Practice to Outside keeps source counters and clock with fresh entry state',async({page})=>{
  const errors=[];page.on('pageerror',e=>errors.push(e.message));
- await page.clock.install();await ready(page);await page.locator('#game').press('1');
+ await page.clock.install();await ready(page);
+ // install() keeps time advancing; only runFor() should tick between entry snapshots.
+ await page.clock.pauseAt(new Date(await page.evaluate(()=>Date.now()+1000)));
+ await page.locator('#game').press('1');
  await page.clock.runFor(180);await page.locator('#game').press('Escape');await page.clock.runFor(60);
  const old=await snapshot(page);expect(old.screen).toBe('results');
  const fields=['cursorCounter','groundPhase','stillTicks','idleTicks','distance'];
