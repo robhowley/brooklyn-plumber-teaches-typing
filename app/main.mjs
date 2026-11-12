@@ -7,8 +7,20 @@ import { mainMenuHit } from '../recovered/control/flow.mjs';
 import { resultCommand, resultHit } from '../recovered/control/results.mjs';
 import { SourceAudio } from '../recovered/audio/audio.mjs';
 import { BrowserAudio } from './audio.mjs';
+import { bindTextInput } from './text-input.mjs';
 
 const canvas=document.querySelector('#game'), status=document.querySelector('#status');
+const mobileControls=document.querySelector('#mobile-controls'), mobileInput=document.querySelector('#mobile-input');
+const touchKeyboard=matchMedia('(any-pointer: coarse)');
+// Browser adaptation: follow the visible area when a touch keyboard resizes or pans it.
+function sizeViewport() {
+  const view=window.visualViewport;
+  for(const [name,value] of Object.entries({height:view?.height??innerHeight,width:view?.width??innerWidth,top:view?.offsetTop??0,left:view?.offsetLeft??0}))
+    document.documentElement.style.setProperty(`--view-${name}`,`${value}px`);
+}
+window.visualViewport?.addEventListener('resize',sizeViewport);
+window.visualViewport?.addEventListener('scroll',sizeViewport);
+window.addEventListener('resize',sizeViewport);sizeViewport();
 const now=()=>Math.floor(performance.now()*BIOS_HZ/1000);
 let stopped=false;
 function stop(error) { stopped=true;status.textContent=`Application stopped: ${error?.message||error}`;status.hidden=false; }
@@ -42,7 +54,12 @@ function handleAudio(request) {
 }
 const session=new Session(data,{bytes:current?Uint8Array.from(current):null,audioBoundary:handleAudio,...(seedParam===null?{}:{seed:Number(seedParam)})});
 const renderer=new Renderer(canvas,data); await renderer.load();
-let pointer={x:308,y:94}, leftPressed=false, pendingKey=0, pendingMenuPointer=null, selection=0, editorReturn='menu';
+let pointer={x:308,y:94}, leftPressed=false, pendingMenuPointer=null, selection=0, editorReturn='menu';
+// Outside/Practice poll one key per host tick. Keep committed text in order,
+// without changing the recovered per-tick game mechanics.
+const pendingKeys=[];
+let discardTextInput=()=>{};
+let inputScreen=session.screen;
 let menu=createMenu({options:sourceAudio.options}), studentUI=null, chooser=null, modal=null, savedModal=null, controlPointer=null;
 let caret=createTextCursor(session.lastWaitTick);
 function storageError(error) { storageWarning=`Browser storage unavailable (${error.message}). Student changes remain in memory only.`;status.textContent=storageWarning;status.hidden=false; }
@@ -54,6 +71,7 @@ function deleteStudent(name) {
 }
 function findName(name) { return Object.keys(profiles.students).find(n=>n.toUpperCase()===name.toUpperCase()); }
 function draw() {
+  if(inputScreen!==session.screen) {flush();inputScreen=session.screen;}
   const p=session.profile;
   const presentation=session.takePresentationEffects();
   if(presentation.length) {
@@ -67,7 +85,7 @@ function draw() {
     else if(e.type==='set-result-suppression')session.student[47]=Number(e.value);
     else if(e.type==='result-pointer')pointer={x:e.x,y:e.y};
     else if(e.type==='save-profile')save();
-    else if(e.type==='host-clock-reset') {pendingKey=0;session.lastWaitTick=now()&65535;}
+    else if(e.type==='host-clock-reset') {pendingKeys.length=0;session.lastWaitTick=now()&65535;}
   }
   if(modal) renderer.modal(modal,session.student);
   else if(studentUI) renderer.studentUI(studentUI,caret.inverted);
@@ -83,9 +101,12 @@ function draw() {
   canvas.dataset.screen=session.screen; canvas.dataset.suspended=String(session.suspended);
   canvas.dataset.audioBlocking=String(!!session.audioPending);
 }
-function flush() { pendingKey=0;pendingMenuPointer=null;session.input.flush(); }
+function flush() { pendingKeys.length=0;pendingMenuPointer=null;session.input.flush();discardTextInput(); }
 function focusGame() {
-  if(stopped)return;canvas.focus();session.suspend(false,now());flush();
+  if(stopped)return;
+  // Never replace a real editor's focus after drawing, audio or a screen change.
+  if(!touchKeyboard.matches&&!mobileControls.contains(document.activeElement))canvas.focus({preventScroll:true});
+  session.suspend(false,now());flush();
   if(session.screen==='menu'&&session.menuIdle&&!session.menuIdle.state.waiting)session.menuIdle.restartPump(now());
   draw();
 }
@@ -187,18 +208,36 @@ function resultsAction(command) {
   else if(command)limitation({type:command});
   draw();
 }
-canvas.addEventListener('keydown',event=>{
-  if(stopped)return;
-  const key=dosKey(event);if(!key)return;event.preventDefault();
+function dispatchKey(key) {
+  if(stopped||!key)return;
   if(session.audioPending || (key===0x12d&&!session.option10&&!session.active&&!['menu','startup'].includes(session.screen))) {flush();return;}
   if(modal)modalEvent({key});
   else if(studentUI)studentEvent({key});
   else if(chooser)chooserEvent({key,pointer:leftPressed?pointer:null});
   else if(session.screen==='startup'||session.screen==='celebration') {if(!session.suspended)session.enqueue(key);}
-  else if(session.active) {if(!session.suspended&&([2,3].includes(session.mode)||session.demo))session.enqueue(key);else if(!session.suspended&&!session.cinematic&&!pendingKey)pendingKey=key;}
+  else if(session.active) {
+    if(!session.suspended&&([2,3].includes(session.mode)||session.demo))session.enqueue(key);
+    else if(!session.suspended&&!session.cinematic) {
+      if(key===27)pendingKeys.length=0; // Back must not wait behind a long text commit.
+      pendingKeys.push(key);
+    }
+  }
   else if(session.screen==='menu') {session.enqueue(key);pumpMenu();}
   else if(session.screen==='results')resultsAction(resultCommand(key,pointer.x,pointer.y));
+}
+canvas.addEventListener('keydown',event=>{
+  const key=dosKey(event);if(!key)return;event.preventDefault();dispatchKey(key);
 });
+discardTextInput=bindTextInput(mobileInput,dispatchKey).flush;
+function focusTextInput() {
+  mobileInput.focus({preventScroll:true});
+  if(session.suspended)focusGame();
+}
+mobileInput.addEventListener('focus',focusGame);
+for(const button of mobileControls.querySelectorAll('button[data-key]')) {
+  button.addEventListener('pointerdown',event=>{event.preventDefault();focusTextInput();});
+  button.addEventListener('click',()=>dispatchKey(Number(button.dataset.key)));
+}
 function locationInCanvas(event) {const r=canvas.getBoundingClientRect();return {x:Math.floor((event.clientX-r.left)*320/r.width),y:Math.floor((event.clientY-r.top)*200/r.height)};}
 canvas.addEventListener('pointermove',event=>{
   pointer=locationInCanvas(event);const hit=session.screen==='menu'?mainMenuHit(pointer.x,pointer.y):-1;
@@ -206,15 +245,21 @@ canvas.addEventListener('pointermove',event=>{
 });
 // A fresh left press, not a click synthesized after a release or a right button.
 canvas.addEventListener('pointerdown',event=>{
-  if(stopped||session.audioPending)return;
+  if(stopped)return;
+  // Focus during the trusted tap, not after a draw/promise, so mobile browsers
+  // may open their software keyboard. The visible editor remains the owner.
+  if(event.button===0&&touchKeyboard.matches) {event.preventDefault();focusTextInput();}
+  if(session.audioPending)return;
   if(event.button===0) {
     if(!leftPressed)session.audio({type:'effect',id:8,file:0x149bc});
     leftPressed=true;
   }
   if(session.screen==='celebration'&&!session.suspended) {event.preventDefault();session.stepPresentation(0,now(),true);draw();return;}
   if(modal&&['report','about'].includes(modal.kind)) {event.preventDefault();modalEvent({pointer:locationInCanvas(event)});return;}
-  if(event.button!==0)return;event.preventDefault();leftPressed=true;pointer=locationInCanvas(event);canvas.focus();
+  if(event.button!==0)return;event.preventDefault();leftPressed=true;pointer=locationInCanvas(event);
+  if(!touchKeyboard.matches)canvas.focus();
   if(modal)modalEvent({pointer});else if(studentUI)studentEvent({pointer});else if(chooser)chooserEvent({pointer});
+  else if(session.screen==='startup')dispatchKey(32);
   else if(session.screen==='menu') {pendingMenuPointer={...pointer};pumpMenu();}else if(session.screen==='results')resultsAction(resultHit(pointer.x,pointer.y));else if(session.active&&session.suspended)focusGame();
 });
 canvas.addEventListener('contextmenu',event=>event.preventDefault());
@@ -223,8 +268,13 @@ window.addEventListener('pointerup',event=>{
   if(!stopped&&!session.audioPending&&!session.suspended&&session.screen==='celebration') {session.stepPresentation(0,now(),true);draw();}
 });
 window.addEventListener('pointercancel',()=>{leftPressed=false;});
-function suspend() {browserAudio.stop('blur');leftPressed=false;if(!session.active&&!['startup','celebration'].includes(session.screen))return;session.suspend(true,now());flush();draw();}
-canvas.addEventListener('blur',suspend);window.addEventListener('blur',suspend);
+function suspend() {browserAudio.stop('blur');leftPressed=false;session.suspend(true,now());flush();draw();}
+// Moving between the canvas, editor and key strip stays inside the game.
+for(const element of [canvas,mobileControls])element.addEventListener('focusout',event=>{
+  if(event.relatedTarget===canvas||mobileControls.contains(event.relatedTarget))return;
+  suspend();
+});
+window.addEventListener('blur',suspend);
 canvas.addEventListener('focus',focusGame);
 window.addEventListener('focus',()=>{if(!document.hidden)focusGame();});
 document.addEventListener('visibilitychange',()=>{if(document.hidden)suspend();else focusGame();});
@@ -237,20 +287,21 @@ setInterval(()=>{
   if(chooser&&leftPressed) {chooserEvent({pointer});return;}
   if(studentUI?.field) {
     const tick=now()&65535;
-    if(document.activeElement===canvas&&!document.hidden&&tick!==caret.tick) {caret=textCursorTick(caret,tick);session.lastWaitTick=caret.tick;draw();}
+    if((document.activeElement===canvas||document.activeElement===mobileInput)&&!document.hidden&&tick!==caret.tick) {caret=textCursorTick(caret,tick);session.lastWaitTick=caret.tick;draw();}
     return;
   }
   if(session.screen==='menu') {pumpMenu();return;}
   if((!session.active&&!['startup','celebration'].includes(session.screen))||session.suspended)return;
-  const key=pendingKey;pendingKey=0;
+  const key=pendingKeys.shift()??0;
   try {
     session.step(key,now());
+    if(session.cinematic)pendingKeys.length=0;
   } catch(error) {session.suspend(true,now());stop(error);return;}
   if(session.screen==='results') {save();selection=0;}
   draw();
 },1000/BIOS_HZ);
 // Read-only authored verification. No mutation hooks or original code execution.
-window.translationSnapshot=()=>({screen:session.screen,inputPending:session.input.pending(),profile:session.profile,result:session.result,suspended:session.suspended,
+window.translationSnapshot=()=>({screen:session.screen,inputPending:session.input.pending(),hostInputPending:pendingKeys.length,profile:session.profile,result:session.result,suspended:session.suspended,
   menu:structuredClone(menu),studentUI:studentUI?{kind:studentUI.kind,field:studentUI.field,selection:studentUI.selection,caret:{...caret}}:null,
   chooser:structuredClone(chooser),modal:modal?{...modal,lines:undefined}:null,pointer:{...pointer},palette:renderer.palette,operations:renderer.operations,
   startup:{...structuredClone(session.startup.state)},paletteWrites:renderer.paletteWrites,

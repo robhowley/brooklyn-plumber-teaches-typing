@@ -14,7 +14,8 @@ For local setup and tests, see [DEVELOPMENT.md](DEVELOPMENT.md).
 - Results: **N Next**, **M / Escape Menu**. Tab/arrows move selection; Enter activates it. Space does not activate results.
 - Use menu dropdowns with the pointer or arrows/Enter. **5 / report picture** opens a saved student's report; **H / F1** opens Help, **K / F2** Keyboard, and **A** About.
 - Water's advancement sequence cannot be skipped. First Castle graduation repeats its ending until a key is pressed.
-- Losing focus pauses updates and active lesson time. Return to the page or focus the canvas to resume. Wall-clock inactivity still advances, so Water may fail after a long pause.
+- On touch devices, tap the game or the visible **Type here** field to open your keyboard. Tap the title to advance each startup sequence, then tap a menu picture to play. **Back** sends Escape; **Enter** and the arrow buttons operate the original menus, fields and results. Menu shortcuts (including W/E/T/L/H) also work in the typing field. Desktop keeps the full-canvas view.
+- Leaving the page or moving focus outside the game pauses updates and active lesson time, and discards queued text. Moving between the game, typing field and buttons does not pause. Return to the page or tap the game/field to resume. Wall-clock inactivity still advances, so Water may fail after a long pause.
 
 ## Students and saves
 
@@ -29,5 +30,7 @@ For local setup and tests, see [DEVELOPMENT.md](DEVELOPMENT.md).
 - A keyboard or pointer gesture unlocks browser audio. Use the original music/sound/speech menu switches.
 - Four recovered speech clips play. Input is discarded while speech is playing; unavailable or interrupted speech is omitted, without a guessed delay or later replay. Water's lesson timer includes its Ready clip.
 - Music, sound effects and the other speech formats remain silent. Certificate selection/text output, printing, original mouse/finger imagery, Practice cursor blinking and intermediate world/modal fades are unsupported. Welcome text color is provisional.
+- Touch input accepts ASCII, not non-ASCII text. Outside and Practice deliver committed text one key per host tick, retaining committed text until consumed or deliberately flushed; Back discards that queue before exiting.
+- Automated touch tests check editor focus and reduced viewport layout, not whether a physical software keyboard opens. On iOS Safari and Android Chrome, manually check title/menu taps, all four typing activities, student fields, Back/Enter/arrows, rotation with the keyboard open, and leaving/returning to the page.
 - Browser scheduling, input delivery, focus pause and storage are adaptations, not DOS hardware emulation. Quit cannot close the browser tab. Missing resources stop visibly instead of substituting generic art or lessons.
 - `?seed=1` fixes the process entry seed; startup skips and input timing still change later random draws. It is not a recording of an original DOS session.

@@ -2,10 +2,11 @@ import { test, expect } from '@playwright/test';
 import {skipStartupUI,createStudentUI,setDurationsUI} from './source-path.mjs';
 async function point(page,x,y,click=true) {const r=await page.locator('#game').boundingBox();const p=[r.x+x*r.width/320,r.y+y*r.height/200];if(click)await page.mouse.click(...p);else await page.mouse.move(...p);}
 async function ready(page) {await page.goto('./?seed=1');await skipStartupUI(page);await expect(page.locator('#game')).toHaveAttribute('data-screen','menu');}
-test('only the original canvas UI is shown and keyboard works on load and focus return',async({page})=>{
+test('desktop shows only the original canvas and keyboard works on load and focus return',async({page})=>{
  await page.goto('./?seed=1');await expect(page.locator('#game')).toBeFocused();
  await expect(page.locator('main > :visible')).toHaveCount(1);
- await expect(page.locator('button,form,select,input,details,a,section')).toHaveCount(0);
+ await expect(page.locator('#mobile-controls')).toBeHidden();
+ await expect(page.locator('button:visible,form:visible,select:visible,input:visible,textarea:visible,details:visible,a:visible,section:visible')).toHaveCount(0);
  await skipStartupUI(page);await page.keyboard.press('w');
  await expect(page.locator('#game')).toHaveAttribute('data-screen','student');
  await page.keyboard.type('KEYS');await page.keyboard.press('Enter');await page.keyboard.press('Escape');

@@ -3,5 +3,36 @@ body { margin:0; }
 main { height:100vh; height:100dvh; display:grid; place-items:center; }
 canvas { display:block; width:min(100vw,160vh); width:min(100vw,160dvh); height:auto; aspect-ratio:8/5; image-rendering:pixelated; background:#000; touch-action:manipulation; }
 canvas:focus-visible { outline:2px solid #fff; outline-offset:-2px; }
+#mobile-controls { display:none; }
+/* The DOS raster stays unchanged. Only coarse-pointer devices get host keys. */
+@media (any-pointer:coarse) {
+  main {
+    position:fixed; top:var(--view-top,0px); left:var(--view-left,0px);
+    width:var(--view-width,100vw); height:var(--view-height,100dvh);
+    box-sizing:border-box; padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
+    display:flex; flex-direction:column; justify-content:center; gap:4px;
+  }
+  canvas {
+    flex:none;
+    width:min(100%,calc((var(--view-height,100dvh) - 100px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) * 1.6));
+  }
+  #mobile-controls {
+    flex:none; display:grid; grid-template-columns:auto minmax(0,1fr); align-items:center;
+    gap:4px 8px; padding:4px; box-sizing:border-box; width:min(100%,640px); height:96px;
+    background:#000; font:16px/1.2 system-ui,sans-serif;
+  }
+  #mobile-controls label { padding-left:4px; }
+  #mobile-input {
+    box-sizing:border-box; width:100%; height:40px; min-width:0; resize:none;
+    padding:8px; border:1px solid #aaa; border-radius:0; background:#111; color:#fff;
+    font:16px/22px monospace; touch-action:manipulation;
+  }
+  #mobile-controls nav { grid-column:1/-1; display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:4px; }
+  #mobile-controls button {
+    height:44px; min-width:0; padding:0; border:1px solid #aaa; border-radius:0;
+    background:#171717; color:#fff; font:16px/1 system-ui,sans-serif; touch-action:manipulation;
+  }
+  #mobile-controls :focus-visible { outline:2px solid #fff; outline-offset:-3px; }
+}
 #status { position:fixed; bottom:0; left:0; right:0; margin:0; padding:12px 16px; max-height:50vh; overflow:auto; background:#171717; }
 [hidden] { display:none !important; }
