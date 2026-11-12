@@ -36,6 +36,14 @@ function counts(entries) {
 test('archive-pinned source identity, font bindings and real independently read glyph pixels',()=>{
   assert.equal(sha(exe),'6caed439b64dc3bad8de4f9df53b63ae5712bf3c54b0bbfc00603557e4720f5e');
   assert.ok(evidence.verifiedInstructionLines>2800);
+  // Position argument immediates, independently checked against the pinned EXE.
+  for(const [yOffset,xOffset,x,y] of [[0x10da0,0x10da4,160,100],[0x10db6,0x10dba,267,175],
+    [0xe945,0xe949,300,100],[0x12187,0x1218b,300,180],[0x14647,0x1464b,160,100],[0x155f5,0x155f9,280,182]]) {
+    assert.equal(exe.readUInt16LE(xOffset),x);assert.equal(exe.readUInt16LE(yOffset),y);
+  }
+  assert.equal(exe.subarray(0x158c4,0x158c7).toString('hex'),'e9a0fe'); // Enter -> physical hit tests
+  assert.equal(exe.readUInt16LE(0x14888),305);assert.equal(exe.readUInt16LE(0x14896),187);
+  assert.equal(exe.subarray(0x114f2,0x114fd).toString('hex'),'ff76eaff76ec9a400c5c11'); // main Report restores x/y
   const msd=raw('ENGLISH.MSD'),records=json('analysis/control/messages.json').resources;
   for(const id of [10,11,12,13,20,21,22,23,30,31,32,33,40,41,42,43,
     100,101,102,103,2110,2120,2130,2240,2250,2260,2270,5500,5501,5502,5503,5504,5505,
@@ -119,7 +127,8 @@ test('HLP CR-only line table, color control, next-four-column tabs, 35-column cl
 test('all recovered help key targets, page overlap, button cycle and exact caller return',()=>{
   assert.deepEqual(evidence.helpKeys,[9,13,27,68,100,301,327,328,329,331,333,335,336,337]);
   let state=openHelp(1,'results',evidence.help[1]);
-  assert.equal(helpInput(state,{key:13}).route,'results');
+  assert.equal(helpInput(state,{key:13,x:280,y:182}).route,'results');
+  assert.equal(helpInput(state,{key:13,x:0,y:0}).closed,false);
   state=helpInput(state,{key:337});assert.equal(state.top,17);
   state=helpInput(state,{key:336});assert.equal(state.top,18);
   state=helpInput(state,{key:329});assert.equal(state.top,1);
@@ -138,6 +147,19 @@ test('all recovered help key targets, page overlap, button cycle and exact calle
   assert.equal(helpInput(state,{leftButton:true,x:300,y:188}).route,'results');
   assert.equal(helpInput(state,{leftButton:true,x:301,y:188}).closed,false);
   assert.equal(helpInput(openHelp(2,'results',evidence.help[2]),{key:337}).top,0);
+});
+
+test('Help Enter uses inclusive physical hitboxes, independent of retained navigation index',()=>{
+  const state={...openHelp(1,'results',evidence.help[1]),top:2,button:2};
+  for(const [x,y,action] of [[17,178,'down'],[56,188,'down'],[72,178,'up'],[111,188,'up'],[261,178,'done'],[300,188,'done']]) {
+    const result=helpInput(state,{key:13,x,y});
+    if(action==='done')assert.equal(result.route,'results');else assert.equal(result.top,action==='down'?3:1);
+    assert.equal(result.button,2);
+  }
+  for(const [x,y] of [[16,182],[57,182],[71,182],[112,182],[260,182],[301,182],[280,177],[280,189]]) {
+    assert.deepEqual(helpInput(state,{key:13,x,y}),state);
+  }
+  assert.equal(helpInput(state,{key:0x150}).button,2);
 });
 
 test('keyboard/about retain original pixels/text and modal returns to caller, without links',()=>{

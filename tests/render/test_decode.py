@@ -1,7 +1,8 @@
 import sys
 from pathlib import Path as _Path
 sys.path.insert(0, str(_Path(__file__).resolve().parents[2] / 'tools'))
-from source import archive_path
+from source import archive_path, EXE_MEMBER, EXE_SHA256
+from collections import Counter
 import hashlib, json, pathlib, re, struct, sys, unittest, zipfile
 ROOT=pathlib.Path(__file__).resolve().parents[2]
 sys.path.insert(0,str(ROOT/'tools/render'))
@@ -82,6 +83,38 @@ class DecodeTests(unittest.TestCase):
                     if world=='water': palette[144:192]=z.read('MarioTea/MARIO/BITER.GPO')[144:192]
                     actual=manifest['worlds'][world]['palettes'][char]['rgb6']
                     self.assertEqual(bytes(v for rgb in actual for v in rgb),palette)
+
+    def test_inline_cursor_bytes_palette_indices_and_provenance(self):
+        manifest=json.loads((ROOT/'assets/render/manifest.json').read_text())
+        records=[r for r in manifest['sprites'] if r['family']=='CURSOR']
+        self.assertEqual(len(records),1)
+        record=records[0]
+        with zipfile.ZipFile(archive_path()) as z:
+            exe=z.read(EXE_MEMBER)
+            prefs=z.read('MarioTea/MARIO/PREFS.CRX')
+        self.assertEqual(hashlib.sha256(exe).hexdigest(),EXE_SHA256)
+        self.assertEqual(hashlib.sha256(prefs).hexdigest(),
+                         'aff25eaa9c084e28c4f0e61e4856b18a38ede57cf81930ab6c9b835a08a73132')
+        header,pixels=decode_raster(exe,0x2238f,0x2243f)
+        self.assertEqual(header,{'headerWords':[0,0,14,12],'originX':0,'originY':0,'width':14,'height':12})
+        self.assertEqual(record,{**header,'family':'CURSOR','name':'arrow','index':0,
+                                'member':EXE_MEMBER,'memberSha256':EXE_SHA256,
+                                'fileOffset':'0x2238f','endExclusive':'0x2243f',
+                                'indicesPath':'cursor/arrow.indices',
+                                'indicesSha256':'460f9ad03bf0028431cb9eec197af70d5baf50827c945d723b37147f264aa0b5'})
+        self.assertEqual(len(pixels),168)
+        self.assertEqual(pixels,exe[0x22397:0x2243f])
+        self.assertEqual(Counter(pixels),{0:104,15:34,29:30})
+        self.assertEqual(hashlib.sha256(pixels).hexdigest(),record['indicesSha256'])
+        self.assertEqual((ROOT/'assets/render'/record['indicesPath']).read_bytes(),pixels)
+        visible=[(i%14,i//14) for i,pixel in enumerate(pixels) if pixel]
+        self.assertEqual((min(x for x,y in visible),min(y for x,y in visible),
+                          max(x for x,y in visible),max(y for x,y in visible)),(0,0,8,10))
+        for index,rgb6 in [(15,(63,63,63)),(29,(14,14,14))]:
+            self.assertEqual(tuple(prefs[index*3:index*3+3]),rgb6)
+        # The common raster decoder must reject a truncated or extended arrow span.
+        for end in (0x2243e,0x22440):
+            with self.assertRaises(ValueError): decode_raster(exe,0x2238f,end)
 
     def test_archive_and_all_outputs(self):
         archive=archive_path()

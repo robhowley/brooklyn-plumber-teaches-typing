@@ -67,6 +67,34 @@ class AppDataTests(unittest.TestCase):
                 self.assertEqual(len(pixels), record['width'] * record['height'])
                 self.assertEqual(hashlib.sha256(pixels).hexdigest(), record['indicesSha256'])
 
+    def test_cursor_is_bundled_with_exact_pixels_and_manifest_provenance(self):
+        data = json.loads((ROOT / 'app/data.json').read_text())
+        render = json.loads((ROOT / 'assets/render/manifest.json').read_text())
+        records = [s for s in render['sprites'] if s['family'] == 'CURSOR']
+        self.assertEqual(len(records), 1)
+        self.assertEqual([k for k in data['sprites'] if k.startswith('CURSOR/')], ['CURSOR/arrow'])
+        sprite = data['sprites']['CURSOR/arrow']
+        self.assertEqual({k: v for k, v in sprite.items() if k != 'pixels'}, records[0])
+        self.assertEqual((sprite['family'], sprite['name'], sprite['index']), ('CURSOR', 'arrow', 0))
+        self.assertEqual((sprite['headerWords'], sprite['originX'], sprite['originY'],
+                          sprite['width'], sprite['height']), ([0, 0, 14, 12], 0, 0, 14, 12))
+        self.assertEqual(sprite['member'], 'MarioTea/MARIO/MARIO.EXE')
+        self.assertEqual(sprite['memberSha256'], '6caed439b64dc3bad8de4f9df53b63ae5712bf3c54b0bbfc00603557e4720f5e')
+        self.assertEqual((sprite['fileOffset'], sprite['endExclusive']), ('0x2238f', '0x2243f'))
+        pixels = base64.b64decode(sprite['pixels'], validate=True)
+        self.assertEqual(len(pixels), sprite['width'] * sprite['height'])
+        self.assertEqual(hashlib.sha256(pixels).hexdigest(),
+                         '460f9ad03bf0028431cb9eec197af70d5baf50827c945d723b37147f264aa0b5')
+        self.assertEqual(hashlib.sha256(pixels).hexdigest(), sprite['indicesSha256'])
+        self.assertEqual(pixels, (ROOT / 'assets/render' / sprite['indicesPath']).read_bytes())
+        exe = (ROOT / 'assets/original/raw/MarioTea/MARIO/MARIO.EXE.data').read_bytes()
+        self.assertEqual(pixels, exe[0x22397:0x2243f])
+        for index, rgb in [(15, [255, 255, 255]), (29, [57, 57, 57])]:
+            self.assertEqual(data['palettes']['PREFS.CRX'][index*3:index*3+3], rgb)
+        # Runtime publication needs only the existing bundle, not a new asset URL.
+        self.assertEqual((ROOT / 'dist/app/data.json').read_bytes(), (ROOT / 'app/data.json').read_bytes())
+        self.assertFalse((ROOT / 'dist/assets/render').exists())
+
     def test_water_bindings_reach_consumer_without_repacking(self):
         data = json.loads((ROOT / 'app/data.json').read_text())
         bindings = json.loads((ROOT / 'assets/render/water/bindings.json').read_text())

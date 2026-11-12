@@ -189,6 +189,44 @@ test('chooser pointer runs before key, double-press strict10 tick boundary and c
   r=studentChooserInput(s,{pointer:{x:181,y:158},key:68,ticks:110});assert.equal(r.state.done,true);assert.deepEqual(r.effects,[]);
 });
 
+test('main wait positions and highlight navigation do not reposition the pointer',()=>{
+  assert.deepEqual(createMenu().pointer,{x:160,y:100});
+  assert.deepEqual(createMenu({profilePresent:true}).pointer,{x:267,y:175});
+  let state={...createMenu(),pointer:{x:42,y:73}};
+  for(const key of [9,0x14d,0x150,0x148,0x14b,27,32]) {
+    state=menuInput(state,{key}).state;assert.deepEqual(state.pointer,{x:42,y:73});
+  }
+});
+
+test('Preferences and durations wrap all positioning targets, while Enter keeps their distinct dispatch',()=>{
+  for(const [kind,positions] of [['edit',[[207,74],[154,94],[89,157],[154,157],[225,157],[292,186]]],
+    ['times',[[202,75],[202,95],[202,115],[202,135],[285,182]]]]) {
+    let state=createStudentUI(newStudent('OLD'),kind);
+    for(let i=0;i<positions.length*2;i++) {
+      state=studentUIInput(state,{key:9}).state;
+      assert.deepEqual(state.pointer,{x:positions[i%positions.length][0],y:positions[i%positions.length][1]});
+    }
+    state=studentUIInput(state,{key:0x14b}).state;
+    assert.equal(state.selection,positions.length-2);
+  }
+  const prefs={...createStudentUI(newStudent('OLD')),selection:1,pointer:{x:292,y:186}};
+  assert.equal(studentUIInput(prefs,{key:13}).state.field.name,'goal');
+  const times={...createStudentUI(newStudent('OLD'),'times'),pointer:{x:202,y:115}};
+  assert.equal(studentUIInput(times,{key:13}).state.field.name,'2');
+  assert.equal(studentUIInput({...times,pointer:{x:10,y:10}},{key:13}).state.field,null);
+  const created=uiKeys(createStudentUI(newStudent('OLD'),'new'),[65,13]).state;
+  assert.deepEqual(created.pointer,{x:292,y:186});
+});
+
+test('Load name navigation preserves physical coordinates; Enter tests x without y or button index',()=>{
+  const state={...createStudentChooser(['A','B']),pointer:{x:207,y:0},button:1};
+  const moved=studentChooserInput(state,{key:0x150}).state;
+  assert.deepEqual(moved.pointer,{x:207,y:0});assert.equal(moved.selection,1);
+  assert.equal(studentChooserInput(moved,{key:13}).state.done,true);
+  assert.deepEqual(studentChooserInput(moved,{key:13}).effects,[]);
+  assert.deepEqual(studentChooserInput({...moved,pointer:{x:265,y:0},button:0},{key:13}).effects,[{type:'load-student',name:'B'}]);
+});
+
 test('real FONT5H dropdown pixels, border and selected opaque cells retain source palette indices',()=>{
   const fonts=font('FONT5H'),front=blank().fill(88),state={...createMenu(),row:1};
   drawMenuWidgets(front,fonts,messages,state,1);

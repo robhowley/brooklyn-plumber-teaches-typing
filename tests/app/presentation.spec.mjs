@@ -61,15 +61,25 @@ test('source durations target all four fields; cursor inversion follows changed 
  const a=await pixels(page);await page.clock.runFor(60);expect((await snap(page)).studentUI.caret.inverted).toBe(true);expect(await pixels(page)).not.toEqual(a);
  await press(page,'End');expect((await snap(page)).studentUI.field.cursor).toBe(3);expect((await snap(page)).studentUI.caret.inverted).toBe(false);
 });
-test('help paging, Keyboard F1 and About preserve raster, pointer and results context without lesson input',async({page})=>{
- await ready(page);const initial=await pixels(page);await press(page,'F1');await press(page,'PageDown');expect((await snap(page)).modal.top).toBe(17);
+// Compare every noncursor pixel, while separately asserting returned coordinates.
+function withoutArrows(image,...positions) {
+ const copy=image.slice();
+ for(const {x,y} of positions)for(let dy=0;dy<12;dy++)for(let dx=0;dx<14;dx++) {
+  if(x+dx>=320||y+dy>=200)continue;copy.fill(0,((y+dy)*320+x+dx)*4,((y+dy)*320+x+dx)*4+4);
+ }
+ return copy;
+}
+test('help paging, Keyboard F1 and About preserve noncursor raster and results context without lesson input',async({page})=>{
+ await ready(page);const initial=await pixels(page), initialPointer=(await snap(page)).pointer;await press(page,'F1');await press(page,'PageDown');expect((await snap(page)).modal.top).toBe(17);
  await press(page,'End');expect((await snap(page)).modal.top).toBeGreaterThan(17);await press(page,'Home');expect((await snap(page)).modal.top).toBe(0);
- await point(page,280,182);expect(await pixels(page)).toEqual(initial);
+ await point(page,280,182);expect((await snap(page)).pointer).toEqual({x:280,y:182});
+ expect(withoutArrows(await pixels(page),initialPointer,{x:280,y:182})).toEqual(withoutArrows(initial,initialPointer,{x:280,y:182}));
  await press(page,'F2');await press(page,'F1');await point(page,150,90);await expect(page.locator('#game')).toHaveAttribute('data-screen','keyboard');await press(page,'Escape');
  await press(page,'a');await press(page,'1');await expect(page.locator('#game')).toHaveAttribute('data-screen','menu');
  await press(page,'a');const bounds=await page.locator('#game').boundingBox();await page.mouse.click(bounds.x+10,bounds.y+10,{button:'right'});await expect(page.locator('#game')).toHaveAttribute('data-screen','menu');
  await press(page,'4');await press(page,'Escape');await expect(page.locator('#game')).toHaveAttribute('data-screen','results');const result=await snap(page), image=await pixels(page);
- await press(page,'F1');await press(page,'End');expect((await snap(page)).modal.top).toBe(0);await press(page,'Escape');expect((await snap(page)).result).toEqual(result.result);expect(await pixels(page)).toEqual(image);
+ await press(page,'F1');await press(page,'End');expect((await snap(page)).modal.top).toBe(0);await press(page,'Escape');expect((await snap(page)).result).toEqual(result.result);expect((await snap(page)).pointer).toEqual({x:280,y:182});
+ expect(withoutArrows(await pixels(page),result.pointer,{x:280,y:182})).toEqual(withoutArrows(image,result.pointer,{x:280,y:182}));
  await press(page,'F2');await press(page,'n');await expect(page.locator('#game')).toHaveAttribute('data-screen','results');
 });
 test('all four HUDs use exact original values, origins, palette and font pixels; BLACKBRD uses operation210',async({page})=>{

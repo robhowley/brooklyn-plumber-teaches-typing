@@ -25,9 +25,9 @@ def sprite_record(sprite, root):
 for sprite in manifest['sprites']:
     if sprite['family'] in ('WALKING', 'OUTSIDE', 'FONT3H', 'FONT5H', 'FONT7H', 'FONT9H', 'PRACTICE') or (sprite['family'] == 'GREET2' and sprite['name'] == 'prefbox_1'):
         result['sprites'][sprite['family'] + '/' + sprite['name']] = sprite_record(sprite, ASSETS)
-# Enabled worlds use decoded family indices, never flattened resource indices.
+# Render sprites use decoded family indices, never flattened resource indices.
 for sprite in render['sprites']:
-    if sprite['family'] in ('IDLE', 'WATER', 'WATER_INLINE', 'CASTLE'):
+    if sprite['family'] in ('IDLE', 'WATER', 'WATER_INLINE', 'CASTLE', 'CURSOR'):
         result['sprites'][sprite['family'] + '/' + sprite['name']] = sprite_record(sprite, RENDER)
 for palette in manifest['palettes']:
     result['palettes'][palette['name']] = json.loads((ASSETS / palette['path']).read_text())['rgb8']

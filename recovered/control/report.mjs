@@ -36,7 +36,8 @@ export function modalReturn(state,{key=null,pointerChanged=false,pointerEnabled=
 // FILE 0x14655..0x1467f: F1 repeats the keyboard-screen wait; other keys
 // close it. Do not open main-menu help while the keyboard screen owns input.
 export function keyboardInput(state,event={}) {
-  // Unlike Report/About's0x147f2 callback,0x14669 only polls a key.
+  // Browser adaptation: keep pointer-only nondismissal. FILE 0x14669..0x14681
+  // reads an uninitialized local key after pointer wakeup, so its outcome is unknown.
   return event.key===null||event.key===undefined||event.key===0x13b?state:modalReturn(state,event);
 }
 
@@ -67,7 +68,8 @@ export function helpInput(state,{key=null,x=0,y=0,leftButton=false,doneKey=68,qu
   if(state.closed) return state;
   const out={...state}, max=Math.max(0,state.lines.length-18);
   let action=null;
-  if(leftButton&&y>=178&&y<=188) {
+  // FILE 0x158c4 jumps back to physical hit testing at 0x15767 for Enter.
+  if((leftButton||key===13)&&y>=178&&y<=188) {
     if(x>=17&&x<=56) action='down';
     else if(x>=72&&x<=111) action='up';
     else if(x>=261&&x<=300) action='done';
@@ -77,7 +79,6 @@ export function helpInput(state,{key=null,x=0,y=0,leftButton=false,doneKey=68,qu
     else action=new Map([[9,'tab'],[13,'enter'],[68,'done'],[100,'done'],[301,'quit'],[327,'home'],[328,'up'],
       [329,'pageUp'],[331,'left'],[333,'tab'],[335,'end'],[336,'down'],[337,'pageDown']]).get(key);
   }
-  if(action==='enter') action=['down','up','done'][out.button];
   switch(action) {
     case 'done':out.closed=true;out.route=out.returnTo;out.flushInput=true;break;
     case 'quit':if(quitAllowed) out.request='quit';break;
