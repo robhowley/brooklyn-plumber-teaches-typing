@@ -46,9 +46,10 @@ test('entry/menu uses local decoded assets only; selection and hover survive sca
  test.skip(testInfo.project.name==='pages-prefix','Welcome speech can drain the queued click.');
  const failures=[],requests=[];page.on('pageerror',e=>failures.push(e.message));page.on('request',r=>requests.push(r.url()));
  await ready(page);expect(await page.locator('canvas').getAttribute('width')).toBe('320');
- await point(page,250,20,false);await expect(page.locator('#game')).toHaveCSS('cursor','pointer');
- await point(page,250,55,false);await expect(page.locator('#game')).toHaveCSS('cursor','pointer');
- await point(page,250,85,false);await expect(page.locator('#game')).toHaveCSS('cursor','pointer');
+ for(const y of [20,55,85]) {
+  await point(page,250,y,false);await expect.poll(async()=> (await page.evaluate(()=>translationSnapshot())).cursor.visible).toBe(true);
+  await expect(page.locator('#game')).toHaveCSS('cursor','none');
+ }
  await point(page,250,85);await expect(page.locator('#game')).toHaveAttribute('data-screen','castle');
  await page.waitForTimeout(150);await page.waitForFunction(()=>!translationSnapshot().audioHost.blocking);
  await page.locator('#game').press('Escape');await expect(page.locator('#game')).toHaveAttribute('data-screen','results');

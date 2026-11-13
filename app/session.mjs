@@ -66,7 +66,7 @@ export class Session {
     const owner=this;
     this.rng={get seed(){return owner.seed;},set seed(value){owner.seed=value>>>0;}};
     this.audioHandler=audioBoundary;this.audioLog=[];this.option10=option10;
-    this.presentationEffects=[];this.resultEffects=[];this.menuTimer=createMenuIdleState();this.demo=null;this.practiceDemoTick=0;
+    this.presentationEffects=[];this.resultEffects=[];this.menuTimer=createMenuIdleState();this.menuEntries=0;this.demo=null;this.practiceDemoTick=0;
     this.celebrationResources=hydrateCelebrationResources(data.celebration);
     this.startup=createStartup({rng:this.rng,input:this.input,option10:this.option10,audioBoundary:request=>this.audio(request)});
     this.screen='startup';this.audio({type:'music',id:1,file:0x1d8e6});
@@ -99,6 +99,8 @@ export class Session {
     this.audio({type:'music-stop',file:0x10d7d});
     const resume=()=>{
       this.audio({type:'music',id:2,file:0x10d99});
+      // Actual main entry, not return from an overlay (MARIO.EXE FILE 0x10d9f..0x10dc4).
+      this.menuEntries++;
       this.menuIdle=createMenuIdle({rng:this.rng,input:this.input,timer:this.menuTimer,nowTicks:this.sampleTicks,demo:this.profile.demo});
     };
     this.sampleTicks=nowTicks;

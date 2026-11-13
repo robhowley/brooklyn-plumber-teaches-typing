@@ -28,6 +28,6 @@ For local setup and tests, see [DEVELOPMENT.md](DEVELOPMENT.md).
 
 - A keyboard or pointer gesture unlocks browser audio. Use the original music/sound/speech menu switches.
 - Four recovered speech clips play. Input is discarded while speech is playing; unavailable or interrupted speech is omitted, without a guessed delay or later replay. Water's lesson timer includes its Ready clip.
-- Music, sound effects and the other speech formats remain silent. Certificate selection/text output, printing, original mouse/finger imagery, Practice cursor blinking and intermediate world/modal fades are unsupported. Welcome text color is provisional.
+- Music, sound effects and the other speech formats remain silent. Certificate selection/text output, printing, original finger imagery, Practice cursor blinking and intermediate world/modal fades are unsupported. Welcome text color is provisional.
 - Browser scheduling, input delivery, focus pause and storage are adaptations, not DOS hardware emulation. Quit cannot close the browser tab. Missing resources stop visibly instead of substituting generic art or lessons.
 - `?seed=1` fixes the process entry seed; startup skips and input timing still change later random draws. It is not a recording of an original DOS session.

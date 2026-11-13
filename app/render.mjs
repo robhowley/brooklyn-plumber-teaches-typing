@@ -19,7 +19,7 @@ export class Renderer {
   constructor(canvas,data) {
     this.canvas=canvas; this.ctx=canvas.getContext('2d'); this.data=data;
     this.front=new Uint8Array(64000); this.pixels={}; this.backgrounds={}; this.animations={};
-    this.image=this.ctx.createImageData(320,200);
+    this.image=this.ctx.createImageData(320,200); this.cursor=null;
     this.waveCounter=-1; // DS:0302 / FILE0x1f572 initial FFFF; retained across entries.
   }
   async load() {
@@ -83,12 +83,33 @@ export class Renderer {
     if(!this.backgrounds[name]) throw new Error(`Missing background: ${name}`);
     this.front.set(this.backgrounds[name]); this.palette=palette;
   }
+  setCursor(position) {
+    this.cursor=position===null?null:{x:position.x,y:position.y};
+  }
   present() {
     const pal=this.palette==='presentation'?Array.from(this.presentationPalette,v=>Math.round(v*255/63)):this.data.palettes[this.palette];
     if(!pal || pal.length!==768) throw new Error(`Missing palette: ${this.palette}`);
     for(let i=0;i<64000;i++) {
       const p=this.front[i]*3;
       this.image.data.set([pal[p],pal[p+1],pal[p+2],255],i*4);
+    }
+    if(this.cursor) {
+      const name='CURSOR/arrow', sprite=this.data.sprites[name], pixels=this.pixels[name];
+      if(!sprite||!pixels) throw new Error(`Missing sprite: ${name}`);
+      const {x,y}=this.cursor;
+      // FILE 0x2238f, hotspot (0,0); index zero is transparent. Clipping is
+      // a browser adaptation. Never draw into the indexed scene or its snapshots.
+      if(Number.isInteger(x)&&Number.isInteger(y)) {
+        const left=Math.max(0,x), top=Math.max(0,y);
+        const right=Math.min(320,x+sprite.width), bottom=Math.min(200,y+sprite.height);
+        for(let py=top;py<bottom;py++)for(let px=left;px<right;px++) {
+          const value=pixels[(py-y)*sprite.width+px-x];
+          if(value) {
+            const p=value*3;
+            this.image.data.set([pal[p],pal[p+1],pal[p+2],255],(py*320+px)*4);
+          }
+        }
+      }
     }
     this.ctx.putImageData(this.image,0,0);
   }

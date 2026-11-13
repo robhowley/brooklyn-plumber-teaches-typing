@@ -28,7 +28,8 @@ export function menuWelcomeHit(front,x,y) {
   for(let dx=-3;dx<4;dx++) for(let dy=-3;dy<4;dy++) if(menuPixel(front,s16(x+dx),s16(y+dy))===88) return true;
   return false;
 }
-export function createMenu({options=0}={}) { return {column:1,row:0,options,pointer:{x:308,y:94}}; }
+// MARIO.EXE FILE 0x10d9f..0x10dc4, guest position then profile override.
+export function createMenu({options=0,profilePresent=false}={}) { return {column:1,row:0,options,pointer:profilePresent?{x:267,y:175}:{x:160,y:100}}; }
 
 // One pump iteration. A pending key wins over pointer input (0x10e1c..0x10e46).
 // pointer is a source press edge, not hover; caller maps browser coordinates explicitly.
@@ -169,7 +170,7 @@ export function studentUIInput(state,{key=0,pointer=null,messages={}}={},names={
         const name=f.text.split('.')[0];
         const collision=Object.keys(names).find(n=>n.toUpperCase()===name.toUpperCase());
         s.bytes=collision?normalizeLoaded(names[collision]):newStudent(name);
-        prefsDisplay(s.bytes);s.kind='edit';effects.push({type:collision?'loaded-student':'created-student',name});
+        prefsDisplay(s.bytes);s.kind='edit';s.pointer={x:292,y:186};effects.push({type:collision?'loaded-student':'created-student',name});
       } else if(f.text!==readStudent(s.bytes).name) {
         // 0xf3d8..0xf420: Escape is the ONLY cancellation. No collision prompt.
         if(readStudent(s.bytes).profilePresent) effects.push({type:'delete-student',name:readStudent(s.bytes).name});

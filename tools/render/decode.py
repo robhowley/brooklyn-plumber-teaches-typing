@@ -2,7 +2,7 @@
 import sys as _sys
 from pathlib import Path as _Path
 _sys.path.insert(0, str(_Path(__file__).resolve().parents[1]))
-from source import archive_path, objdump
+from source import archive_path, objdump, EXE_MEMBER, EXE_SHA256
 
 import hashlib, json, pathlib, struct, zipfile
 ROOT = pathlib.Path(__file__).resolve().parents[2]
@@ -177,6 +177,12 @@ def main():
             record.update(family='WATER_INLINE',index=i,name=['small','large'][i],fileOffset=hex(offset),
                           indicesPath=f'water/bubble-{i}.indices',indicesSha256=hashlib.sha256(pixels).hexdigest())
             records.append((record,pixels))
+        # Inline software arrow, not a GSK resource. FILE ranges include the header.
+        record,pixels=decode_raster(exe,0x2238f,0x2243f)
+        record.update(family='CURSOR',name='arrow',index=0,member=EXE_MEMBER,memberSha256=EXE_SHA256,
+                      fileOffset='0x2238f',endExclusive='0x2243f',
+                      indicesPath='cursor/arrow.indices',indicesSha256=hashlib.sha256(pixels).hexdigest())
+        records.append((record,pixels))
         for record,pixels in records+scenes:
             path=out/record['indicesPath']; path.parent.mkdir(parents=True,exist_ok=True)
             path.write_bytes(pixels)

@@ -85,7 +85,7 @@ test('new and reloaded students can select every activity at the default goal',a
   for(const [index,screen] of ['outdoor','water','castle','practice'].entries()) {
    await page.clock.runFor(300);
    const bounds=await game.boundingBox(),x=bounds.x+250*bounds.width/320,y=bounds.y+(20+index*31)*bounds.height/200;
-   await page.mouse.move(x,y);await expect(game).toHaveCSS('cursor','pointer');
+   await page.mouse.move(x,y);await expect.poll(async()=> (await snapshot(page)).cursor.visible).toBe(true);await expect(game).toHaveCSS('cursor','none');
    if(reloaded)await page.mouse.click(x,y);else await game.press(String(index+1));
    await page.clock.runFor(300);await expect(game).toHaveAttribute('data-screen',screen);
    expect((await snapshot(page)).profile).toMatchObject({name:'OPEN',goal:5,lesson:1,character:1,completed:[0,0,0],durations:[2,5,5,10]});

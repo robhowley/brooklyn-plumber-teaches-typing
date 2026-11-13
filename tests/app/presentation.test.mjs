@@ -27,6 +27,20 @@ test('student composition binds source text-grid origins, PREFS palette and actu
  r.studentUI(createStudentUI(s.bytes,'new'));assert.deepEqual(r.operations.map(o=>[o.x,o.y]),[[56,110]]);
  r.studentUI(createStudentUI(s.bytes,'times'));assert.deepEqual(r.operations.filter(o=>o.x===190).map(o=>o.y),[70,90,110,130]);
 });
+test('hydrated cursor presentation leaves control snapshots and caret drawing unchanged',async()=>{
+ const r=await renderer(),s=createStudentUI(newStudent('ADA'));
+ r.studentUI(s);const snapshot=r.front.slice(),clean=r.image.data.slice();
+ r.setCursor({x:66,y:130});r.present();
+ assert.deepEqual(r.front,snapshot);
+ assert.notDeepEqual(r.image.data,clean);
+ r.front.set(snapshot);r.setCursor(null);r.present();
+ assert.deepEqual(r.image.data,clean);
+ const field=createStudentUI(s.bytes,'new');
+ r.studentUI(field,true);const caret=r.front.slice(),caretImage=r.image.data.slice();
+ r.setCursor({x:192,y:110});r.studentUI(field,true);
+ assert.deepEqual(r.front,caret);
+ r.setCursor(null);r.present();assert.deepEqual(r.image.data,caretImage);
+});
 test('missing required control font or background fails visibly instead of substituting art',async()=>{
  const r=await renderer();delete r.backgrounds.HELP;
  assert.throws(()=>r.modal({kind:'help'},newStudent('ADA')),/Missing control screen HELP/);
