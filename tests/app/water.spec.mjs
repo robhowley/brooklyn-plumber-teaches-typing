@@ -1,14 +1,33 @@
 import {test,expect} from '@playwright/test';
 import {skipStartupUI,finishCelebrationUI,createStudentUI} from './source-path.mjs';
 const snap=page=>page.evaluate(()=>translationSnapshot());
-async function ready(page,character=1,lesson=1,goal=10) {
- await page.clock.install();await page.addInitScript(()=>{window.__sourceTestClock=true;});await page.goto('./?seed=1');await skipStartupUI(page);await expect(page.locator('#game')).toHaveAttribute('data-screen','menu');
+async function ready(page,character=1,lesson=1,goal=10,{paused=false}={}) {
+ await page.clock.install();
+ if(paused)await page.clock.pauseAt(new Date(await page.evaluate(()=>Date.now()+1000)));
+ await page.addInitScript(()=>{window.__sourceTestClock=true;});await page.goto('./?seed=1');await skipStartupUI(page);await expect(page.locator('#game')).toHaveAttribute('data-screen','menu');
  await createStudentUI(page,{name:'SWIMMER',character,goal,lesson,durations:[undefined,1]});await page.locator('#game').press('2');
  await expect(page.locator('#game')).toHaveAttribute('data-screen','water');
 }
 async function burst(page,codes) {await page.evaluate(codes=>{
  const canvas=document.querySelector('#game');for(const code of codes)canvas.dispatchEvent(new KeyboardEvent('keydown',{key:String.fromCharCode(code),bubbles:true}));
-},codes);await page.clock.runFor(60);}
+},codes);await page.clock.runFor(60);
+ // A host callback can resample the same BIOS tick. Wait for source dispatch
+ // before the caller reads stats or targets; bonus movies retain input until exit.
+ const s=await snap(page);
+ if(s.inputPending&&!s.water.movie) {
+  await page.clock.runFor(60);expect((await snap(page)).inputPending).toBe(false);
+ }
+}
+test('Water burst drains input after a callback samples the same BIOS tick',async({page})=>{
+ await ready(page,1,1,10,{paused:true});
+ // Rephase the host interval at 5000 ms. Its next two callbacks both sample
+ // BIOS tick 92 (5054.945... and 5109.890... ms, floored after conversion).
+ await page.clock.fastForward(5000-await page.evaluate(()=>performance.now()));
+ await page.clock.runFor(80);
+ const s=await snap(page);expect(s.water.phase).toBe('wait');expect(s.inputPending).toBe(false);
+ await burst(page,[s.water.window[10]^32]);
+ const after=await snap(page);expect(after.inputPending).toBe(false);expect(after.water.stats.errors).toBe(1);
+});
 for(const character of [1,2,3]) test(`Water character${character}: real canvas, case, queued burst, bonus, F10, Next and persistence`,async({page})=>{
  const errors=[],bad=[];page.on('pageerror',e=>errors.push(e.message));page.on('response',r=>{if(r.status()>=400)bad.push(r.url());});
  await ready(page,character);let s=await snap(page);expect(s.limit).toBe(60);expect(s.profile.durations[1]).toBe(1);
@@ -54,9 +73,6 @@ test('Water normal timeout advances once, Next retains group; Castle is selectab
  // ignored but resets inactivity, avoiding failure while the real clock runs.
  for(let i=0;i<8;i++) {
   await burst(page,s.water.window.slice(10,18));s=await snap(page);
-  // A host callback can sample the same BIOS tick and leave the burst queued.
-  // Drain it before reading targets, otherwise the next burst repeats stale bytes.
-  if(s.inputPending) {await page.clock.runFor(60);s=await snap(page);}
   expect(s.inputPending).toBe(false);expect(s.water.stats.correct).toBe((i+1)*8);expect(s.water.stats.errors).toBe(0);
  }
  for(let i=0;i<4;i++){await page.clock.runFor(15000);await page.locator('#game').press('Tab');await page.clock.runFor(60);}
