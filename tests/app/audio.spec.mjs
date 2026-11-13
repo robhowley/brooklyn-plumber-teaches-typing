@@ -125,9 +125,12 @@ test('denied speech is acknowledged, later unlock never replays historical welco
  await page.waitForTimeout(150);expect(await page.evaluate(()=>pcmStarts.length)).toBe(0);
 });
 test('disabled Alt-X is consumed in fields, chooser, Help, results and all four worlds including Demo',async({page})=>{
- test.setTimeout(45000);await page.goto('./?seed=1');await skipStartupUI(page);
+ test.setTimeout(45000);await page.clock.install();await page.goto('./?seed=1');await skipStartupUI(page);
+ // Compare input effects without advancing the independently blinking caret.
+ await page.clock.pauseAt(new Date(await page.evaluate(()=>Date.now()+1000)));
  await page.locator('#game').press('w');const field=(await snap(page)).studentUI;
  await page.locator('#game').press('Alt+x');expect((await snap(page)).studentUI).toEqual(field);
+ await page.clock.resume();
  await page.locator('#game').press('Escape');await page.locator('#game').press('Escape');
  await page.locator('#game').press('l');await page.locator('#game').press('Alt+x');expect((await snap(page)).screen).toBe('load');
  await page.locator('#game').press('Escape');

@@ -67,6 +67,13 @@ test('Water inactivity resets on wrong/ignored input, strict >20 chases then sin
  await page.clock.runFor(15000);let s=await snap(page);expect(s.screen).toBe('results');expect(s.profile.lesson).toBe(1);
  await page.locator('#game').press('n');s=await snap(page);expect(s.screen).toBe('water');expect(s.water.failed).toBe(false);
 });
+async function waitForScreen(page,screen) {
+ // Source waits need changed LOW ticks, not a fixed amount of host time.
+ for(let i=0;i<20&&(await snap(page)).screen!==screen;i++)await page.clock.runFor(60);
+ expect((await snap(page)).screen).toBe(screen);
+ // Screen entry can precede the native audio acknowledgement.
+ await page.waitForFunction(()=>!translationSnapshot().audioHost.blocking);
+}
 test('Water normal timeout advances once, Next retains group; Castle is selectable below goal 30',async({page})=>{
  await ready(page);let s=await snap(page);
  // At least60 net correct in one minute reaches goal10. Remaining input is
@@ -78,9 +85,9 @@ test('Water normal timeout advances once, Next retains group; Castle is selectab
  for(let i=0;i<4;i++){await page.clock.runFor(15000);await page.locator('#game').press('Tab');await page.clock.runFor(60);}
  s=await snap(page);expect(s.water.stats.wpm).toBeGreaterThanOrEqual(s.profile.goal);expect(s.screen).toBe('celebration');
  await page.locator('#game').press('Escape');await page.clock.runFor(120);expect((await snap(page)).screen).toBe('celebration');
- await finishCelebrationUI(page);s=await snap(page);
+ await finishCelebrationUI(page);await waitForScreen(page,'results');s=await snap(page);
  expect(s.screen).toBe('results');expect(s.water.timedOut).toBe(true);expect(s.water.failed).toBe(false);expect(s.profile.lesson).toBe(2);
- await page.locator('#game').press('n');expect((await snap(page)).profile.lesson).toBe(2);expect((await snap(page)).screen).toBe('water');
- await page.locator('#game').press('Escape');await page.clock.runFor(120);await page.locator('#game').press('m');
- await page.clock.runFor(300);await page.locator('#game').press('3');await page.clock.runFor(300);expect((await snap(page)).screen).toBe('castle');expect((await snap(page)).profile.goal).toBeLessThan(30);
+ await page.locator('#game').press('n');await waitForScreen(page,'water');expect((await snap(page)).profile.lesson).toBe(2);
+ await page.locator('#game').press('Escape');await waitForScreen(page,'results');await page.locator('#game').press('m');
+ await waitForScreen(page,'menu');await page.locator('#game').press('3');await waitForScreen(page,'castle');expect((await snap(page)).profile.goal).toBeLessThan(30);
 });

@@ -6,6 +6,12 @@ async function ready(page,char=1,minutes=60,lesson=1) {
  await createStudentUI(page,{name:'CLIMBER',character:char,goal:30,lesson,durations:[undefined,undefined,minutes]});await page.locator('#game').press('3');
  await expect(page.locator('#game')).toHaveAttribute('data-screen','castle');
 }
+async function exitToResults(page) {
+ await page.locator('#game').press('Escape');let s=await snap(page);
+ // A repeated source low tick can delay input consumption and generator completion.
+ for(let i=0;i<6&&s.screen!=='results';i++) {await page.clock.runFor(60);s=await snap(page);}
+ expect(s.screen).toBe('results');return s;
+}
 async function key(page,code) {
  if(code)await page.evaluate(code=>document.querySelector('#game').dispatchEvent(new KeyboardEvent('keydown',{key:String.fromCharCode(code),bubbles:true})),code);
  await page.clock.runFor(56);
@@ -38,15 +44,15 @@ for(const char of [1,2,3])test(`Castle character${char}: actual source-key two-c
  expect(result.seenBonus).toBe(true);expect(s.castle.stats.correct).toBeGreaterThan(100);expect(s.castle.stats.errors).toBe(0);
  expect(s.castle.flags).toEqual({failed:false,timeout:false,exit:false});
  await page.screenshot({path:`reports/browser/castle-repeat-${char}.png`});
- await page.locator('#game').press('Escape');await page.clock.runFor(120);s=await snap(page);
+ s=await exitToResults(page);
  expect(s.screen).toBe('results');expect(s.castle.flags.exit).toBe(true);expect(s.profile.lesson).toBe(1);
  await page.locator('#game').press('n');s=await snap(page);expect(s.screen).toBe('castle');expect(s.castle.stats.attempts).toBe(0);
- expect(s.profile.character).toBe(char);await page.clock.runFor(120);await page.waitForFunction(()=>!translationSnapshot().audioHost.blocking);await page.locator('#game').press('Escape');await page.clock.runFor(120);
+ expect(s.profile.character).toBe(char);await page.clock.runFor(120);await page.waitForFunction(()=>!translationSnapshot().audioHost.blocking);await exitToResults(page);
  await page.locator('#game').press('m');
  for(const mode of ['1','2','3','4','3']) {
   await page.clock.runFor(300);await page.locator('#game').press(mode);await page.clock.runFor(300);
   expect((await snap(page)).screen).toBe(({1:'outdoor',2:'water',3:'castle',4:'practice'})[mode]);
-  await page.locator('#game').press('Escape');await page.clock.runFor(180);
+  await exitToResults(page);
   expect((await snap(page)).screen).toBe('results');await page.locator('#game').press('m');
  }
  expect(errors).toEqual([]);expect(requests).toEqual([]);
