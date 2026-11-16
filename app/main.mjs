@@ -48,6 +48,9 @@ renderer=new Renderer(canvas,data); await renderer.load();
 // Source citations below refer to MarioTea/MARIO/MARIO.EXE, SHA256
 // 6caed439b64dc3bad8de4f9df53b63ae5712bf3c54b0bbfc00603557e4720f5e.
 let pointer={x:160,y:100}, leftPressed=false, pendingKey=0, pendingMenuPointer=null, selection=0, editorReturn='menu', editorReset=false;
+// Practice polls/reads repeatedly (FILE 0xb6ff..0xb710, 0xb7e6..0xb7ee).
+// Browser policy: 64 normalized events, drop newest. Not a recovered DOS capacity.
+const practiceKeys=[];
 let menu=createMenu({options:sourceAudio.options}), studentUI=null, chooser=null, modal=null, savedModal=null;
 // Browser policy: retain logical position on leave/blur, hide until re-entry/focus.
 // Keyboard positioning never warps the OS pointer; touch uses the same mapped press.
@@ -92,7 +95,7 @@ function draw() {
     else if(e.type==='set-result-suppression')session.student[47]=Number(e.value);
     else if(e.type==='result-pointer')setPointer({x:e.x,y:e.y});
     else if(e.type==='save-profile')save();
-    else if(e.type==='host-clock-reset') {pendingKey=0;session.lastWaitTick=now()&65535;}
+    else if(e.type==='host-clock-reset') {pendingKey=0;practiceKeys.length=0;session.lastWaitTick=now()&65535;}
   }
   syncCursor();
   const presentation=session.takePresentationEffects();
@@ -115,7 +118,7 @@ function draw() {
   canvas.dataset.screen=session.screen; canvas.dataset.suspended=String(session.suspended);
   canvas.dataset.audioBlocking=String(!!session.audioPending);
 }
-function flush() { pendingKey=0;pendingMenuPointer=null;session.input.flush(); }
+function flush() { pendingKey=0;practiceKeys.length=0;pendingMenuPointer=null;session.input.flush(); }
 function focusGame() {
   if(stopped)return;browserFocused=true;canvas.focus();session.suspend(false,now());flush();
   if(session.screen==='menu'&&session.menuIdle&&!session.menuIdle.state.waiting)session.menuIdle.restartPump(now());
@@ -244,7 +247,11 @@ canvas.addEventListener('keydown',event=>{
   else if(studentUI)studentEvent({key});
   else if(chooser)chooserEvent({key,pointer:leftPressed?pointer:null});
   else if(session.screen==='startup'||session.screen==='celebration') {if(!session.suspended)session.enqueue(key);}
-  else if(session.active) {if(!session.suspended&&([2,3].includes(session.mode)||session.demo))session.enqueue(key);else if(!session.suspended&&!session.cinematic&&!pendingKey)pendingKey=key;}
+  else if(session.active) {
+    if(!session.suspended&&([2,3].includes(session.mode)||session.demo))session.enqueue(key);
+    else if(!session.suspended&&session.mode===4) {if(practiceKeys.length<64)practiceKeys.push(key);}
+    else if(!session.suspended&&!session.cinematic&&!pendingKey)pendingKey=key;
+  }
   else if(session.screen==='menu') {session.enqueue(key);pumpMenu();}
   else if(session.screen==='results')resultsAction(resultCommand(key,pointer.x,pointer.y));
 });
@@ -300,7 +307,13 @@ setInterval(()=>{
   if((!session.active&&!['startup','celebration'].includes(session.screen))||session.suspended)return;
   const key=pendingKey;pendingKey=0;
   try {
-    session.step(key,now());
+    if(session.screen==='practice'&&!session.demo) {
+      const ticks=now(), seconds=Math.floor(Date.now()/1000);
+      // One host sample per batch; an empty queue still refreshes the timer.
+      do {session.step(practiceKeys.shift()??0,ticks,seconds);}
+      while(practiceKeys.length&&session.screen==='practice'&&!session.suspended&&!session.audioPending);
+      if(session.screen!=='practice'||session.suspended||session.audioPending)practiceKeys.length=0;
+    } else session.step(key,now());
   } catch(error) {session.suspend(true,now());stop(error);return;}
   if(session.screen==='results') {save();selection=0;}
   draw();

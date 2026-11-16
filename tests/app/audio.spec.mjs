@@ -71,6 +71,102 @@ for(const outcome of ['ended','denied','blur','suspended'])test(`first menu gest
  expect(errors).toEqual([]);
 });
 
+test('audio completion clears queued Practice input at the browser boundary (adapter)',async({page})=>{
+ await page.clock.install();await page.addInitScript(()=>{window.__sourceTestClock=true;});
+ await open(page,{denied:true});await page.clock.pauseAt(new Date(await page.evaluate(()=>Date.now()+1000)));
+ // Practice emits no blocking speech. This browser-owned adapter exercises the
+ // defensive completion flush, not an original Practice speech path.
+ await page.evaluate(async()=>{
+  AudioContext.prototype.resume=function(){
+   const native=window.nativeResume.call(this);native.catch(()=>{});
+   return new Promise((resolve,reject)=>{window.denyPracticeUnlock=()=>reject(new Error('test denied'));});
+  };
+  const {Session}=await import(new URL('app/session.mjs',location.href)),step=Session.prototype.step;
+  Session.prototype.step=function(...args){
+   Session.prototype.step=step;
+   window.requestPracticeSpeech=()=>this.audio({type:'speech',name:'ready'});
+   return step.apply(this,args);
+  };
+ });
+ const game=page.locator('#game');await game.press('4');await page.clock.runFor(60);
+ const before=await snap(page),targets=before.practice.rows.slice(33,36).map(c=>String.fromCharCode(c));
+ await game.evaluate((game,keys)=>{
+  for(const key of keys)game.dispatchEvent(new KeyboardEvent('keydown',{key,bubbles:true}));
+  window.requestPracticeSpeech();
+ },targets);
+ let s=await snap(page);expect(s.audioHost.blocking).toBe(true);expect(s.suspended).toBe(false);
+ expect(s.practice).toMatchObject({index:0,attempts:0,correct:0});
+ await page.clock.runFor(600);s=await snap(page);
+ expect(s.ticks).toBe(before.ticks);expect(s.audioHost.blocking).toBe(true);
+ await page.evaluate(()=>window.denyPracticeUnlock());
+ await page.waitForFunction(()=>!translationSnapshot().audioHost.blocking);
+ expect((await snap(page)).audioHost.outcomes.at(-1)).toMatchObject({name:'ready',outcomes:[{status:'denied'}]});
+ // No blur, focus, navigation or interval drain can clear the queue before this completion.
+ await page.clock.runFor(60);s=await snap(page);
+ expect(s.screen).toBe('practice');expect(s.suspended).toBe(false);
+ expect(s.practice).toMatchObject({index:0,attempts:0,correct:0});
+ await game.press(targets[0]);await page.clock.runFor(60);
+ expect((await snap(page)).practice).toMatchObject({index:1,attempts:1,correct:1});
+});
+
+test('queued Practice input stays discarded through Ready speech and Demo host-clock reset',async({page})=>{
+ await page.clock.install();await page.addInitScript(()=>{window.__sourceTestClock=true;});
+ await open(page,{denied:true});await page.clock.pauseAt(new Date(await page.evaluate(()=>Date.now()+1000)));
+ const game=page.locator('#game');await game.press('4');
+ const targets=(await snap(page)).practice.rows.slice(33,36).map(c=>String.fromCharCode(c));
+ await game.evaluate((game,keys)=>{
+  for(const key of keys)game.dispatchEvent(new KeyboardEvent('keydown',{key,bubbles:true}));
+  game.blur();
+ },targets);
+ await game.focus();await page.clock.runFor(60);
+ expect((await snap(page)).practice).toMatchObject({index:0,attempts:0,correct:0});
+ // Practice emits effects only, and mode 4 suppresses result speech (FILE 0x165a9..0x16603).
+ // Blocking speech is reachable only after leaving Practice, here Outside Ready.
+ await game.evaluate((game,keys)=>{
+  for(const key of ['Escape',...keys])game.dispatchEvent(new KeyboardEvent('keydown',{key,bubbles:true}));
+ },targets);
+ await page.clock.runFor(60);expect((await snap(page)).screen).toBe('results');
+ await game.press('m');await page.clock.runFor(300);
+ await page.evaluate(()=>{
+  AudioContext.prototype.resume=function(){
+   const native=window.nativeResume.call(this);native.catch(()=>{});
+   return new Promise((resolve,reject)=>{window.finishPracticeUnlock=()=>native.then(resolve,reject);});
+  };
+ });
+ await game.press('1');const blocked=await snap(page);
+ expect(blocked.screen).toBe('outdoor');expect(blocked.audioHost.blocking).toBe(true);
+ expect(blocked.audio.at(-1).request.name).toBe('ready');
+ await game.evaluate(game=>{
+  for(const key of ['a','Escape','n','m','4'])game.dispatchEvent(new KeyboardEvent('keydown',{key,bubbles:true}));
+ });
+ await page.clock.runFor(600);expect((await snap(page)).ticks).toBe(blocked.ticks);
+ await game.evaluate(game=>game.blur());await page.waitForFunction(()=>!translationSnapshot().audioHost.blocking);
+ expect((await snap(page)).audioHost.outcomes.at(-1).outcomes[0].status).toBe('blur');
+ await page.evaluate(()=>window.finishPracticeUnlock());await game.focus();await page.clock.runFor(60);
+ expect((await snap(page)).outdoor.attempts).toBe(0);
+ expect(await page.evaluate(()=>pcmStarts.length)).toBe(0); // Late unlock never replays Ready.
+ await game.press('Escape');await page.clock.runFor(60);await game.press('m');await page.clock.runFor(300);
+ // Only Demo exit emits host-clock-reset. Demo Practice uses the shared FIFO,
+ // never the ordinary Practice queue. Exercise that reachable return path.
+ expect((await snap(page)).screen).toBe('menu');
+ await game.press('d');await page.clock.runFor(300);expect((await snap(page)).profile.demo).toBe(true);
+ // Selecting Demo itself requests Welcome. Settle that real speech by blur too.
+ expect((await snap(page)).audio.at(-1).request.name).toBe('welcome');
+ expect((await snap(page)).audioHost.blocking).toBe(true);
+ await game.evaluate(game=>game.blur());await page.waitForFunction(()=>!translationSnapshot().audioHost.blocking);
+ await game.focus();await game.press('4');await page.clock.runFor(180);
+ expect(await snap(page)).toMatchObject({screen:'practice',audioHost:{blocking:false},demo:{mode:4}});
+ await game.evaluate((game,keys)=>{
+  for(const key of ['Escape',...keys])game.dispatchEvent(new KeyboardEvent('keydown',{key,bubbles:true}));
+ },targets);
+ await page.clock.runFor(60);let s=await snap(page);
+ expect(s.screen).toBe('menu');expect(s.profile.demo).toBe(false);expect(s.inputPending).toBe(false);
+ await page.clock.runFor(300);await game.press('4');await page.clock.runFor(60);s=await snap(page);
+ expect(s.screen).toBe('practice');expect(s.practice).toMatchObject({index:0,attempts:0,correct:0});
+ await game.press(String.fromCharCode(s.practice.rows[33]));await page.clock.runFor(60);
+ expect((await snap(page)).practice).toMatchObject({index:1,attempts:1,correct:1});
+});
+
 test('native Chrome buffers contain every exact VOC sample and source requests wait for ended',async({page})=>{
  test.setTimeout(45000);await open(page);
  // Independent authored transport test, real trusted gesture and real Chrome nodes.
