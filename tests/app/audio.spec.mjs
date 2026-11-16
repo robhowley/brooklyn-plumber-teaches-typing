@@ -149,11 +149,11 @@ test('queued Practice input stays discarded through Ready speech and Demo host-c
  // Only Demo exit emits host-clock-reset. Demo Practice uses the shared FIFO,
  // never the ordinary Practice queue. Exercise that reachable return path.
  expect((await snap(page)).screen).toBe('menu');
+ const speechBeforeDemo=(await snap(page)).audio.filter(e=>e.request.type==='speech');
  await game.press('d');await page.clock.runFor(300);expect((await snap(page)).profile.demo).toBe(true);
- // Selecting Demo itself requests Welcome. Settle that real speech by blur too.
- expect((await snap(page)).audio.at(-1).request.name).toBe('welcome');
- expect((await snap(page)).audioHost.blocking).toBe(true);
- await game.evaluate(game=>game.blur());await page.waitForFunction(()=>!translationSnapshot().audioHost.blocking);
+ // Demo's menu bubble is silent; it must not block entry or add speech.
+ expect((await snap(page)).audio.filter(e=>e.request.type==='speech')).toEqual(speechBeforeDemo);
+ expect((await snap(page)).audioHost.blocking).toBe(false);
  await game.focus();await game.press('4');await page.clock.runFor(180);
  expect(await snap(page)).toMatchObject({screen:'practice',audioHost:{blocking:false},demo:{mode:4}});
  await game.evaluate((game,keys)=>{
