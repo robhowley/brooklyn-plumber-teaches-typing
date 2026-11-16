@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {Session,editStudent} from '../../app/session.mjs';
-import {newStudent} from '../../recovered/control/student.mjs';
+import {newStudent,studentForSave} from '../../recovered/control/student.mjs';
 import {skipStartup,finishCelebration} from './source-path.mjs';
 import {Renderer} from '../../app/render.mjs';
 const data=JSON.parse(readFileSync(new URL('../../app/data.json',import.meta.url)));
@@ -57,6 +57,35 @@ test('all3 characters finish all-world presentations before results, never on ab
     const abort=make({character,goal:45});abort.start(0,mode,100);
     for(let i=1;abort.active&&i<100;i++)abort.step(27,i,100);
     assert.equal(abort.screen,'results');assert.equal(abort.celebration,undefined);assert.equal(abort.advance.advanced,false);
+    assert.equal(abort.resultEffects.some(e=>e.type==='save-profile'),false);
+  }
+});
+test('celebration saves only after final progression, including all Castle ending modes',()=>{
+  for(const [mode,lesson,correct] of [[1,1,180],[2,1,180],[3,1,1],[3,6,1],[3,6,5]]) {
+    const s=make({goal:1,lesson,minutes:1,waterMinutes:1,castleMinutes:1});s.start(0,mode,100);
+    if(mode===1) {s.outdoor.correct=correct;s.outdoor.attempts=correct;s.step(0,1092,160);}
+    else if(mode===2) {s.water.stats.correct=correct;s.water.stats.attempts=correct;s.water.lastInput=160;s.step(0,1092,160);s.step(0,1093,160);}
+    else {s.step(0,1,100);s.castle.stats.correct=correct;s.castle.stats.attempts=correct;s.castle.stats.limitSeconds=1;s.step(9,20,101);s.step(0,21,101);}
+    assert.equal(s.screen,'celebration');
+    if(mode===3)assert.equal(s.celebration.endMode,lesson===1?1:correct===1?2:4);
+    for(let t=2000;t<2020;t++) {
+      s.step(0,t,160);assert.equal(s.screen,'celebration');
+      assert.equal(s.resultEffects.some(e=>e.type==='save-profile'),false);
+    }
+    finishCelebration(s);
+    const expected=Array.from(studentForSave(s.student));
+    const other=Array.from(newStudent('Bob')),profiles={current:'Bob',students:{Ada:Array.from(newStudent('Ada')),Bob:other}};
+    const writes=[];
+    for(const effect of s.resultEffects.splice(0))if(effect.type==='save-profile') {
+      assert.equal(s.screen,'results');assert.equal(s.profile.lesson,lesson===1?2:6);
+      if(mode===3&&correct===5)assert.equal(s.profile.completed[2],1);
+      s.save({setItem:(key,value)=>writes.push({key,value})},profiles);
+    }
+    assert.equal(writes.length,1);
+    assert.equal(writes[0].key,'mtt-static-translation.students.v1');
+    assert.deepEqual(JSON.parse(writes[0].value),{current:'Ada',students:{Ada:expected,Bob:other}});
+    s.stepPresentation(32,20000,true);
+    assert.equal(s.resultEffects.some(e=>e.type==='save-profile'),false);
   }
 });
 test('real indexed renderer applies59 startup palette writes, presentation texts and full clip restoration',async()=>{

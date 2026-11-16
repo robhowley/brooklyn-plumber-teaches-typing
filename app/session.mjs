@@ -148,6 +148,9 @@ export class Session {
       this.effects.push(...stepWater(this.water,{celebrationComplete:true}));this.completeWater();
     } else if(this.celebrationWorld===3)this.acknowledgeCastleEnding();
     else this.enterResults();
+    // MARIO.EXE FILE 0x13da8/0x17e8f/0xdadc: save after presentation returns
+    // and final student bytes are installed (Castle completed write at 0xdacb).
+    this.resultEffects.push({type:'save-profile'});
   }
   enterResults() {
     if(this.demo) {
