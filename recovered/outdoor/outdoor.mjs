@@ -64,7 +64,9 @@ export function makeObstacle(code, typeDraw, heightDraw = 0) {
   if (type !== 1 && type !== 2) throw new RangeError('Expected 15-bit RNG output');
   return { active: true, flag: 0, x: type === 1 ? 293 : 283,
     y: type === 1 ? BLOCK_HEIGHTS[Math.trunc(heightDraw / 32768)] : 123,
-    xOffset: type === 1 ? 0 : 30, code, countdown: 0, type, variant: 0 };
+    // FILE 0x12eb6..0x12ece stamps a private image; 0x13cdf..0x13cf9
+    // clears the input code only, not the stamped pixels.
+    xOffset: type === 1 ? 0 : 30, code, stampedCode: code, countdown: 0, type, variant: 0 };
 }
 
 const emptyObstacle = () => ({ active: false, code: 0 });
@@ -78,10 +80,11 @@ export function createOutdoor({ bytes, seed, character = 1, lessonIndex = 0, pre
   return { character, seed: seed >>> 0, stream: { bytes: lessonBytes(bytes), index: lessonIndex },
     obstacles: Array.from({ length: 10 }, emptyObstacle), particles: [],
     x: 20, y: 90, mode: 0, jumpIndex: 0, followX: 0,
-    cursorX: -1, cursorCounter: previous?.cursorCounter ?? 0, cursorFrame: 0, targetIndex: -1,
+    cursorX: -1, cursorCounter: previous?.cursorCounter ?? 0, cursorFrame: 0, targetIndex: -1, promptCode: 32,
     speed: 5, scroll: 1, groundPhase: previous?.groundPhase ?? 0,
     stillTicks: previous?.stillTicks ?? 0, idleTicks: previous?.idleTicks ?? 0,
-    distance: previous?.distance ?? 0, frame: { kind: 'idle', index: 0 },
+    // FILE 0x151a4..0x151bb decodes IDLE entry zero twice on every entry.
+    distance: previous?.distance ?? 0, frame: { kind: 'idle', index: 0 }, idleIndex: 0,
     fingerCode: null, // FILE 0x12bf8..0x12c05: neutral base on entry
     attempts: 0, correct: 0, errors: 0, aborted: false, ended: false };
 }
@@ -114,7 +117,6 @@ export function idleFrame(ticks, schedule, period) {
 
 // 0x135c9..0x13851. Schedule comes from tables.json, not invented timing.
 export function updatePlayer(s, idleSchedule, idlePeriod, audioBoundary = () => {}) {
-  const previousFrame = s.frame;
   const m = motion(s);
   Object.assign(s, { followX: m.followX, x: m.x, scroll: m.scroll });
   s.y = 90;
@@ -126,6 +128,7 @@ export function updatePlayer(s, idleSchedule, idlePeriod, audioBoundary = () => 
       if (!idleSchedule) throw new TypeError('Idle schedule required after four stationary updates');
       const idle = idleFrame(s.idleTicks, idleSchedule, idlePeriod);
       s.idleTicks = idle.ticks;
+      s.idleIndex = idle.index;
       s.frame = { kind: 'idle', index: idle.index };
     } else s.frame = { kind: 'run', index: Math.trunc(s.distance / 6) % 12 };
     s.distance = i16(s.distance + Math.abs(m.dx));
@@ -138,8 +141,9 @@ export function updatePlayer(s, idleSchedule, idlePeriod, audioBoundary = () => 
       s.jumpIndex = 0; s.y = 85; s.obstacles[0].flag = 1;
       s.mode = s.mode === 2 ? 3 : 0;
     }
-    // Mode 2 holds the previous image while finishing its Y sequence.
-    if (s.mode === 2) s.frame = previousFrame;
+    // FILE 0x137eb..0x137fb calls 0x15309..0x1532d: restore the last
+    // decoded IDLE, not the previous jump. Test AFTER the terminal mode change.
+    if (s.mode === 2) s.frame = { kind: 'idle', index: s.idleIndex };
   }
 }
 
@@ -272,6 +276,9 @@ export function tick(s, { key = 0, elapsed = 0, limit = 120, idleSchedule, idleP
   const events = updateObstacles(s, audioBoundary);
   updateParticles(s);
   selectTarget(s);
+  // FILE 0x139e0..0x13a48 draws target or space BEFORE timeout/input.
+  // A hit clears code later but cannot change this iteration's prompt.
+  s.promptCode = s.targetIndex < 0 ? 32 : s.obstacles[s.targetIndex].code;
   if ((elapsed | 0) >= (limit | 0)) requestEnd(s); // signed long compare, 0x13a8e..0x13aad
   else {
     // FILE 0x13aaa bypasses the 0x13aaf poll on timeout, including Demo RNG/key reads.

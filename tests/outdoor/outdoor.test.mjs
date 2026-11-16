@@ -155,6 +155,22 @@ test('tables and lowercase classification match copied executable bytes', () => 
   assert.equal(upperCode(0x161), 65);
 });
 
+test('imagery evidence pins idle restore, prompt coordinates and private-image input clearing', () => {
+  assert.equal(evidence.member, 'MarioTea/MARIO/MARIO.EXE');
+  assert.equal(evidence.memberSha256, '6caed439b64dc3bad8de4f9df53b63ae5712bf3c54b0bbfc00603557e4720f5e');
+  assert.equal(span(0x137eb, 16).toString('hex'), '833ef84f02750c9a490f5c118916f24f');
+  assert.equal(span(0x15309, 37).toString('hex'), '558bec39262f3477059aa42600008b1e034983e301b102d3e38b9708498b870649eb005dcb');
+  assert.equal(span(0x13a14, 22).toString('hex'), 'c706ab589b00c706a958af00c6060d2e0fc6060e2e00');
+  assert.equal(span(0x13cdf, 6).toString('hex'), '26c747180600');
+  assert.equal(span(0x13cf3, 6).toString('hex'), '26c747140000');
+  const idle = tables.resources.filter(r => r.member.endsWith('/IDLE.GCO'));
+  for (const [name, index] of [['mstd0001', 0], ['lstd0001', 47], ['pstd0001', 94]]) {
+    const r = idle.find(r => r.name.toLowerCase().startsWith(name));
+    assert.equal(r.index, index);
+    assert.equal(r.memberSha256, '76d661e591f6f7ad531a12e3fa7d07e88e7ffa14acf3153154cd8609add8c45f');
+  }
+});
+
 test('source opcodes preserve strict spacing, countdown and loop order', () => {
   assert.equal(span(0x13070, 5).toString('hex'), 'c746f8dc00');
   assert.equal(span(0x13cdf, 6).toString('hex'), '26c747180600');
@@ -232,6 +248,59 @@ test('spawn threshold is >220, removal is sixth update, one-slot shift', () => {
   const events = updateObstacles(s);
   assert.ok(events.some(e => e.id === 4)); assert.equal(s.particles.length, 4);
   assert.equal(s.obstacles[0].code, 65); // first lesson character was generated for second object
+});
+
+test('prompt snapshots the selected target before correct, wrong, ignored and timeout input', () => {
+  for (const key of [65, 66, 0, 27]) {
+    const s = state(); s.obstacles[0] = makeObstacle(65, 0);
+    tick(s, { ...options, pollInput() { assert.equal(s.promptCode, 65); return key; } });
+    assert.equal(s.promptCode, 65);
+    if (key === 65) {
+      assert.equal(s.obstacles[0].code, 0);
+      tick(s, options); assert.equal(s.promptCode, 32);
+    }
+  }
+  const s = state(); s.obstacles[0] = makeObstacle(66, 0);
+  tick(s, { ...options, elapsed: 120 }); assert.equal(s.promptCode, 66);
+});
+
+test('stamped obstacle code survives hit and five updates, turtle changes image next update', () => {
+  for (const draw of [0, 32767]) {
+    const s = state(), o = makeObstacle(65, draw); s.obstacles[0] = o;
+    s.scroll = 0; selectTarget(s); acceptKey(s, 65);
+    assert.equal(o.code, 0); assert.equal(o.stampedCode, 65); assert.equal(!!o.shell, false);
+    for (let n = 1; n <= 6; n++) {
+      updateObstacles(s);
+      assert.equal(o.active, n < 6); assert.equal(o.stampedCode, 65);
+      assert.equal(!!o.shell, draw !== 0);
+      assert.equal(o.countdown, 6 - n);
+    }
+  }
+});
+
+for (const character of [1, 2, 3]) test(`abort restores last decoded idle for character ${character}, resets on entry, keeps terminal jump`, () => {
+  const schedule = tables.tables[['marioIdle', 'luigiIdle', 'peachIdle'][character - 1]].values;
+  let s = createOutdoor({ bytes: Buffer.from('A'), seed: 1, character });
+  const abort = expected => {
+    s.mode = 1; s.jumpIndex = 0; updatePlayer(s, schedule, 90);
+    assert.deepEqual(s.frame, { kind: 'jump', index: 0 });
+    s.mode = 2;
+    for (let n = 1; n < 11; n++) {
+      updatePlayer(s, schedule, 90);
+      assert.deepEqual(s.frame, { kind: 'idle', index: expected });
+      assert.equal(s.y, 90 + JUMP_Y[n]);
+    }
+    updatePlayer(s, schedule, 90);
+    assert.deepEqual(s.frame, { kind: 'jump', index: 11 }); assert.equal(s.mode, 3); assert.equal(s.y, 85);
+  };
+  abort(0);
+  s.mode = 0; s.cursorX = -1; s.idleTicks = schedule[2] * 2; s.stillTicks = 10;
+  updatePlayer(s, schedule, 90); const later = s.frame.index; assert.ok(later > 0);
+  // Running decodes must not replace the separately retained IDLE image.
+  s.cursorX = 300; updatePlayer(s, schedule, 90); assert.equal(s.frame.kind, 'run');
+  abort(later);
+  s = createOutdoor({ bytes: Buffer.from('A'), seed: 1, character, previous: s });
+  abort(0);
 });
 
 test('debris gravity, scroll and inclusive clipping bounds', () => {

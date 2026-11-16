@@ -201,8 +201,9 @@ export class Renderer {
     for(const o of s.obstacles) if(o.active) {
       const block=o.type===1, x=o.x+(block?ox:o.xOffset), y=o.y+(block?oy:0);
       this.sprite(`OUTSIDE/${block?'brick1_1':o.shell?'turt1_2':'turt1_1'}`,x,y);
-      // FILE 0x1413d mapping; DS:4fc0 is FONT7H's glyph field+b (0x12643).
-      if(o.code) this.text(String.fromCharCode(o.code),x+(block?6:15),y+3,{font:'FONT7H'});
+      // FILE 0x1413d..0x14249 stamps OUTSIDE indices 0/2; the cleared
+      // input code does not erase it. FILE 0x13221..0x1323d selects shell1.
+      if(o.stampedCode&&!o.shell) this.text(String.fromCharCode(o.stampedCode),x+(block?6:15),y+3,{font:'FONT7H'});
     }
     for(const p of s.particles) this.sprite('OUTSIDE/expls1_1',p.x,p.y);
     if(s.targetIndex>=0) {
@@ -217,6 +218,15 @@ export class Renderer {
     // pre-input guidance, never read the code that correct input just cleared.
     this.fingers(1,this.backgrounds.OUTSIDE);
     if(s.fingerCode!==null)this.fingers(1,this.backgrounds.OUTSIDE,s.fingerCode);
+    // MARIO.EXE FILE 0x139e0..0x13a48, FONT7H index code-32, (175,155),
+    // foreground15/shadow0. FILE 0x1a80a..0x1a860 and 0x9edf..0x9f36
+    // restore background for zero samples, including the all-zero space glyph.
+    // MarioTea/MARIO/FONT7H.GSO SHA256
+    // b2287d630e98c5fa4547eeac92355715be660ab5a06281d343eb0a95ce668918;
+    // OUTSIDE.GSO 180f1ac87f11814ebc5f53898556fb8df79dda0546c0963e361eb7e39e4294a6;
+    // IDLE.GCO 76d661e591f6f7ad531a12e3fa7d07e88e7ffa14acf3153154cd8609add8c45f.
+    drawSourceText(this.front,{FONT7H:this.font7},[{text:String.fromCharCode(s.promptCode),
+      x:175,y:155,font:'FONT7H',color:15,shadow:0,background:0,opaque:false}],this.backgrounds.OUTSIDE);
     this.operations=drawNumericHUD(this.front,this.fonts,1,{...s,...stats},this.data.messages);
     this.present();
   }
