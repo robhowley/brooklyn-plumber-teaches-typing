@@ -22,6 +22,15 @@ async function pixels(page,mode,code=null) {
    const right=index>=6;if(right)index--;
    stamp(index,x+(right?gap:0)+tables.x[index],y+tables.y[index]);
   }
+  // FILE 0x139dc..0x13a48: prompt follows hands and restores its zero samples.
+  if(mode===1) {
+   const glyph=data.sprites[`FONT7H/font7_${s.outdoor.promptCode}`];
+   const raw=Uint8Array.from(atob(glyph.pixels),c=>c.charCodeAt(0));
+   raw.forEach((v,i)=>{
+    const p=(155+Math.floor(i/glyph.width))*320+175+i%glyph.width;
+    expected[p]=v===1?15:v===2?0:bg[p];
+   });
+  }
   const actual=document.querySelector('#game').getContext('2d').getImageData(0,0,320,200).data,palette=data.palettes[s.palette];
   let compared=0,nonBackground=0,mismatches=0;
   for(const dx of [x,x+gap])for(let j=0;j<41;j++)for(let i=0;i<39;i++) {

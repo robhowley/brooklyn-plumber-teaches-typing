@@ -25,7 +25,7 @@ function paint(r,s) {
  else if(s.mode===2)r.water(s.takeEffects(),s.water);
  else r.castle(s.takeEffects(),s.castle);
 }
-function pixels(r,mode,code=null) {
+function pixels(r,mode,code=null,promptCode=32) {
  const [x,y,gap]=[[90,158,90],[100,3,70],[100,158,70],[30,45,230]][mode-1];
  const bg=mode===1?r.backgrounds.OUTSIDE:mode===2?r.backgrounds.WATER:mode===3?r.castleBackground:r.backgrounds.PRACTICE;
  const expected=bg.slice();
@@ -39,6 +39,15 @@ function pixels(r,mode,code=null) {
   let index=exe[0x2258c+code-32];if(index>=40)index-=40;
   const right=index>=6;if(right)index--;
   stamp(index,x+(right?gap:0)+exe.readInt16LE(0x21df6+index*2),y+exe.readInt16LE(0x21e0a+index*2));
+ }
+ // FILE 0x139dc..0x13a48: the stationary prompt follows hand guidance.
+ // Its zero samples restore scene pixels, including the overlapping right hand.
+ if(mode===1) {
+  const glyph=data.sprites[`FONT7H/font7_${promptCode}`],raw=r.pixels[`FONT7H/font7_${promptCode}`];
+  raw.forEach((v,i)=>{
+   const p=(155+Math.floor(i/glyph.width))*320+175+i%glyph.width;
+   expected[p]=v===1?15:v===2?0:bg[p];
+  });
  }
  const palette=data.palettes[r.palette];let compared=0;
  for(const dx of [x,x+gap])for(let j=0;j<41;j++)for(let i=0;i<38;i++) {
@@ -62,21 +71,23 @@ test('Practice base, exact target, wrong/repeated/ignored keys, controls and ree
 });
 
 test('Outside snapshots guidance before correct input, retains wrong/repeated targets, clears and resets on bonus/reentry',async()=>{
- const r=await renderer(),s=session(1);paint(r,s);pixels(r,1);
+ const r=await renderer(),s=session(1);
+ const check=(code=null)=>pixels(r,1,code,s.outdoor.promptCode);
+ paint(r,s);check();
  s.outdoor.obstacles[0]={...makeObstacle(65,0),x:210};
  s.outdoor.obstacles[1]={...makeObstacle(65,0),x:293};
- s.step(65,1,100);assert.equal(s.outdoor.obstacles[0].code,0);paint(r,s);pixels(r,1,65);
- s.step(0,2,100);assert.equal(s.outdoor.fingerCode,65);paint(r,s);pixels(r,1,65);
- s.outdoor.obstacles[1].code=66;selectTarget(s.outdoor);paint(r,s);pixels(r,1,66);
- for(const key of [9,90,0]) {s.step(key,++s.sampleTicks,100);paint(r,s);pixels(r,1,s.outdoor.fingerCode);}
+ s.step(65,1,100);assert.equal(s.outdoor.obstacles[0].code,0);paint(r,s);check(65);
+ s.step(0,2,100);assert.equal(s.outdoor.fingerCode,65);paint(r,s);check(65);
+ s.outdoor.obstacles[1].code=66;selectTarget(s.outdoor);paint(r,s);check(66);
+ for(const key of [9,90,0]) {s.step(key,++s.sampleTicks,100);paint(r,s);check(s.outdoor.fingerCode);}
  // Direct selection owns the pre-input snapshot even when no target exists.
- s.outdoor.obstacles.forEach(o=>o.active=false);selectTarget(s.outdoor);paint(r,s);pixels(r,1);
+ s.outdoor.obstacles.forEach(o=>o.active=false);selectTarget(s.outdoor);paint(r,s);check();
  s.outdoor.obstacles[0]={...makeObstacle(65,0),x:260};
  s.bonus.mode=2;s.bonus.code=33;s.bonus.countdown=30;s.step(33,10,100);
  for(let t=12;s.cinematic&&t<500;t+=2)s.step(0,t,101);
- assert.equal(s.cinematic,null);paint(r,s);pixels(r,1);
- s.step(0,501,101);paint(r,s);pixels(r,1,s.outdoor.fingerCode);
- s.start(502,1,101);paint(r,s);pixels(r,1);
+ assert.equal(s.cinematic,null);paint(r,s);check();
+ s.step(0,501,101);paint(r,s);check(s.outdoor.fingerCode);
+ s.start(502,1,101);paint(r,s);check();
 });
 
 test('Water consumes source prompt order, wrong/ignored keys retain pixels, bonus returns neutral until next shift',async()=>{
@@ -113,6 +124,6 @@ test('Demo renders source-selected guidance in all four activities',async()=>{
   const s=session(mode,1,true);paint(r,s);
   for(let t=1;t<20;t++){s.step(0,t,100);paint(r,s);}
   const code=mode===1?s.outdoor.fingerCode:mode===2?s.water.lastPrompt:mode===3?s.castle.lastFinger:s.practice.rows[33+s.practice.index];
-  pixels(r,mode,code);
+  pixels(r,mode,code,s.outdoor?.promptCode);
  }
 });

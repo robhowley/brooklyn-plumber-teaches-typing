@@ -1,10 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import { createHash } from 'node:crypto';
 import { Session, editStudent, loadProfiles } from '../../app/session.mjs';
 import { newStudent } from '../../recovered/control/student.mjs';
 import { lessonPrefix, loadCorpus, selectCorpusSegment, initializeBonus, outdoorBonusDelay, seedFromTime, createPractice } from '../../recovered/runtime/runtime.mjs';
-import { tick } from '../../recovered/outdoor/outdoor.mjs';
+import { tick, createOutdoor, makeObstacle, selectTarget, acceptKey, updateObstacles, updatePlayer } from '../../recovered/outdoor/outdoor.mjs';
 import { Renderer } from '../../app/render.mjs';
 import { spriteRect, characterFrame } from '../../recovered/render/render.mjs';
 const data=JSON.parse(fs.readFileSync(new URL('../../app/data.json',import.meta.url)));
@@ -206,7 +207,7 @@ test('renderer uses exact indexed palettes, origin, masks, ground, idle and deco
   assert.equal(r.front[(98+y)*320+23+x],r.pixels['IDLE/mstd0001_1'][pixel]);
   assert.equal(r.front[140*320+21],r.ground[1]);
   // FILE0x1413d..0x14259: brick glyph at +6,+3, FONT7H slot(code-32), map0/15/31.
-  s.outdoor.obstacles[0]={active:true,type:1,x:200,y:90,code:65};
+  s.outdoor.obstacles[0]={...makeObstacle(65,0),x:200,y:90};
   r.outdoor(s.outdoor,s.stats(),s.bonus);
   const glyph=data.sprites['FONT7H/font7_65'], mask=r.pixels['FONT7H/font7_65'];
   assert.equal(glyph.index,65-32);
@@ -217,5 +218,96 @@ test('renderer uses exact indexed palettes, origin, masks, ground, idle and deco
   // Nonzero font-mask pixels must be able to write palette index zero (black).
   assert.ok(r.front.subarray(106*320+30,114*320).some(v=>v===0));
   assert.throws(()=>r.sprite('missing',0,0),/Missing sprite/);
+ } finally {globalThis.fetch=oldFetch;}
+});
+
+// Source identities and decoded resource indices are checked in the generated
+// assets/render/manifest.json and analysis/outdoor/{evidence,tables}.json.
+// These compare translation pixels, not the appearance of original hardware.
+test('Outside imagery matches decoded glyphs and actors through their source lifetimes', async t => {
+ const canvas={getContext:()=>({createImageData:()=>({data:new Uint8ClampedArray(64000*4)}),putImageData(){}})};
+ const oldFetch=globalThis.fetch;
+ globalThis.fetch=async path=>({ok:true,arrayBuffer:async()=>{
+  const file=fs.readFileSync(new URL('../../'+path.slice(2),import.meta.url));return file.buffer.slice(file.byteOffset,file.byteOffset+file.byteLength);
+ }});
+ try {
+  const r=new Renderer(canvas,data);await r.load();
+  const glyph=data.sprites['FONT7H/font7_65'];
+  assert.equal(glyph.member,'MarioTea/MARIO/FONT7H.GSO');
+  assert.equal(glyph.memberSha256,'b2287d630e98c5fa4547eeac92355715be660ab5a06281d343eb0a95ce668918');
+  assert.equal(glyph.indexSha256,'d011ba960556d56b29644a4cda97496513f5a4306e1fa105b94e552c5854bd6d');
+  assert.equal(glyph.index,33);assert.equal(glyph.offset,0xe50);
+  assert.equal(createHash('sha256').update(r.pixels['FONT7H/font7_65']).digest('hex'),'984502ef4a8ab7a561858d430587f1c8af93bac11874300fae31e38776b46454');
+  const fresh=character=>createOutdoor({bytes:Buffer.from('AB'),seed:1,character});
+  await t.test('stationary prompt uses pre-input code, foreground15/shadow0 and background for zero samples',()=>{
+   const s=fresh(1), schedule=data.idleSchedules.m;
+   s.obstacles[0]=makeObstacle(65,0);
+   const check=code=>{
+    r.outdoor(s,{},null);
+    const glyph=data.sprites[`FONT7H/font7_${code}`],raw=r.pixels[`FONT7H/font7_${code}`];
+    raw.forEach((v,i)=>{
+     const p=(155+Math.floor(i/glyph.width))*320+175+i%glyph.width;
+     assert.equal(r.front[p],v===1?15:v===2?0:r.backgrounds.OUTSIDE[p],`prompt code${code} sample${i}`);
+    });
+   };
+   tick(s,{key:65,idleSchedule:schedule.thresholds,idlePeriod:schedule.halfTickPeriod});
+   assert.equal(s.obstacles[0].code,0);check(65);
+   tick(s,{idleSchedule:schedule.thresholds,idlePeriod:schedule.halfTickPeriod});check(32);
+   // Change glyph before clearing again; no old samples may survive.
+   s.promptCode=66;check(66);s.promptCode=32;check(32);
+  });
+  await t.test('brick remains stamped through five updates, turtle hit then unlabeled shell',()=>{
+   for(const character of [1,2,3])for(const draw of [0,32767]) {
+    const s=fresh(character),o={...makeObstacle(65,draw),x:200};s.obstacles[0]=o;s.scroll=0;
+    selectTarget(s);acceptKey(s,65);
+    for(let n=0;n<=6;n++) {
+     r.outdoor(s,{},null);
+     assert.equal(o.active,n<6);
+     if(n<6) {
+      const block=o.type===1,x=o.x+(block?(character===3?36:0):30),y=o.y+(block&&character===3?30:0);
+      const name=`OUTSIDE/${block?'brick1_1':n?'turt1_2':'turt1_1'}`;
+      const sprite=data.sprites[name],raw=r.pixels[name];
+      const expected=Uint8Array.from(raw);
+      if(block||n===0) {
+       const glyph=data.sprites['FONT7H/font7_65'],mask=r.pixels['FONT7H/font7_65'];
+       mask.forEach((v,i)=>{if(v)expected[(3+Math.floor(i/glyph.width))*sprite.width+(block?6:15)+i%glyph.width]=v===1?15:31;});
+      }
+      expected.forEach((v,i)=>{if(v)assert.equal(r.front[(y+Math.floor(i/sprite.width))*320+x+i%sprite.width],v,`char${character} type${o.type} update${n} sample${i}`);});
+     }
+     if(n===6) {
+      // At destruction only decoded debris (brick) or the background (turtle)
+      // remains at the old image. Check zeros too, not just visible samples.
+      const expected=r.backgrounds.OUTSIDE.slice();
+      for(const p of s.particles) {
+       const sprite=data.sprites['OUTSIDE/expls1_1'],raw=r.pixels['OUTSIDE/expls1_1'],rect=spriteRect(sprite,p.x,p.y);
+       raw.forEach((v,i)=>{if(v)expected[(rect.top+Math.floor(i/sprite.width))*320+rect.left+i%sprite.width]=v;});
+      }
+      const block=o.type===1,x=200+(block?(character===3?36:0):30),y=o.y+(block&&character===3?30:0);
+      for(let dy=0;dy<(block?16:17);dy++)for(let dx=0;dx<(block?20:30);dx++) {
+       const p=(y+dy)*320+x+dx;assert.equal(r.front[p],expected[p],`destroyed char${character} type${o.type} sample${dx},${dy}`);
+      }
+     } else updateObstacles(s);
+    }
+   }
+  });
+  await t.test('all characters restore initial and later idle images and preserve terminal jump',()=>{
+   for(const character of [1,2,3]) {
+    const prefix=['m','l','p'][character-1],schedule=data.idleSchedules[prefix];let s=fresh(character);
+    const check=(kind,index)=>{
+     assert.deepEqual(s.frame,{kind,index});r.outdoor(s,{},null);
+     const binding=characterFrame(character,kind,index,schedule.thresholds),name=binding.family+'/'+binding.name;
+     const sprite=data.sprites[name],raw=r.pixels[name],rect=spriteRect(sprite,s.x,s.y);
+     raw.forEach((v,i)=>{if(v)assert.equal(r.front[(rect.top+Math.floor(i/sprite.width))*320+rect.left+i%sprite.width],v);});
+    };
+    const abort=index=>{
+     s.mode=1;s.jumpIndex=0;updatePlayer(s,schedule.thresholds,schedule.halfTickPeriod);s.mode=2;
+     for(let n=1;n<12;n++){updatePlayer(s,schedule.thresholds,schedule.halfTickPeriod);check(n===11?'jump':'idle',n===11?11:index);}
+    };
+    abort(0);
+    s.mode=0;s.cursorX=-1;s.stillTicks=10;s.idleTicks=schedule.thresholds[2]*2;
+    updatePlayer(s,schedule.thresholds,schedule.halfTickPeriod);const later=s.frame.index;assert.ok(later>0);abort(later);
+    s=createOutdoor({bytes:Buffer.from('A'),seed:1,character,previous:s});abort(0);
+   }
+  });
  } finally {globalThis.fetch=oldFetch;}
 });
