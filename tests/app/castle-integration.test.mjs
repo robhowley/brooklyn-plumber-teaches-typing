@@ -96,14 +96,29 @@ test('failure, timeout, explicit exit stay distinct and ending requires explicit
  assert.equal(failure.screen,'results');assert.equal(failure.castle.flags.failed,true);assert.equal(failure.advance.advanced,false);
  const abort=make();abort.step(27,1,100);abort.step(0,2,100);
  assert.equal(abort.screen,'results');assert.equal(abort.castle.flags.exit,true);assert.equal(abort.advance.advanced,false);
- const s=make(1,45,6);s.step(0,1,100);s.castle.stats.correct=5;s.castle.stats.attempts=5;
+ const s=make(1,47,6);s.step(0,1,100);s.castle.stats.correct=5;s.castle.stats.attempts=5;
  // Source timeout is checked from refreshed score, never set flags directly.
- s.castle.stats.limitSeconds=1;s.step(9,20,101);s.step(0,21,101);
+ s.castle.stats.limitSeconds=1;s.step(9,20,101);assert.equal(s.castle.stats.wpm,47);s.step(0,21,101);
  assert.equal(s.castle.flags.timeout,true);assert.equal(s.castle.flags.failed,false);
  assert.equal(s.castleEnding.event.mode,4);assert.equal(s.screen,'celebration');assert.equal(s.profile.completed[2],0);
  assert.throws(()=>s.acknowledgeCastleEnding(),/Complete/);
+ const decision=structuredClone(s.castle.result),ticks=s.castle.stats.ticks;
  acknowledge(s);assert.equal(s.screen,'results');assert.equal(s.profile.completed[2],1);
- assert.ok(s.profile.goal>=45);assert.equal(s.next(22).mode,3);assert.equal(s.screen,'castle');
+ assert.deepEqual(s.advance,decision);assert.equal(s.advance.advanced,true);
+ assert.equal(s.result.wpm,45);assert.equal(s.profile.lastWpm,45);assert.equal(s.profile.accuracy,100);
+ assert.equal(s.result.elapsedSeconds,1);assert.equal(s.result.ticks,ticks);assert.equal(s.clock.ticks,ticks);
+ assert.equal(s.clock.running,false);assert.equal(s.castle.stats.wpm,47);
+ assert.equal(s.audioLog.filter(e=>e.request.type==='speech').at(-1).request.name,'toobad');
+ assert.equal(s.profile.goal,52);assert.equal(s.profile.lesson,6);assert.equal(s.profile.previousGoal,47);
+ assert.equal(s.next(22).mode,3);assert.equal(s.screen,'castle');
+});
+test('Castle Results without an ending reads the stopped controller timer before the host alias updates',()=>{
+ const s=make(1,48,6);s.step(0,1,100);s.castle.stats.correct=5;s.castle.stats.attempts=5;
+ s.castle.stats.limitSeconds=1;s.step(9,20,101);assert.equal(s.castle.stats.wpm,47);
+ s.step(0,21,101);assert.equal(s.screen,'results');assert.equal(s.castleEnding,null);
+ assert.equal(s.advance.advanced,false);assert.equal(s.profile.goal,48);assert.equal(s.profile.lesson,6);
+ assert.equal(s.result.wpm,45);assert.equal(s.profile.lastWpm,45);assert.equal(s.result.elapsedSeconds,1);
+ assert.equal(s.clock.ticks,20);assert.equal(s.clock.running,false);
 });
 test('Next and reentry span1/2/3/4 for all characters, source Castle duration field3',()=>{
  for(const char of [1,2,3]) {

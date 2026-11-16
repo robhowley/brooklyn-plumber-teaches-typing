@@ -155,6 +155,16 @@ export class Session {
       const returned=this.demo.finish();this.student=returned.student;this.demo=null;
       this.resultEffects.push({type:'host-clock-reset'});this.enterMenu(this.sampleTicks);return;
     }
+    // MARIO.EXE FILE 0x16598..0x165a6: Results operation210 calls100
+    // (0x16243..0x16251), after qualification, before drawing and speech.
+    const clock=timer(this.mode===3?this.castle.stats:this.mode===2?this.water.timer:this.clock,100,this.sampleTicks);
+    if(this.mode===3)this.castle.stats=clock;
+    else if(this.mode===2)this.water.timer=clock;
+    this.clock=clock;
+    this.result={...this.result,...score({...this.activity,ticks:clock.ticks,
+      limitSeconds:this.mode===3?clock.limitSeconds:this.limit,previousAccuracy:this.profile.accuracy})};
+    const v=new DataView(this.student.buffer);
+    v.setInt16(17,this.result.wpm,true);v.setInt16(19,this.result.profileAccuracy,true);
     this.screen='results';const p=this.profile;
     const effects=resultEntryEffects({demo:false,suppressed:!!this.activity.aborted,profilePresent:p.profilePresent,
       world:this.mode,mode:this.mode,goal:p.goal,previousGoal:p.previousGoal,wpm:this.result.wpm});
