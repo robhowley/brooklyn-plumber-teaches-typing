@@ -288,6 +288,7 @@ export class Session {
         const frames=this.data.bonusAnimations[['m','l','p'][this.profile.character-1]].frames;
         if(this.cinematic.frame>=frames.length) {
           this.cinematic=null; this.clock=timer(this.clock,300,nowTicks);
+          this.outdoor.fingerCode=null; // FILE 0x13c33, neutral base after bonus
           return [{type:'bonus-finished'}]; // host latch is flushed by main
         }
       }

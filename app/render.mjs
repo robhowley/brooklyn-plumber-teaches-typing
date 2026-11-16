@@ -3,7 +3,7 @@ import { hydrateCelebrationResources, CelebrationRenderer } from './celebration-
 import { CASTLE_CLIPS, drawCastleText, beginCastleTransition, stepCastleTransition,
   finishCastleTransition, drawCastleBonusActor, castleBonusBlock, beginCastleBonus,
   finishCastleBonus, drawCastleBonusPacket } from './castle-render.mjs';
-import { blitSprite, drawGround, characterFrame, updateSprite, spriteRect, clipRect, drawCastleScene } from '../recovered/render/render.mjs';
+import { blitSprite, drawGround, characterFrame, updateSprite, spriteRect, clipRect, drawCastleScene, drawFingers } from '../recovered/render/render.mjs';
 import { waterActorOperations, drawWaterOperations, drawWaterText, waterBonusSprite, drawWaterBonusPacket } from './water-render.mjs';
 import { drawMenuWidgets, drawStudentChooserNames, drawTextField } from './menu-render.mjs';
 import { drawReport, drawSourceText } from './report-render.mjs';
@@ -43,6 +43,7 @@ export class Renderer {
       .sort((a,b)=>a[1].index-b[1].index).map(([name,sprite])=>({sprite,pixels:this.pixels[name]}));
     this.waterResources={water:records('WATER'),bubbles:records('WATER_INLINE')};
     this.font9=records('FONT9H'); this.font7=records('FONT7H');
+    this.fingerResources=records('FINGER');
     this.fonts={FONT3H:records('FONT3H'),FONT5H:records('FONT5H')};
     for(const [name,font] of Object.entries(this.fonts)) if(font.length!==96) throw new Error(`Missing decoded font ${name}`);
     if(!this.data.control?.help || !this.data.control?.teachers) throw new Error('Missing control resources, rebuild app data');
@@ -187,6 +188,9 @@ export class Renderer {
     if(state) drawMenuWidgets(this.front,this.fonts.FONT5H,this.data.messages,state,profile.lesson);
     this.present();
   }
+  fingers(mode,background,code=null) {
+    drawFingers(this.front,background,this.fingerResources,this.data.fingers,mode,code);
+  }
   outdoor(s,stats,bonus) {
     const prefix=['m','l','p'][s.character-1];
     this.background('OUTSIDE','outdoor-'+prefix);
@@ -209,6 +213,10 @@ export class Renderer {
       this.sprite('OUTSIDE/brick1_1',bonus.x,bonus.y);
       this.text(String.fromCharCode(bonus.code),bonus.x+6,bonus.y+3,{font:'FONT7H'});
     }
+    // Full-scene redraw is a browser adaptation. Reconstruct the source's
+    // pre-input guidance, never read the code that correct input just cleared.
+    this.fingers(1,this.backgrounds.OUTSIDE);
+    if(s.fingerCode!==null)this.fingers(1,this.backgrounds.OUTSIDE,s.fingerCode);
     this.operations=drawNumericHUD(this.front,this.fonts,1,{...s,...stats},this.data.messages);
     this.present();
   }
@@ -225,6 +233,9 @@ export class Renderer {
     // Host static cursor in place of shared blinking text-entry callback.
     const x=30+8*s.index;
     this.front.fill(1,103*320+x,103*320+Math.min(320,x+8));
+    // FILE 0xb62f..0xb647, base and target before each input wait (Demo too).
+    this.fingers(4,this.backgrounds.PRACTICE);
+    this.fingers(4,this.backgrounds.PRACTICE,s.rows[33+s.index]);
     this.operations=drawNumericHUD(this.front,this.fonts,4,{...s,...stats},this.data.messages);
     this.present();
   }
@@ -245,7 +256,10 @@ export class Renderer {
         this.background('WATER','water-'+['m','l','p'][e.character]);
         this.waterDraw={character:e.character+1};
         this.waterResources.bonus=waterBonusSprite(this.waterResources.water[33],this.font7[state.bonus.code-32]);
-      } else if(e.type==='background-update') {
+        this.fingers(2,scene); // FILE 0x16bee, before initial prompt
+      } else if(e.type==='prompt-stop') this.fingers(2,scene);
+      else if(e.type==='prompt') this.fingers(2,scene,e.code);
+      else if(e.type==='background-update') {
         // 0x9cab..0x9d3f: twenty16x14 tiles at y65, zero restores scene.
         this.waveCounter=(this.waveCounter+1)%50;
         for(let tile=0;tile<20;tile++) {
@@ -291,7 +305,9 @@ export class Renderer {
         this.front.set(this.castleBackground); this.castleClip=CASTLE_CLIPS.full;
         this.castleBonus=null; this.palette='castle-'+['m','l','p'][state.character-1];
         this.castleBlock=castleBonusBlock(this.castleActor({family:'CASTLE',index:14},0,0),this.font7[state.bonus.code-32]);
-      } else if(e.type==='statistics'&&e.operation===200) this.operations=drawNumericHUD(this.front,this.fonts,3,e.stats,this.data.messages);
+      } else if(e.type==='prompt-stop') this.fingers(3,this.castleBackground);
+      else if(e.type==='prompt') this.fingers(3,this.castleBackground,e.code);
+      else if(e.type==='statistics'&&e.operation===200) this.operations=drawNumericHUD(this.front,this.fonts,3,e.stats,this.data.messages);
       else if(e.type==='clip') this.castleClip=rect(e.rect);
       else if(e.type==='clip-save-full') this.castleClip=CASTLE_CLIPS.full;
       else if(e.type==='clip-restore') this.castleClip=rect(e.rect);

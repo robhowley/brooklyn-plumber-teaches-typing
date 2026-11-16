@@ -49,6 +49,27 @@ export function updateSprite(front, background, current, previous, clip) {
   if (a) blitSprite(front,current.sprite,current.pixels,current.x,current.y,clip);
 }
 
+// MarioTea/MARIO/MARIO.EXE SHA256
+// 6caed439b64dc3bad8de4f9df53b63ae5712bf3c54b0bbfc00603557e4720f5e.
+// FILE 0x18070..0x18126: null code draws base indices10/11; ASCII32..126
+// uses the extracted lookup/position tables. Values >=40 do NOT add a Shift
+// hand. Values >=6 move to the right origin and decrement the resource index.
+// FINGER.GSO/GSK identities and FILE table offsets are in data.fingers.
+// Each draw uses 0x7a47 background restoration, not a transparent overlay.
+export function drawFingers(front, background, resources, tables, mode, code = null) {
+  const [x,y,gap] = tables.origins[mode-1];
+  const draw = (index,dx,dy) => updateSprite(front,background,{...resources[index],x:dx,y:dy},null);
+  if (code === null) {
+    draw(10,x,y); draw(11,x+gap,y);
+  } else if (code >= 32 && code < 127) {
+    let index = tables.lookup[code-32];
+    if (index >= 40) index -= 40;
+    const right = index >= 6;
+    if (right) index--;
+    if (index <= 9) draw(index,x+(right?gap:0)+tables.x[index],y+tables.y[index]);
+  }
+}
+
 function validateSprite(sprite, pixels) {
   const [, , width, height] = sprite.headerWords;
   if (!Number.isInteger(width) || !Number.isInteger(height) || width <= 0 || height <= 0 ||

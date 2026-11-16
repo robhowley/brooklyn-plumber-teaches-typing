@@ -82,6 +82,7 @@ export function createOutdoor({ bytes, seed, character = 1, lessonIndex = 0, pre
     speed: 5, scroll: 1, groundPhase: previous?.groundPhase ?? 0,
     stillTicks: previous?.stillTicks ?? 0, idleTicks: previous?.idleTicks ?? 0,
     distance: previous?.distance ?? 0, frame: { kind: 'idle', index: 0 },
+    fingerCode: null, // FILE 0x12bf8..0x12c05: neutral base on entry
     attempts: 0, correct: 0, errors: 0, aborted: false, ended: false };
 }
 
@@ -205,6 +206,9 @@ export function selectTarget(s) {
     if (o.code === 0) continue;
     s.targetIndex = i; s.cursorX = o.x; break;
   }
+  // FILE 0x134cc..0x13541: guidance precedes input, which may clear o.code.
+  // No target restores base; a live target requests its highlight every call.
+  s.fingerCode = s.targetIndex < 0 ? null : s.obstacles[s.targetIndex].code;
 }
 
 // 0x13ba1..0x13d1a, ordinary input path. Call AFTER selectTarget, once per tick.

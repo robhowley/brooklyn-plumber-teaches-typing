@@ -89,6 +89,7 @@ export class CastleController {
     this.sceneType = 0; this.scene = 0; this.phase = 'entry'; this.cycle = 0;
     this.locked = false; this.completion = false; this.targetX = 0;
     this.lastInput = 0; this.walkCounter = 0; this.stage = 0; this.velocity = 0;
+    this.lastFinger = -1; // FILE 0xbc2b, reset again by operation1
     this.rockfaces = []; this.clip = [0, 0, 319, 199]; this.effects = [];
     this.ended = false; this.awaitingBonus = false; this.pendingOperation = null;
     this.readyPending = true; // d55e, consumed at the tail of the first bb06 call
@@ -169,9 +170,16 @@ export class CastleController {
     if (operation === 1) {
       this.lastInput = this.nowSeconds;
       this.queue.initialize(this.sceneType);
+      this.lastFinger = -1; // FILE 0xbc2b
       input.flush(); this.emit('flush-input');
     } else if (operation === 2 || operation === 3) {
       const expected = this.queue.target;
+      // FILE 0xbc4e..0xbc76: compare BEFORE input, including operation3.
+      // Bonus restoration does not reset this comparison word.
+      if (expected !== this.lastFinger) {
+        this.lastFinger = expected;
+        this.emit('prompt-stop'); this.emit('prompt', { code: expected });
+      }
       this.flags.failed = castleFailure({ operation, failed: this.flags.failed,
         attempts: this.stats.attempts, accuracy: this.stats.accuracy,
         now: this.nowSeconds, lastInput: this.lastInput });
@@ -228,6 +236,7 @@ export class CastleController {
     for (const rock of this.rockfaces) rock.dirty = true;
     this.emit('bonus-restore', { scene: this.sceneType === 1 ? 2 : this.scene,
       palette: 'castle-character', reloadResources: true, file: 0xbe09 });
+    this.emit('prompt-stop'); // FILE 0xbe4a, base only, no inferred highlight
     this.lastInput = this.nowSeconds;
     this.clock(300); input.flush(); this.emit('flush-input');
     this.targetX = castleTextTarget(this.queue.correct, this.queue.length, this.targetX);
@@ -320,6 +329,7 @@ export class CastleController {
   *scenes() {
     this.clock(320);
     this.emit('scene', { scene: 0, file: 0xd68f });
+    this.emit('prompt-stop'); // FILE 0xc639, initial neutral hands
     for (;;) {
       this.sceneType = 0;
       if (this.cycle && (yield* this.scroll(0, 92))) return;
