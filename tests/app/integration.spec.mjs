@@ -3,6 +3,86 @@ import {skipStartupUI,createStudentUI} from './source-path.mjs';
 async function ready(page){await page.addInitScript(()=>{window.__sourceTestClock=true;});await page.goto('./?seed=1');await skipStartupUI(page);await expect(page.locator('#game')).toHaveAttribute('data-screen','menu');}
 async function point(page,x,y){const r=await page.locator('#game').boundingBox();await page.mouse.click(r.x+x*r.width/320,r.y+y*r.height/200);}
 const snapshot=page=>page.evaluate(()=>translationSnapshot());
+async function burst(page,keys) {
+ await page.locator('#game').evaluate((game,keys)=>{
+  for(const key of keys)game.dispatchEvent(new KeyboardEvent('keydown',{key,bubbles:true}));
+ },keys);
+}
+test.describe('Practice keyboard bursts',()=>{
+ test.beforeEach(async({page})=>{
+  await page.clock.install();await ready(page);
+  await page.clock.pauseAt(new Date(Math.ceil((await page.evaluate(()=>Date.now())+1000)/1000)*1000));
+  await page.locator('#game').press('4');
+  await expect(page.locator('#game')).toHaveAttribute('data-screen','practice');
+ });
+ test('consumes consecutive distinct targets in order at one sampled time',async({page})=>{
+  const before=await snapshot(page),targets=before.practice.rows.slice(33,36);
+  expect(new Set(targets).size).toBe(3);
+  // Observe authored Session calls and browser clocks, not just equal frozen values.
+  await page.evaluate(async()=>{
+   const {Session}=await import(new URL('app/session.mjs',location.href));
+   const step=Session.prototype.step,ticks=performance.now,seconds=Date.now;
+   const reads={ticks:0,seconds:0};window.burstSamples=[];
+   performance.now=function(){reads.ticks++;return ticks.call(this);};
+   Date.now=function(){reads.seconds++;return seconds.call(this);};
+   Session.prototype.step=function(key,tick,second){
+    window.burstSamples.push({key,tick,second,reads:{...reads}});return step.apply(this,arguments);
+   };
+   window.restoreBurstClocks=()=>{performance.now=ticks;Date.now=seconds;Session.prototype.step=step;};
+  });
+  await burst(page,targets.map(c=>String.fromCharCode(c)));
+  await page.clock.runFor(60);
+  const samples=await page.evaluate(()=>{restoreBurstClocks();return burstSamples.slice(0,3);});
+  expect(samples).toEqual(targets.map(key=>({key,tick:samples[0].tick,second:samples[0].second,reads:{ticks:1,seconds:1}})));
+  const s=await snapshot(page);
+  expect(s.practice).toMatchObject({index:3,attempts:3,correct:3,errors:0,lastCorrect:samples[0].second});
+  expect(s.ticks-before.ticks).toBeGreaterThanOrEqual(1);expect(s.ticks-before.ticks).toBeLessThanOrEqual(2);
+ });
+ test('keeps wrong and ignored keys ordered across an exact line transition',async({page})=>{
+  const before=await snapshot(page),line=before.practice.rows.slice(33,66).filter(Boolean),next=before.practice.rows.slice(66,99);
+  const keys=line.map(c=>String.fromCharCode(c));
+  await burst(page,[keys[0].toUpperCase(),'Backspace',...keys,'F10','Enter',...next.slice(0,3).map(c=>String.fromCharCode(c))]);
+  await page.clock.runFor(60);const s=await snapshot(page),correct=line.length+4;
+  expect(s.practice).toMatchObject({index:3,attempts:correct+1,correct,errors:1});
+  expect(s.practice.rows.slice(33,66)).toEqual(next);
+ });
+ test('bounds the accepted prefix at 64 normalized events and drops newest overflow',async({page})=>{
+  const targets=(await snapshot(page)).practice.rows.slice(33,35).map(c=>String.fromCharCode(c));
+  await burst(page,[...Array(63).fill('F10'),...targets]);await page.clock.runFor(60);
+  expect((await snapshot(page)).practice).toMatchObject({index:1,attempts:1,correct:1,errors:0});
+  await burst(page,[...Array(64).fill('F10'),targets[1]]);await page.clock.runFor(60);
+  expect((await snapshot(page)).practice).toMatchObject({index:1,attempts:1,correct:1});
+  await burst(page,[targets[1]]);await page.clock.runFor(60);
+  expect((await snapshot(page)).practice).toMatchObject({index:2,attempts:2,correct:2});
+ });
+ test('discards a queued burst on blur and ignores keys while suspended',async({page})=>{
+  const targets=(await snapshot(page)).practice.rows.slice(33,36).map(c=>String.fromCharCode(c));
+  await burst(page,targets);await page.locator('#game').evaluate(game=>game.blur());
+  const paused=await snapshot(page);expect(paused.suspended).toBe(true);
+  await burst(page,targets);await page.clock.runFor(600);
+  expect((await snapshot(page)).ticks).toBe(paused.ticks);
+  await page.locator('#game').focus();await page.clock.runFor(60);
+  expect((await snapshot(page)).practice).toMatchObject({index:0,attempts:0,correct:0});
+  await burst(page,targets);await page.clock.runFor(60);
+  expect((await snapshot(page)).practice).toMatchObject({index:3,attempts:3,correct:3});
+ });
+ for(const route of ['n','m'])test(`stops at Escape and discards the tail before ${route==='n'?'Next':'Menu'}`,async({page})=>{
+  const first=String.fromCharCode((await snapshot(page)).practice.rows[33]);
+  await burst(page,[first,'Escape','n','m','4',first]);await page.clock.runFor(60);
+  let s=await snapshot(page);expect(s.screen).toBe('results');
+  expect(s.practice).toMatchObject({index:1,attempts:1,correct:1,errors:0,aborted:true});
+  await page.clock.runFor(120);expect((await snapshot(page)).screen).toBe('results');
+  await page.locator('#game').press(route);
+  if(route==='m') {
+   await expect(page.locator('#game')).toHaveAttribute('data-screen','menu');
+   await page.clock.runFor(300);await page.locator('#game').press('4');
+  }
+  await page.clock.runFor(60);s=await snapshot(page);expect(s.screen).toBe('practice');
+  expect(s.practice).toMatchObject({index:0,attempts:0,correct:0,aborted:false});
+  await burst(page,[String.fromCharCode(s.practice.rows[33])]);await page.clock.runFor(60);
+  expect((await snapshot(page)).practice).toMatchObject({index:1,attempts:1,correct:1});
+ });
+});
 test('Practice original menu hit, case, ignored keys, exact line change, face and early Next',async({page})=>{
  const errors=[];page.on('pageerror',e=>errors.push(e.message));
  await page.clock.install();await ready(page);
