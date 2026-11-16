@@ -112,7 +112,6 @@ export class Session {
     const completedWaits=this.menuIdle.state.waiting&&this.changedTick(nowTicks)?1:0;
     const effects=this.menuIdle.step({nowTicks,completedWaits,demo:this.profile.demo,fileDropdownOpen});
     this.presentationEffects.push(...effects);
-    if(effects.some(e=>e.type==='menu-bubble-request'))this.audio({type:'speech',name:'welcome',file:0x10eb2});
     return effects;
   }
   rebaseHostClock(oldTicks,newTicks) {

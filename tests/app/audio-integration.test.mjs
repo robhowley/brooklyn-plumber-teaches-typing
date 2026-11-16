@@ -63,6 +63,27 @@ test('welcome and results gate their source pumps and input initialization',()=>
   assert.equal(s.next(101),null);s.completeAudio([{status:'missing'}],101,100);
   assert.ok(s.resultEffects.some(e=>e.type==='flush-input'));
 });
+test('idle bubbles keep queued input and never start Welcome or block the menu',()=>{
+  for(const kind of ['saved','guest','demo']) {
+    const {s,requests}=make();
+    if(kind==='guest')s.student[28]=0;
+    if(kind==='demo')s.selectDemo();
+    s.takePresentationEffects();s.enqueue(52);
+    const effects=s.menuStep(kind==='demo'?1:100);
+    assert.ok(effects.some(e=>e.type==='menu-bubble-request'),kind);
+    assert.deepEqual(s.takePresentationEffects(),effects);
+    assert.deepEqual(requests,[],kind);
+    assert.equal(s.audioPending,undefined);
+    assert.equal(s.input.consume(),52,kind);
+  }
+});
+test('first-entry Welcome remains blocking and is not repeated on menu reentry',()=>{
+  const {s,requests}=make();s.menuWelcomed=false;s.enterMenu(20);
+  assert.equal(s.audioPending.entry.request.name,'welcome');
+  s.completeAudio([{status:'ended'}],21,100);s.enterMenu(22);
+  assert.equal(s.audioPending,null);
+  assert.equal(requests.filter(r=>r.name==='welcome').length,1);
+});
 test('all worlds and Demo consume disabled Alt-X without abort or counted attempt',()=>{
   for(const demo of [false,true])for(const mode of [1,2,3,4]) {
     const s=skipStartup(new Session(data,{seed:1}));if(demo)s.selectDemo();s.start(0,mode,100);

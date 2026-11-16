@@ -153,9 +153,12 @@ test('blocking menu speech hides both the software arrow and native override unt
    return new Promise((resolve,reject)=>{window.finishCursorUnlock=()=>native.then(resolve,reject);});
   };
  });
+ const altered=structuredClone(data),front=Buffer.from(altered.backgrounds.MAINMENU.pixels,'base64');
+ front[20*320+250]=88;altered.backgrounds.MAINMENU.pixels=front.toString('base64');
+ await page.route('**/app/data.json',r=>r.fulfill({json:altered}));
  await page.goto('./?seed=1');await expect(page.locator('#game')).toHaveAttribute('data-screen','startup');
  await page.clock.runFor(16400);expect((await snap(page)).screen).toBe('menu');
- await key(page,'Shift');await page.clock.runFor(6000);
+ await move(page,250,20,true);await page.clock.runFor(300);
  await page.waitForFunction(()=>translationSnapshot().audioHost.blocking);
  expect((await snap(page)).screen).toBe('menu');await visible(page,false);
  await move(page,100,90);await visible(page,false);
