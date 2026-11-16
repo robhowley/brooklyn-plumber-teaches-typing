@@ -23,7 +23,7 @@ def sprite_record(sprite, root):
     return {**sprite, 'pixels': b64(root / sprite['indicesPath'])}
 
 for sprite in manifest['sprites']:
-    if sprite['family'] in ('WALKING', 'OUTSIDE', 'FONT3H', 'FONT5H', 'FONT7H', 'FONT9H', 'PRACTICE') or (sprite['family'] == 'GREET2' and sprite['name'] == 'prefbox_1'):
+    if sprite['family'] in ('WALKING', 'OUTSIDE', 'FONT3H', 'FONT5H', 'FONT7H', 'FONT9H', 'PRACTICE', 'FINGER') or (sprite['family'] == 'GREET2' and sprite['name'] == 'prefbox_1'):
         result['sprites'][sprite['family'] + '/' + sprite['name']] = sprite_record(sprite, ASSETS)
 # Render sprites use decoded family indices, never flattened resource indices.
 for sprite in render['sprites']:
@@ -85,6 +85,29 @@ for char in 'MLP':
 # writes, not frame differences: unchanged values still erase foreground art.
 exe = (ASSETS / 'raw/MarioTea/MARIO/MARIO.EXE.data').read_bytes()
 assert hashlib.sha256(exe).hexdigest() == '6caed439b64dc3bad8de4f9df53b63ae5712bf3c54b0bbfc00603557e4720f5e'
+# FINGER service FILE 0x17fa4..0x18126: resources 10/11 are base hands,
+# 0..9 highlights. Extract all 95 ASCII entries and signed position words,
+# including the activity initializer immediates, not a modern keyboard chart.
+# Member identities also travel with each decoded sprite in result['sprites'].
+finger_members = {'FINGER.GSO': '2ff6f12ad9491f3e8f12060451ba2aec9de8b6cdf9695b4f07ea0a04ca0a1688',
+                  'FINGER.GSK': '5959d392c045be861a95e28efb440d3945afb181588e6135e91e223db1f6bf7a'}
+for name, sha in finger_members.items():
+    assert hashlib.sha256((ASSETS / ('raw/MarioTea/MARIO/' + name + '.data')).read_bytes()).hexdigest() == sha
+origins = []
+for offset in (0x12a21, 0x16a34, 0xd7cd, 0xb1ad):
+    for i, address in enumerate((0x51b4, 0x51b2, 0x51b0)):
+        assert exe[offset + i*6:offset + i*6 + 4] == b'\xc7\x06' + struct.pack('<H', address)
+    origins.append([struct.unpack_from('<h', exe, offset + i*6 + 4)[0] for i in range(3)])
+result['fingers'] = {'lookup': list(exe[0x2258c:0x225eb]),
+                     'x': list(struct.unpack_from('<10h', exe, 0x21df6)),
+                     'y': list(struct.unpack_from('<10h', exe, 0x21e0a)), 'origins': origins,
+                     'member': 'MarioTea/MARIO/MARIO.EXE', 'memberSha256': hashlib.sha256(exe).hexdigest(),
+                     'members': finger_members,
+                     'source': {'lookup': 'FILE 0x2258c..0x225ea (ASCII32..126)',
+                                'x': 'FILE 0x21df6', 'y': 'FILE 0x21e0a',
+                                'origins': ['FILE 0x12a21', 'FILE 0x16a34', 'FILE 0xd7cd', 'FILE 0xb1ad'],
+                                'draw': 'FILE 0x18070..0x18126; compositor 0x7a47'}}
+(ROOT / '.tmp/fingers-evidence.json').write_text(json.dumps(result['fingers'], indent=2) + '\n')
 castle = render['worlds']['castle']
 result['castle'] = {'bonusXs': list(struct.unpack_from('<3h', exe, 0x213b4)),
                     'scenes': [b64(RENDER / s['indicesPath']) for s in castle['scenes']],
