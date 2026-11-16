@@ -31,6 +31,25 @@ test('timeout finalizes score then advances exactly once; Next enters Water with
  assert.equal(s.profile.goal,10);assert.equal(s.profile.completed[0],1);
  assert.deepEqual(s.next(5000),{mode:2,lesson:1});assert.equal(s.screen,'water');
 });
+test('Results retain profile accuracy on zero attempts in every world',()=>{
+ for(const mode of [1,2,3,4]) {
+  const s=session();new DataView(s.student.buffer).setInt16(19,83,true);s.start(0,mode,100);
+  for(let t=20;s.active&&t<30;t++)s.step(27,t,101);
+  assert.equal(s.screen,'results');assert.equal(s.result.accuracy,0);assert.equal(s.result.profileAccuracy,83);
+  assert.equal(s.profile.accuracy,83);assert.equal(s.result.wpm,0);assert.equal(s.advance.advanced,false);
+ }
+});
+test('Outside and Practice Results retain stopped scores and exclude suspended time',()=>{
+ for(const mode of [1,4]) {
+  const s=session();s.start(0,mode,100);
+  Object.assign(s.activity,{correct:150,attempts:160,errors:10});
+  s.suspend(true,100);s.suspend(false,1000);s.step(27,1810,150);
+  assert.equal(s.screen,'results');assert.equal(s.result.wpm,28);assert.equal(s.profile.lastWpm,28);
+  assert.equal(s.result.accuracy,93);assert.equal(s.profile.accuracy,93);assert.equal(s.result.elapsedSeconds,50);
+  assert.equal(s.clock.ticks,910);assert.equal(s.clock.running,false);assert.equal(s.advance.advanced,false);
+  assert.equal(s.profile.goal,5);assert.equal(s.profile.lesson,1);
+ }
+});
 test('student edits clamp durations and groups; save does not touch old app namespace',()=>{
  const s=session();s.student=editStudent(s.student,{lesson:99,minutes:99});assert.equal(s.profile.lesson,6);assert.equal(s.profile.durations[0],60);
  const calls=[];const storage={setItem:(...args)=>calls.push(args),getItem:()=>'{bad'};

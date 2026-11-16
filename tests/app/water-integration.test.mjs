@@ -1,7 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import {Session,editStudent} from '../../app/session.mjs';
+import {Session,editStudent,SAVE_KEY,loadProfiles} from '../../app/session.mjs';
+import {statsOperations} from '../../app/stats-render.mjs';
+import {reportOperations} from '../../app/report-render.mjs';
 import {Renderer} from '../../app/render.mjs';
 import {newStudent} from '../../recovered/control/student.mjs';
 import {skipStartup,finishCelebration} from './source-path.mjs';
@@ -72,15 +74,48 @@ test('host preserves pending abort tail and bonus-during-failure timer semantics
  assert.equal(s.clock.running,true); // source failure-exit is empty, not normal stop
  assert.equal(s.advance.advanced,false);
 });
+test('Water Results refresh counters skipped by a pending abort tail without advancing',()=>{
+ const s=make(),[first,second]=s.water.window.slice(10,12);
+ for(const key of [first,second^32,second,27,65])s.enqueue(key);
+ s.step(0,182,110);assert.equal(s.screen,'results');assert.equal(s.water.stats.wpm,0);
+ assert.equal(s.result.wpm,1);assert.equal(s.profile.lastWpm,1);
+ assert.equal(s.result.accuracy,66);assert.equal(s.profile.accuracy,66);assert.equal(s.result.elapsedSeconds,10);
+ assert.equal(s.advance.advanced,false);assert.equal(s.profile.goal,10);assert.equal(s.profile.lesson,1);
+ assert.equal(s.audioLog.some(e=>e.request.name==='congrats'||e.request.name==='toobad'),false);
+ assert.equal(s.input.pending(),true);assert.equal(s.clock.running,false);
+});
 test('cached timeout and final wait precede results; unskippable celebration precedes results and preserves strict >30 progression',()=>{
  for(const [correct,completed] of [[150,0],[156,1]]) {
   const s=make(1,25,6);s.water.stats.correct=correct;s.water.stats.attempts=correct;
   s.water.lastInput=160;s.step(0,1092,160); // refresh crosses limit, next loop observes it
   assert.equal(s.water.timedOut,true);assert.equal(s.screen,'water');
-  s.step(0,1093,160);assert.equal(s.screen,'celebration');finishCelebration(s);
+  const qualifiedWpm=correct===150?25:26;assert.equal(s.water.stats.wpm,qualifiedWpm);
+  s.step(0,1093,160);assert.equal(s.screen,'celebration');
+  const decision=structuredClone(s.water.progression);finishCelebration(s);
+  assert.deepEqual(s.advance,decision); // Results must not qualify again at the lower final WPM.
   assert.equal(s.screen,'results');assert.equal(s.advance.advanced,true);
-  assert.equal(s.profile.goal,30);assert.equal(s.profile.completed[1],completed);
-  assert.equal(s.result.elapsedSeconds,60);assert.equal(s.clock.ticks,1093);
+  assert.equal(s.profile.goal,30);assert.equal(s.profile.lesson,6);assert.equal(s.profile.completed[1],completed);
+  const finalWpm=correct===150?24:25;
+  assert.equal(s.result.wpm,finalWpm);assert.equal(s.profile.lastWpm,finalWpm);
+  assert.equal(s.result.accuracy,100);assert.equal(s.profile.accuracy,100);
+  assert.equal(s.result.stoppedAt,160);assert.equal(s.water.stats.wpm,qualifiedWpm);
+  assert.equal(s.result.elapsedSeconds,60);assert.equal(s.clock.ticks,1093);assert.equal(s.clock.running,false);
+  assert.equal(s.audioLog.at(-1).request.name,correct===150?'toobad':'congrats');
+  const stats=statsOperations({...s.activity,...s.result},s.profile,data.messages);
+  assert.equal(stats.find(op=>op.x===144&&op.y===64).text,` ${finalWpm}`);
+  const report=reportOperations(s.student,{messages:data.messages,teachers:data.control.teachers});
+  assert.equal(report.find(op=>op.x===178&&op.y===120).text,` ${finalWpm}`);
+  assert.equal(report.find(op=>op.x===178&&op.y===132).text,'100%');
+  const other=Array.from(newStudent('Other')),profiles={current:'Water',students:{Other:other}};
+  const storage=new Map([['typing-kingdom-v1','untouched1'],['typing-kingdom-v2','untouched2']]);
+  s.save({setItem:(key,value)=>storage.set(key,value)},profiles);
+  const saved=loadProfiles({getItem:key=>storage.get(key)});
+  assert.deepEqual(saved.students.Water,Array.from(s.student));assert.equal(saved.students.Water.length,260);
+  assert.equal(new DataView(Uint8Array.from(saved.students.Water).buffer).getInt16(17,true),finalWpm);
+  assert.equal(new DataView(Uint8Array.from(saved.students.Water).buffer).getInt16(19,true),100);
+  assert.deepEqual(saved.students.Other,other);
+  assert.deepEqual([...storage.keys()],['typing-kingdom-v1','typing-kingdom-v2',SAVE_KEY]);
+  assert.equal(storage.get('typing-kingdom-v1'),'untouched1');assert.equal(storage.get('typing-kingdom-v2'),'untouched2');
   assert.equal(s.next(1200).mode,3);assert.equal(s.screen,'castle'); // Water progression now routes into Castle
  }
 });
