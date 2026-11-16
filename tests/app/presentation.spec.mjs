@@ -6,11 +6,11 @@ const KEY='mtt-static-translation.students.v1';
 const data=JSON.parse(readFileSync(new URL('../../app/data.json',import.meta.url)));
 const snap=page=>page.evaluate(()=>translationSnapshot());
 async function point(page,x,y) {const r=await page.locator('#game').boundingBox();await page.mouse.click(r.x+x*r.width/320,r.y+y*r.height/200);}
-async function ready(page,names=['ADA','BOB']) {
+async function ready(page,names=['ADA','BOB'],startupOptions) {
  const students=Object.fromEntries(names.map(n=>[n,Array.from(newStudent(n))]));
  for(const b of Object.values(students)) {b[23]=30;b[30]=1;b[32]=1;b[34]=1;b[36]=1;}
  await page.addInitScript(({KEY,students})=>localStorage.setItem(KEY,JSON.stringify({current:Object.keys(students)[0],students})),{KEY,students});
- await page.goto('./?seed=1');await skipStartupUI(page);await expect(page.locator('#game')).toHaveAttribute('data-screen','menu');
+ await page.goto('./?seed=1');await skipStartupUI(page,startupOptions);await expect(page.locator('#game')).toHaveAttribute('data-screen','menu');
 }
 async function press(page,key) {await page.locator('#game').press(key);}
 async function pixels(page) {return page.evaluate(()=>Array.from(document.querySelector('#game').getContext('2d').getImageData(0,0,320,200).data));}
@@ -99,9 +99,26 @@ test('all four HUDs use exact original values, origins, palette and font pixels;
   const result=await snap(page);expect(result.palette).toBe('BLACKBRD.CRX');expect(result.operations.find(o=>o.x===136&&o.y===32).text).toBe(String(stats.attempts).padStart(4,' '));await press(page,'m');
  }
 });
+test('idle menu bubble stays visible and silent with unlocked audio and accepts one activity key',async({page})=>{
+ await page.clock.install();await page.addInitScript(()=>{
+  window.__sourceTestClock=true;window.bubblePCMStarts=0;
+  const start=AudioBufferSourceNode.prototype.start;
+  AudioBufferSourceNode.prototype.start=function(...args){window.bubblePCMStarts++;return start.apply(this,args);};
+ });
+ await ready(page,['ADA'],{muted:false});
+ await expect.poll(async()=>(await snap(page)).audioHost.state).toBe('unlocked');
+ const before=await snap(page),starts=await page.evaluate(()=>bubblePCMStarts);
+ await page.clock.runFor(6000);const after=await snap(page);
+ expect(after.operations.slice(1,5).map(o=>o.text.trim())).toEqual(Array.from({length:4},(_,i)=>data.messages[1210+i].slice(0,20).trim()));
+ const image=await pixels(page),pal=data.palettes[after.palette];
+ for(const [x,y] of [[6,142],[185,193],[6,170],[185,170]])expect(image.slice((y*320+x)*4,(y*320+x)*4+3)).toEqual(pal.slice(24,27));
+ expect(after.audio.filter(e=>e.request.type==='speech')).toEqual(before.audio.filter(e=>e.request.type==='speech'));
+ expect(await page.evaluate(()=>bubblePCMStarts)).toBe(starts);expect(after.audioHost.blocking).toBe(false);
+ await press(page,'4');await page.clock.runFor(300);expect((await snap(page)).screen).toBe('practice');
+});
 test('palette88 welcome intercept precedes world hit, and blocked storage/resource errors stay visible',async({page})=>{
  const altered=structuredClone(data);const front=Buffer.from(altered.backgrounds.MAINMENU.pixels,'base64');front[20*320+250]=88;altered.backgrounds.MAINMENU.pixels=front.toString('base64');
- await page.route('**/app/data.json',r=>r.fulfill({json:altered}));await ready(page);await point(page,250,20);await expect(page.locator('#game')).toHaveAttribute('data-screen','menu');await expect.poll(async()=> (await snap(page)).audio.some(e=>e.request.name==='welcome')).toBe(true);
+ await page.route('**/app/data.json',r=>r.fulfill({json:altered}));await ready(page);const welcomes=(await snap(page)).audio.filter(e=>e.request.name==='welcome').length;await point(page,250,20);await expect(page.locator('#game')).toHaveAttribute('data-screen','menu');await expect.poll(async()=> (await snap(page)).audio.filter(e=>e.request.name==='welcome').length).toBe(welcomes+1);
  await page.addInitScript(()=>{Storage.prototype.setItem=function(){throw new Error('blocked');};});await page.reload();await skipStartupUI(page);await expect(page.locator('#game')).toHaveAttribute('data-screen','menu');await press(page,'w');await page.keyboard.type('TEST');await press(page,'Enter');await press(page,'Escape');await expect(page.locator('#status')).toContainText('storage unavailable');
  await page.unroute('**/app/data.json');await page.route('**/app/data.json',r=>r.fulfill({json:{...data,sprites:{}}}));await page.reload();await expect(page.locator('#status')).toContainText('Missing decoded font');
 });

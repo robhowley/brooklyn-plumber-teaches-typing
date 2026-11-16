@@ -66,6 +66,16 @@ test('real indexed renderer applies59 startup palette writes, presentation texts
  const s=new Session(data,{seed:1});r.presentation(s.takePresentationEffects(),1);
  for(let t=1;s.screen==='startup';t++){s.step(0,t,0);r.presentation(s.takePresentationEffects(),1);}
  assert.equal(r.paletteWrites,59);
+ for(const kind of ['saved','guest','demo']) {
+  const s=kind==='guest'?skipStartup(new Session(data,{seed:1})):make();
+  if(kind==='demo')s.selectDemo();
+  s.takePresentationEffects();s.menuStep(kind==='demo'?1:100);
+  r.menuBubble=false;r.presentation(s.takePresentationEffects(),1);r.menu(s.profile);
+  assert.equal(r.menuBubble,true,kind);
+  for(const [x,y] of [[6,142],[185,193],[6,170],[185,170]])assert.equal(r.front[y*320+x],8,kind);
+  const base=kind==='demo'?1200:kind==='saved'?1210:1220;
+  assert.deepEqual(r.operations.slice(1,5).map(o=>o.text.trim()),Array.from({length:4},(_,i)=>data.messages[base+i].slice(0,20).trim()));
+ }
  for(const character of [1,2,3]) {
   const w=make({character,goal:25,lesson:6,waterMinutes:1});w.start(0,2,100);w.water.stats.correct=180;w.water.stats.attempts=180;w.water.lastInput=160;
   w.step(0,1092,160);w.step(0,1093,160);r.presentation(w.takePresentationEffects(),character);
