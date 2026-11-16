@@ -283,8 +283,9 @@ export class Session {
     if(this.mode===4) {
       if(this.demo) {this.enqueue(key);key=this.pollDemo({target:this.practice.rows[33+this.practice.index]}).key;this.seed=this.demoRng.seed;}
       if(key===0x12d) {if(this.option10)this.effects.push({type:'quit-request'});key=0;}
-      if(this.stats().elapsedSeconds>=this.limit || key===27) {
-        this.practice.aborted=key===27; this.finish(nowTicks); return [{type:'end'}];
+      const timedOut=this.stats().elapsedSeconds>=this.limit;
+      if(key===27) {
+        this.practice.aborted=true; this.finish(nowTicks); return [{type:'end'}];
       }
       const expected=this.practice.rows[33+this.practice.index];
       const result=practiceInput(this.practice,key,wallSeconds);
@@ -294,6 +295,8 @@ export class Session {
       if(result==='advance-one-byte') this.typed+=String.fromCharCode(key);
       if(result==='next-line') this.typed='';
       this.lastPracticeCorrect=this.practice.lastCorrect;
+      // MARIO.EXE FILE 0xb69e..0xb6a5 flags timeout; 0xb7e6..0xb800 exits AFTER input.
+      if(timedOut) {this.finish(nowTicks);return [{type:'end'}];}
       return [{type:result}];
     }
     if(this.demo)this.enqueue(key);

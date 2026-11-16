@@ -96,6 +96,85 @@ test('practice preserves case, ignored keys, line-end SPACE/CR, counters and las
  assert.equal(s.practice.errors,1);assert.equal(s.practice.correct,s.practice.attempts-1);assert.ok(s.practice.rows.subarray(0,33).every(n=>n===0));
  s.step(27,t++,101);s.start(t,4);assert.ok(s.profile.errorCounts.every(n=>n===0));
 });
+for(const nowTicks of [1091,1092,1200])for(const kind of ['correct','incorrect','SPACE','CR']) {
+ test(`practice ${kind} input is consumed once on tick ${nowTicks}, before timeout results`,()=>{
+  const s=configured({goal:10,practiceMinutes:1});s.start(0,4,100);
+  if(kind==='SPACE'||kind==='CR') {
+   while(s.practice.rows[33+s.practice.index])s.step(s.practice.rows[33+s.practice.index],1,101);
+  } else s.step(s.practice.rows[33],1,101);
+  const before=structuredClone(s.practice),typed=s.typed,profile=s.profile;
+  const expected=before.rows[33+before.index],wrong=kind==='incorrect';
+  const key=kind==='SPACE'?32:kind==='CR'?13:wrong?expected-32:expected;
+  const audioStart=s.audioLog.length;
+  const events=s.step(key,nowTicks,200),expired=nowTicks>=1092;
+  assert.deepEqual(events,[{type:expired?'end':wrong?'retain-target':kind==='correct'?'advance-one-byte':'next-line'}]);
+  assert.equal(s.practice.attempts,before.attempts+1);
+  assert.equal(s.practice.correct,before.correct+Number(!wrong));
+  assert.equal(s.practice.errors,before.errors+Number(wrong));
+  assert.equal(s.practice.lastCorrect,wrong?101:200);assert.equal(s.lastPracticeCorrect,s.practice.lastCorrect);
+  assert.equal(s.practice.index,wrong?before.index:kind==='correct'?before.index+1:0);
+  assert.equal(s.typed,wrong?typed:kind==='correct'?typed+String.fromCharCode(key):'');
+  if(kind==='SPACE'||kind==='CR')assert.deepEqual(s.practice.rows.slice(33,297),before.rows.slice(66,330));
+  else assert.deepEqual(s.practice.rows,before.rows);
+  assert.equal(s.profile.errorCounts.reduce((sum,n)=>sum+n,0),Number(wrong));
+  if(wrong)assert.equal(s.profile.errorCounts[expected-32],1);
+  assert.deepEqual(s.audioLog.slice(audioStart).filter(e=>e.request.type==='effect').map(e=>e.request.id),[wrong?11:1]);
+  assert.equal(s.screen,expired?'results':'practice');assert.equal(s.clock.running,!expired);assert.equal(s.clock.ticks,nowTicks);
+  assert.equal(s.practice.aborted,false);
+  if(expired) {
+   assert.equal(s.result.elapsedSeconds,60);
+   assert.equal(s.result.accuracy,Math.trunc(s.practice.correct*100/s.practice.attempts));
+   assert.equal(s.result.wpm,Math.trunc(Math.max(0,s.practice.correct-s.practice.errors)*182/nowTicks));
+   assert.equal(s.profile.lastWpm,s.result.wpm);assert.equal(s.profile.accuracy,s.result.accuracy);
+   assert.equal(s.advance.advanced,false);
+   assert.deepEqual([s.profile.lesson,s.profile.goal,s.profile.completed],[profile.lesson,profile.goal,profile.completed]);
+   const finished=structuredClone({practice:s.practice,typed:s.typed,result:s.result,student:s.student,audio:s.audioLog});
+   assert.deepEqual(s.step(key,nowTicks+1,201),[]);
+   assert.deepEqual({practice:s.practice,typed:s.typed,result:s.result,student:s.student,audio:s.audioLog},finished);
+  }
+ });
+}
+for(const nowTicks of [1091,1092])for(const key of [0,10,0x144,0x12d,27]) {
+ test(`practice non-scoring key ${key} preserves timeout and Escape priority at tick ${nowTicks}`,()=>{
+  const s=configured({practiceMinutes:1});s.start(0,4,100);
+  const before=structuredClone(s.practice),audioStart=s.audioLog.length;
+  const ended=nowTicks>=1092||key===27;
+  assert.deepEqual(s.step(key,nowTicks,200),[{type:ended?'end':'ignored'}]);
+  assert.deepEqual(s.practice,{...before,aborted:key===27});
+  assert.equal(s.screen,ended?'results':'practice');assert.equal(s.clock.running,!ended);
+  assert.equal(s.audioLog.slice(audioStart).filter(e=>e.request.type==='effect').length,0);
+ });
+}
+for(const kind of ['synthetic','physical-correct','physical-incorrect','Escape']) {
+ test(`Demo Practice expiry dispatches ${kind} once and restores the selected record/menu`,()=>{
+  const s=configured({goal:10,practiceMinutes:1});s.selectDemo();
+  const selected=s.student.slice();selected[27]=0;new DataView(selected.buffer).setInt16(15,4,true);
+  s.start(0,4,100);
+  const demo=s.demo,entries=s.menuEntries,target=s.practice.rows[33];
+  const synthetic=kind==='synthetic',escape=kind==='Escape',wrong=kind==='physical-incorrect';
+  // FILE 0xb6af..0xb710: a due synthetic key wins even over queued Escape.
+  if(synthetic)demo.state.countdown=1;
+  const key=synthetic||escape?27:wrong?target-32:target;
+  const audioStart=s.audioLog.length;
+  assert.deepEqual(s.step(key,1092,200),[{type:'end'}]);
+  assert.equal(s.practice.attempts,Number(!escape),'one final Demo dispatch before expiry');
+  assert.equal(s.practice.correct,Number(!escape&&!wrong));assert.equal(s.practice.errors,Number(wrong));
+  assert.equal(s.practice.index,Number(!escape&&!wrong));
+  assert.equal(s.typed,escape||wrong?'':String.fromCharCode(target));
+  assert.equal(s.practice.lastCorrect,escape||wrong?0:200);assert.equal(s.lastPracticeCorrect,s.practice.lastCorrect);
+  assert.equal(s.practice.aborted,escape);
+  assert.equal(demo.state.lastLowTick,1092);assert.equal(demo.state.done,true);
+  assert.deepEqual(s.student,selected);assert.equal(s.demo,null);assert.equal(s.input.pending(),false);
+  assert.equal(s.screen,'menu');assert.equal(s.menuEntries,entries+1);assert.equal(s.clock.running,false);
+  assert.equal(s.practiceDemoTick,1092);assert.deepEqual(s.resultEffects,[{type:'host-clock-reset'}]);
+  assert.deepEqual(s.audioLog.slice(audioStart).map(e=>[e.request.type,e.request.id]),[
+   ...escape?[]:[['effect',wrong?11:1]],['music-stop',undefined],['music',2]
+  ]);
+  const finished=structuredClone({practice:s.practice,typed:s.typed,student:s.student,audio:s.audioLog});
+  assert.deepEqual(s.step(key,1093,201),[]);
+  assert.deepEqual({practice:s.practice,typed:s.typed,student:s.student,audio:s.audioLog},finished);
+ });
+}
 test('practice duration, focus suspension, no failure, early results and Next retain mode/lesson and timestamp',()=>{
  const s=configured({practiceMinutes:1});s.start(100,4);s.step(0,110,100);s.suspend(true,111);
  const rows=s.practice.rows.slice();s.step(65,500,200);assert.deepEqual(s.practice.rows,rows);assert.equal(s.clock.ticks,11);
