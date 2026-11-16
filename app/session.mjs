@@ -186,6 +186,8 @@ export class Session {
     if(this.screen==='menu')this.audio({type:'music-stop',file:0x11bb1});
     // Student service normalization also follows a cancelled New (zeroed bytes).
     this.student=normalizeStudent(this.student);
+    // MARIO.EXE FILE 0x12c72/0xd93d invoke op111: 0x15ba3..0x15ba8 copies the starting goal.
+    if(mode===1||mode===3)this.student.copyWithin(0x15,0x17,0x19);
     const p=this.profile, rng={seed:this.seed};
     const prefix=lessonPrefix(p.lesson,rng), kind=mode===4?practiceCorpus(p.goal):mode===2?'words':mode===3?'sentenc':'letters';
     this.corpusName=(prefix+kind).toUpperCase();
