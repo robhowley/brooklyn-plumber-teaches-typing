@@ -20,7 +20,9 @@ for(const mode of [1,3]) {
  });
  for(const lesson of [1,6]) test(`world ${mode}: stale previous goal cannot reject success in lesson ${lesson}`,()=>{
   const s=make({lesson});new DataView(s.student.buffer).setInt16(21,30,true);
-  s.start(0,mode,100);timeout(s,mode,30);
+  // Castle stops one tick after qualification: 30*182/1093 truncates to 4.
+  // Seed 31 correct answers so the recomputed Results score still meets 5.
+  s.start(0,mode,100);timeout(s,mode,mode===3?31:30);
   assert.equal(s.result.wpm,5);assert.deepEqual(resultSpeech(s),['congrats']);
   assert.equal(s.advance.advanced,true);assert.equal(s.profile.previousGoal,5);
   assert.equal(s.profile.lesson,lesson===1?2:6);assert.equal(s.profile.goal,lesson===1?5:mode===1?7:10);
