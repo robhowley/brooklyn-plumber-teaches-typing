@@ -6,7 +6,7 @@ import { newStudent } from '../../recovered/control/student.mjs';
 import { lessonPrefix, loadCorpus, selectCorpusSegment, initializeBonus, outdoorBonusDelay, seedFromTime, createPractice } from '../../recovered/runtime/runtime.mjs';
 import { tick } from '../../recovered/outdoor/outdoor.mjs';
 import { Renderer } from '../../app/render.mjs';
-import { spriteRect } from '../../recovered/render/render.mjs';
+import { spriteRect, characterFrame } from '../../recovered/render/render.mjs';
 const data=JSON.parse(fs.readFileSync(new URL('../../app/data.json',import.meta.url)));
 import {skipStartup} from './source-path.mjs';
 const configured=(settings={})=>skipStartup(new Session(data,{bytes:editStudent(newStudent('Ada'),settings),seed:1}));
@@ -32,6 +32,30 @@ test('outdoor integration preserves recovered frame order, old-scroll ground and
  const events=tick(expected,{key:65,elapsed:0,limit:120,idleSchedule:schedule.thresholds,idlePeriod:schedule.halfTickPeriod,bonus,second:10});
  assert.deepEqual(s.step(65,1,10),events);assert.deepEqual(s.outdoor,expected);assert.deepEqual(s.bonus,bonus);
  assert.equal(s.outdoor.groundPhase,1);assert.equal(s.outdoor.scroll,9);
+});
+test('retained Outside movement reaches every negative run index through actual Session entries', {timeout:30000},()=>{
+ const s=configured(),seen=new Set();let updates=0,first=null;
+ // No injected distance, cursor, limit or movement. Let each default two-minute
+ // activity finish without input, then enter Outside again with its retained state.
+ for(let entry=1;entry<=140&&seen.size<11;entry++) {
+  const retained=s.outdoor?.distance??0;
+  s.start(updates,1,100+Math.floor(updates/18.2));
+  assert.equal(s.outdoor.distance,retained);assert.equal(s.outdoor.x,20);
+  for(let n=1;n<=2185&&s.active;n++) {
+   updates++;s.step(0,updates,100+Math.floor(updates/18.2));
+   const {kind,index}=s.outdoor.frame;
+   if(kind==='run'&&index<0) {
+    first??={entry,updates,index};seen.add(index);
+    const binding=characterFrame(1,kind,index,data.idleSchedules.m.thresholds);
+    assert.equal(binding.name,`mjmp${String(index+21).padStart(4,'0')}_1`);
+    assert.ok(data.sprites[`${binding.family}/${binding.name}`]);
+   }
+  }
+  assert.equal(s.screen,'results');
+ }
+ assert.deepEqual(first,{entry:129,updates:279625,index:-1});
+ assert.deepEqual([...seen].sort((a,b)=>a-b),[-11,-10,-9,-8,-7,-6,-5,-4,-3,-2,-1]);
+ assert.ok(updates<=140*2185);
 });
 test('bonus raw punctuation intercept stops timer, ignores keys, uses two ticks per frame and resumes without scoring',()=>{
  const s=configured();s.start(0);

@@ -50,16 +50,33 @@ test('all selected run/jump/idle names resolve to actual GSK/GCK indices',()=>{
  for(const [character,prefix] of [[1,'m'],[2,'l'],[3,'p']]) {
   for(const kind of ['run','jump']) for(let i=0;i<12;i++) {
    const binding=characterFrame(character,kind,i);
-   assert.ok(manifest.spriteBindings.some(s=>s.family===binding.family&&s.name===binding.name));
+   assert.deepEqual(binding,{family:'WALKING',name:`${prefix}${kind==='run'?'run':'jmp'}${String(i+(kind==='run'?1:8)).padStart(4,'0')}_1`});
+   const sprite=manifest.spriteBindings.find(s=>s.family===binding.family&&s.name===binding.name);
+   assert.equal(sprite.index,(character-1)*30+i+(kind==='run'?0:12));
   }
   const thresholds=manifest.idleSchedules[prefix].thresholds;
   for(let i=0;i<thresholds.length;i++) {
    const binding=characterFrame(character,'idle',i,thresholds);
+   assert.deepEqual(binding,{family:'IDLE',name:`${prefix}std${String(thresholds[i]).padStart(4,'0')}_1`});
    assert.ok(manifest.sprites.some(s=>s.name===binding.name));
   }
  }
- assert.throws(()=>characterFrame(1,'run',-1),RangeError);
- assert.throws(()=>characterFrame(1,'jump',12),RangeError);
+ for(const [kind,index] of [['run',-12],['run',12],['run',-1.5],['run',NaN],['jump',-1],['jump',12],['idle',-1]])
+  assert.throws(()=>characterFrame(1,kind,index),RangeError);
+});
+
+for(const [character,prefix,base] of [[1,'m',0],[2,'l',30],[3,'p',60]]) test(`negative run indices select adjacent jump resources for ${prefix}`,()=>{
+ // MarioTea/MARIO/MARIO.EXE (pinned by tools/source.py), FILE 0x1375e..0x1377e:
+ // run slot DS:4f66 + 4*index overlaps jump DS:4f32, loaded at 0x1d6fe..0x1d747.
+ // WALKING.GSK indices 14..24, 44..54, 74..84 are jmp0010..0020, not run frames.
+ for(const [index,suffix,resource] of [[-11,10,14],[-10,11,15],[-9,12,16],[-8,13,17],[-7,14,18],
+   [-6,15,19],[-5,16,20],[-4,17,21],[-3,18,22],[-2,19,23],[-1,20,24]]) {
+  const binding=characterFrame(character,'run',index);
+  assert.deepEqual(binding,{family:'WALKING',name:`${prefix}jmp${String(suffix).padStart(4,'0')}_1`});
+  assert.equal(manifest.spriteBindings.find(s=>s.family===binding.family&&s.name===binding.name).index,base+resource);
+ }
+ // Signed IDIV can also yield zero for negative distance; it still selects run0001.
+ assert.deepEqual(characterFrame(character,'run',Math.trunc(-72/6)%12),{family:'WALKING',name:`${prefix}run0001_1`});
 });
 
 test('all recovered Castle clips include their last pixel and exclude adjacent pixels',()=>{
