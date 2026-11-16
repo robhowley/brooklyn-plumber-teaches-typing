@@ -109,6 +109,26 @@ test('Practice original menu hit, case, ignored keys, exact line change, face an
  await point(page,78,184);await expect(page.locator('#game')).toHaveAttribute('data-screen','practice');
  expect((await snapshot(page)).profile.mode).toBe(4);expect(errors).toEqual([]);
 });
+test('Practice consumes the pending key once on the timeout iteration before saving results',async({page})=>{
+ await page.clock.install();await ready(page);
+ await createStudentUI(page,{name:'BOUNDARY',durations:[undefined,undefined,undefined,1]});
+ await page.clock.pauseAt(new Date(await page.evaluate(()=>Date.now()+1000)));
+ await page.locator('#game').press('4');
+ await page.clock.runFor(59900);
+ let s=await snapshot(page);
+ for(let n=0;n<100&&s.ticks<1091;n++) {await page.clock.runFor(1);s=await snapshot(page);}
+ expect(s.ticks).toBe(1091);expect(s.screen).toBe('practice');
+ const target=s.practice.rows[33];
+ await page.locator('#game').press(String.fromCharCode(target));await page.clock.runFor(60);
+ s=await snapshot(page);
+ expect(s.screen).toBe('results');expect(s.ticks).toBe(1092);
+ expect(s.practice).toMatchObject({attempts:1,correct:1,errors:0,index:1,aborted:false});
+ expect(s.result).toMatchObject({accuracy:100,elapsedSeconds:60});expect(s.profile.accuracy).toBe(100);
+ const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem('mtt-static-translation.students.v1')));
+ expect(saved.students.BOUNDARY[19]).toBe(100);
+ const completed=s.practice;
+ await page.clock.runFor(1000);expect((await snapshot(page)).practice).toEqual(completed);
+});
 test('Practice focus pause excludes time; duration ends with zero accuracy and no invented failure',async({page})=>{
  await page.clock.install();await ready(page);await createStudentUI(page,{name:'TIMER',durations:[undefined,undefined,undefined,1]});await page.locator('#game').press('4');
  await page.clock.runFor(10000);await page.locator('#game').evaluate(c=>c.blur());
