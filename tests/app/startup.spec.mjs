@@ -13,10 +13,16 @@ test('natural startup retains59 palette writes,13 RNG draws, then menu idle text
  await page.clock.runFor(10000);s=await snap(page);expect(s.screen).toBe('menu');expect(s.menuIdle).not.toBeNull();
  expect(s.operations.map(o=>o.text)).toHaveLength(6);expect(s.audio.some(e=>e.status==='omitted'&&e.outcomes.some(o=>o.status==='locked'))).toBe(true);expect(errors).toEqual([]);
 });
+test('startup skip helper sends no keys after natural menu entry',async({page})=>{
+ await open(page);await page.clock.runFor(16020);
+ await expect(page.locator('#game')).toHaveAttribute('data-screen','menu');
+ await skipStartupUI(page);const s=await snap(page);
+ expect(s.screen).toBe('menu');expect(s.menu.row).toBe(0);expect(s.inputPending).toBe(false);
+});
 test('separate source skips reach menu without a leaked lesson key and focus does not credit missed waits',async({page})=>{
  await open(page);await page.locator('#game').press('Space');await page.clock.runFor(60);
  await page.locator('#game').evaluate(c=>c.blur());const before=await snap(page);await page.clock.runFor(10000);expect((await snap(page)).startup).toEqual(before.startup);
- await page.locator('#game').focus();await skipStartupUI(page);let s=await snap(page);expect(s.screen).toBe('menu');expect(s.outdoor).toBeNull();expect(s.paletteWrites).toBe(59);
+ await page.locator('#game').focus();await skipStartupUI(page);let s=await snap(page);expect(s.screen).toBe('menu');expect(s.menu.row).toBe(0);expect(s.inputPending).toBe(false);expect(s.outdoor).toBeNull();expect(s.paletteWrites).toBe(59);
  await page.locator('#game').press('4');await page.clock.runFor(300);s=await snap(page);expect(s.screen).toBe('practice');expect(s.practice.attempts).toBe(0);
 });
 for(const character of [1,2,3])test(`character${character} explicit Demo uses all4 world pollers and returns unsaved`,async({page})=>{
