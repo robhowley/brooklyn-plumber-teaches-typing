@@ -108,13 +108,18 @@ export function outdoorPalette(background, character, turtle) {
 
 // Caller passes the recovered outdoor animation kind/index, not a guessed time.
 // FILE 0x1d610..0x1d814 loads these names; idle thresholds identify resource names.
+// MarioTea/MARIO/MARIO.EXE identity is pinned in tools/source.py.
+// FILE 0x1375e..0x1377e: signed run indices -11..-1 address DS:4f66+4*index,
+// inside the preceding 13-entry jump table at DS:4f32 (0x1d6fe..0x1d747).
+// Jump slot index+13 names jmp(index+21), including 0020, not a wrapped run frame.
 export function characterFrame(character, kind, index, idleThresholds) {
   const prefix = character === 2 ? 'l' : character === 3 ? 'p' : 'm';
   let value, family, action;
   if (kind === 'run' && index >= 0 && index < 12) { value=index+1; family='WALKING'; action='run'; }
   else if (kind === 'jump' && index >= 0 && index < 12) { value=index+8; family='WALKING'; action='jmp'; }
+  else if (kind === 'run' && index >= -11 && index < 0) { value=index+21; family='WALKING'; action='jmp'; }
   else if (kind === 'idle' && idleThresholds && index >= 0 && index < idleThresholds.length) { value=idleThresholds[index]; family='IDLE'; action='std'; }
-  else throw new RangeError('unsupported frame, including signed-distance overflow');
+  else throw new RangeError('unsupported frame');
   if (!Number.isInteger(index) || !Number.isInteger(value)) throw new RangeError('frame index');
   return {family, name:`${prefix}${action}${String(value).padStart(4,'0')}_1`};
 }

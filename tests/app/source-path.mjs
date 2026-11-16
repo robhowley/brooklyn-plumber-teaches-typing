@@ -37,19 +37,25 @@ export async function skipStartupUI(page,{muted=true}={}) {
   if(muted)await page.evaluate(()=>{AudioContext.prototype.resume=()=>Promise.reject(new Error('Audio omitted by non-audio test'));});
   await page.locator('#game').focus();
   await page.evaluate(()=>window.scrollTo(0,0));
-  // Queue separate keys for each original skip site before the next sampled tick.
-  for(let i=0;i<4;i++)await page.locator('#game').press('Space');
-  for(let i=0;i<80;i++) {
-    const state=await page.locator('#game').getAttribute('data-screen');
-    if(state==='menu')break;
-    await page.locator('#game').press('Space');
-    // Browser clock only. Never mutate a controller through page.evaluate.
-    if(await page.evaluate(()=>!!window.__sourceTestClock))await page.clock.runFor(60);
-    else await page.waitForTimeout(60);
+  // Synthetic skip events do not unlock audio. Keep a trusted, non-source
+  // gesture for audio suites, without adding another startup/menu key.
+  if(!muted)await page.locator('#game').press('Shift');
+  // Check and queue all four source skip keys in one browser turn. Separate
+  // awaited commands can deliver a late Space to the menu and open File.
+  await page.evaluate(()=>{
+    const game=document.querySelector('#game');
+    if(game.dataset.screen==='startup')for(let i=0;i<4;i++)game.dispatchEvent(new KeyboardEvent('keydown',{key:' ',bubbles:true}));
+  });
+  const ready=()=>{
+    const s=translationSnapshot();
+    // The menu exists before its first callback starts the initial blink.
+    return s.screen==='menu'&&s.menuTimer.delayTicks>0&&s.menuIdle&&!s.menuIdle.waiting&&!s.audioHost.blocking&&!s.inputPending;
+  };
+  if(await page.evaluate(()=>!!window.__sourceTestClock)) {
+    // Advance only browser time until the source input pump is ready.
+    for(let i=0;i<80&&!await page.evaluate(ready);i++)await page.clock.runFor(60);
   }
-  await page.waitForFunction(()=>!translationSnapshot().audioHost.blocking);
-  if(await page.evaluate(()=>!!window.__sourceTestClock))await page.clock.runFor(300);
-  else await page.waitForTimeout(300);
+  await page.waitForFunction(ready);
 }
 export async function setDurationsUI(page,durations) {
   const key=k=>page.locator('#game').press(k);
