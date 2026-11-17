@@ -32,6 +32,21 @@ test('source bytes prove text keys, type flags, numeric clamps, name delete orde
   assert.equal(slice('pixel',0x14fe5,6),'81f900fa7206'); // unsigned linear <64000
 });
 
+test('pinned MARIO.EXE bytes identify independent editor indices and Main key-before-pointer dispatch',()=>{
+  // Member MarioTea/MARIO/MARIO.EXE SHA-256 is asserted above and pinned by
+  // tools/source.py. These are executable FILE offsets, not runtime addresses.
+  assert.equal(slice('student',0xf14d,3),'be0500'); // Preferences keyboard SI=5
+  assert.equal(slice('student',0xf30b,6),'813e7752b000'); // pointer name test, no SI assignment
+  assert.equal(slice('student',0xf437,6),'813e77529000'); // pointer goal test, no SI assignment
+  assert.equal(slice('duration-draw',0x8f4c,6),'c706a8400400'); // keyboard DS:40a8=4
+  assert.equal(slice('duration-draw',0x8fab,2),'33f6'); // separate pointer scan SI=0
+  assert.equal(slice('duration-draw',0x918c,4),'ff0ea840'); // backward keyboard navigation
+  assert.equal(slice('duration-draw',0x91ea,4),'ff06a840'); // forward keyboard navigation
+  assert.equal(slice('menu',0x10e1e,5),'9adb1f0000'); // key pending check
+  assert.equal(slice('menu',0x10e27,10),'9ab10129168bf8e9a703'); // consume then jump past pointer
+  assert.equal(slice('menu',0x10e31,5),'803e795200'); // pointer check follows
+});
+
 test('cursor4/2 counts use changed LOW ticks, preserve wrap and never catch up',()=>{
   assert.equal(slice('text',0x1b0de,7),'b8020050b80400');
   assert.equal(slice('cursor-wait',0x192ce,8),'a12c4e3b46f674dd');
@@ -156,6 +171,61 @@ test('student name/goal/character source pointer boundaries and keyboard parity;
   for(const [input,goal] of [[[48],5],[[57,57,57],150]]) {
     const selected=studentUIInput(state,{pointer:{x:144,y:99}}).state;
     const r=uiKeys(selected,[...input,13]);assert.equal(readStudent(r.state.bytes).goal,goal);
+  }
+});
+
+test('pointer name/goal edits retain the Preferences keyboard index through field completion and navigation',()=>{
+  for(const [name,pointer] of [['name',{x:176,y:70}],['goal',{x:144,y:90}]])
+    for(const selection of [1,3,5]) for(const ending of [27,13,0x148,0x150]) {
+      const initial=uiKeys(createStudentUI(newStudent('OLD')),Array(selection+1).fill(9)).state;
+      let state=studentUIInput(initial,{pointer}).state;
+      assert.equal(state.selection,selection);assert.equal(state.field.name,name);
+      state=uiKeys(state,[57,ending]).state;
+      assert.equal(state.field,null);assert.equal(state.done,false);assert.equal(state.selection,selection);
+      if(ending===27)assert.equal(readStudent(state.bytes)[name],name==='name'?'OLD':5);
+      const entered=studentUIInput(state,{key:13}).state;
+      if(selection===1)assert.equal(entered.field.name,'goal');
+      else if(selection===3)assert.equal(readStudent(entered.bytes).character,2);
+      else assert.equal(entered.done,true);
+      const tab=studentUIInput(state,{key:9}).state;
+      assert.equal(tab.selection,(selection+1)%6);
+      const back=studentUIInput(state,{key:0x14b}).state;
+      assert.equal(back.selection,(selection+5)%6);
+      assert.equal(studentUIInput(back,{key:9}).state.selection,selection);
+    }
+});
+
+test('pointer duration edits retain the keyboard index, Enter follows pointer and backward navigation uses the retained index',()=>{
+  for(const selection of [1,4])for(let i=0;i<4;i++)for(const ending of [27,13,0x148,0x150]) {
+    const initial=uiKeys(createStudentUI(newStudent('OLD'),'times'),Array((selection+1)%5).fill(9)).state;
+    const [x,y]=DURATION_RECTS[i];
+    let state=studentUIInput(initial,{pointer:{x,y}}).state;
+    assert.equal(state.field.name,String(i));assert.equal(state.selection,selection);
+    state=uiKeys(state,[57,ending]).state;
+    assert.equal(state.field,null);assert.equal(state.done,false);assert.equal(state.selection,selection);
+    assert.equal(readStudent(state.bytes).durations[i],ending===27?p.durations[i]:9);
+    const entered=studentUIInput(state,{key:13}).state;
+    assert.equal(entered.field.name,String(i));assert.equal(entered.selection,selection);
+    const tab=studentUIInput(state,{key:9}).state;
+    assert.equal(tab.selection,(selection+1)%5);
+    const back=studentUIInput(state,{key:0x148}).state;
+    assert.equal(back.selection,(selection+4)%5);
+    assert.equal(studentUIInput(back,{key:9}).state.selection,selection);
+  }
+});
+
+test('Preferences keys precede pointer edits, while Times pointer edits precede keys',()=>{
+  const pointer={x:190,y:70};
+  const prefs=studentUIInput(createStudentUI(newStudent('OLD')),{key:9,pointer}).state;
+  assert.equal(prefs.selection,0);assert.equal(prefs.field,null);
+  const times=studentUIInput(createStudentUI(newStudent('OLD'),'times'),{key:9,pointer}).state;
+  assert.equal(times.selection,4);assert.equal(times.field.name,'0');
+});
+
+test('main keys precede pointer activation for activities and menu navigation',()=>{
+  for(const key of [52,13,0x14d])for(const pointer of [{x:250,y:50},{x:120,y:4}]) {
+    const state=createMenu();
+    assert.deepEqual(menuInput(state,{key,pointer,front:blank()},p),menuInput(state,{key},p));
   }
 });
 

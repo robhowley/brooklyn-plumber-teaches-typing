@@ -202,16 +202,18 @@ export function studentUIInput(state,{key=0,pointer=null,messages={}}={},names={
     const x=s16(pointer.x),y=s16(pointer.y);s.pointer={x,y};
     if(times) {
       if(x>=266&&x<=305&&y>=177&&y<=187) {s.done=true;effects.push({type:'save-student',bytes:s.bytes.slice()});}
-      else {const i=DURATION_RECTS.findIndex(([a,b,w,h])=>x>=a&&x<=a+w&&y>=b&&y<=b+h);if(i>=0){s.selection=i;activate=true;}}
+      // FILE 0x8fab..0x911f scans with SI, retaining keyboard index DS:40a8.
+      else {const i=DURATION_RECTS.findIndex(([a,b,w,h])=>x>=a&&x<=a+w&&y>=b&&y<=b+h);if(i>=0)beginField(s,String(i),String(readStudent(s.bytes).durations[i]&0xffff).padEnd(2,' '),2,0x2002);}
     } else {
       if(inside(x,y,[273,179,312,193])) {s.done=true;effects.push({type:'save-student',bytes:s.bytes.slice()});}
       else if(y>130&&y<180) {
         const i=[[66,116],[132,182],[208,258]].findIndex(([a,b])=>x>=a&&x<b);
         if(i>=0) {s.bytes[29]=i+1;return {state:s,effects};}
       }
-      // Source has no upper x bound for the name field (0xf30b..0xf332).
-      if(x>=176&&y>=70&&y<79) {s.selection=0;activate=true;}
-      else if(x>=144&&x<168&&y>=90&&y<=99) {s.selection=1;activate=true;}
+      // FILE 0xf30b..0xf335 / 0xf437..0xf461 enter fields without changing
+      // keyboard SI. The name hitbox has no upper x bound.
+      if(x>=176&&y>=70&&y<79) beginField(s,'name',readStudent(s.bytes).name,8,0x103);
+      else if(x>=144&&x<168&&y>=90&&y<=99) beginField(s,'goal',String(readStudent(s.bytes).goal&0xffff).padEnd(3,' '),3,0x2002);
     }
   }
   if(activate) {
