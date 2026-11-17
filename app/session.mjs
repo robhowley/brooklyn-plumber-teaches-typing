@@ -5,7 +5,7 @@ import { createOutdoor, makeBonus, tick } from '../recovered/outdoor/outdoor.mjs
 import { seedFromTime, lessonPrefix, loadCorpus, selectCorpusSegment, createPractice, practiceInput } from '../recovered/runtime/runtime.mjs';
 import { practiceCorpus, practiceExpression } from '../recovered/worlds/routines.mjs';
 import { newStudent, readStudent, normalizeStudent, studentForSave, recordProblemKey } from '../recovered/control/student.mjs';
-import { progression, nextRoute } from '../recovered/control/flow.mjs';
+import { progression } from '../recovered/control/flow.mjs';
 import { score, timer } from '../recovered/control/scoring.mjs';
 import { lessonLimitSeconds, clampLessonMinutes, resultEntryEffects, resultNextState } from '../recovered/control/results.mjs';
 import { createStartup, createMenuIdle, createMenuIdleState, createDemo, demoStudent } from '../recovered/control/startup.mjs';
@@ -466,14 +466,16 @@ export class Session {
     if(this.advance.advanced&&this.mode===1)this.enterCelebration(1,this.advance);
     else this.enterResults();
   }
+  // MarioTea/MARIO/MARIO.EXE SHA256 6caed439b64dc3bad8de4f9df53b63ae5712bf3c54b0bbfc00603557e4720f5e.
+  // FILE 0x11502..0x11510 (Main), 0x11b92..0x11ba3 (Results) share 0x103f8:
+  // route 0x10412..0x10451, queue slots 0/1/2 0x10457..0x10470, save 0x10471..0x10475.
   next(nowTicks,saveProfile=()=>{}) {
-    if(this.screen!=='results'||this.audioPending)return null;
-    const queued=resultNextState(this.profile),route=nextRoute(this.profile);
+    if(!['menu','results'].includes(this.screen)||this.audioPending||this.profile.demo)return null;
+    const queued=resultNextState(this.profile),route={mode:queued.state.mode,lesson:queued.state.lesson};
     this.student.set(queued.state.pending.map(Number),44);
     const view=new DataView(this.student.buffer);view.setInt16(15,route.mode,true);view.setInt16(25,route.lesson,true);
     this.resultEffects.push(queued.effects[0]);saveProfile();
     if (![1,2,3,4].includes(route.mode)) return route;
-    new DataView(this.student.buffer).setInt16(25,route.lesson,true);
     this.start(nowTicks,route.mode); return route;
   }
   save(storage, profiles) {
