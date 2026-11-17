@@ -1,29 +1,170 @@
 {
   "source": "MarioTea/MARIO/MARIO.EXE",
   "sha256": "6caed439b64dc3bad8de4f9df53b63ae5712bf3c54b0bbfc00603557e4720f5e",
-  "offsetKind": "original member FILE offset, hexadecimal",
-  "translated": [
-    {"function":"durationSeconds","ranges":["16d0e-16d34","b1e6-b20c","d949-d96f"],"state":["DS:50c8 water minutes","DS:50ca castle minutes","DS:50cc practice minutes"],"limits":"Caller supplies default300 or600; low-word signed product preserved"},
-    {"function":"waterCharacter","ranges":["17892-178e5"],"limits":"Ordinary input branch only; bonus/special command dispatch excluded"},
-    {"function":"practiceCorpus","ranges":["b10f-b138"],"state":["DS:50bf goal","DS:50b7 corpus mode"]},
-    {"function":"practiceCharacter","ranges":["b73d-b7e0"],"state":["DS:41c3 cursor","DS:41e6 target row","DS:41b3 last-correct time"],"limits":"Returns next-line action; wrapping and drawing excluded"},
-    {"function":"practiceExpression","ranges":["b4f6-b547","b343-b36d"],"resources":["PRACTICE.GSO indices0,1,2"]},
-    {"function":"castleFailure","ranges":["bc7e-bcd0"],"state":["DS:46e2 failure","DS:46d5 last-input time"],"limits":"Operation2 only; no timing-unit conversion"},
-    {"function":"waterSwimmer","ranges":["17301-17453"],"state":["DS:4c9b peak","DS:4c99 delay","DS:5006 x","DS:5004 y","DS:4c1a update counter","DS:4ff8 frame","DS:4c1f ended"],"limits":"Random bubble spawn/rendering excluded"},
-    {"function":"waterPursuer","ranges":["1711d-172cf"],"state":["DS:4c31 mode","DS:4c33 frame","DS:4c35 y","DS:4c37 x","DS:4c39 drawnX","DS:4c21 savedY","DS:4c1d failurePhase"],"resources":["WATER.GSO indices18..22 bite","WATER.GSO indices23..32 octo"]},
-    {"function":"waterBubble","ranges":["17013-170f5"],"state":["record+0 active","+1 x","+3 y","+5 dx","+7 dy","+9 large"],"resources":["inline sprites DS:2a9c and DS:2aa8"],"limits":"Caller owns ten-slot pool allocation and scheduling"},
-    {"function":"castleApproach","ranges":["c7f3-c845"],"state":["BP-0x10 velocity","BP-0xc target","DS:5006 x"]},
-    {"function":"castleRockface","ranges":["c451-c4d9"],"state":["DS:469f +18*index","record+0 x","+2 y","+8 phase"],"resources":["CASTLE.GSO indices0..3"],"limits":"Valid phase0,1..32,100; no rendering or collision invented"},
-    {"function":"castleSand","ranges":["cd7a-cdac"],"state":["DS:50b9 WPM","DS:468b text target","DS:5006 x","DS:5004 y"]},
-    {"function":"castleTextTarget","ranges":["bf30-bf47"],"state":["DS:4689 correct in segment","DS:468d queue length","DS:468b target"],"limits":"Positive queue length or0; preserve signed16 low product"}
-  ],
-  "notTranslated": [
-    {"area":"practice line wrapping","range":"b3e1-b4d3","reason":"32-byte lookahead/rewind and long-word cases require additional contract proof"},
-    {"area":"castle sentence collection","range":"dd93-ddfa","reason":"Shared circular corpus lifecycle and fatal error callback not implemented"},
-    {"area":"bonus animation","ranges":["17801-17890","bdba-be80","17ef9-17fa3","de6c-df45"],"reason":"BAN/ANI payload and shared bonus activation remain unresolved"},
-    {"area":"pause and extended keys","ranges":["177e4-177ff","bd65-bdae","b712-b73a"],"reason":"Shared keyboard translation and option gates not translated"},
-    {"area":"castle scripted pipe/scene rendering","ranges":["c082-c27b","ca14-cb14","d127-d227","cefa-d378"],"reason":"Draw/clipping/decompression and synchronization omitted; sequence documented"},
-    {"area":"RNG and scheduling","reason":"No original-machine execution; seed and update cadence not recovered here"},
-    {"area":"full gameplay equivalence","reason":"No claim; unit tests validate authored translations against statically derived expectations only"}
+  "archiveSha256": "b59886a6f7b48b0057c8db1c099ed598c8a3581245b0f8884316203de55784bd",
+  "offsetKind": "original member FILE byte offsets, hexadecimal, inclusive",
+  "scope": "Curated claims for selected routines and formerly stale omissions, not an inventory of the whole game or proof of exhaustive equivalence. Tests compare authored translations with statically derived expectations, never original-machine execution.",
+  "maintenance": "Authored evidence, not build output. No app/recovered/tools consumers or coverage producer found when replacing the old translated/notTranslated buckets; no compatibility reader is needed. Original-derived bytes, listings, text and numerical tables remain ignored, not copied into this file.",
+  "statusMeaning": {
+    "implemented": "Only the stated claim is implemented; limits and browser adaptations still apply.",
+    "omitted": "Source behavior deliberately not reproduced, with the replacement identified.",
+    "unknown": "The cited evidence does not establish the stated property. Not a claim that the whole routine is untranslated."
+  },
+  "entries": [
+    {
+      "id": "durationSeconds", "status": "implemented",
+      "ranges": ["0x16d0e-0x16d39", "0xb1e6-0xb211", "0xd949-0xd974"],
+      "claim": "Signed low-word minutes times 60; caller supplies the 300/600-second default.",
+      "implementation": ["recovered/worlds/routines.mjs#durationSeconds"],
+      "tests": ["tests/worlds/routines.test.mjs#word multiplication truncates before sign extension"]
+    },
+    {
+      "id": "waterCharacter", "status": "implemented", "ranges": ["0x17892-0x178e5"],
+      "claim": "Ordinary input 32..127, exact case and signed counters only; bonus/special dispatch is separate.",
+      "implementation": ["recovered/worlds/routines.mjs#waterCharacter"],
+      "tests": ["tests/worlds/routines.test.mjs#water compares exact case and counts DEL but not CR or extended keys"]
+    },
+    {
+      "id": "practiceCorpus", "status": "implemented", "ranges": ["0xb10f-0xb13d"],
+      "claim": "Goal thresholds 10/30 select letters/words/sentenc despite activity mode4.",
+      "implementation": ["recovered/worlds/routines.mjs#practiceCorpus"],
+      "tests": ["tests/worlds/routines.test.mjs#practice corpus follows goal thresholds despite activity mode4"]
+    },
+    {
+      "id": "practiceCharacter", "status": "implemented", "ranges": ["0xb73d-0xb7e3"],
+      "claim": "Ordinary input, SPACE/CR at NUL target, counters and last-correct update; helper returns a next-line action rather than drawing.",
+      "implementation": ["recovered/worlds/routines.mjs#practiceCharacter", "recovered/runtime/runtime.mjs#practiceInput"],
+      "tests": ["tests/worlds/routines.test.mjs#practice line ending is space or CR, not LF; errors do not reset expression timer"]
+    },
+    {
+      "id": "practiceExpression", "status": "implemented", "ranges": ["0xb4f6-0xb547", "0xb343-0xb371"],
+      "claim": "Strict idle >15 and WPM >goal choose the expression resource.",
+      "resources": [{"member": "MarioTea/MARIO/PRACTICE.GSO", "sha256": "2cb053fb1e016d3bd322e09a64406a521a5c903a33df535c8da4acb05a3976b1", "indices": [0, 1, 2]}],
+      "implementation": ["recovered/worlds/routines.mjs#practiceExpression"],
+      "tests": ["tests/worlds/routines.test.mjs#practice expressions use strict >15 idle and strict >goal success"]
+    },
+    {
+      "id": "castleFailure", "status": "implemented", "ranges": ["0xbc7e-0xbcd1"],
+      "claim": "Operation2 accuracy/inactivity gates with signed32 elapsed subtraction, not a timing-unit conversion.",
+      "implementation": ["recovered/worlds/routines.mjs#castleFailure"],
+      "tests": ["tests/worlds/routines.test.mjs#castle failure gates and exact thresholds"]
+    },
+    {
+      "id": "waterSwimmer", "status": "implemented", "ranges": ["0x17301-0x17456"],
+      "claim": "One numeric movement update, peak-relative low-word WPM product, old-Y delay and frame cycle; not pool allocation or rendering.",
+      "implementation": ["recovered/worlds/routines.mjs#waterSwimmer"],
+      "tests": ["tests/worlds/routines.test.mjs#water follows peak-relative WPM, moves one vertical pixel, wraps x and cycles six frames"]
+    },
+    {
+      "id": "waterPursuer", "status": "implemented", "ranges": ["0x1711d-0x172d2"],
+      "claim": "Pursuit/failure coordinates and frame selection before wrap-driven mode change.",
+      "resources": [{"member": "MarioTea/MARIO/WATER.GSO", "sha256": "1d61258b81c917bfd48a7bd7d22905ae8181e114d1154389853b63bd06836aae", "indices": [18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32]}],
+      "implementation": ["recovered/worlds/routines.mjs#waterPursuer"],
+      "tests": ["tests/worlds/routines.test.mjs#pursuer frame resources and wrap-driven mode change"]
+    },
+    {
+      "id": "waterBubble", "status": "implemented", "ranges": ["0x17013-0x170f8"],
+      "claim": "One active bubble movement, enlargement and inclusive bounds; caller owns the ten-slot pool and scheduling.",
+      "implementation": ["recovered/worlds/routines.mjs#waterBubble"],
+      "tests": ["tests/worlds/routines.test.mjs#water bubbles divide toward zero, enlarge after dy reaches -11, use inclusive bounds"]
+    },
+    {
+      "id": "castleApproach", "status": "implemented", "ranges": ["0xc7f3-0xc847"],
+      "claim": "Signed acceleration toward target with asymmetric +1 and equality reset.",
+      "implementation": ["recovered/worlds/routines.mjs#castleApproach"],
+      "tests": ["tests/worlds/routines.test.mjs#castle approach accelerates and retains original asymmetric +1"]
+    },
+    {
+      "id": "castleRockface", "status": "implemented", "ranges": ["0xc451-0xc4de"],
+      "claim": "Trigger and phases 0,1..32,100 select position/resource; no collision calculation occurs in this routine.",
+      "resources": [{"member": "MarioTea/MARIO/CASTLE.GSO", "sha256": "dc62d4fcfbe8499ac6da2a6e78fcecbad0a0611f3774eae90351c9f8bd177a62", "indices": [0, 1, 2, 3]}],
+      "implementation": ["recovered/worlds/routines.mjs#castleRockface"],
+      "tests": ["tests/worlds/routines.test.mjs#rockface starts at x equality, follows 32 samples then remains at state100"]
+    },
+    {
+      "id": "castleSand", "status": "implemented", "ranges": ["0xcd7a-0xcdac"],
+      "claim": "WPM-derived depth and one-pixel forward approach, not a collision/death check.",
+      "implementation": ["recovered/worlds/routines.mjs#castleSand"],
+      "tests": ["tests/worlds/routines.test.mjs#sand depth and text progress are integer formulas, not collision or death checks"]
+    },
+    {
+      "id": "castleTextTarget", "status": "implemented", "ranges": ["0xbf30-0xbf49"],
+      "claim": "Signed low-word product divided by queue length; zero length retains previous target.",
+      "implementation": ["recovered/worlds/routines.mjs#castleTextTarget"],
+      "tests": ["tests/worlds/routines.test.mjs#sand depth and text progress are integer formulas, not collision or death checks"]
+    },
+    {
+      "id": "practiceLine", "status": "implemented", "ranges": ["0xb3e1-0xb4d3"],
+      "claim": "32-byte lookahead/rewind, LF, long-word repetition and NUL-copy behavior, not conventional word wrapping.",
+      "implementation": ["recovered/runtime/runtime.mjs#practiceLine", "recovered/runtime/runtime.mjs#advancePracticeLine"],
+      "tests": ["tests/runtime/runtime.test.mjs#long word repeats rather than conventional hard wrapping; trailing fragment rewinds", "tests/runtime/runtime.test.mjs#strcpy semantics stop at embedded NUL even though source cursor consumes later bytes", "tests/runtime/runtime.test.mjs#nine fills populate rows1..9 and never row0; line advance shifts exactly eight rows"]
+    },
+    {
+      "id": "castleSentence", "status": "implemented", "ranges": ["0xdd93-0xddfa", "0x93f6-0x9649"],
+      "claim": "Shared circular reader, whitespace normalization and 500-byte bound including backtick.",
+      "adaptation": "RangeError replaces the source fatal-error route; unusable corpus scans are bounded for host safety.",
+      "implementation": ["recovered/worlds/castle.mjs#castleSentence", "recovered/runtime/runtime.mjs#loadCorpus", "recovered/runtime/runtime.mjs#nextCastle"],
+      "tests": ["tests/worlds/castle.test.mjs#dd93 reader normalizes whitespace, retains duplicates, counts backtick in500 bound", "tests/runtime/runtime.test.mjs#water collapses whitespace, castle preserves repeats, practice retains LF and skips backtick"]
+    },
+    {
+      "id": "bonusPlayback", "status": "implemented",
+      "ranges": ["0x17801-0x17891", "0xbdba-0xbe82", "0x17ef9-0x17fa3", "0xde6c-0xdf45"],
+      "claim": "Water/Castle punctuation intercept before ordinary scoring, stopped timer, two changed-tick waits per BAN/ANI packet, scene restoration and input flush. Not a claim about every celebration wait.",
+      "implementation": ["recovered/worlds/water.mjs#stepWater", "recovered/worlds/castle.mjs#resumeBonus", "app/session.mjs#stepWaterHost", "app/session.mjs#stepCastleHost", "app/water-render.mjs#drawWaterBonusPacket", "app/castle-render.mjs#drawCastleBonusPacket"],
+      "tests": ["tests/app/water-integration.test.mjs#bonus uses two distinct changed ticks per packet, flushes input and excludes stopped time", "tests/app/castle-integration.test.mjs#Castle bonus exact packets, two changed ticks, stop/restore/flush and retained clocks", "tests/worlds/water-render.test.mjs#all three complete bonus sequences match fresh BAN commands and ANI records, including dirty restore", "tests/worlds/castle-render.test.mjs#all three Castle BAN/ANI movies preserve persistent writes and previous-sprite restoration"]
+    },
+    {
+      "id": "extendedKeysAndQuit", "status": "implemented",
+      "ranges": ["0x19221-0x1927e", "0x177e4-0x17800", "0xbd65-0xbdb0", "0xb712-0xb73c", "0x149fc-0x14a1e"],
+      "claim": "Separate pending/read/flush and extended-prefix normalization; option-gated Alt-X quits, it is not pause. Escape aborts the lesson.",
+      "adaptation": "DOM key mapping and an unbounded host FIFO replace DOS input services. Session.suspend is browser focus suspension, not recovered game pause behavior.",
+      "implementation": ["recovered/runtime/runtime.mjs#createPendingInput", "recovered/worlds/water.mjs#stepWater", "recovered/worlds/castle.mjs#operation", "app/session.mjs#dosKey", "app/session.mjs#step", "app/session.mjs#suspend"],
+      "tests": ["tests/runtime/runtime.test.mjs#pending/read are distinct source operations, including incomplete extended prefixes", "tests/worlds/water.test.mjs#option10 extended quit exits process path, not pause or lesson results", "tests/app/audio-integration.test.mjs#all worlds and Demo consume disabled Alt-X without abort or counted attempt", "tests/app/session.test.mjs#suspend freezes active ticks and mechanics; resume excludes wall time"]
+    },
+    {
+      "id": "castleScenes", "status": "implemented",
+      "ranges": ["0xc082-0xc27b", "0xca14-0xcb16", "0xd127-0xd229", "0xcefa-0xd37a"],
+      "claim": "Scripted pipe/scene sequence, clipping and 40-strip transitions with dirty restoration and decoded BGS backgrounds; not all rendering or synchronization in the executable.",
+      "implementation": ["recovered/worlds/castle.mjs#scenes", "app/castle-render.mjs#beginCastleTransition", "app/castle-render.mjs#stepCastleTransition", "app/castle-render.mjs#finishCastleTransition"],
+      "tests": ["tests/worlds/castle.test.mjs#two complete cycles, every stage,40 strips, pipe coordinates and exact repeated RNG tests", "tests/worlds/castle-render.test.mjs#all 40 transition strips restore aligned unions from scratch, every scene and character", "tests/worlds/castle-render.test.mjs#all stages, pipes and sink frames use dirty erasure rather than scene redraw"]
+    },
+    {
+      "id": "randomAndWorldWaits", "status": "implemented",
+      "ranges": ["0x37be-0x382c", "0x126a0-0x126b3", "0x192a2-0x192e1", "0x17943-0x17a08", "0xc01c-0xc020"],
+      "claim": "Low16 time seed, RNG recurrence/scaling and shared draw order; Water/Castle gameplay and bonus waits observe a changed low tick once without gap catch-up. Other host wait sites are outside this claim.",
+      "adaptation": "Browser time supplies seconds/ticks; BIOS_HZ=18.2 is a host conversion, not measured original-machine cadence or a recovered original session seed.",
+      "implementation": ["recovered/runtime/runtime.mjs#seedFromTime", "recovered/runtime/runtime.mjs#random15", "recovered/runtime/runtime.mjs#scaleRandom", "app/session.mjs#changedTick", "app/session.mjs#stepWaterHost", "app/session.mjs#stepCastleHost"],
+      "tests": ["tests/runtime/runtime.test.mjs#srand uses low16 time, and recurrence agrees with exact integer product", "tests/runtime/runtime.test.mjs#bounded random is signed low32 multiply /32768, low16 return", "tests/app/integration.test.mjs#shared RNG consumes prefix, segment, four bonus draws then pre-reset delay, persists across activities", "tests/app/water-integration.test.mjs#bonus uses two distinct changed ticks per packet, flushes input and excludes stopped time", "tests/app/castle-integration.test.mjs#Castle bonus exact packets, two changed ticks, stop/restore/flush and retained clocks"]
+    },
+    {
+      "id": "practiceCursor", "status": "implemented",
+      "ranges": ["0xb64e-0xb69a", "0x1aced-0x1aefb", "0x192ce-0x192db"],
+      "claim": "8x8 space cell at (30+8*index,96), including column32; 4/2 changed-tick color phases and reset before input/timeout dispatch.",
+      "resources": [{"member": "MarioTea/MARIO/FONT5H.GSO", "sha256": "aa9b883273bf0997b4e128c4a72eb7028c534656d1c284948cf51cae74968464", "indices": [0], "ranges": ["0x22-0x6b"]}],
+      "implementation": ["app/session.mjs#step", "app/render.mjs#practice"],
+      "tests": ["tests/app/integration.test.mjs#Practice cursor shares the low-word wait sample, exact 4/2 phases, duplicates, gaps and rollover", "tests/app/integration.test.mjs#renderer uses exact indexed palettes, origin, masks, ground, idle and decoded ANI at the app boundary"]
+    },
+    {
+      "id": "certificateDocument", "status": "implemented",
+      "ranges": ["0xaaf9-0xaea6", "0xa903-0xa971", "0xa9a3-0xa9f5", "0xaa8b-0xaaf8", "0xaecf-0xb0a5", "0xeeed-0xef0a", "0x20d4e-0x20dc9", "0x20dd2-0x20ddc"],
+      "claim": "Completed-level selection/reprint and 60x80 padded CRLF text document, including border, centered art and messages. Selection/printing do not change printed/pending/save flags.",
+      "resources": [{"member": "MarioTea/MARIO/ENGLISH.MSD", "sha256": "fd2168878e19b1b85ae0c6ce8e14ad4386a801e7c460ed134bde5f181cb29e15", "indices": [21, 22, 23, 96, 97, 98, 99, 100, 101], "ids": [200, 201, 202, 4200, 4201, 4202, 4203, 4204, 4205]}],
+      "adaptation": "Native HTML selector and browser print dialog replace the DOS selector raster and printer transport. No separate export/PDF generator; final pagination depends on the browser/printer.",
+      "implementation": ["recovered/control/certificate.mjs#certificateLevels", "recovered/control/certificate.mjs#certificateDocument", "app/certificate.mjs#openCertificateSelector"],
+      "tests": ["tests/control/certificate.test.mjs#only completed levels can print, including already printed and nonpending levels", "tests/control/certificate.test.mjs#entire padded CRLF document matches independently decoded pinned source for every level/name", "tests/app/certificate.spec.mjs#completed and printed levels reprint exact text natively without changing profile or storage"]
+    },
+    {
+      "id": "dosDeviceTransport", "status": "omitted", "ranges": ["0x4a41-0x4a56", "0x4ddb-0x4deb", "0xa9a3-0xa9f5"],
+      "claim": "DOS keyboard polling/blocking and printer device output are not reproduced.",
+      "adaptation": "DOM input, nonblocking host FIFO and browser printing replace these device operations, not a DOS device emulator.",
+      "implementation": ["recovered/runtime/runtime.mjs#createPendingInput", "app/certificate.mjs#openCertificateSelector"],
+      "tests": ["tests/control/host.test.mjs#source raw keyboard has one C pushback byte, no recovered DOS queue capacity", "tests/app/certificate.spec.mjs#completed and printed levels reprint exact text natively without changing profile or storage"]
+    },
+    {
+      "id": "dosKeyboardCapacity", "status": "unknown", "ranges": ["0x4a41-0x4a56", "0x4ddb-0x4deb", "0x19241-0x1927e"],
+      "claim": "These DOS service calls and normalization code do not establish the original keyboard queue capacity or overflow behavior. Host FIFO capacity is not evidence for either.",
+      "implementation": ["recovered/runtime/runtime.mjs#createPendingInput"],
+      "tests": ["tests/control/host.test.mjs#source raw keyboard has one C pushback byte, no recovered DOS queue capacity"]
+    }
   ]
 }
