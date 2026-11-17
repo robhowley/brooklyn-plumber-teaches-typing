@@ -140,8 +140,19 @@ export function createMenuIdle({rng,input,timer,nowTicks,demo=false}) {
     }
     return events;
   }
+  // Shared routine 0x10c27..0x10ce2, also called directly by the eye press
+  // at 0x11169..0x11190. GREET2 indices 4/3/2, bindings 0x11b33..0x11b81.
+  // No input flush, random timer update or speech request on this path.
+  function blink() {
+    if(state.waiting) throw new Error('Menu blink still waiting');
+    state.blink=false;
+    sequence=[wait(1,0x10c50),draw('GREET2','eyes0044_halfway',50,47),
+      wait(1,0x10c79),draw('GREET2','eyes0043_closed',50,47),wait(2,0x10cae),
+      draw('GREET2','eyes0042_open',50,47)];
+    return drain();
+  }
   input.flush(); // 0x10dd8, return-to-menu clears unread lesson/demo keys.
-  return {state,
+  return {state,blink,
     step({nowTicks,demo:activeDemo=state.demoActive,fileDropdownOpen=false,completedWaits=0}={}) {
       const events=[];
       if(!Number.isInteger(nowTicks)) throw new TypeError('Explicit source tick sample required');
@@ -167,12 +178,7 @@ export function createMenuIdle({rng,input,timer,nowTicks,demo=false}) {
       } else if(state.blink) {
         state.blink=false;
         if(fileDropdownOpen) state.idleSince=nowTicks|0;
-        else {
-          sequence=[wait(1,0x10c50),draw('GREET2','eyes0044_halfway',50,47),
-            wait(1,0x10c79),draw('GREET2','eyes0043_closed',50,47),wait(2,0x10cae),
-            draw('GREET2','eyes0042_open',50,47)];
-          events.push(...drain());
-        }
+        else events.push(...blink());
       }
       return events;
     },

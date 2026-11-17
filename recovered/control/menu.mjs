@@ -60,7 +60,8 @@ export function menuInput(state,{key=0,pointer=null,front=null,messages={}}={},p
     } else {
       const hit=mainMenuHit(x,y);
       if(hit>=0) command=['outdoor','water','castle','practice','report','next'][hit];
-      else if(x>=50&&x<=75&&y>=47&&y<=66) effects.push({type:'incomplete',command:'menu-character-animation'});
+      // FILE 0x11169..0x11190, inclusive eye bounds, closed dropdown only.
+      else if(x>=50&&x<=75&&y>=47&&y<=66) effects.push({type:'menu-blink'});
     }
   }
   if(command==='activate-menu'&&s.row) command=MENU_COMMANDS[s.column-1][s.row-1];

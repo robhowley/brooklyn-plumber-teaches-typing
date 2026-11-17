@@ -54,7 +54,10 @@ class InspectTests(unittest.TestCase):
                     for name in ['render/inspect.py', 'control/startup-inspect.py', 'control/menu-inspect.py']:
                         runpy.run_path(str(root / 'tools' / name), run_name='__main__')
                 listings = {str(p.relative_to(root)): p.read_text() for p in root.rglob('*.asm.txt')}
-                self.assertEqual(len(listings), 38)
+                # Task80 adds greeting, blink and font source spans to the 38 existing listings.
+                self.assertEqual(len(listings), 42)
+                for name in ('greeting', 'blink', 'font-init', 'font-raster'):
+                    self.assertIn(f'.tmp/menu/{name}.asm.txt', listings)
                 self.assertEqual(sum(not p.startswith('.tmp/') for p in listings), 28)
                 # Exact full text equals objdump output with only its known header replaced.
                 self.assertCountEqual(listings.values(), raw)

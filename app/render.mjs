@@ -168,15 +168,24 @@ export class Renderer {
     if(state.field) {const placement=studentFieldPlacement(state);drawTextField(this.front,this.fonts[placement.font],state.field,{...placement,inverted});}
     this.operations=ops;this.present();
   }
-  chooser(state) {this.background('LOAD');drawStudentChooserNames(this.front,this.fonts.FONT5H,state);this.present();}
+  chooser(state) {
+    this.background('LOAD');
+    if(state.names.length)drawStudentChooserNames(this.front,this.fonts.FONT5H,state);
+    // MARIO.EXE FILE 0xf7b1..0xf7dc, ENGLISH.MSD 2500 (member offset 0x6c2).
+    else this.text(this.data.messages[2500],112,96,{color:4,shadow:8});
+    this.present();
+  }
   menu(profile,state) {
     this.background('MAINMENU'); this.front.fill(14,0,320*8);
     for(const [id,x] of [[1100,16],[1110,104],[1120,224]]) this.text(this.data.messages[id],x,0,{color:0,shadow:0});
-    // Welcome palette slot mapping still untraced, visibly isolated host choice.
+    // MARIO.EXE FILE 0x109ec..0x10a29 maps foreground slot 1 to 55 for
+    // saved and guest greetings (0x10aad..0x10add). Slot 2 defaults to 8
+    // at 0x1ac76..0x1ac91; FONT5H has only 0/1 samples, zero stays transparent.
+    // Member hashes and static slices: tools/control/menu-inspect.py.
     if(profile.profilePresent) {
-      this.text(this.data.messages[1150],144,34,{color:12,shadow:55});
-      this.text(profile.name+'!',136+Math.floor((8-profile.name.length)/2)*8,49,{color:12,shadow:55});
-    } else for(let i=0;i<5;i++) this.text(this.data.messages[1250+i],136,24+i*10,{color:12,shadow:55});
+      this.text(this.data.messages[1150],144,34,{color:55,shadow:8});
+      this.text(profile.name+'!',136+Math.floor((8-profile.name.length)/2)*8,49,{color:55,shadow:8});
+    } else for(let i=0;i<5;i++) this.text(this.data.messages[1250+i],136,24+i*10,{color:55,shadow:8});
     if(this.menuEyes) {const r=this.startupSprites.GREET2[this.menuEyes];blitSprite(this.front,r.sprite,r.pixels,50,47);}
     if(this.menuBubble) {
       // FILE 0x10742..0x108ed, 2-pixel frame and rows20..23, color14.

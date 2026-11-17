@@ -213,6 +213,7 @@ function menuEvent(event) {
     if(effect.type==='start') {if(effect.lesson)new DataView(session.student.buffer).setInt16(25,effect.lesson,true);if([1,2,3,4].includes(effect.mode))start(effect.mode);else limitation(effect);}
     else if(effect.type==='set-lesson')new DataView(session.student.buffer).setInt16(25,effect.lesson,true);
     else if(effect.type==='save-student')save();
+    else if(effect.type==='menu-blink')session.presentationEffects.push(...session.menuIdle.blink());
     else if(effect.type==='demo') {session.selectDemo();}
     else if(effect.type==='new-student')openEditor('new',fromDropdown);
     else if(effect.type==='edit-student')openEditor('edit',fromDropdown);

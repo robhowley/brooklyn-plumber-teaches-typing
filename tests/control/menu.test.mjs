@@ -79,6 +79,19 @@ test('88 intercepts entire 7x7 before bar, dropdown and world; linear source wra
   assert.deepEqual(menuInput(createMenu(),{key:49,pointer:{x:20,y:0},front},p).effects,[{type:'start',mode:1}]);
 });
 
+test('eye hitbox is inclusive, below palette88 interception and closed-dropdown dispatch',()=>{
+  for(const x of [50,60,75])for(const y of [47,55,66]) {
+    const pointer={x,y};
+    assert.deepEqual(menuInput(createMenu(),{pointer,front:blank()},p).effects,[{type:'menu-blink'}]);
+    const dropdown=menuInput({...createMenu(),row:1},{pointer,front:blank()},p);
+    assert.equal(dropdown.state.row,0);assert.equal(dropdown.effects.some(e=>e.type==='menu-blink'),false);
+    const front=blank();front[y*320+x]=88;
+    assert.deepEqual(menuInput(createMenu(),{pointer,front},p).effects,[{type:'sound-request',name:'welcome'}]);
+  }
+  for(const [x,y] of [[49,55],[76,55],[60,46],[60,67]])
+    assert.deepEqual(menuInput(createMenu(),{pointer:{x,y},front:blank()},p).effects,[]);
+});
+
 test('every activity is selectable by key or pointer without changing student progress',()=>{
   for(const profile of [p,{...p,profilePresent:false},{...p,profilePresent:false,demo:true}]) {
     const before=structuredClone(profile);
