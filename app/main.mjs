@@ -47,7 +47,7 @@ const session=new Session(data,{bytes:current?Uint8Array.from(current):null,audi
 renderer=new Renderer(canvas,data); await renderer.load();
 // Source citations below refer to MarioTea/MARIO/MARIO.EXE, SHA256
 // 6caed439b64dc3bad8de4f9df53b63ae5712bf3c54b0bbfc00603557e4720f5e.
-let pointer={x:160,y:100}, leftPressed=false, pendingKey=0, pendingMenuPointer=null, selection=0, editorReturn='menu', editorReset=false;
+let pointer={x:160,y:100}, pointerButtons=0, pendingKey=0, pendingMenuPointer=null, selection=0, editorReturn='menu', editorReset=false;
 // Practice polls/reads repeatedly (FILE 0xb6ff..0xb710, 0xb7e6..0xb7ee).
 // Browser policy: 64 normalized events, drop newest. Not a recovered DOS capacity.
 const practiceKeys=[];
@@ -169,11 +169,12 @@ function chooserEvent(event) {
   for(const effect of result.effects) if(effect.type==='load-student')loadStudent(effect.name);else limitation(effect);
   if(chooser.done) {chooser=null;session.screen='menu';setPointer(pointer);flush();focusGame();}else draw();
 }
-function openModal(kind,section=1) {
+function openModal(kind,section=1,fromPointer=false) {
   syncCursor();if(session.screen==='menu')renderer.menu(session.profile,menu);
   // Only main's Report caller saves coordinates (FILE 0x114d5..0x114ff).
   savedModal={screen:session.screen,front:renderer.front.slice(),palette:renderer.palette,
-    pointer:kind==='report'&&session.screen==='menu'?{...pointer}:null,operations:renderer.operations};
+    pointer:kind==='report'&&session.screen==='menu'?{...pointer}:null,operations:renderer.operations,
+    openerHeld:fromPointer&&['report','about'].includes(kind)&&!!(pointerButtons&1)};
   modal=kind==='help'?openHelp(section,session.screen,data.control.help[section]):{kind,returnTo:session.screen,closed:false};
   session.screen=kind;flush();
   // Entry positioning: FILE 0xe94c, 0x14650, 0x1218e, 0x155fc.
@@ -220,7 +221,7 @@ function menuEvent(event) {
     else if(effect.type==='edit-student')openEditor('edit',fromDropdown);
     else if(effect.type==='lesson-times')openEditor('times');
     else if(effect.type==='load-student')openChooser();
-    else if(['help','keyboard','about','report'].includes(effect.type))openModal(effect.type,effect.operation);
+    else if(['help','keyboard','about','report'].includes(effect.type))openModal(effect.type,effect.operation,!!event.pointer);
     else limitation(effect);
   }
   draw();
@@ -246,10 +247,12 @@ function resultsAction(command) {
 canvas.addEventListener('keydown',event=>{
   if(stopped)return;
   const key=dosKey(event);if(!key)return;event.preventDefault();
-  if(session.audioPending || (key===0x12d&&!session.option10&&!session.active&&!['menu','startup'].includes(session.screen))) {flush();return;}
+  // Report/About accept every key; Keyboard repeats only F1 (FILE
+  // 0x14803..0x1481f, 0x14669..0x1467f). Alt-X here dismisses, not quits.
+  if(session.audioPending || (key===0x12d&&!['report','about','keyboard'].includes(modal?.kind)&&!session.option10&&!session.active&&!['menu','startup'].includes(session.screen))) {flush();return;}
   if(modal)modalEvent({key});
   else if(studentUI)studentEvent({key});
-  else if(chooser)chooserEvent({key,pointer:leftPressed?pointer:null});
+  else if(chooser)chooserEvent({key,pointer:pointerButtons&1?pointer:null});
   else if(session.screen==='startup'||session.screen==='celebration') {if(!session.suspended)session.enqueue(key);}
   else if(session.active) {
     if(!session.suspended&&([2,3].includes(session.mode)||session.demo))session.enqueue(key);
@@ -266,31 +269,50 @@ function locationInCanvas(event) {
   return {x:Math.min(305,Math.floor((event.clientX-r.left)*320/r.width)),y:Math.min(187,Math.floor((event.clientY-r.top)*200/r.height))};
 }
 // Browser motion is tracked even during fields; original driver polling there
-// is unestablished. Motion never calls an activation reducer or redraws front.
+// is unestablished. Motion alone never activates a control or redraws front.
 canvas.addEventListener('pointermove',event=>{setPointer(locationInCanvas(event));presentPointer();});
 canvas.addEventListener('pointerenter',event=>{pointerInside=true;setPointer(locationInCanvas(event));presentPointer();});
 canvas.addEventListener('pointerleave',()=>{pointerInside=false;presentPointer();});
-// A fresh left press, not a click synthesized after a release or a right button.
-canvas.addEventListener('pointerdown',event=>{
-  if(stopped||session.audioPending)return;
-  pointerInside=true;setPointer(locationInCanvas(event));
-  if(event.button===0) {
-    if(!leftPressed)session.audio({type:'effect',id:8,file:0x149bc});
-    leftPressed=true;
+// FILE 0x14813..0x1481a compares the whole button word, not its left bit.
+// Track it before modal entry (0x148c6..0x148d9), including browser chords.
+function trackPointerButtons(buttons) {
+  const previous=pointerButtons;pointerButtons=buttons;
+  // Browser adaptation: preserve press-to-open usability by finishing only
+  // the opener's left release before delivering modal changes. The source
+  // activates on press (0x10e3b..0x10e51), then repolls at modal entry; it
+  // has no release drain. Keyboard entry inherits every held bit.
+  if(savedModal?.openerHeld&&!(buttons&1)) {
+    savedModal.openerHeld=false;return (previous&~1)!==buttons;
   }
+  return previous!==buttons;
+}
+window.addEventListener('pointermove',event=>{
+  const changed=trackPointerButtons(event.buttons);
+  if(changed&&!stopped&&!session.audioPending&&modal&&['report','about'].includes(modal.kind))modalEvent({pointer});
+});
+// A fresh left press, not a click synthesized after a release or a right button.
+window.addEventListener('pointerdown',event=>{
+  const leftPressed=!!(pointerButtons&1),changed=trackPointerButtons(event.buttons);
+  if(stopped||session.audioPending)return;
+  if(event.target===canvas) {
+    pointerInside=true;setPointer(locationInCanvas(event));
+    if(event.button===0&&!leftPressed)session.audio({type:'effect',id:8,file:0x149bc});
+  }
+  if(modal&&['report','about'].includes(modal.kind)) {event.preventDefault();if(changed)modalEvent({pointer});return;}
+  if(event.target!==canvas)return;
   if(session.screen==='celebration'&&!session.suspended) {event.preventDefault();session.stepPresentation(0,now(),true);draw();return;}
-  if(modal&&['report','about'].includes(modal.kind)) {event.preventDefault();modalEvent({pointer});return;}
-  if(event.button!==0)return;event.preventDefault();leftPressed=true;canvas.focus();
+  if(event.button!==0)return;event.preventDefault();canvas.focus();
   if(modal)modalEvent({pointer});else if(studentUI)studentEvent({pointer});else if(chooser)chooserEvent({pointer});
   else if(session.screen==='menu') {pendingMenuPointer={...pointer};pumpMenu();}else if(session.screen==='results')resultsAction(resultHit(pointer.x,pointer.y));else if(session.active&&session.suspended)focusGame();
 });
 canvas.addEventListener('contextmenu',event=>event.preventDefault());
 window.addEventListener('pointerup',event=>{
-  if(event.button===0)leftPressed=false;
+  const changed=trackPointerButtons(event.buttons);
+  if(changed&&!stopped&&!session.audioPending&&modal&&['report','about'].includes(modal.kind)) {modalEvent({pointer});return;}
   if(!stopped&&!session.audioPending&&!session.suspended&&session.screen==='celebration') {session.stepPresentation(0,now(),true);draw();}
 });
-window.addEventListener('pointercancel',()=>{leftPressed=false;});
-function suspend() {browserFocused=false;browserAudio.stop('blur');leftPressed=false;if(session.active||['startup','celebration'].includes(session.screen)) {session.suspend(true,now());flush();}draw();}
+window.addEventListener('pointercancel',()=>{pointerButtons=0;if(savedModal)savedModal.openerHeld=false;});
+function suspend() {browserFocused=false;browserAudio.stop('blur');pointerButtons=0;if(savedModal)savedModal.openerHeld=false;if(session.active||['startup','celebration'].includes(session.screen)) {session.suspend(true,now());flush();}draw();}
 canvas.addEventListener('blur',suspend);window.addEventListener('blur',suspend);
 canvas.addEventListener('focus',focusGame);
 window.addEventListener('focus',()=>{if(!document.hidden)focusGame();});
@@ -301,7 +323,7 @@ if(storageWarning) {status.textContent=storageWarning;status.hidden=false;}
 focusGame();
 setInterval(()=>{
   if(stopped||session.audioPending)return;
-  if(chooser&&leftPressed) {chooserEvent({pointer});return;}
+  if(chooser&&(pointerButtons&1)) {chooserEvent({pointer});return;}
   if(studentUI?.field) {
     const tick=now()&65535;
     if(document.activeElement===canvas&&!document.hidden&&tick!==caret.tick) {caret=textCursorTick(caret,tick);session.lastWaitTick=caret.tick;draw();}
