@@ -61,15 +61,17 @@ function setPointer(position) {
   if(chooser)chooser.pointer={...pointer};
   if(session.screen==='menu')menu.pointer={...pointer};
 }
-function syncCursor() {
-  // Only shared-pump waits own the arrow, not fields, animations, audio or
+function sharedInputWait() {
+  // Only shared-pump waits own click effect8 and the arrow, not fields, animations, audio or
   // main blink waits (FILE 0x10c27..0x10ce3). Final celebration pumps are
   // FILE 0x14113/0x17d77/0xe0fe; preceding ready/abort/movie waits are not.
   const waiting=modal||studentUI&&!studentUI.field||chooser||
     session.screen==='menu'&&session.menuIdle&&!session.menuIdle.state.waiting||
     session.screen==='results'||session.screen==='celebration'&&session.celebration?.wait==='wait-input';
-  cursorVisible=!!waiting&&!stopped&&!session.audioPending&&!session.suspended&&
-    pointerInside&&browserFocused&&!document.hidden;
+  return !!waiting&&!stopped&&!session.audioPending&&!session.suspended&&browserFocused&&!document.hidden;
+}
+function syncCursor() {
+  cursorVisible=sharedInputWait()&&pointerInside;
   renderer.setCursor(cursorVisible?pointer:null);
   if(cursorVisible)canvas.style.cursor='none';else canvas.style.removeProperty('cursor');
 }
@@ -201,6 +203,7 @@ function limitation(effect) {
     if(musicChanged)session.audio(effect.value&1?{type:'music',id:2}:{type:'music-stop'});
   }
   else if(effect.type==='sound-request') session.audio({type:'speech',name:effect.name});
+  else if(effect.type==='sound') session.audio({type:'effect',id:effect.id,file:effect.file});
 }
 function menuEvent(event) {
   if(session.audioPending)return;
@@ -277,6 +280,9 @@ canvas.addEventListener('pointerleave',()=>{pointerInside=false;presentPointer()
 // Track it before modal entry (0x148c6..0x148d9), including browser chords.
 function trackPointerButtons(buttons) {
   const previous=pointerButtons;pointerButtons=buttons;
+  // Shared pump tests the left-bit rise after polling, before caller key
+  // dispatch (FILE 0x149a8..0x149bc). Chords can arrive as pointermove.
+  if(!(previous&1)&&(buttons&1)&&sharedInputWait())session.audio({type:'effect',id:8,file:0x149bc});
   // Browser adaptation: preserve press-to-open usability by finishing only
   // the opener's left release before delivering modal changes. The source
   // activates on press (0x10e3b..0x10e51), then repolls at modal entry; it
@@ -292,11 +298,10 @@ window.addEventListener('pointermove',event=>{
 });
 // A fresh left press, not a click synthesized after a release or a right button.
 window.addEventListener('pointerdown',event=>{
-  const leftPressed=!!(pointerButtons&1),changed=trackPointerButtons(event.buttons);
+  const changed=trackPointerButtons(event.buttons);
   if(stopped||session.audioPending)return;
   if(event.target===canvas) {
     pointerInside=true;setPointer(locationInCanvas(event));
-    if(event.button===0&&!leftPressed)session.audio({type:'effect',id:8,file:0x149bc});
   }
   if(modal&&['report','about'].includes(modal.kind)) {event.preventDefault();if(changed)modalEvent({pointer});return;}
   if(event.target!==canvas)return;

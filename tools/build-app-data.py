@@ -79,7 +79,7 @@ for char in 'MLP':
     result['bonusAnimations'][char.lower()] = {'frames': frames, 'backgroundsPath': path,
         'member': ani['member'], 'memberSha256': ani['memberSha256'], 'palette': 'OUTSKY.CRX',
         'source': 'MARIO.EXE FILE 0x14298..0x14360; 0x82e9..0x835b',
-        'playback': {'callbackFileOffset': '0x14259', 'tickWaitsPerPacket': 2,
+        'playback': {'callbackFileOffset': '0x1425a', 'tickWaitsPerPacket': 2,
                      'sound7OneBasedFrames': list((ASSETS / 'raw/MarioTea/MARIO/MARIO.EXE.data').read_bytes()[0x219e7:0x219f2])}}
 # Castle FILE d6a4..d74a, d8a4..d91f, de6c..df45. Expose actual BAN
 # writes, not frame differences: unchanged values still erase foreground art.

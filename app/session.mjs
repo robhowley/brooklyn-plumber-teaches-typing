@@ -152,6 +152,9 @@ export class Session {
     this.resultEffects.push({type:'save-profile'});
   }
   enterResults() {
+    // Outside wrapper cleanup returns before its music-only stop and Results,
+    // including Demo and completed celebrations (MARIO.EXE FILE 0x13e1b..0x13e20).
+    if(this.mode===1)this.audio({type:'music-stop',file:0x13e1b});
     if(this.demo) {
       if(this.mode===4)this.practiceDemoTick=this.demo.state.lastLowTick;
       const returned=this.demo.finish();this.student=returned.student;this.demo=null;
@@ -196,6 +199,9 @@ export class Session {
     if(this.screen==='startup')throw new Error('Finish source startup before selecting a world');
     if (![1,2,3,4].includes(mode)) throw new Error('Unsupported activity');
     if(this.screen==='menu')this.audio({type:'music-stop',file:0x11bb1});
+    // Castle's wrapper owns a separate entry stop, also on Results routes,
+    // before initialization at FILE 0xde14 (MARIO.EXE FILE 0xde0f).
+    if(mode===3)this.audio({type:'music-stop',file:0xde0f});
     // Student service normalization also follows a cancelled New (zeroed bytes).
     this.student=normalizeStudent(this.student);
     // MARIO.EXE FILE 0x12c72/0xd93d invoke op111: 0x15ba3..0x15ba8 copies the starting goal.
@@ -283,8 +289,8 @@ export class Session {
       // FILE 0x1425a callback: two changed BIOS ticks per BAN/ANI packet.
       if(nowTicks>=this.cinematic.nextTick) {
         this.lastWaitTick=nowTicks&65535;
-        this.cinematic.frame++; this.cinematic.nextTick=nowTicks+2;
         this.bonusAudio(1,this.cinematic.frame);
+        this.cinematic.frame++; this.cinematic.nextTick=nowTicks+2;
         const frames=this.data.bonusAnimations[['m','l','p'][this.profile.character-1]].frames;
         if(this.cinematic.frame>=frames.length) {
           this.cinematic=null; this.clock=timer(this.clock,300,nowTicks);
@@ -341,6 +347,8 @@ export class Session {
   bonusAudio(mode,frame) {
     const playback=mode===1?this.data.bonusAnimations[['m','l','p'][this.profile.character-1]].playback:
       mode===2?this.data.water.playback:this.data.castle.playback;
+    // Player passes the completed zero-based packet BEFORE incrementing
+    // (FILE 0x8356..0x837a); each callback alone adds one for its table.
     if(playback.sound7OneBasedFrames.includes(frame+1))this.audio({type:'effect',id:7,file:playback.callbackFileOffset});
   }
   changedTick(ticks) {
@@ -370,7 +378,7 @@ export class Session {
         if(++this.waterMovie.waits<2) break;
         this.waterMovie.waits=0;
         const frames=this.data.water.animations[['m','l','p'][this.profile.character-1]].frames;
-        this.bonusAudio(2,this.waterMovie.frame+1);
+        this.bonusAudio(2,this.waterMovie.frame);
         if(++this.waterMovie.frame<frames.length) {
           const packet={type:'water-packet',frame:this.waterMovie.frame};
           events.push(packet); this.effects.push(packet); break;
@@ -437,7 +445,7 @@ export class Session {
       if(++this.castleMovie.waits<2) return events;
       this.castleMovie.waits=0;
       const frames=this.data.castle.animations[['m','l','p'][this.profile.character-1]].frames;
-      this.bonusAudio(3,this.castleMovie.frame+1);
+      this.bonusAudio(3,this.castleMovie.frame);
       if(++this.castleMovie.frame<frames.length) {
         const packet={type:'castle-packet',frame:this.castleMovie.frame};
         events.push(packet); this.effects.push(packet); return events;

@@ -87,7 +87,10 @@ export function menuInput(state,{key=0,pointer=null,front=null,messages={}}={},p
   else if(command==='quit') effects.push({type:'quit-request',hostCanExit:false});
   else if(command==='certificate') effects.push({type:'certificate-request',hostCanPrint:false});
   else if(['new-student','load-student','demo','lesson-times','about','keyboard'].includes(command)) effects.push({type:command});
-  else if(!['none','unrecognized'].includes(command)) effects.push({type:'incomplete',command});
+  // Failed localized/key-table lookup alone requests ordinary effect10,
+  // which obeys Effects (MARIO.EXE FILE 0x113b4..0x113ca, 0x119f9..0x119fd).
+  else if(command==='unrecognized') effects.push({type:'sound',id:10,file:0x119fd});
+  else if(command!=='none') effects.push({type:'incomplete',command});
   // Explicit close calls, not a blanket modal-close policy (0x113d1..0x11598).
   const activatedRow=(key===13||key===32)&&state.row;
   if(['help','keyboard','new-student','load-student','demo','edit-student','about','quit','toggle-music','toggle-sound','toggle-speech'].includes(command)&&effects.length &&
