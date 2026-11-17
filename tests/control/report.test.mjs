@@ -62,6 +62,47 @@ test('archive-pinned source identity, font bindings and real independently read 
   }
 });
 
+test('pinned Report/About callback tests every key and successive whole button words',()=>{
+  // MarioTea/MARIO/MARIO.EXE, SHA256 checked above. Both callers pass
+  // 115c:0432 -> FILE 0x147f2, then flush input at FILE 0x19221.
+  for(const start of [0xe953,0x12195])assert.equal(exe.subarray(start,start+25).toString('hex'),
+    'b85c1150b8320450b80100509aea045c1183c4069a91012916');
+  // Pending key wins; enabled mouse compares DS:5273 != DS:526d without
+  // a left-bit test. Equal words return zero, including held nonzero masks.
+  assert.equal(exe.subarray(0x14803,0x14823).toString('hex'),
+    '9adb1f00000bc07510803e7a5200740ea173523b066d527405b80100eb0233c0');
+  assert.equal(exe.subarray(0x148c6,0x148dc).toString('hex'),
+    '0ee8a0ffa17752a37152a17552a36f52a17352a36d52');
+  // Menu mouse activation is a fresh left press, not a release. There is
+  // no source rule swallowing its later release: modal entry polls afresh.
+  // Pointer-open click completion in main.mjs is an explicit browser policy.
+  assert.equal(exe.subarray(0x10e3b,0x10e51).toString('hex'),
+    'f706735201007503e98d03f7066d5201007403e98003');
+  // Every driver poll first copies the old whole word, then stores INT33 BX.
+  // Thus 0x148d9 is an entry baseline, not a fixed snapshot for the whole wait.
+  assert.equal(exe.subarray(0x1c117,0x1c11d).toString('hex'),'a17352a36d52');
+  assert.equal(exe.subarray(0x1c144,0x1c14a).toString('hex'),'8b46f2a37352');
+  // Keyboard consumes a key only if pending, then repeats only for F1.
+  assert.equal(exe.subarray(0x14669,0x14681).toString('hex'),
+    '9adb1f00000bc074089ab10129168946f6817ef63b0174d4');
+});
+
+test('modal dismissal retains caller routes and flush policy, including Alt-X without Quit',()=>{
+  for(const returnTo of ['menu','results'])for(const kind of ['report','about','keyboard']) {
+    const state={kind,returnTo,closed:false},input=kind==='keyboard'?keyboardInput:modalReturn;
+    for(const key of [27,65,0x12d]) {
+      assert.deepEqual(input(state,{key}),{...state,closed:true,route:returnTo,flushInput:kind!=='keyboard'});
+    }
+    assert.equal(input(state,{pointerEnabled:true,pointerChanged:false}),state);
+    assert.equal(input(state,{pointerEnabled:false,pointerChanged:true}),state);
+    if(kind==='keyboard') {
+      for(let i=0;i<3;i++)assert.equal(input(state,{key:0x13b}),state);
+      assert.equal(input(state,{pointerEnabled:true,pointerChanged:true}),state);
+    } else assert.deepEqual(input(state,{pointerEnabled:true,pointerChanged:true}),
+      {...state,closed:true,route:returnTo,flushInput:true});
+  }
+});
+
 test('signed per-key ranking, ASCII ties, space exclusion, DEL inclusion and 16-bit wrap',()=>{
   assert.equal(reportProblemKeys(counts([[32,32767],[127,8],[65,8],[66,8],[67,8],[68,8],[69,8]])),' A B C D E');
   assert.equal(reportProblemKeys(counts([[65,-1],[66,-32768],[127,1]])),' \x7f');
