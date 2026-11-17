@@ -19,14 +19,17 @@ assert hashlib.sha256(archive.read_bytes()).hexdigest() == 'b59886a6f7b48b0057c8
 with zipfile.ZipFile(archive) as z:
     b = z.read('MarioTea/MARIO/MARIO.EXE')
     members = {name: hashlib.sha256(z.read('MarioTea/MARIO/' + name)).hexdigest()
-               for name in ('GREET2.GSO', 'GREET2.GSK', 'PREFS.CRX', 'LOAD.CRX', 'LESSTIME.CRX')}
+               for name in ('GREET2.GSO', 'GREET2.GSK', 'FONT5H.GSO', 'FONT5H.GSK', 'ENGLISH.MSD',
+                            'PREFS.CRX', 'LOAD.CRX', 'LESSTIME.CRX')}
 assert hashlib.sha256(b).hexdigest() == '6caed439b64dc3bad8de4f9df53b63ae5712bf3c54b0bbfc00603557e4720f5e'
 ranges = {'text': (0x1aced, 0x1b41c), 'quit': (0x149fc, 0x14a8c),
           'delete': (0xe14e, 0xe65b), 'dropdown': (0x105cc, 0x1072f),
           'dropdown-draw': (0x11be8, 0x11d54), 'duration-draw': (0x8d66, 0x928b),
           'cursor-wait': (0x192a2, 0x192e2),
           'menu': (0x10ce3, 0x11a05), 'student': (0xebd2, 0xfb90),
-          'pixel': (0x14fc8, 0x15000)}
+          'pixel': (0x14fc8, 0x15000),
+          'greeting': (0x109ec, 0x10adf), 'blink': (0x10c27, 0x10ce3),
+          'font-init': (0x1ac76, 0x1ac91), 'font-raster': (0x1a868, 0x1a8c3)}
 for name, (a, e) in ranges.items():
     code = b[a:e]
     names = b'\0.text\0.shstrtab\0'
