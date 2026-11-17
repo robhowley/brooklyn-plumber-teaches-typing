@@ -1,5 +1,5 @@
 // Static translation only. FILE offsets/member hashes: tools/control/menu-inspect.py.
-import { mainMenuCommand, mainMenuHit, menuNavigation, nextRoute } from './flow.mjs';
+import { mainMenuCommand, mainMenuHit, menuNavigation } from './flow.mjs';
 import { newStudent, normalizeStudent, readStudent, STUDENT_SIZE } from './student.mjs';
 import { s16 } from './scoring.mjs';
 
@@ -74,7 +74,8 @@ export function menuInput(state,{key=0,pointer=null,front=null,messages={}}={},p
     // Intentionally omit MARIO.EXE FILE 0x11465..0x114ce goal gates.
     effects.push({type:'start',mode});
   } else if(command==='next') {
-    if(!profile.demo) effects.push({type:'start',...nextRoute(profile)});
+    // FILE 0x11502..0x11510 dispatches the shared Next route at 0x103f8.
+    if(!profile.demo) effects.push({type:'next'});
   } else if(command.startsWith('lesson-') && command!=='lesson-times') {
     effects.push({type:'set-lesson',lesson:Number(command.slice(7))},{type:'save-student'});s.row=0;
   } else if(command.startsWith('toggle-')) {

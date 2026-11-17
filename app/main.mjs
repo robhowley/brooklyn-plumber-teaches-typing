@@ -211,6 +211,7 @@ function menuEvent(event) {
   menu.pointer={...pointer};
   for(const effect of result.effects) {
     if(effect.type==='start') {if(effect.lesson)new DataView(session.student.buffer).setInt16(25,effect.lesson,true);if([1,2,3,4].includes(effect.mode))start(effect.mode);else limitation(effect);}
+    else if(effect.type==='next')next();
     else if(effect.type==='set-lesson')new DataView(session.student.buffer).setInt16(25,effect.lesson,true);
     else if(effect.type==='save-student')save();
     else if(effect.type==='menu-blink')session.presentationEffects.push(...session.menuIdle.blink());
