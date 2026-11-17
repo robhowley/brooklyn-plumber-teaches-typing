@@ -97,6 +97,63 @@ test('practice preserves case, ignored keys, line-end SPACE/CR, counters and las
  assert.equal(s.practice.errors,1);assert.equal(s.practice.correct,s.practice.attempts-1);assert.ok(s.practice.rows.subarray(0,33).every(n=>n===0));
  s.step(27,t++,101);s.start(t,4);assert.ok(s.profile.errorCounts.every(n=>n===0));
 });
+test('Practice cursor shares the low-word wait sample, exact 4/2 phases, duplicates, gaps and rollover',()=>{
+ const s=configured();s.rebaseHostClock(0,65535);s.start(65535,4,100);
+ for(const [tick,inverted,left] of [
+  [65535,false,0],[65536,true,4],[65536,true,4],
+  [65537,true,3],[65600,true,2],[65601,true,1],[65602,false,2],
+  [65602,false,2],[65603,false,1],[65604,true,4]
+ ]) {
+  s.step(0,tick,100);
+  assert.deepEqual(s.practice.cursor,{tick:tick&65535,inverted,left});
+  assert.equal(s.lastWaitTick,tick&65535);
+  assert.equal(s.changedTick(tick),false,'Practice consumed the shared observation');
+ }
+ // A new activity inherits the shared sample, not its own clock origin.
+ s.start(65604,4,100);s.step(0,65604,100);
+ assert.deepEqual(s.practice.cursor,{tick:68,inverted:false,left:0});
+ s.rebaseHostClock(65604,131140);s.start(131140,4,100);s.step(0,131140,100);
+ assert.deepEqual(s.practice.cursor,{tick:68,inverted:false,left:0},'high word alone is not a change');
+ s.step(0,131141,100);assert.equal(s.practice.cursor.inverted,true);
+});
+for(const kind of ['correct','wrong','Tab','Backspace','LF','F10','Alt-X','Escape','timeout']) {
+ test(`Practice cursor resets before ${kind} dispatch without sampling another wait`,()=>{
+  const s=configured({goal:10,practiceMinutes:1});s.start(0,4,100);s.step(0,1,100);
+  assert.equal(s.practice.cursor.inverted,true);
+  const target=s.practice.rows[33],tick=kind==='timeout'?1092:2;
+  const key={correct:target,wrong:target-32,Tab:9,Backspace:8,LF:10,F10:0x144,'Alt-X':0x12d,Escape:27,timeout:0}[kind];
+  s.step(key,tick,101);
+  assert.deepEqual(s.practice.cursor,{tick:1,left:0,inverted:false});
+  assert.equal(s.lastWaitTick,1,'callback termination must precede the tick wait');
+  if(s.active) {
+   s.step(0,tick,101);
+   assert.deepEqual(s.practice.cursor,{tick,left:4,inverted:true},'next wait sees the outstanding change once');
+   s.step(0,tick,101);assert.equal(s.practice.cursor.left,4);
+  } else assert.equal(s.changedTick(tick),true);
+ });
+}
+test('Demo Practice cursor waits only when neither synthetic nor physical input is ready',()=>{
+ const s=configured({goal:10});s.selectDemo();s.start(0,4,100);
+ s.step(0,1,100);assert.deepEqual(s.practice.cursor,{tick:1,left:4,inverted:true});
+ assert.equal(s.demo.state.countdown,29);
+ s.step(0,1,100);assert.equal(s.practice.cursor.left,4);assert.equal(s.demo.state.countdown,29);
+ s.demo.state.countdown=1;s.step(27,2,100); // due synthetic target wins over Escape
+ assert.equal(s.practice.correct,1);assert.equal(s.practice.aborted,false);
+ assert.deepEqual(s.practice.cursor,{tick:1,left:0,inverted:false});assert.equal(s.lastWaitTick,1);
+ s.demo.state.countdown=20;s.step(0x144,2,100); // queued physical Escape, left by synthetic input
+ assert.equal(s.screen,'menu');assert.equal(s.practice.aborted,true);
+ assert.deepEqual(s.practice.cursor,{tick:1,left:0,inverted:false});assert.equal(s.lastWaitTick,1);
+});
+test('Practice focus suspension and host rebase freeze cursor countdown without catching up',()=>{
+ const s=configured();s.start(0,4,100);s.step(0,1,100);s.step(0,2,100);
+ s.suspend(true,3);const cursor=structuredClone(s.practice.cursor);
+ s.step(s.practice.rows[33],900,200);assert.deepEqual(s.practice.cursor,cursor);assert.equal(s.practice.attempts,0);
+ s.suspend(false,900);s.step(0,900,200);
+ assert.deepEqual(s.practice.cursor,{tick:900,left:3,inverted:true});
+ s.step(0,901,200);assert.equal(s.practice.cursor.left,2);
+ s.rebaseHostClock(901,0);s.step(0,0,200);assert.equal(s.practice.cursor.left,2);
+ s.step(0,1,200);assert.equal(s.practice.cursor.left,1);
+});
 for(const nowTicks of [1091,1092,1200])for(const kind of ['correct','incorrect','SPACE','CR']) {
  test(`practice ${kind} input is consumed once on tick ${nowTicks}, before timeout results`,()=>{
   const s=configured({goal:10,practiceMinutes:1});s.start(0,4,100);
@@ -141,7 +198,8 @@ for(const nowTicks of [1091,1092])for(const key of [0,10,0x144,0x12d,27]) {
   const before=structuredClone(s.practice),audioStart=s.audioLog.length;
   const ended=nowTicks>=1092||key===27;
   assert.deepEqual(s.step(key,nowTicks,200),[{type:ended?'end':'ignored'}]);
-  assert.deepEqual(s.practice,{...before,aborted:key===27});
+  const cursor=key===0&&!ended?{tick:nowTicks,left:4,inverted:true}:before.cursor;
+  assert.deepEqual(s.practice,{...before,aborted:key===27,cursor});
   assert.equal(s.screen,ended?'results':'practice');assert.equal(s.clock.running,!ended);
   assert.equal(s.audioLog.slice(audioStart).filter(e=>e.request.type==='effect').length,0);
  });
@@ -217,6 +275,29 @@ test('renderer uses exact indexed palettes, origin, masks, ground, idle and deco
   s.start(0,4);r.practice(s.practice,s.stats(),0,'');
   // Nonzero font-mask pixels must be able to write palette index zero (black).
   assert.ok(r.front.subarray(106*320+30,114*320).some(v=>v===0));
+  // Space resource0 is the recovered opaque cursor cell, not a one-row caret.
+  const space=data.sprites['FONT5H/font5_32'];
+  assert.equal(space.member,'MarioTea/MARIO/FONT5H.GSO');
+  assert.equal(space.memberSha256,'aa9b883273bf0997b4e128c4a72eb7028c534656d1c284948cf51cae74968464');
+  assert.deepEqual([space.index,space.offset,space.width,space.height],[0,34,8,8]);
+  assert.ok(r.pixels['FONT5H/font5_32'].every(v=>v===0));
+  const cell=(index,color)=>{
+   const x=30+8*index;
+   for(let y=96;y<104;y++)for(let dx=0;dx<8;dx++)assert.equal(r.front[y*320+x+dx],color,`cursor ${index}: ${dx},${y}`);
+  };
+  cell(0,1);s.step(0,1,100);r.practice(s.practice,s.stats(),0,s.typed);cell(0,15);
+  const first=s.practice.rows[33];s.step(first,2,100);r.practice(s.practice,s.stats(),0,s.typed);cell(1,1);
+  const typedGlyph=data.sprites[`FONT5H/font5_${first}`],mask5=r.pixels[`FONT5H/font5_${first}`];
+  // Full redraw removes every old cursor pixel while preserving the existing typed glyph.
+  mask5.forEach((v,i)=>assert.equal(r.front[(96+Math.floor(i/typedGlyph.width))*320+30+i%typedGlyph.width],v?1:r.backgrounds.PRACTICE[(96+Math.floor(i/typedGlyph.width))*320+30+i%typedGlyph.width]));
+  s.practice.rows.fill(65,33,65);s.practice.rows[65]=0;s.practice.index=0;s.typed='';
+  for(let n=0;n<31;n++)s.step(65,2,100);
+  r.practice(s.practice,s.stats(),0,s.typed);cell(31,1);
+  s.step(0,2,100);r.practice(s.practice,s.stats(),0,s.typed);cell(31,15);
+  s.step(65,3,100);assert.equal(s.practice.index,32);r.practice(s.practice,s.stats(),0,s.typed);cell(32,1);
+  s.step(0,3,100);r.practice(s.practice,s.stats(),0,s.typed);cell(32,15);
+  s.step(13,4,100);assert.equal(s.practice.index,0);r.practice(s.practice,s.stats(),0,s.typed);cell(0,1);
+  for(let y=96;y<104;y++)for(let x=278;x<294;x++)assert.equal(r.front[y*320+x],r.backgrounds.PRACTICE[y*320+x],'line transition clears columns31/32');
   assert.throws(()=>r.sprite('missing',0,0),/Missing sprite/);
  } finally {globalThis.fetch=oldFetch;}
 });

@@ -249,9 +249,15 @@ export class Renderer {
       this.text(text,30,96+row*10,{color:0,shadow:0});
     }
     this.text(typed,30,96,{color:1,shadow:1});
-    // Host static cursor in place of shared blinking text-entry callback.
-    const x=30+8*s.index;
-    this.front.fill(1,103*320+x,103*320+Math.min(320,x+8));
+    // MARIO.EXE FILE 0xb64e..0xb696: space32, (30+8*index,96), fg15/bg1.
+    // FILE 0x1aced..0x1aef9 swaps colors after changed-tick waits (4/2).
+    // MarioTea/MARIO/MARIO.EXE SHA256
+    // 6caed439b64dc3bad8de4f9df53b63ae5712bf3c54b0bbfc00603557e4720f5e.
+    // MarioTea/MARIO/FONT5H.GSO SHA256
+    // aa9b883273bf0997b4e128c4a72eb7028c534656d1c284948cf51cae74968464,
+    // resource0 (font5_32), FILE0x22: all-zero 8x8 cell. Index32 is not clamped.
+    drawTextField(this.front,this.fonts.FONT5H,{text:'',cursor:0,maxLength:0},
+      {x:30+8*s.index,y:96,foreground:15,background:1,inverted:s.cursor.inverted});
     // FILE 0xb62f..0xb647, base and target before each input wait (Demo too).
     this.fingers(4,this.backgrounds.PRACTICE);
     this.fingers(4,this.backgrounds.PRACTICE,s.rows[33+s.index]);
