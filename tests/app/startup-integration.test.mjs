@@ -88,6 +88,30 @@ test('celebration saves only after final progression, including all Castle endin
     assert.equal(s.resultEffects.some(e=>e.type==='save-profile'),false);
   }
 });
+for(const [previous,now] of [[100,101],[65535,65536]])for(const dismissal of ['keyboard','pointer'])
+test(`celebration input wait preserves shared tick ${previous}->${now} on ${dismissal} dismissal`,()=>{
+  const s=make({goal:5,lesson:6,minutes:1});
+  s.start(0,1,100);s.outdoor.correct=180;s.outdoor.attempts=180;s.step(0,1092,160);
+  assert.equal(s.screen,'celebration');assert.equal(s.celebration.wait,'wait-tick');
+  // Skip the walking sequence through its real key poll, reaching the input-only wait.
+  s.stepPresentation(32,previous);
+  assert.equal(s.celebration.wait,'wait-input');assert.equal(s.lastWaitTick,previous);
+  s.takePresentationEffects();
+  s.stepPresentation(0,now);
+  assert.equal(s.celebration.wait,'wait-input');assert.equal(s.lastWaitTick,previous);
+  assert.deepEqual(s.takePresentationEffects(),[]);
+  s.stepPresentation(dismissal==='keyboard'?32:0,now,dismissal==='pointer');
+  assert.equal(s.screen,'results');assert.equal(s.lastWaitTick,previous);
+  // The next presentation's first timed wait must still observe the outstanding change.
+  s.enterCelebration(1,{state:s.profile});
+  assert.equal(s.celebration.wait,'wait-tick');
+  const x=s.celebration.x;s.takePresentationEffects();
+  s.stepPresentation(0,now);
+  assert.equal(s.lastWaitTick,now&65535);assert.equal(s.celebration.x,x+5);
+  assert.equal(s.takePresentationEffects().filter(e=>e.type==='actor').length,1);
+  s.stepPresentation(0,now);
+  assert.equal(s.celebration.x,x+5);assert.deepEqual(s.takePresentationEffects(),[]);
+});
 test('real indexed renderer applies59 startup palette writes, presentation texts and full clip restoration',async()=>{
  const r=new Renderer({getContext:()=>({createImageData:()=>({data:new Uint8ClampedArray(256000)}),putImageData(){}})},data);
  const oldFetch=globalThis.fetch;globalThis.fetch=async path=>({ok:true,arrayBuffer:async()=>{const b=readFileSync(new URL('../../'+path.slice(2),import.meta.url));return b.buffer.slice(b.byteOffset,b.byteOffset+b.byteLength);}});
