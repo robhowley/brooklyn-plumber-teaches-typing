@@ -228,8 +228,10 @@ function menuEvent(event) {
 function pumpMenu() {
   session.menuStep(now(),menu.column===1&&menu.row>0);
   if(session.audioPending||!session.menuIdle) {draw();return;}
-  if(!session.menuIdle.state.waiting&&pendingMenuPointer) {const point=pendingMenuPointer;pendingMenuPointer=null;menuEvent({pointer:point});}
-  else if(!session.menuIdle.state.waiting&&session.input.pending())menuEvent({key:session.input.consume()});
+  // MARIO.EXE FILE 0x10e1e..0x10e4e consumes a key before sampling a press.
+  // Retaining a browser press between pumps is a host policy, not a source FIFO.
+  if(!session.menuIdle.state.waiting&&session.input.pending())menuEvent({key:session.input.consume()});
+  else if(!session.menuIdle.state.waiting&&pendingMenuPointer) {const point=pendingMenuPointer;pendingMenuPointer=null;menuEvent({pointer:point});}
   else draw();
 }
 function resultsAction(command) {
