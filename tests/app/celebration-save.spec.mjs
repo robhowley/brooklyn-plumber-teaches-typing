@@ -74,12 +74,20 @@ for(const mode of [1,2,3])for(const input of ['pointerdown','pointerup','keyboar
  // Hold before the animation: Water may already reach its final wait in the timeout callback batch.
  if(input==='pointerup')await page.mouse.down();
  await reachCelebration(page,mode);await finalWait(page);expect(await saved(page)).toEqual(before);
+ const audioBefore=(await snap(page)).audio;
  if(input==='keyboard') {
   await page.locator('#game').press('Space');
   for(let i=0;(await snap(page)).screen==='celebration';i++) {expect(i).toBeLessThan(3);await page.clock.runFor(55);}
  } else if(input==='pointerup')await page.mouse.up();else await page.mouse.down();
  // Time stays frozen: pointer callbacks must save before any interval can run.
- const value=await assertSaved(page,other);expect((await snap(page)).profile.lesson).toBe(2);
+ const value=await assertSaved(page,other),after=await snap(page);expect(after.profile.lesson).toBe(2);
+ // Final shared wait requests8 only on a fresh left press, before world exit
+ // audio. A release-only dismissal and keyboard return must not request8.
+ let overlap=Math.min(audioBefore.length,after.audio.length);
+ while(overlap&&JSON.stringify(audioBefore.slice(-overlap))!==JSON.stringify(after.audio.slice(0,overlap)))overlap--;
+ const added=after.audio.slice(overlap).map(e=>e.request);
+ expect(added.filter(r=>r.type==='effect'&&r.id===8)).toEqual(input==='pointerdown'?[{type:'effect',id:8,file:0x149bc}]:[]);
+ if(input==='pointerdown')expect(added[0]).toEqual({type:'effect',id:8,file:0x149bc});
  if(input==='pointerdown') {await page.locator('#game').press('m');expect((await snap(page)).screen).toBe('menu');}
  await reloadSaved(page,value);expect(errors).toEqual([]);
 });
@@ -96,7 +104,9 @@ test('Castle repeating ending ignores pointers and saves completed flag on keybo
  const other=await ready(page,3,{ending4:true}),before=await saved(page);
  let s=await reachCelebration(page,3,{ending4:true});expect(s.castle.ending.mode).toBe(4);expect(s.profile.completed[2]).toBe(0);
  await page.clock.runFor(2000);
- await page.locator('#game').dispatchEvent('pointerdown',{button:0});await page.locator('#game').dispatchEvent('pointerup',{button:0});
+ const audioBefore=(await snap(page)).audio;
+ await page.locator('#game').dispatchEvent('pointerdown',{button:0,buttons:1});await page.locator('#game').dispatchEvent('pointerup',{button:0,buttons:0});
+ expect((await snap(page)).audio).toEqual(audioBefore); // ENDF's movie waits do not call the mouse pump.
  expect((await snap(page)).screen).toBe('celebration');expect(await saved(page)).toEqual(before);
  await page.locator('#game').press('Space');
  for(let i=0;(await snap(page)).screen==='celebration';i++) {expect(i).toBeLessThan(5);await page.clock.runFor(55);}
