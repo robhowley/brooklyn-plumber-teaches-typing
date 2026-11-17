@@ -6,6 +6,7 @@ import { openHelp, helpInput, helpPointer, modalReturn, keyboardInput } from '..
 import { resultCommand, resultHit } from '../recovered/control/results.mjs';
 import { SourceAudio } from '../recovered/audio/audio.mjs';
 import { BrowserAudio } from './audio.mjs';
+import { openCertificateSelector } from './certificate.mjs';
 
 const canvas=document.querySelector('#game'), status=document.querySelector('#status');
 const now=()=>Math.floor(performance.now()*BIOS_HZ/1000);
@@ -122,7 +123,9 @@ function draw() {
 }
 function flush() { pendingKey=0;practiceKeys.length=0;pendingMenuPointer=null;session.input.flush(); }
 function focusGame() {
-  if(stopped)return;browserFocused=true;canvas.focus();session.suspend(false,now());flush();
+  if(stopped)return;browserFocused=true;
+  if(session.screen==='certificate')return;
+  canvas.focus();session.suspend(false,now());flush();
   if(session.screen==='menu'&&session.menuIdle&&!session.menuIdle.state.waiting)session.menuIdle.restartPump(now());
   draw();
 }
@@ -224,6 +227,11 @@ function menuEvent(event) {
     else if(effect.type==='edit-student')openEditor('edit',fromDropdown);
     else if(effect.type==='lesson-times')openEditor('times');
     else if(effect.type==='load-student')openChooser();
+    else if(effect.type==='certificate-request'&&session.profile.profilePresent) {
+      // Browser selector/print transport only; the recovered constructor is pure.
+      session.screen='certificate';flush();
+      openCertificateSelector(session.profile,data,()=>{session.screen='menu';flush();focusGame();});
+    }
     else if(['help','keyboard','about','report'].includes(effect.type))openModal(effect.type,effect.operation,!!event.pointer);
     else limitation(effect);
   }
