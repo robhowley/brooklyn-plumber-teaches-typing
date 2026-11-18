@@ -13,6 +13,7 @@ For local setup and tests, see [DEVELOPMENT.md](DEVELOPMENT.md).
 - **Escape** ends an activity early. **F10** also ends Outside and Water but is ignored in Castle and Practice.
 - Results: **N Next**, **M / Escape Menu**. Tab/arrows move selection; Enter activates it. Space does not activate results.
 - Use menu dropdowns with the pointer or arrows/Enter. **5 / report picture** opens a saved student's report; **H / F1** opens Help, **K / F2** Keyboard, and **A** About.
+- **C / Student > Certificate** opens a completed-level selector for printing or reprinting. Choose a level and **Print** to open the native browser print dialog; **Cancel / Escape** closes the selector. This selector and print transport are browser adaptations and do not mark certificates printed or change saves. The recovered 60×80 text fits one Letter page in monospace; browser paper, scaling, margins and header/footer settings can affect output. Save as PDF is available only through the browser's dialog where supported.
 - Water's advancement sequence cannot be skipped. First Castle graduation repeats its ending until a key is pressed.
 - Losing focus pauses updates and active lesson time. Return to the page or focus the canvas to resume. Wall-clock inactivity still advances, so Water may fail after a long pause.
 
@@ -28,6 +29,6 @@ For local setup and tests, see [DEVELOPMENT.md](DEVELOPMENT.md).
 
 - A keyboard or pointer gesture unlocks browser audio. Use the original music/sound/speech menu switches.
 - Four recovered speech clips play. Input is discarded while speech is playing; unavailable or interrupted speech is omitted, without a guessed delay or later replay. Water's lesson timer includes its Ready clip.
-- Music, sound effects and the other speech formats remain silent. Certificate selection/text output, printing and intermediate world/modal fades are unsupported. Welcome text color is provisional.
+- Music, sound effects and the other speech formats remain silent. Intermediate world/modal fades are unsupported. Welcome text color is provisional.
 - Browser scheduling, input delivery, focus pause and storage are adaptations, not DOS hardware emulation. Quit cannot close the browser tab. Missing resources stop visibly instead of substituting generic art or lessons.
 - `?seed=1` fixes the process entry seed; startup skips and input timing still change later random draws. It is not a recording of an original DOS session.

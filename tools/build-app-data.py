@@ -3,6 +3,7 @@ import base64
 import json
 import struct
 import hashlib
+import re
 import sys
 from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
@@ -85,6 +86,52 @@ for char in 'MLP':
 # writes, not frame differences: unchanged values still erase foreground art.
 exe = (ASSETS / 'raw/MarioTea/MARIO/MARIO.EXE.data').read_bytes()
 assert hashlib.sha256(exe).hexdigest() == '6caed439b64dc3bad8de4f9df53b63ae5712bf3c54b0bbfc00603557e4720f5e'
+# Certificate text, not CERTIF pixels. Pinned inert members only; original text
+# and pointer data remain in ignored app/data.json and .tmp evidence.
+from source import EXE_MEMBER, EXE_SHA256
+msd_member = 'MarioTea/MARIO/ENGLISH.MSD'
+msd = (ASSETS / ('raw/' + msd_member + '.data')).read_bytes()
+msd_sha = 'fd2168878e19b1b85ae0c6ce8e14ad4386a801e7c460ed134bde5f181cb29e15'
+assert hashlib.sha256(msd).hexdigest() == msd_sha
+checked = 0
+for line in (ROOT / 'analysis/control/verified-disassembly.txt').read_text().splitlines():
+    match = re.match(r'\s*([0-9a-f]+):\s+((?:[0-9a-f]{2} )*[0-9a-f]{2})(?:\s|$)', line)
+    if match:
+        offset = int(match[1], 16)
+        if 0xa8f0 <= offset < 0xb0a6 or 0xeeed <= offset < 0xef0d:
+            raw = bytes.fromhex(match[2])
+            assert exe[offset:offset + len(raw)] == raw, hex(offset)
+            checked += 1
+assert checked > 800
+art = []
+for i in range(31):
+    offset, segment = struct.unpack_from('<HH', exe, 0x20d4e + i*4)
+    start = 0x2e00 + segment*16 + offset
+    end = exe.index(0, start)
+    art.append({'index': i, 'fileOffset': hex(start), 'text': exe[start:end].decode('ascii')})
+assert [len(row['text']) for row in art] == [46]*30 + [0]
+assert exe[0x20dd2:0x20ddd] == b'%-80.80s\r\n\0'
+count, size = struct.unpack_from('<HH', msd)
+text_start = 4 + count*4
+assert text_start + size == len(msd)
+resources = []
+for i in range(count):
+    resource_id, offset = struct.unpack_from('<HH', msd, 4 + i*4)
+    if resource_id in (*range(4200, 4206), *range(200, 203)):
+        start = text_start + offset
+        text = msd[start:msd.index(0, start)].decode('ascii')
+        assert result['messages'][str(resource_id)] == text
+        resources.append({'id': resource_id, 'index': i, 'fileOffset': hex(start)})
+assert [r['index'] for r in resources] == [21, 22, 23, 96, 97, 98, 99, 100, 101]
+result['certificate'] = {
+    'art': art, 'resources': resources, 'verifiedInstructionLines': checked,
+    'members': {EXE_MEMBER: EXE_SHA256, msd_member: msd_sha},
+    'source': {'selection': 'FILE 0xaaf9..0xaea6 (completed checks 0xac46/0xad23)',
+               'rows': 'FILE 0xa903..0xa970; output 0xa9a3..0xa9f5; format 0x20dd2',
+               'centering': 'FILE 0xaa8b..0xaaf8', 'art': 'FILE 0xaecf..0xaf15; table 0x20d4e indices 0..30',
+               'text': 'FILE 0xaf16..0xb000; level resource 0xeeed..0xef0a',
+               'border': 'FILE 0xb001..0xb068', 'constructor': 'FILE 0xb069..0xb0a5'}}
+(ROOT / '.tmp/certificate-evidence.json').write_text(json.dumps(result['certificate'], indent=2) + '\n')
 # FINGER service FILE 0x17fa4..0x18126: resources 10/11 are base hands,
 # 0..9 highlights. Extract all 95 ASCII entries and signed position words,
 # including the activity initializer immediates, not a modern keyboard chart.
