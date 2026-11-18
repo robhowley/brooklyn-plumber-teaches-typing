@@ -140,7 +140,7 @@ export class Session {
       return;
     }
     if(this.screen!=='celebration')return;
-    const effects=this.celebration.step({input:this.input,tickReady:this.changedTick(nowTicks),pointerChanged});
+    const effects=this.celebration.step({input:this.input,tickReady:this.celebration.wait==='wait-tick'&&this.changedTick(nowTicks),pointerChanged});
     this.presentationEffects.push(...effects);
     for(const e of effects)if(e.type==='set-completed')this.student[38+e.index]=1;
     if(!this.celebration.complete)return;

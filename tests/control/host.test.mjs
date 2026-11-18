@@ -40,7 +40,7 @@ test('source raw keyboard has one C pushback byte, no recovered DOS queue capaci
 });
 
 test('low-word changed wait differs from full tick elapsed accounting', () => {
-  at(0x192ce, 'a12c4e3b46f674dd'); // compare only BIOS DX with previous low word
+  at(0x192ce, 'a12c4e3b46f674dd8b46f6a32c4e'); // compare BIOS DX, loop while equal, then store changed low word
   at(0x19343, '8b46f28946fc8b46f08946fe'); // elapsed reader retains DX and CX
   let clock = timer(timer({}, 320, 0), 300, 65535);
   clock = timer(clock, 100, 65536);
