@@ -15,6 +15,35 @@ test.describe('Practice keyboard bursts',()=>{
   await page.locator('#game').press('4');
   await expect(page.locator('#game')).toHaveAttribute('data-screen','practice');
  });
+ test('paints the blinking 8x8 Practice cell and freezes its phase on blur',async({page})=>{
+  const errors=[];page.on('pageerror',e=>errors.push(e.message));
+  const data=await page.evaluate(()=>fetch('./app/data.json').then(r=>r.json()));
+  const palette=data.palettes['PRACTICE.CRX'];
+  const cell=()=>page.evaluate(()=>{
+   const s=translationSnapshot(),x=30+8*s.practice.index;
+   return Array.from(document.querySelector('#game').getContext('2d').getImageData(x,96,8,8).data);
+  });
+  const check=async()=>{
+   const s=await snapshot(page),index=s.practice.cursor.inverted?15:1;
+   expect(await cell()).toEqual(Array.from({length:64},()=>[...palette.slice(index*3,index*3+3),255]).flat());
+   return index;
+  };
+  const colors=new Set([await check()]);
+  for(let n=0;n<8;n++) {await page.clock.runFor(60);colors.add(await check());}
+  expect([...colors].sort((a,b)=>a-b)).toEqual([1,15]);
+  const target=(await snapshot(page)).practice.rows[33];
+  await page.locator('#game').press(String.fromCharCode(target));await page.clock.runFor(60);
+  expect((await snapshot(page)).practice.index).toBe(1);await check();
+  const old=await page.evaluate(()=>Array.from(document.querySelector('#game').getContext('2d').getImageData(30,96,8,8).data));
+  const glyph=Array.from(atob(data.sprites[`FONT5H/font5_${target}`].pixels),c=>c.charCodeAt(0));
+  expect(old).toEqual(glyph.flatMap(v=>[...palette.slice((v?1:15)*3,(v?1:15)*3+3),255]));
+  await page.locator('#game').evaluate(game=>game.blur());
+  const paused=await snapshot(page),pixels=await cell();await page.clock.runFor(30000);
+  expect((await snapshot(page)).practice.cursor).toEqual(paused.practice.cursor);expect(await cell()).toEqual(pixels);
+  await page.locator('#game').focus();
+  expect((await snapshot(page)).practice.cursor).toMatchObject({inverted:paused.practice.cursor.inverted,left:paused.practice.cursor.left});
+  await check();await page.clock.runFor(60);await check();expect(errors).toEqual([]);
+ });
  test('consumes consecutive distinct targets in order at one sampled time',async({page})=>{
   const before=await snapshot(page),targets=before.practice.rows.slice(33,36);
   expect(new Set(targets).size).toBe(3);

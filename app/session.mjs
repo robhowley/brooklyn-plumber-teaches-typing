@@ -11,6 +11,7 @@ import { lessonLimitSeconds, clampLessonMinutes, resultEntryEffects, resultNextS
 import { createStartup, createMenuIdle, createMenuIdleState, createDemo, demoStudent } from '../recovered/control/startup.mjs';
 import { Celebration } from '../recovered/control/celebration.mjs';
 import { hydrateCelebrationResources } from './celebration-render.mjs';
+import { createTextCursor, textCursorTick } from '../recovered/control/menu.mjs';
 
 export const SAVE_KEY = 'mtt-static-translation.students.v1';
 export const BIOS_HZ = 18.2; // Host clock conversion, not measured DOS timing.
@@ -116,6 +117,7 @@ export class Session {
   }
   rebaseHostClock(oldTicks,newTicks) {
     this.menuIdle?.rebaseClock(oldTicks,newTicks);this.sampleTicks=newTicks;this.lastWaitTick=newTicks&65535;
+    if(this.screen==='practice')this.practice.cursor.tick=this.lastWaitTick;
   }
   selectDemo() {this.student=demoStudent(this.student);}
   pollDemo(args) {
@@ -242,6 +244,8 @@ export class Session {
     } else {
       this.practice=createPractice(corpus,this.lastPracticeCorrect);
       this.practice.aborted=false; this.typed='';
+      // MARIO.EXE FILE 0xb64e..0xb696 invokes the shared 4/2 cursor for each wait.
+      this.practice.cursor=createTextCursor(this.lastWaitTick);
     }
     // Student operation0xaf9 at 0x128d8/0xb1ca, body 0xe3f1..0xe419.
     this.student.fill(0,68); this.student[47]=0;
@@ -272,6 +276,8 @@ export class Session {
       this.clock=this.water.timer;
       this.input.flush();
     } else if(!this.cinematic) this.clock=timer(this.clock,value?310:300,nowTicks);
+    // Host focus suspension freezes the Practice phase without consuming a wait.
+    if(this.mode===4) {this.lastWaitTick=nowTicks&65535;this.practice.cursor.tick=this.lastWaitTick;}
     this.suspended=value;
   }
   stats() { if(this.mode===3) return this.castle.stats; if(this.mode===2) return this.water.stats; return score({...this.activity,ticks:this.clock.ticks,limitSeconds:this.limit,previousAccuracy:this.profile.accuracy}); }
@@ -303,8 +309,14 @@ export class Session {
     this.clock=timer(this.clock,100,nowTicks);
     if(this.mode===4) {
       if(this.demo) {this.enqueue(key);key=this.pollDemo({target:this.practice.rows[33+this.practice.index]}).key;this.seed=this.demoRng.seed;}
-      if(key===0x12d) {if(this.option10)this.effects.push({type:'quit-request'});key=0;}
       const timedOut=this.stats().elapsedSeconds>=this.limit;
+      // FILE 0x1ada9..0x1adcf / 0x1ae8b..0x1ae97: callback/key readiness
+      // restores normal colors and exits BEFORE the shared low-word wait
+      // (FILE 0x192ce..0x192d9), with no elapsed-gap catch-up.
+      // Even ignored/wrong keys start a fresh wait (0xb7ee -> 0xb62f).
+      if(key||timedOut)this.practice.cursor=createTextCursor(this.lastWaitTick);
+      else if(this.changedTick(nowTicks))this.practice.cursor=textCursorTick(this.practice.cursor,nowTicks);
+      if(key===0x12d) {if(this.option10)this.effects.push({type:'quit-request'});key=0;}
       if(key===27) {
         this.practice.aborted=true; this.finish(nowTicks); return [{type:'end'}];
       }
