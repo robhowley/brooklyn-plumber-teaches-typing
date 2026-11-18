@@ -36,6 +36,7 @@ playwright-report/
 /analysis/runtime/corpora.json
 /analysis/worlds/strings.json
 /analysis/worlds/tables.json
+/analysis/worlds/coverage.json
 # World static traces/evidence remain local, including future focused listings.
 /analysis/worlds/castle-*.txt
 /analysis/worlds/castle-evidence.json
