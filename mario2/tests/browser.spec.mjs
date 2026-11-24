@@ -65,7 +65,7 @@ test('indexed hotspot path, name editing, duplicates and blank name',async({page
  await page.keyboard.type('!');await expect(page.getByRole('status')).toContainText('ABCDEFG!');
  await page.keyboard.press('Backspace');
  await page.keyboard.press('Enter');await hit(4,5);await skip(page);await hit(5,14,3);await skip(page);await hit(14,17,2);
- await page.reload();await skip(page);await name(page,0,'ABCDEFG');await expect(page.locator('dialog')).toBeVisible();
+ await page.reload();await skip(page);await name(page,0,'ABCDEFG');await expect(page.locator('#duplicate')).toBeVisible();
  await page.getByRole('button',{name:'Cancel',exact:true}).click();
  await expect(page.getByRole('status')).toContainText('Setup state 3');
  await page.keyboard.press('Enter');await page.getByRole('button',{name:'OK',exact:true}).click();await finish(page);

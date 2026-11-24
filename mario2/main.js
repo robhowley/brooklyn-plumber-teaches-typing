@@ -4,7 +4,8 @@ import {createSetup} from './setup.js';
 import {createStudentStore} from './storage.js';
 import {createTyping,normalizeTypingKey,createRandom,seedFromCalendar} from './typing.js';
 import {createMedia} from './media.js';
-import {selectLesson,setupMovie,welcomeMovie} from './selection.js';
+import {calculateReport} from './report.js';
+import {selectLesson,setupMovie,welcomeMovie,reportMovie} from './selection.js';
 
 const canvas=document.querySelector('canvas'), status=document.querySelector('#status');
 const error=document.querySelector('#error'), controls=document.querySelector('#controls');
@@ -45,22 +46,60 @@ try {
   }};
   const skip=document.createElement('button'); skip.textContent='Skip movie'; skip.onclick=()=>media.skip();
   controls.before(enable,skip);
+  const quit=document.createElement('dialog');
+  quit.setAttribute('aria-label','Quit confirmation (resource624)');
+  quit.innerHTML='<p>Quit?</p><button value="2" autofocus>Yes</button><button value="1">No</button>';
+  document.body.append(quit);
+  let quitApplication=false, exited=false, terminal=false;
+  function exit() {
+    exited=true; musicSelector=0; clearInterval(timer); media.dispose();
+    controls.replaceChildren(); status.textContent='Application exited. Reload to start again.';
+  }
+  function confirmQuit(application=false) {
+    if(terminal||exited) return;
+    quitApplication=application; quit.showModal(); quit.querySelector('[value="2"]').focus();
+  }
+  function quitResult(yes) {
+    quit.close();
+    if(!yes) return;
+    if(quitApplication) {musicSelector=0;media.audio(0,0xc0);play(40,exit);}
+    else {
+      // WINMARIO FILE 0x1ce8c teardown stops audio; 0x1476a..0x14a3b returns to Welcome with operation32.
+      media.audio(0,0xc0); finished=false; musicSelector=1;
+      display(setup.welcome());media.audio(0,0x20);
+    }
+  }
+  quit.querySelectorAll('button').forEach(b=>b.onclick=()=>quitResult(b.value==='2'));
+  quit.addEventListener('cancel',event=>{event.preventDefault();quitResult(true);});
   function update(result) {
-    if(result.effects.some(e=>e.type==='finish')) {
+    if(result.effects.some(e=>e.type==='finish') && !finished) {
       finished=true; musicSelector=0; media.audio(0,0xc0);
+      const report=calculateReport(result.view), prior=setup.reportContext();
+      display(setup.beginReport(report));
+      play(reportMovie({speed:report.speed,...prior},random),()=>{
+        display({...view,reportStrings:report.reportStrings});
+        musicSelector=(report.speed&65535)>=(prior.threshold&65535)?7:8;
+        media.audio(0,0xc0);media.audio(musicSelector,3);
+        const next=setup.finishReport(); terminal=!!next.terminal;
+        display({...next,reportStrings:report.reportStrings});
+      });
+      return;
     }
     display({...view,...result.view});
   }
   function startTyping() {
     const lesson=selectLesson(assets.manifest.lessons['lesson-'+'htbns'[view.keyset]],random);
-    typing=createTyping({lesson,durationSeconds:view.durationSeconds,nowMs:performance.now()});
+    const args={lesson,durationSeconds:view.durationSeconds,nowMs:performance.now()};
+    if(typing) typing.reenter(args);
+    else typing=createTyping(args);
+    finished=false;
     update({view:typing.snapshot(),effects:[]});
     musicSelector=5; media.audio(0,0xc0); media.audio(5,3);
   }
   function startTimer() {
     clearInterval(timer);
     timer=setInterval(()=>{
-      if(fixture||movie||finished||!view) return;
+      if(fixture||movie||quit.open||document.hidden||exited||terminal||!view) return;
       if(view.state===21 && typing) update(typing.acceptedUpdate(performance.now()));
       renderer.visitOverlay({state:view.state,transition:0,movie:0,timerDelivered:true});
     },100);
@@ -75,6 +114,7 @@ try {
     2:[['Mario',3,0],['Princess',3,1],['Luigi',3,2]],
     3:[['Confirm name',4]],4:[['Choose lesson plan',5]],
     5:[['Express',14,3]],
+    10:[['Repeat',39]],
     14:['Home','Top','Bottom','Numbers','Symbols'].map((s,i)=>[s,17,i]),
   };
   function display(next) {
@@ -86,16 +126,24 @@ try {
     if(reenter) renderer.enter(view);
     else renderer.draw(view);
     status.textContent=fixture ? 'Renderer fixture only, no mechanics or statistics calculated.' :
-      view.state===21 ? finished ? 'Finish handoff for I6. Report and progression are not implemented.' :
+      terminal ? 'Browser adaptation: certificate unavailable; progression stopped.' :
+      view.state===10 ? 'Report | '+view.reportStrings?.join(' | ') :
+      view.state===21 ?
         'State 21 | Typed: '+(view.counters?.total??0)+' | Errors: '+(view.counters?.errors??0)+' | Elapsed: '+(view.elapsed??0) :
       'Setup state '+view.state+' | Name: '+(view.name||'(blank)')+' | Character: '+view.character+' | Keyset: '+view.keyset;
     error.textContent=view.storageError ? 'Persistence refused: '+view.storageError.message : '';
     controls.replaceChildren();
-    if (!fixture) for (const [label,selector,argument] of choices[view.state]??[]) {
+    if (!fixture && !terminal) for (const [label,selector,argument] of choices[view.state]??[]) {
       const button=document.createElement('button');
       button.textContent=label;
       button.onclick=()=>dispatch({type:'select',selector,argument});
       controls.append(button);
+    }
+    if(!fixture && !terminal) {
+      for(const [label,application] of [['Quit to Welcome',false],['Quit application',true]]) {
+        const button=document.createElement('button');button.textContent=label;
+        button.onclick=()=>{if(movie){media.skip();return;}confirmQuit(application);};controls.append(button);
+      }
     }
     if (view.state===3 && !fixture) {
       const hint=document.createElement('p');
@@ -106,7 +154,9 @@ try {
     else if(!view.duplicate && dialog.open) dialog.close();
   }
   function dispatch(action){
-    if(fixture||movie||finished) return;
+    if(fixture||quit.open||terminal||exited) return;
+    if(movie){media.skip();return;}
+    if(action.type==='select' && action.selector===16){confirmQuit(true);return;}
     const old=view.state;
     display(setup.dispatch(action));
     if(view.state===21 && old!==21) startTyping();
@@ -117,8 +167,16 @@ try {
   dialog.querySelectorAll('button').forEach(b=>b.onclick=()=>dispatch({type:'duplicate-result',result:Number(b.value)}));
   dialog.addEventListener('cancel',event=>{event.preventDefault();dispatch({type:'duplicate-result',result:2});});
   window.addEventListener('keydown',event=>{
-    if(fixture) return;
+    if(fixture||terminal||exited) return;
     if(movie){event.preventDefault();media.skip();return;}
+    if(quit.open) {
+      if(event.key==='Escape'){event.preventDefault();quitResult(true);}
+      else if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(event.key)) {
+        event.preventDefault();quit.querySelector(document.activeElement.value==='2'?'[value="1"]':'[value="2"]').focus();
+      }
+      return;
+    }
+    if(event.key==='Escape'){event.preventDefault();if(view.state===1)exit();else confirmQuit();return;}
     if(view.state===21 && typing && !finished && !event.ctrlKey && !event.metaKey && !event.altKey) {
       event.preventDefault();
       const virtualKey=event.keyCode;
@@ -134,11 +192,20 @@ try {
   });
   canvas.addEventListener('click',event=>{
     if(movie){media.skip();return;}
-    if(fixture || view.duplicate || finished) return;
+    if(fixture || view.duplicate || quit.open || terminal || exited) return;
     const bounds=canvas.getBoundingClientRect();
     const x=(event.clientX-bounds.left)*640/bounds.width, y=(event.clientY-bounds.top)*480/bounds.height;
     const hit=(assets.presentation.hotspots[view.state]??[]).find(({rectangle:[l,t,r,b]})=>x>=l&&x<=r&&y>=t&&y<=b);
-    if(hit) dispatch({type:'select',selector:hit.selector,argument:hit.argument});
+    if(hit) {
+      // FILE 0x17684..0x17697: selector28 with application+0xca=0
+      // returns no hit before audio10. Count saved students, not the draft name.
+      if(hit.selector===28 && setup.studentCount()===0) return;
+      // WINMARIO FILE 0x17697: accepted inclusive menu hit, audio10/resource499
+      // with flags2 precedes returning the selector. Browser transport needs
+      // open+play (3) to load the WAVE. Misses/skip/typing stay silent.
+      media.audio(10,3);
+      dispatch({type:'select',selector:hit.selector,argument:hit.argument});
+    }
   });
   document.querySelector('#typing').onclick=()=>{fixture=true;display({state:21,rows:['SOURCE RENDER FIXTURE','asdf jkl;'],expectedByte:74,cursorColumn:2});};
   document.querySelector('#report').onclick=()=>{fixture=true;display({state:10,reportStrings:['FIXTURE','0','0','0','0','0']});};

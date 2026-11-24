@@ -2,6 +2,7 @@
 // 39a4fb53384afbfec13063c2f4c67d51013b1f8ea494788c88f1ac6c12f47f22.
 // Browser persistence of manual mode/keyset selections is an adaptation;
 // original manual Express did not promise immediate saves (WINDATA-0009).
+import {qualifies} from './report.js';
 const word = (r, p) => r[p] + 256 * r[p + 1];
 function setWord(r, p, value) {
   r[p] = value & 255;
@@ -36,9 +37,11 @@ export function createSetup({store, nameKeyFlags}) {
   let record = file?.students.find(s => s.name === file.currentName)?.record.slice() ?? freshRecord();
   let state = 1;
   let duplicate = null;
+  let report = null, terminal = false;
   const snapshot = () => ({state, name: recordName(record), character: word(record, 3),
     mode: word(record, 5), keyset: word(record, 1), durationSeconds: word(record, 27)*60,
-    duplicate: duplicate && {...duplicate}, storageError: storageError && {...storageError}});
+    duplicate: duplicate && {...duplicate}, storageError: storageError && {...storageError},
+    ...(terminal ? {terminal:true} : {})});
 
   function persist(candidate, nextState) {
     if (!file) return; // A failed load must never turn into an empty-file overwrite.
@@ -71,6 +74,26 @@ export function createSetup({store, nameKeyFlags}) {
   }
   return {
     snapshot,
+    studentCount: () => file?.students.length ?? 0,
+    reportContext: () => ({previous:word(record,11),threshold:word(record,29+2*word(record,5))}),
+    beginReport(value) {
+      if(state!==21 || report || terminal) return snapshot();
+      report=value; state=10;
+      return snapshot();
+    },
+    finishReport() {
+      if(state!==10 || !report || report.applied) return snapshot();
+      report.applied=true;
+      // FILE 0x2ae0..0x2b58: manual +920=0 updates WPM and progression
+      // in memory only. No accuracy/time/problem history write or source writer.
+      setWord(record,11,report.speed);
+      if(qualifies(report,word(record,29+2*word(record,5)),word(record,21+2*word(record,5)))) {
+        if(word(record,1)===4) terminal=true;
+        else setWord(record,1,word(record,1)+1);
+      }
+      return snapshot();
+    },
+    welcome() {if(!terminal) state=1; return snapshot();},
     dispatch(action) {
       if (!action) return snapshot();
       if (duplicate) {
@@ -92,7 +115,7 @@ export function createSetup({store, nameKeyFlags}) {
         }
       } else if (action.type === 'select') {
         // XPRESS-0001 FILE 0x14032..0x140ec, 0x14132..0x14182,
-        // 0x14220..0x1426c. This bounded implementation stops at state21.
+        // 0x14220..0x1426c. Ordinary Express setup selectors.
         const {selector, argument: arg} = action;
         if (state === 1 && selector === 2) state = 2;
         else if (state === 2 && selector === 3 && Number.isInteger(arg) && arg >= 0 && arg <= 2) {
@@ -109,8 +132,9 @@ export function createSetup({store, nameKeyFlags}) {
           const candidate = record.slice();
           setWord(candidate, 1, arg);
           persist(candidate, 21);
-        } else if (state === 1 && selector === 39 && file?.currentName && word(record, 5) === 3) {
-          state = 21; // Stored ordinary Express handoff, no typing mechanics.
+        } else if ((state === 1 || state === 10) && selector === 39 && recordName(record) && word(record, 5) === 3 && !terminal) {
+          report=null;
+          state = 21; // Repeat and Continue use the actual in-memory record.
         }
       }
       return snapshot();
