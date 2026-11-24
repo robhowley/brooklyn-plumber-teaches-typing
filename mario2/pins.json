@@ -23,6 +23,146 @@
   },
   "assets": [
     {
+      "id": "movies-0",
+      "kind": "movies",
+      "source": {
+        "path": "/MARIO/LOGO.AVI;1",
+        "size": 782780,
+        "sha256": "1170b130f73d119361ec82fba8d2064ed9458c9c3aae9f539fb57695dd845910",
+        "image_extents": [
+          {
+            "image_offset": 287555584,
+            "length": 782780
+          }
+        ]
+      },
+      "roles": [
+        "startup"
+      ],
+      "claims": [],
+      "join": {
+        "file_offset": 139194,
+        "sha256": "48f5a0d800bc5eaacf5b0b6783b9b1560e521067e322801677c1687b94261795",
+        "size": 13
+      },
+      "placement": {
+        "field_u16_2": 0,
+        "field_u16_4": 0,
+        "byte6": 0
+      },
+      "expected_artifacts": [
+        {
+          "name": "stream-1-audio.wav",
+          "sha256": "4e6f0b9457abcb682660a8eded2cc6e5ce3b7233d8c9856c95a4f08a5ad29e7d",
+          "bytes": 282284
+        },
+        {
+          "name": "frames.zlib",
+          "sha256": "9ecf22d92fde15e1d6ad9c081a691fc437f77274d7952769ce2f42dd99751eb0",
+          "bytes": 797433
+        }
+      ]
+    },
+    {
+      "id": "movies-1",
+      "kind": "movies",
+      "source": {
+        "path": "/MARIO/INTRO.AVI;1",
+        "size": 2566476,
+        "sha256": "96b2041e350382febf744ff498d83ec56fb712a77217352d1bb2e5d8a15661c8",
+        "image_extents": [
+          {
+            "image_offset": 284985344,
+            "length": 2566476
+          }
+        ]
+      },
+      "roles": [
+        "startup"
+      ],
+      "claims": [],
+      "join": {
+        "file_offset": 139207,
+        "sha256": "919d4e2564f06a989b02b33b72cc96db50ddf06e761c90877d61a1bc1168a20a",
+        "size": 13
+      },
+      "placement": {
+        "field_u16_2": 0,
+        "field_u16_4": 0,
+        "byte6": 0
+      },
+      "expected_artifacts": [
+        {
+          "name": "stream-1-audio.wav",
+          "sha256": "c9e294d482840bf396a278ac856d68f658ae43e830465b94322649a7e608756e",
+          "bytes": 907440
+        },
+        {
+          "name": "frames.zlib",
+          "sha256": "0881c0d65ae8a39fd06df8813f1db76cca78fef11f2c1679f43534169d43b5a5",
+          "bytes": 18794740
+        }
+      ]
+    },
+    {
+      "id": "ne-2-485",
+      "kind": "resource",
+      "type": 2,
+      "index": 485,
+      "executable_file_offset": 20254720,
+      "source": {
+        "path": "/MARIO/WINMARIO.EXE;1::NE:2:485",
+        "size": 308736,
+        "sha256": "a3c4ad533201e791e9505e24f85948d022b5299a6a57b580bbfc8c754df01dbf",
+        "image_extents": [
+          {
+            "image_offset": 496728064,
+            "length": 308736
+          }
+        ]
+      },
+      "roles": [
+        "startup"
+      ],
+      "claims": [],
+      "expected_artifacts": [
+        {
+          "name": "pixels.zlib",
+          "sha256": "8e92ab1cdae4e81ac28cd9325b38595100b068a1ef2670e8c4b2bc5a8579cbb6",
+          "bytes": 25404
+        }
+      ]
+    },
+    {
+      "id": "ne-2-613",
+      "kind": "resource",
+      "type": 2,
+      "index": 613,
+      "executable_file_offset": 18632704,
+      "source": {
+        "path": "/MARIO/WINMARIO.EXE;1::NE:2:613",
+        "size": 308736,
+        "sha256": "1bb8182e496d67bf8813994a51af73ab46708c1629ae71ae075d030aa18dde08",
+        "image_extents": [
+          {
+            "image_offset": 495106048,
+            "length": 308736
+          }
+        ]
+      },
+      "roles": [
+        "startup"
+      ],
+      "claims": [],
+      "expected_artifacts": [
+        {
+          "name": "pixels.zlib",
+          "sha256": "9afcb847ce128fe9d0fd73a047d23bf9ecb4d265bad1c13115a4b91b87ed6a53",
+          "bytes": 322
+        }
+      ]
+    },
+    {
       "id": "ne-2-103",
       "kind": "resource",
       "source": {

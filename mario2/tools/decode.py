@@ -1,6 +1,6 @@
 """Bounded inert Windows media readers, adapted from authored static research.
 No source programs are imported or executed. Offsets are immediate-member FILE offsets.
-Only Express DIB/RLE AVI, PCM, MIDI events and Win16 UI formats are supported.
+Only selected DIB/RLE/MSVC AVI, PCM, MIDI events and Win16 UI formats are supported.
 """
 from pathlib import Path
 import hashlib
@@ -345,6 +345,48 @@ def decode_dib(b, out, bmp=False):
     return dict(status='decoded', image=h, pixel_format=mode, decoded_sha256=sha(pixels), **tail(b, end))
 
 
+def msvc8(raw, width, height, previous=None):
+    """Indexed CRAM blocks, bottom-up traversal with top-down retained indices.
+
+    Adapted from authored media-next/codecs_new.py::msvc8, independently
+    checked against verify-codecs/video_check.py on LOGO/INTRO (pins.json).
+    Palette realization is separate from the retained native index plane.
+    """
+    need(width > 0 and height > 0 and width % 4 == height % 4 == 0
+         and width*height <= MAX_PIXELS, 'MSVC dimensions')
+    need(previous is None or len(previous) == width*height, 'MSVC previous shape')
+    pixels = bytearray(previous if previous is not None else bytes(width*height))
+    p = i = 0
+    total = width*height//16
+    while i < total:
+        a, c = sl(raw, p, 2); p += 2
+        if c & 252 == 132:
+            count = ((c-132) << 8)+a
+            need(count > 0 and i+count <= total, 'MSVC skip bounds')
+            need(previous is not None, 'MSVC initial-frame skip')
+            i += count
+            continue
+        flags = a | (c << 8)
+        if c < 128:
+            colors = sl(raw, p, 2); p += 2
+        elif c >= 144:
+            colors = sl(raw, p, 8); p += 8
+        else:
+            colors = bytes([a])
+        x = (i % (width//4))*4
+        y = height-1-(i//(width//4))*4
+        for dy in range(4):
+            if len(colors) == 1:
+                row = colors*4
+            else:
+                row = bytes(colors[(((dy & 2) << 1)+(dx & 2) if len(colors) == 8 else 0)
+                                   + (((flags >> (dy*4+dx)) & 1) ^ 1)] for dx in range(4))
+            pixels[(y-dy)*width+x:(y-dy)*width+x+4] = row
+        i += 1
+    need(raw[p:] in (b'', b'\0\0'), 'MSVC unexpected trailing bytes')
+    return bytes(pixels), len(raw)
+
+
 def decode_avi(b,out):
     cs,end=riff(b);need(b[8:12]==b'AVI ','not AVI')
     strls=[c for c in flatten(cs) if c.get('form')=='strl'];streams=[]
@@ -395,7 +437,8 @@ def decode_avi(b,out):
                 stream['decode_status']='unsupported-codec';stream['unsupported']=str(e);all_decoded=False
         elif stream['type']=='vids':
             h=stream['bitmap'];prev=None;palette=[rgb[:] for rgb in h['palette']];frame=0;failures=[]
-            if h['compression'] not in (0,1,2):
+            is_msvc = h['compression'] == int.from_bytes(b'CRAM', 'little') and h['bits'] == 8
+            if h['compression'] not in (0,1,2) and not is_msvc:
                 stream['decode_status']='unsupported-codec';all_decoded=False;continue
             for s in ss:
                 raw=sl(b,s['file_offset'],s['size'])
@@ -407,6 +450,8 @@ def decode_avi(b,out):
                 try:
                     if not raw:
                         need(prev is not None,'AVI empty initial frame');used=0
+                    elif is_msvc:
+                        prev,used=msvc8(raw,h['width'],h['height'],prev)
                     elif h['compression'] in (1,2):
                         prev,used=rle8(raw,h['width'],h['height'],prev,bits=h['bits'])
                         need(not any(raw[used:]),'AVI RLE trailing nonzero bytes')

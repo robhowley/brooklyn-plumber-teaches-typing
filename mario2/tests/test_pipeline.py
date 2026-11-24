@@ -28,10 +28,15 @@ class UnitTests(unittest.TestCase):
         # FILE offset, exact member and member SHA256 for all 38 original joins.
         identities = sorted((int(a['id'].split('-')[1]),a['join']['file_offset'],
                              a['source']['path'],a['source']['sha256'])
-                            for a in PINS['assets'] if a['kind']=='movies')
+                            for a in PINS['assets'] if a['kind']=='movies' and int(a['id'].split('-')[1]) >= 14)
         self.assertEqual(len(identities),38)
         self.assertEqual(hashlib.sha256(json.dumps(identities,separators=(',',':')).encode()).hexdigest(),
                          'c75aba1876fd78c86f52a2fa72cf73dd8921dac48f439bb5c443fe3907a9b031')
+        for identity in ('movies-0', 'movies-1', 'ne-2-485', 'ne-2-613'):
+            pins = copy.deepcopy(PINS)
+            pins['assets'] = [a for a in pins['assets'] if a['id'] != identity]
+            with self.subTest(missing=identity), self.assertRaises(ValueError):
+                build.validate_pins(pins)
         for field in ('assets', 'lessons'):
             pins = copy.deepcopy(PINS)
             pins[field].pop()
@@ -110,7 +115,7 @@ class DiscTests(unittest.TestCase):
                 build.build(iso)
                 self.assertEqual(first,snapshot())
                 manifest = json.loads((build.DIST/'assets.json').read_text())
-                self.assertEqual(len(manifest['assets']),77)
+                self.assertEqual(len(manifest['assets']),81)
                 self.assertEqual(len(manifest['lessons']),5)
                 runtime = {'index.html','main.js','styles.css','setup.js','storage.js','assets.js','render.js','typing.js','media.js','selection.js','report.js'}
                 for name in runtime:
@@ -155,6 +160,8 @@ class DiscTests(unittest.TestCase):
                             self.assertEqual(entry['source']['member'],a['source']['path'])
                             self.assertEqual(entry['source']['sha256'],a['source']['sha256'])
                             packed = (build.DIST/entry['files']['frames.zlib']).read_bytes()
+                            if selector in (0, 1):
+                                continue  # All startup native data is checked in test_startup_codec.
                             expected_frames = reference_avi.frames(source.read(a['source']), coverage)
                             for f, (offset, expected, palette) in zip(entry['data']['decoded_frames'], expected_frames, strict=True):
                                 frame = zlib.decompress(packed[f['output_offset']:f['output_offset']+f['compressed_bytes']])
@@ -186,7 +193,7 @@ class DiscTests(unittest.TestCase):
                         movies[0]['join'] = copy.deepcopy(movies[1]['join'])
                     if mutation == 'font': pins['font']['sha256'] = '0'*64
                     if mutation == 'artifact': pins['assets'][0]['expected_artifacts'][0]['sha256'] = '0'*64
-                    if mutation == 'resource-offset': pins['assets'][0]['executable_file_offset'] += 1
+                    if mutation == 'resource-offset': next(a for a in pins['assets'] if a['kind'] == 'resource')['executable_file_offset'] += 1
                     if mutation == 'lesson-expanded': pins['lessons'][0]['expanded_sha256'] = '0'*64
                     if mutation == 'lesson-normalized': pins['lessons'][0]['normalized_sha256'] = '0'*64
                     pinpath = Path(tmp)/'bad-pins.json'
