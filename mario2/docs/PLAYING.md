@@ -1,6 +1,6 @@
 # Mario 2: Express typing and media
 
-Build and serve with [DEVELOPMENT.md](DEVELOPMENT.md). This iteration runs ordinary Express typing and setup movies, stopping at an explicit finish handoff.
+Build and serve with [DEVELOPMENT.md](DEVELOPMENT.md). Ordinary Express includes setup, typing, calculated reports, progression, Repeat and quit/Continue.
 
 ## Controls and saves
 
@@ -10,9 +10,10 @@ Build and serve with [DEVELOPMENT.md](DEVELOPMENT.md). This iteration runs ordin
 4. Choose lesson plan, Express, then Home, Top, Bottom, Numbers or Symbols.
 5. Type the displayed rows in state21. Correct keys advance; wrong keys count without advancing. Repeated keydowns count; Enter and keyup do not type. Hand cues follow the expected byte.
 6. Enable audio / Retry unlocks browser audio. Any key or canvas click skips an active movie before other input. Failed or blocked media holds the current screen until explicit Retry or Skip.
-7. Expiry stops at Finish handoff for I6. Reports, progression, repeat, quit and the unanswered terminal certificate are not implemented.
+7. After expiry, watch or skip the report movie and read the six calculated fields. Repeat begins the updated keyset; Escape opens quit confirmation (Yes by default, arrow keys choose No). Quit to Welcome retains the in-memory student for Continue. Quit application confirms, plays movie40, then exits; Escape at Welcome exits without that movie.
+8. Passing the final keyset stops with a labeled browser adaptation: certificate unavailable; progression stopped. There is no synthetic certificate, mode advance or continuation past this stop.
 
-Reload retains the current student and setup selections. Continue resumes an ordinary Express handoff. This immediate selection persistence is a browser adaptation, not proof of original manual Express save timing. Saves use only `mtt2-static-translation.students.v1` with the `mario2-students.v1` envelope. The original app's three save keys are never read, changed, imported or deleted. A visible Persistence refused message means the setup was not saved; existing malformed data is not reset or overwritten.
+Reload retains the current student and setup selections. Continue starts ordinary Express from the current record. Report speed and progression remain in memory only for manual Express, with no report autosave; a browser reload therefore restores the last persisted setup selection, not unsaved report progression. This immediate selection persistence is a browser adaptation, not proof of original manual Express save timing. Saves use only `mtt2-static-translation.students.v1` with the `mario2-students.v1` envelope. The original app's three save keys are never read, changed, imported or deleted. A visible Persistence refused message means the setup was not saved; existing malformed data is not reset or overwritten.
 
 Open Renderer fixtures for supplied typing rows, hand cues and report strings. These are presentation examples, not a playable lesson or calculated report. Deliver one overlay visit applies one source-table visit with gates open; some visits have no visible frame. Return to setup restores its screen. Live mode delivers 100ms timer visits. Blur stops future visits without resetting rows, counters or sample phase; resume catches up at most two seconds per sample.
 

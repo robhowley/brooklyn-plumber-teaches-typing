@@ -5,11 +5,49 @@ test.beforeEach(async({page})=>{
  await page.route('**/main.js',async route=>{
   const response=await route.fetch();
   const source=(await response.text()).replace("import {createMedia} from './media.js';",
-   "import {createMedia as nativeMedia} from './media.js'; const createMedia=options=>{const media=nativeMedia(options);window.audioCalls=[];return {...media,audio(...args){window.audioCalls.push(args);return media.audio(...args);}};};");
+   "import {createMedia as nativeMedia} from './media.js'; const createMedia=options=>{const media=nativeMedia(options);window.audioCalls=[];window.mediaSnapshot=()=>media.snapshot();return {...media,audio(...args){window.audioCalls.push(args);return media.audio(...args);}};};");
   await route.fulfill({response,body:source});
  });
  await page.clock.install({time:new Date(2026,0,1)});
  await page.clock.pauseAt(new Date(2026,0,1,0,0,1));
+});
+test('indexed menu hit requests source audio10 before selection, rejected and consumed clicks do not',async({page})=>{
+ await page.goto('./');
+ await expect(page.getByRole('button',{name:'Skip movie',exact:true})).toBeVisible();
+ const canvas=page.locator('canvas');
+ const calls=()=>page.evaluate(()=>window.audioCalls.filter(([s])=>s===10));
+ // Same hotspot during Welcome speech consumes the click as movie skip.
+ await canvas.click({position:{x:140,y:210}});
+ expect(await calls()).toEqual([]);
+ await canvas.click({position:{x:1,y:1}});
+ expect(await calls()).toEqual([]);
+ await page.getByRole('button',{name:'Enable audio / Retry',exact:true}).click();
+ // Inclusive source rectangle left/top edge: New Student -> state2.
+ await canvas.click({position:{x:90,y:175}});
+ await expect(page.getByRole('status')).toContainText('Setup state 2');
+ expect(await calls()).toEqual([[10,3]]);
+ await expect.poll(()=>page.evaluate(()=>window.mediaSnapshot().audio.find(a=>a.selector===10)?.state)).toBe('playing');
+ // FILE 0x17684: state2 selector28 is disabled with no saved students.
+ expect(await page.evaluate(key=>localStorage.getItem(key),own)).toBeNull();
+ const bounds=await canvas.boundingBox();
+ await canvas.click({position:{x:619*bounds.width/640,y:459*bounds.height/480}});
+ await expect(page.getByRole('status')).toContainText('Setup state 2');
+ expect(await calls()).toEqual([[10,3]]);
+ await page.getByRole('button',{name:'Quit to Welcome',exact:true}).click();
+ // Inject a canvas event behind the modal to prove the coordinator guard too.
+ await canvas.dispatchEvent('click',{clientX:140,clientY:210});
+ expect(await calls()).toEqual([[10,3]]);
+ await page.keyboard.press('Escape');
+});
+test('live typing and fixture canvas clicks never request menu audio10',async({page})=>{
+ await enter(page);
+ await page.locator('canvas').click({position:{x:140,y:210}});
+ await page.keyboard.press('z');
+ expect(await page.evaluate(()=>window.audioCalls.filter(([s])=>s===10))).toEqual([]);
+ await page.locator('summary').click();
+ await page.locator('#report').click();
+ await page.locator('canvas').click({position:{x:140,y:210}});
+ expect(await page.evaluate(()=>window.audioCalls.filter(([s])=>s===10))).toEqual([]);
 });
 async function enter(page) {
  await page.goto('./');
@@ -54,6 +92,15 @@ test('live typing accepts correct, wrong and repeat keydowns, never Enter or key
  await page.screenshot({path:info.outputPath('live-typing.png')});
  expect(await page.evaluate(()=>Object.keys(localStorage))).toEqual([own]);
 });
+test('hidden-document timer gate preserves counters and catches up without rebasing (browser event vector)',async({page})=>{
+ await enter(page);await page.keyboard.press('z');
+ await page.evaluate(()=>Object.defineProperty(document,'hidden',{configurable:true,value:true}));
+ await page.clock.runFor(5000);
+ await expect(page.getByRole('status')).toContainText('Typed: 1 | Errors: 1 | Elapsed: 0');
+ await page.evaluate(()=>Object.defineProperty(document,'hidden',{configurable:true,value:false}));
+ await page.clock.runFor(500);
+ await expect(page.getByRole('status')).toContainText('Elapsed: 2');
+});
 test('expiry is sampled then handed off on the next visit, input can intervene',async({page},info)=>{
  await enter(page);
  await page.evaluate(key=>{
@@ -66,9 +113,9 @@ test('expiry is sampled then handed off on the next visit, input can intervene',
  await page.keyboard.press('z');
  await expect(page.getByRole('status')).toContainText('Typed: 1');
  await page.clock.runFor(100);
- await expect(page.getByRole('status')).toContainText('Finish handoff for I6');
- await page.keyboard.press('x');
- await expect(page.getByRole('status')).toContainText('Finish handoff for I6');
+ await expect(page.getByRole('status')).toContainText('Report');
+ await page.keyboard.press('x'); // Skip only, not typing or Repeat.
+ await expect(page.getByRole('status')).toContainText('Keys Typed:    1');
  await page.screenshot({path:info.outputPath('finish-handoff.png')});
 });
 test('real welcome movie emits a displayed frame before explicit skip',async({page},info)=>{
@@ -228,4 +275,134 @@ test('failed movies visibly hold setup; a skip key cannot also select or type',a
  await expect(page.getByRole('status')).toContainText('Setup state 1');
  await page.getByRole('button',{name:'New student',exact:true}).click();
  await expect(page.getByRole('status')).toContainText('Setup state 2');
+});
+
+async function fastContinue(page,keyset=0,threshold=0,previous=0) {
+ await enter(page);
+ await page.evaluate(({own,keyset,threshold,previous})=>{
+  const file=JSON.parse(localStorage.getItem(own)),r=file.students[0].record;
+  r[1]=keyset;r[27]=0;r[28]=0;r[35]=threshold;r[36]=0;r[11]=previous;r[12]=0;
+  localStorage.setItem(own,JSON.stringify(file));
+ },{own,keyset,threshold,previous});
+ await page.reload();await page.getByRole('button',{name:'Skip movie',exact:true}).click();
+ await page.getByRole('button',{name:'Continue',exact:true}).click();
+}
+for(const [label,threshold,previous,selectors,audio] of [
+ ['pass',10,0,[51,52],7],['lower',20,13,[60,61],8],
+ ['higher',20,1,[53,54],8],['equal',20,12,[56,57,58,59],8],
+]) test('calculated report compares previous speed before mutation: '+label,async({page})=>{
+ await fastContinue(page,0,threshold,previous);
+ const key=(await page.locator('canvas').getAttribute('aria-label')).slice('Next key: '.length);
+ await page.keyboard.press(key===' '?'Space':key);await page.clock.runFor(1100);
+ await expect(page.locator('#media-status')).toContainText(new RegExp('Movie ('+selectors.join('|')+')'));
+ await page.keyboard.press('Enter');
+ await expect(page.getByRole('status')).toContainText('Word/Min:     12');
+ expect(await page.evaluate(()=>window.audioCalls.at(-1))).toEqual([audio,3]);
+});
+test('report, Repeat and Welcome Continue use updated record; quit No preserves typing and report',async({page},info)=>{
+ await fastContinue(page);
+ await page.keyboard.press('z');
+ await page.keyboard.press('Escape');
+ await expect(page.getByRole('dialog',{name:'Quit confirmation (resource624)'})).toBeVisible();
+ await page.keyboard.press('ArrowRight');await page.keyboard.press('Enter');
+ await expect(page.getByRole('status')).toContainText('Typed: 1');
+ await page.clock.runFor(1100);
+ await page.keyboard.press('Escape'); // active report movie consumes this once
+ await expect(page.getByRole('status')).toContainText('Keys Typed:    1');
+ expect(await page.evaluate(()=>window.audioCalls.at(-1))).toEqual([7,3]);
+ await page.screenshot({path:info.outputPath('calculated-report.png')});
+ const report=await page.getByRole('status').textContent();
+ await page.keyboard.press('Escape');await page.keyboard.press('ArrowRight');await page.keyboard.press('Enter');
+ expect(await page.getByRole('status').textContent()).toBe(report);
+ await page.getByRole('button',{name:'Repeat',exact:true}).click();
+ await expect(page.getByRole('status')).toContainText('Typed: 0');
+ await page.keyboard.press('Escape');await page.keyboard.press('Enter'); // default Yes
+ await expect(page.getByRole('status')).toContainText('Keyset: 1');
+ await page.getByRole('button',{name:'Continue',exact:true}).click();
+ await expect(page.getByRole('status')).toContainText('State 21');
+ await page.getByRole('button',{name:'Quit application',exact:true}).click();
+ await page.keyboard.press('Escape'); // confirmation Escape means Yes
+ await expect(page.locator('#media-status')).toContainText('40');
+ await page.keyboard.press('x');
+ await expect(page.getByRole('status')).toContainText('Application exited');
+});
+test('qualifying terminal result stops with labeled browser adaptation; failed keyset4 can Repeat',async({page},info)=>{
+ await fastContinue(page,4,0);await page.clock.runFor(1100);await page.keyboard.press('Enter');
+ await expect(page.getByRole('status')).toHaveText('Browser adaptation: certificate unavailable; progression stopped.');
+ await expect(page.getByRole('button',{name:'Repeat',exact:true})).toHaveCount(0);
+ await page.keyboard.press('Escape');await page.clock.runFor(2000);
+ await expect(page.getByRole('status')).toContainText('progression stopped');
+ await page.screenshot({path:info.outputPath('terminal-stop.png')});
+});
+test('failed report media and retry hold progression; explicit skip awards once without a manual writer',async({page})=>{
+ await fastContinue(page);
+ await page.route('**/stream-*-audio.wav',route=>route.fulfill({status:404,body:'missing'}));
+ await page.clock.runFor(1100);
+ await expect(page.locator('#media-status')).toContainText('failed');
+ await expect(page.getByRole('status')).toContainText('Report');
+ await page.getByRole('button',{name:'Enable audio / Retry',exact:true}).click();
+ await expect(page.locator('#media-status')).toContainText('failed');
+ await page.getByRole('button',{name:'Repeat',exact:true}).click(); // skip only
+ await expect(page.getByRole('status')).toContainText('Keys Typed:    0');
+ await page.getByRole('button',{name:'Enable audio / Retry',exact:true}).click();
+ await page.keyboard.press('Escape');await page.keyboard.press('Enter');
+ await expect(page.getByRole('status')).toContainText('Keyset: 1');
+ const r=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)).students[0].record,own);
+ expect(r[1]).toBe(0);expect(r[11]).toBe(0); // no invented manual report autosave
+});
+test('nonqualifying terminal keyset remains repeatable and Welcome Escape omits movie40',async({page})=>{
+ await fastContinue(page,4,10);await page.clock.runFor(1100);await page.keyboard.press('Enter');
+ expect(await page.evaluate(()=>window.audioCalls.at(-1))).toEqual([8,3]);
+ await page.getByRole('button',{name:'Repeat',exact:true}).click();
+ await page.keyboard.press('Escape');await page.keyboard.press('Escape');
+ await expect(page.getByRole('status')).toContainText('Setup state 1');
+ await page.keyboard.press('Escape');await expect(page.getByRole('status')).toContainText('Application exited');
+ expect(await page.locator('#media-status').textContent()).not.toContain('40');
+});
+
+// Real one-minute stored lesson, normal 100ms visits and fifth-sample clock.
+// Only the browser clock is controlled; no typing/report/progression helper injection.
+for (const [count,speed,keyset] of [[49,9,0],[50,10,1],[55,11,1]])
+test('full-minute lifecycle and speed boundary: '+count+' correct keys',async({page},info)=>{
+ await enter(page);
+ await page.evaluate(key=>{
+  const file=JSON.parse(localStorage.getItem(key)),r=file.students[0].record;
+  r[27]=1;r[28]=0;r[35]=10;r[36]=0;
+  localStorage.setItem(key,JSON.stringify(file));
+ },own);
+ await page.reload();await page.getByRole('button',{name:'Skip movie',exact:true}).click();
+ await page.getByRole('button',{name:'Continue',exact:true}).click();
+ for(let i=0;i<count;i++) {
+  const key=(await page.locator('canvas').getAttribute('aria-label')).slice('Next key: '.length);
+  await page.keyboard.press(key===' '?'Space':key);
+ }
+ await page.clock.runFor(59000);
+ await expect(page.getByRole('status')).toContainText('Typed: '+count+' | Errors: 0 | Elapsed: 59');
+ await expect(page.getByRole('button',{name:'Repeat',exact:true})).toHaveCount(0);
+ await page.clock.runFor(1000); // elapsed reaches60, pending finish is not consumed yet
+ await expect(page.getByRole('status')).toContainText('Elapsed: 60');
+ await page.clock.runFor(100); // next delivered visit owns handoff
+ await expect(page.getByRole('status')).toContainText('Report');
+ await page.getByRole('button',{name:'Skip movie',exact:true}).click();
+ const fields=['Keys Typed: '+String(count).padStart(4),'Errors:        0',
+  'Word/Min:   '+String(speed).padStart(4),'Accuracy:   100%','Lesson Time: 1:00','Problem Keys:None!'];
+ await expect(page.getByRole('status')).toHaveText('Report | '+fields.join(' | '));
+ expect(await page.evaluate(()=>window.audioCalls.at(-1))).toEqual([speed>=10?7:8,3]);
+ await page.screenshot({path:info.outputPath('full-minute-report.png')});
+ await page.getByRole('button',{name:'Repeat',exact:true}).click();
+ await expect(page.getByRole('status')).toContainText('Typed: 0 | Errors: 0 | Elapsed: 0');
+ await page.getByRole('button',{name:'Quit to Welcome',exact:true}).click();await page.keyboard.press('Enter');
+ await expect(page.getByRole('status')).toContainText('Keyset: '+keyset);
+ expect(await page.evaluate(()=>window.audioCalls.slice(-2))).toEqual([[0,192],[0,32]]);
+ expect(await page.evaluate(()=>window.mediaSnapshot().audio.map(a=>a.selector))).toEqual([1]);
+ await page.getByRole('button',{name:'Continue',exact:true}).click();
+ await expect(page.getByRole('status')).toContainText('Typed: 0 | Errors: 0 | Elapsed: 0');
+});
+for(const threshold of [0,10]) test('quit report audio '+(threshold?8:7)+' closes old slots before Welcome',async({page})=>{
+ await fastContinue(page,0,threshold);await page.clock.runFor(1100);
+ await page.getByRole('button',{name:'Skip movie',exact:true}).click();
+ expect(await page.evaluate(()=>window.audioCalls.at(-1))).toEqual([threshold?8:7,3]);
+ await page.getByRole('button',{name:'Quit to Welcome',exact:true}).click();await page.keyboard.press('Enter');
+ expect(await page.evaluate(()=>window.audioCalls.slice(-2))).toEqual([[0,192],[0,32]]);
+ expect(await page.evaluate(()=>window.mediaSnapshot().audio.map(a=>a.selector))).toEqual([1]);
 });

@@ -31,6 +31,25 @@ function express(setup, keyset) {
   return select(setup, 17, keyset);
 }
 
+test('student count follows saved students, not a draft name or failed write', () => {
+  const h = harness();
+  assert.equal(h.setup.studentCount(), 0);
+  enterName(h.setup, 'A');
+  assert.equal(h.setup.studentCount(), 0);
+  h.setup.dispatch({type:'confirm-name'});
+  assert.equal(h.setup.studentCount(), 1);
+  const reloaded = createSetup({store:h.store,nameKeyFlags:flags});
+  assert.equal(reloaded.studentCount(), 1);
+  enterName(reloaded, 'B');
+  assert.equal(reloaded.studentCount(), 1);
+  reloaded.dispatch({type:'confirm-name'});
+  assert.equal(reloaded.studentCount(), 2);
+  const failed = harness(flags,{getItem:()=>null,setItem(){throw new Error('refused');}});
+  enterName(failed.setup, 'A');
+  failed.setup.dispatch({type:'confirm-name'});
+  assert.equal(failed.setup.studentCount(), 0);
+});
+
 test('all 15 character/keyset routes, exact source defaults, independent reload', () => {
   for (let character = 0; character < 3; character++) for (let keyset = 0; keyset < 5; keyset++) {
     const h = harness();

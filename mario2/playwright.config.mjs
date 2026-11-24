@@ -1,7 +1,7 @@
 import {defineConfig} from '@playwright/test';
 const port=Number(process.env.TRANSLATION_PORT||4287);
 export default defineConfig({
- testDir:'./tests',testMatch:['browser.spec.mjs','integration.spec.mjs'],outputDir:'./.tmp/browser',workers:1,
+ testDir:'./tests',testMatch:['browser.spec.mjs','integration.spec.mjs','acceptance.spec.mjs'],outputDir:'./.tmp/browser',workers:1,
  use:{headless:true,viewport:{width:1024,height:1000},...(process.env.PLAYWRIGHT_CHANNEL?{channel:process.env.PLAYWRIGHT_CHANNEL}:{})},
  projects:[
   {name:'root',use:{baseURL:`http://127.0.0.1:${port}/`}},
