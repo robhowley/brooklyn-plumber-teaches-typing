@@ -30,6 +30,26 @@ class PresentationTests(unittest.TestCase):
             source.close()
         result = decode_presentation(b, PINS)
         self.assertEqual(bytes(result['nameKeyFlags']), b[0x2273f:0x2283f])
+        # State6 switch entry -> 03:4406 -> DS:02c2, FILE 0x202c2.
+        self.assertEqual(struct.unpack_from('<H',b,0x17584+2*6)[0],0x4406)
+        self.assertEqual(b[0x17606:0x17609].hex(),'b8c202')
+        self.assertEqual(struct.unpack_from('<6h',b,0x202c2),(30,410,253,468,1,0))
+        # Original static operands: source scroll rectangles precede row division.
+        self.assertEqual(b[0x3c87:0x3c93].hex(),'81fe4d027c2581fe64027f1f')
+        self.assertEqual(struct.unpack_from('<6h',b,0x2008e),(216,115,378,171,39,28))
+        self.assertEqual(b[0x17684:0x17697].hex(),'26837c0a1c750cc41e1e262683bfca0000741f')
+        for key, start in [('characters',0x20eb6),('worlds',0x20ec2)]:
+            for i, value in enumerate(result['students'][key]):
+                p=0x13200+struct.unpack_from('<H',b,start+4*i)[0]
+                self.assertEqual(value,b[p:b.index(0,p)].decode('ascii'))
+        for pointer,value in result['students']['labels'].items():
+            p=0x13200+int(pointer,16)
+            self.assertEqual(value,b[p:b.index(0,p)].decode('ascii'))
+        # Independent resource108 DIB identity and used palette index, not a setup substitute.
+        import hashlib
+        self.assertEqual(hashlib.sha256(b[0x1a1400:0x1a1400+308736]).hexdigest(),
+                         '19c45e592c3bba834e87fb1afe699dcae735ffb35eba1d3b09c73f2e607c5cc7')
+        self.assertEqual(struct.unpack_from('<IiiHH',b,0x1a1400),(40,640,480,1,8))
         self.assertEqual(bytes(result['fingers']['mapping']), b[0x20bc0:0x20c40])
         for pin in PINS['overlays']:
             off = pin['file_offset']

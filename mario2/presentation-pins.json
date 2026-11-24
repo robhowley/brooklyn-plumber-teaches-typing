@@ -3,8 +3,18 @@
   "executable_sha256": "39a4fb53384afbfec13063c2f4c67d51013b1f8ea494788c88f1ac6c12f47f22",
   "member": "/MARIO/WINMARIO.EXE;1",
   "slices": {
-    "setupMovies": {"file_offset": 131142, "size": 24, "sha256": "7a504184809c203f29bce8bddf5b8a085bd3972dbe56ec3983ac56f48c7eacb9"},
-    "reportSelection": {"file_offset": 106224, "size": 261, "sha256": "9c2f3e88e06a49b4f7b6908434bb9ede7442428266b0e442fbb323dffc7aa0a4"},
+    "studentListBehavior": {"file_offset": 15432, "size": 364, "sha256": "fdc9e74e0533090cb14fa036cce8047c0cc512c94b2d5a09c9bcc5f980f0bba0"},
+    "studentCompositionBehavior": {"file_offset": 17018, "size": 1148, "sha256": "98ce2de54982e0ac2b0131936454cadc8584b03a4d5d5689a24f347fb8636c6d"},
+    "setupMovies": {
+      "file_offset": 131142,
+      "size": 24,
+      "sha256": "7a504184809c203f29bce8bddf5b8a085bd3972dbe56ec3983ac56f48c7eacb9"
+    },
+    "reportSelection": {
+      "file_offset": 106224,
+      "size": 261,
+      "sha256": "9c2f3e88e06a49b4f7b6908434bb9ede7442428266b0e442fbb323dffc7aa0a4"
+    },
     "nameKeyFlags": {
       "file_offset": 141119,
       "size": 256,
@@ -69,6 +79,16 @@
       "file_offset": 9926,
       "size": 1170,
       "sha256": "999e154ae3c8d4cb76ed4c19e538a4850aa8a44e6ad72aa12c016e0ad9f2d1cf"
+    },
+    "studentPointers": {
+      "file_offset": 134838,
+      "size": 24,
+      "sha256": "1375c5398d3cf10276761f976273e9601fdef50896f1b51fc1a4568c8a36c423"
+    },
+    "studentStrings": {
+      "file_offset": 121776,
+      "size": 204,
+      "sha256": "01b273acf04a4f19f5eb93dd2aa60c8f8de882dd941fcdb9ac7abaca1b64a42f"
     }
   },
   "overlays": [
@@ -123,6 +143,7 @@
     }
   ],
   "hotspots": [
+    {"state": 6, "file_offset": 131778, "size": 24, "sha256": "ba691beb39696132ef17f816316160a269bc6a9b265163842d1eee27beea8350"},
     {
       "state": 1,
       "file_offset": 131214,

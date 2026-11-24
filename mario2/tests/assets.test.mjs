@@ -6,7 +6,7 @@ import {loadAssets} from '../assets.js';
 
 test('loads exact indices and palette, resolving all URLs at the manifest prefix', async () => {
   const original=globalThis.fetch, requested=[];
-  const ids=[485,613,103,619,104,105,106,107,119,123,112,599,600,601,608,609,610,
+  const ids=[485,613,103,619,104,105,106,107,108,119,123,112,599,600,601,608,609,610,
     ...Array.from({length:12},(_,i)=>152+i)];
   const palette=Array.from({length:256},(_,i)=>[i,255-i,7]);
   const manifest={schema:'mario2-assets.v1',font:{url:'font.bin'},assets:Object.fromEntries(ids.map(id=>
@@ -21,7 +21,7 @@ test('loads exact indices and palette, resolving all URLs at the manifest prefix
   };
   try {
     const assets=await loadAssets('https://example.test/project/assets.json');
-    assert.equal(assets.bitmaps.size,29);
+    assert.equal(assets.bitmaps.size,30);
     assert.deepEqual([...assets.bitmaps.get(103).pixels],[77,245]);
     assert.deepEqual([...assets.bitmaps.get(152).palette],palette.flat());
     assert.ok(requested.every(url=>url.startsWith('https://example.test/project/')));

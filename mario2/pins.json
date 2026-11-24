@@ -3002,6 +3002,36 @@
           "bytes": 7046
         }
       ]
+    },
+    {
+      "id": "ne-2-108",
+      "kind": "resource",
+      "source": {
+        "id": "rad8d0e43b7da7641a6a6a5d9",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:2:108",
+        "size": 308736,
+        "sha256": "19c45e592c3bba834e87fb1afe699dcae735ffb35eba1d3b09c73f2e607c5cc7",
+        "image_extents": [
+          {
+            "image_offset": 478182400,
+            "length": 308736
+          }
+        ]
+      },
+      "roles": [
+        "Load student"
+      ],
+      "claims": [],
+      "type": 2,
+      "index": 108,
+      "executable_file_offset": 1709056,
+      "expected_artifacts": [
+        {
+          "name": "pixels.zlib",
+          "sha256": "9a94fbbbb2bbc61e64e197aca7c80b9cb7aac542d7fd23dbecf15d1e6594b18d",
+          "bytes": 17009
+        }
+      ]
     }
   ],
   "lessons": [

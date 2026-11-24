@@ -23,32 +23,38 @@ test('indexed menu hit requests source audio10 before selection, rejected and co
  await canvas.click({position:{x:1,y:1}});
  expect(await calls()).toEqual([]);
  await page.getByRole('button',{name:'Enable audio / Retry',exact:true}).click();
+ // FILE 0x2008e selector39/argument28 and FILE 0x17684 display-length gate.
+ // Both canvas and accessible Continue reject before audio, not selector28.
+ await canvas.dispatchEvent('click',{clientX:(await canvas.boundingBox()).x+250,clientY:(await canvas.boundingBox()).y+140});
+ await page.getByRole('button',{name:'Continue',exact:true}).click();
+ expect(await calls()).toEqual([]);
  // Inclusive source rectangle left/top edge: New Student -> state2.
  await canvas.click({position:{x:90,y:175}});
  await expect(page.getByRole('status')).toContainText('Setup state 2');
  expect(await calls()).toEqual([[10,3]]);
  await expect.poll(()=>page.evaluate(()=>window.mediaSnapshot().audio.find(a=>a.selector===10)?.state)).toBe('playing');
- // FILE 0x17684: state2 selector28 is disabled with no saved students.
+ // FILE 0x17684 gates argument28, not every unrelated state2 hotspot.
  expect(await page.evaluate(key=>localStorage.getItem(key),own)).toBeNull();
  const bounds=await canvas.boundingBox();
  await canvas.click({position:{x:619*bounds.width/640,y:459*bounds.height/480}});
  await expect(page.getByRole('status')).toContainText('Setup state 2');
- expect(await calls()).toEqual([[10,3]]);
+ expect(await calls()).toEqual([[10,3],[10,3]]);
  await page.getByRole('button',{name:'Quit to Welcome',exact:true}).click();
  // Inject a canvas event behind the modal to prove the coordinator guard too.
  await canvas.dispatchEvent('click',{clientX:140,clientY:210});
- expect(await calls()).toEqual([[10,3]]);
+ expect(await calls()).toEqual([[10,3],[10,3]]);
  await page.keyboard.press('Escape');
 });
 test('live typing and fixture canvas clicks never request menu audio10',async({page})=>{
  await enter(page);
+ const before=await page.evaluate(()=>window.audioCalls.filter(([s,f])=>s===10&&f===3));
  await page.locator('canvas').click({position:{x:140,y:210}});
  await page.keyboard.press('z');
- expect(await page.evaluate(()=>window.audioCalls.filter(([s,f])=>s===10&&f===3))).toEqual([]);
+ expect(await page.evaluate(()=>window.audioCalls.filter(([s,f])=>s===10&&f===3))).toEqual(before);
  await page.locator('summary').click();
  await page.locator('#report').click();
  await page.locator('canvas').click({position:{x:140,y:210}});
- expect(await page.evaluate(()=>window.audioCalls.filter(([s,f])=>s===10&&f===3))).toEqual([]);
+ expect(await page.evaluate(()=>window.audioCalls.filter(([s,f])=>s===10&&f===3))).toEqual(before);
 });
 async function enter(page) {
  await page.goto('./');await finishStartup(page);

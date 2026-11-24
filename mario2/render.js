@@ -1,5 +1,7 @@
 // Source: WINMARIO.EXE FILE 0x1e394..0x1e55f (overlays),
 // 0x17e58..0x18600 (glyphs), 0x1ada8..0x1ae40 (hands), 0x26c6..0x2b58 (report).
+// Student composition: FILE 0x3f5e..0x3f78 and 0x427a..0x46f6,
+// bitmap108 FILE 0x1a1400, same WINMARIO member hash as setup.js/pins.json.
 // Browser adaptation: deterministic supplied system palette endpoints and nearest-neighbor display.
 export function copyIndexed(target, source, x, y, sx=0, sy=0,
   width=source.width, height=source.height, transparent=[]) {
@@ -71,7 +73,30 @@ export function createRenderer(canvas, assets, {paletteEndpoints}) {
     view=next;
     const surface={...animated,pixels:animated.pixels.slice()};
     if (owner===3) text(surface,view.name,153,133,136,10);
-    if (owner===1 && view.name) text(surface,view.name,117+4*(8-view.name.length),74,130,67);
+    const displayName=view.displayName??view.name;
+    if (owner===1 && displayName) text(surface,displayName,117+4*(8-displayName.length),74,130,67);
+    if (owner===6) {
+      const data=assets.presentation.students, labels=data.labels;
+      (view.students??[]).forEach((name,i)=>text(surface,name,185,40+8*i,138));
+      const r=view.preview;
+      if(r) {
+        const w=p=>r[p]+256*r[p+1], signed=n=>n>32767?n-65536:n;
+        const end=r.indexOf(0,274);text(surface,String.fromCharCode(...r.slice(274,end)),10,42,138);
+        text(surface,data.characters[w(3)],10,76,138);
+        text(surface,labels['0xa9f0']+' '+data.worlds[w(39)||w(41)?2:w(37)?1:0],10,98,138);
+        for(const [label,y,value] of [
+          ['0xa9fe',109,signed((w(1)+1)&65535)],['0xaa06',120,signed(w(29+2*w(5)))],
+          ['0xaa10',131,signed(w(11))],['0xaa16',142,signed(w(9))+'%'],
+          ['0xaa26',153,signed(Math.trunc(w(19)/60))+':'+String(w(19)%60).padStart(2,'0')],
+          ['0xaa3c',164,r[253]?String.fromCharCode(...r.slice(253,258)).split('\0')[0]:labels['0xaa4a']]]) {
+          if(label) text(surface,labels[label],10,y,138);
+          text(surface,value,120,y,138);
+        }
+        text(surface,labels['0xaa50'],10,175,138);
+        const certificates=[37,39,41].flatMap((p,i)=>w(p)?[labels[['0xaa64','0xaa6e','0xaa74'][i]]]:[]);
+        text(surface,certificates.join(labels['0xaa6a'])||labels['0xaa5e'],34,186,138);
+      }
+    }
     if (owner===21) {
       // Fixture rows/expectedByte/cursorColumn are supplied, never advanced here.
       for (const [i,row] of (view.rows ?? []).slice(0,7).entries())
@@ -100,7 +125,7 @@ export function createRenderer(canvas, assets, {paletteEndpoints}) {
     present(surface);
   }
   function enter(next) {
-    const id=next.bitmap ?? ({1:next.name ? 619:103,2:104,3:105,4:106,5:107,14:119,21:123,10:112})[next.state];
+    const id=next.bitmap ?? ({1:(next.displayName??next.name) ? 619:103,2:104,3:105,4:106,5:107,6:108,14:119,21:123,10:112})[next.state];
     if (!id) throw new Error(`Unsupported render state ${next.state}`);
     owner=next.state; view=next; backdrop=bitmap(id);
     animated={...backdrop,pixels:backdrop.pixels.slice()};

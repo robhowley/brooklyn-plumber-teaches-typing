@@ -29,7 +29,8 @@ test('inert source opcodes independently pin signed speed, low-word minutes and 
  try {assert.equal(readSync(fd,b,0,b.length,pins.executable.image_extents[0].image_offset),b.length);} finally {closeSync(fd);}
  assert.equal(createHash('sha256').update(b).digest('hex'),pins.executable.sha256);
  const hash=(start,end)=>createHash('sha256').update(b.subarray(start,end)).digest('hex');
- // Selector28 with zero students jumps to no-hit FILE0x176b6, before audio10.
+ // Hotspot argument28 with empty display string jumps to no-hit before audio10.
+ assert.deepEqual([...Array(6)].map((_,i)=>b.readInt16LE(0x2008e+2*i)),[216,115,378,171,39,28]);
  assert.equal(hash(0x17684,0x17697),'bb64fa99811cbe1d63be9d1926cc95fdd5d4fb4427b804688d39c9fb4dbda639');
  assert.equal(b.subarray(0x17684,0x17697).toString('hex'),'26837c0a1c750cc41e1e262683bfca0000741f');
  // Accepted menu hit plays selector10/flags2 before loading selector/argument.

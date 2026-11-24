@@ -31,7 +31,7 @@ function express(setup, keyset) {
   return select(setup, 17, keyset);
 }
 
-test('student count follows saved students, not a draft name or failed write', () => {
+test('saved student count is independent of the source display-string hit gate', () => {
   const h = harness();
   assert.equal(h.setup.studentCount(), 0);
   enterName(h.setup, 'A');
@@ -176,6 +176,79 @@ test('unsupported modes, out-of-range selectors, invalid name table refuse witho
   for (const n of [0, 1, 2, 4]) assert.equal(select(h.setup, 14, n).state, 5);
   select(h.setup, 14, 3);
   for (const n of [-1, 5, 0.5]) assert.equal(select(h.setup, 17, n).state, 14);
+});
+
+function studentHarness(count=22) {
+  const students=Array.from({length:count},(_,i)=>{
+    const name='S'+String(i).padStart(2,'0'),record=Array(292).fill(0);
+    record[1]=i%5;record[3]=i%3;record[5]=3;record[11]=i;
+    for(let j=0;j<8;j++)record[21+2*j]=j+1;
+    record[100]=200+i;
+    [...name].forEach((c,j)=>record[274+j]=c.charCodeAt(0));
+    return {name,record};
+  });
+  let raw=JSON.stringify({schema:'mario2-students.v1',currentName:students[0]?.name??null,students});
+  let denied=false;
+  const h=harness(flags,{getItem:()=>raw,setItem(k,v){if(denied)throw Error();raw=v;}});
+  return {...h,deny:v=>denied=v};
+}
+const click=(s,x,y)=>s.dispatch({type:'list-click',x,y});
+test('preview scratch/display separate from live bytes, odd row19, scrolling and safety refusal',()=>{
+  const h=studentHarness(),s=h.setup,before=h.store.load().value,live=s.studentContext().record;
+  select(s,6);assert.equal(s.snapshot().students.length,19);
+  click(s,589,230); // odd right edge, between the source scroll rectangles
+  assert.equal(s.studentContext().displayName,'S09');
+  click(s,588,385);
+  assert.equal(s.studentContext().displayName,'S19');assert.equal(s.studentContext().scratchWpm,19);
+  assert.deepEqual(s.studentContext().record,live);assert.deepEqual(h.store.load().value,before);
+  for(let i=0;i<8;i++)click(s,610,300);
+  assert.equal(s.snapshot().scroll,3);click(s,588,385);
+  assert.match(s.snapshot().listError,/safety/);assert.equal(s.studentContext().displayName,'S19');
+  click(s,610,100);assert.equal(s.snapshot().scroll,2);
+  click(s,370,80);assert.equal(s.studentContext().displayName,'S02');
+  const small=studentHarness(1).setup;select(small,6);click(small,354,80);
+  assert.equal(small.studentContext().displayName,'S00');click(small,590,385);
+  assert.equal(small.snapshot().scroll,0);
+});
+test('explicit Express load preserves292 bytes/settings and changes only selection metadata; denied writes do not apply',()=>{
+  const h=studentHarness(),s=h.setup,before=h.store.load().value;
+  select(s,6);click(s,370,112);h.deny(true);click(s,300,440);
+  assert.equal(s.snapshot().state,6);assert.equal(s.studentContext().loadedOrigin,false);
+  assert.deepEqual(h.store.load().value,before);assert.equal(s.snapshot().storageError.code,'write-failed');
+  h.deny(false);click(s,300,440);
+  assert.equal(s.snapshot().state,21);assert.equal(s.studentContext().loadedOrigin,true);
+  assert.deepEqual(s.studentContext().record,before.students[2].record);
+  assert.deepEqual(s.studentContext().durations,[1,2,3,4]);assert.deepEqual(s.studentContext().thresholds,[5,6,7,8]);
+  assert.deepEqual(h.store.load().value.students,before.students);assert.equal(h.store.load().value.currentName,'S02');
+  s.welcome();select(s,39,28);assert.equal(s.studentContext().loadedOrigin,true);
+  s.welcome();select(s,6);click(s,1,1);assert.equal(s.studentContext().loadedOrigin,false);
+  const reloaded=createSetup({store:h.store,nameKeyFlags:flags});assert.equal(reloaded.snapshot().name,'S02');assert.equal(reloaded.studentContext().loadedOrigin,false);
+});
+test('delete626 cancellation, refused persistence, selected-pointer clearing and retained live bytes',()=>{
+  const h=studentHarness(2),s=h.setup,before=h.store.load().value,live=s.studentContext().record;
+  select(s,6);click(s,370,80);click(s,450,440);
+  assert.deepEqual(s.snapshot().deletePrompt,{resource:626,message:'OK to delete file S00.STU?'});
+  s.dispatch({type:'delete-result',result:2});assert.deepEqual(h.store.load().value,before);
+  click(s,450,440);h.deny(true);s.dispatch({type:'delete-result',result:1});
+  assert.deepEqual(h.store.load().value,before);assert.ok(s.snapshot().deletePrompt);
+  h.deny(false);s.dispatch({type:'delete-result',result:1});
+  assert.equal(h.store.load().value.currentName,null);assert.deepEqual(h.store.load().value.students,[before.students[1]]);
+  assert.deepEqual(s.studentContext().record,live);assert.equal(s.snapshot().preview,null);
+  assert.equal(s.accepts({type:'select',selector:39,argument:28}),false); // saved count1, empty display
+  click(s,370,80);assert.equal(s.accepts({type:'select',selector:39,argument:28}),true);
+  click(s,450,440);s.dispatch({type:'delete-result',result:1});
+  assert.equal(s.studentCount(),0);assert.deepEqual(s.studentContext().record,live);
+});
+test('argument28 gate is independent of selector; unsupported scene load is explicitly refused',()=>{
+  const s=studentHarness(0).setup;
+  assert.equal(s.accepts({type:'select',selector:39,argument:28}),false);
+  assert.equal(s.accepts({type:'select',selector:28,argument:0}),true);
+  for(let mode=0;mode<3;mode++) {
+    const h=studentHarness(1),file=h.store.load().value;file.students[0].record[5]=mode;h.store.save(file);
+    const setup=createSetup({store:h.store,nameKeyFlags:flags});select(setup,6);click(setup,370,80);click(setup,300,440);
+    assert.equal(setup.snapshot().state,6);assert.match(setup.snapshot().listError,new RegExp('state '+(18+mode)));
+    assert.equal(setup.studentContext().loadedOrigin,false);
+  }
 });
 
 // Optional source test reads the original executable ONLY as inert bytes, using

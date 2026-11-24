@@ -51,6 +51,12 @@ try {
   quit.setAttribute('aria-label','Quit confirmation (resource624)');
   quit.innerHTML='<p>Quit?</p><button value="2" autofocus>Yes</button><button value="1">No</button>';
   document.body.append(quit);
+  const deletion=document.createElement('dialog');
+  deletion.setAttribute('aria-label','Delete student (resource626)');
+  deletion.innerHTML='<p></p><button value="1" autofocus>OK</button><button value="2">Cancel</button>';
+  document.body.append(deletion);
+  deletion.querySelectorAll('button').forEach(b=>b.onclick=()=>dispatch({type:'delete-result',result:Number(b.value)}));
+  deletion.addEventListener('cancel',event=>{event.preventDefault();dispatch({type:'delete-result',result:2});});
   let quitApplication=false, exited=false, terminal=false;
   function exit() {
     exited=true; musicSelector=0; clearInterval(timer); media.dispose();
@@ -89,6 +95,7 @@ try {
     display({...view,...result.view});
   }
   function startTyping() {
+    setup.beginTyping();
     const lesson=selectLesson(assets.manifest.lessons['lesson-'+'htbns'[view.keyset]],random);
     const args={lesson,durationSeconds:view.durationSeconds,nowMs:performance.now()};
     if(typing) typing.reenter(args);
@@ -113,16 +120,17 @@ try {
   window.addEventListener('focus',()=>{if(!focused){focused=true;startTimer();if(musicSelector) media.audio(musicSelector,3);}});
   window.addEventListener('pagehide',()=>{clearInterval(timer);media.dispose();context.close();});
   const choices={
-    1:[['New student',2],['Continue',39]],
+    1:[['New student',2],['Continue',39,28],['Load student',6]],
     2:[['Mario',3,0],['Princess',3,1],['Luigi',3,2]],
     3:[['Confirm name',4]],4:[['Choose lesson plan',5]],
     5:[['Express',14,3]],
+    6:[['Back to Welcome screen',1]],
     10:[['Repeat',39]],
     14:['Home','Top','Bottom','Numbers','Symbols'].map((s,i)=>[s,17,i]),
   };
   function display(next) {
     const reenter=!view || view.state!==next.state ||
-      (next.state===1 && Boolean(view.name)!==Boolean(next.name));
+      (next.state===1 && Boolean(view.displayName??view.name)!==Boolean(next.displayName??next.name));
     view=next;
     if(view.state===21 && view.expectedByte!==undefined) canvas.setAttribute('aria-label','Next key: '+String.fromCharCode(view.expectedByte));
     else canvas.setAttribute('aria-label','Mario typing display');
@@ -134,7 +142,7 @@ try {
       view.state===21 ?
         'State 21 | Typed: '+(view.counters?.total??0)+' | Errors: '+(view.counters?.errors??0)+' | Elapsed: '+(view.elapsed??0) :
       'Setup state '+view.state+' | Name: '+(view.name||'(blank)')+' | Character: '+view.character+' | Keyset: '+view.keyset;
-    error.textContent=view.storageError ? 'Persistence refused: '+view.storageError.message : '';
+    error.textContent=view.storageError ? 'Persistence refused: '+view.storageError.message : view.listError??'';
     controls.replaceChildren();
     if (!fixture && !terminal) for (const [label,selector,argument] of choices[view.state]??[]) {
       const button=document.createElement('button');
@@ -142,6 +150,18 @@ try {
       button.onclick=()=>dispatch({type:'select',selector,argument});
       controls.append(button);
     }
+    if(view.state===6 && !fixture && !terminal) {
+      for(const [label,x,y] of [['Scroll up',610,100],['Scroll down',610,300],['Load selected student',300,440],['Delete selected student',450,440]]) {
+        const button=document.createElement('button');button.textContent=label;
+        button.onclick=()=>dispatch({type:'list-click',x,y});controls.append(button);
+      }
+      (view.students??[]).forEach((name,i)=>{
+        const button=document.createElement('button');button.textContent='Preview '+name;
+        button.onclick=()=>dispatch({type:'list-click',x:370,y:80+16*i});controls.append(button);
+      });
+    }
+    if(view.deletePrompt && !deletion.open) {deletion.querySelector('p').textContent=view.deletePrompt.message;deletion.showModal();}
+    else if(!view.deletePrompt && deletion.open) deletion.close();
     if(!fixture && !terminal) {
       for(const [label,application] of [['Quit to Welcome',false],['Quit application',true]]) {
         const button=document.createElement('button');button.textContent=label;
@@ -161,9 +181,13 @@ try {
     if(fixture||quit.open||terminal||exited) return;
     if(movie){media.skip();return;}
     if(action.type==='select' && action.selector===16){confirmQuit(true);return;}
+    if(!setup.accepts(action)) return;
+    // Accepted menu actions share the pre-audio display-string gate on canvas and buttons.
+    if(action.type==='select') media.audio(10,3);
     const old=view.state;
     display(setup.dispatch(action));
-    if(view.state===21 && old!==21) startTyping();
+    if(view.state===1 && old===6) {musicSelector=1;media.audio(0,0x20);}
+    else if(view.state===21 && old!==21) startTyping();
     else if(view.state===5 && old!==5) play(setupMovie(assets.presentation.setupMovies,random));
     // FILE 0x15706..0x15728: keyset entry restores SELECT1 with operation32.
     else if(view.state===14 && old!==14) play(14,()=>{musicSelector=1;media.audio(0,0x20);});
@@ -181,6 +205,7 @@ try {
       }
       return;
     }
+    if(deletion.open) return;
     if(event.key==='Escape'){event.preventDefault();if(view.state===1)exit();else confirmQuit();return;}
     if(view.state===21 && typing && !finished && !event.ctrlKey && !event.metaKey && !event.altKey) {
       event.preventDefault();
@@ -201,15 +226,10 @@ try {
     if(fixture || view.duplicate || quit.open || terminal || exited) return;
     const bounds=canvas.getBoundingClientRect();
     const x=(event.clientX-bounds.left)*640/bounds.width, y=(event.clientY-bounds.top)*480/bounds.height;
+    if(deletion.open) return;
     const hit=(assets.presentation.hotspots[view.state]??[]).find(({rectangle:[l,t,r,b]})=>x>=l&&x<=r&&y>=t&&y<=b);
+    if(view.state===6 && !hit) {dispatch({type:'list-click',x,y});return;}
     if(hit) {
-      // FILE 0x17684..0x17697: selector28 with application+0xca=0
-      // returns no hit before audio10. Count saved students, not the draft name.
-      if(hit.selector===28 && setup.studentCount()===0) return;
-      // WINMARIO FILE 0x17697: accepted inclusive menu hit, audio10/resource499
-      // with flags2 precedes returning the selector. Browser transport needs
-      // open+play (3) to load the WAVE. Misses/skip/typing stay silent.
-      media.audio(10,3);
       dispatch({type:'select',selector:hit.selector,argument:hit.argument});
     }
   });
