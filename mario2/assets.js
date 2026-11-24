@@ -13,7 +13,7 @@ export async function loadAssets(manifestURL) {
   const presentation = await (await get(manifest.presentation?.url ?? 'presentation.json')).json();
   if (presentation.schema !== 'mario2-presentation.v1') throw new Error('Invalid presentation schema');
   const bitmaps = new Map();
-  const required = [485,613,103,619,104,105,106,107,119,123,112,599,600,601,608,609,610,
+  const required = [485,613,103,619,104,105,106,107,108,119,123,112,599,600,601,608,609,610,
     ...Array.from({length:12}, (_,i) => 152+i)];
   await Promise.all(required.map(async id => {
     const entry = manifest.assets[`ne-2-${id}`];

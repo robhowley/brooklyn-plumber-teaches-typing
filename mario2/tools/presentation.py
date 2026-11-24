@@ -53,9 +53,18 @@ def decode_presentation(executable, pins):
         if not 0 <= relative < len(slices['reportStrings']):
             raise ValueError('report string pointer outside pinned region')
         formats.append(slices['reportStrings'][relative:].split(b'\0', 1)[0].decode('ascii'))
+    def student_string(pointer):
+        relative = 0x13200 + pointer - pins['slices']['studentStrings']['file_offset']
+        if not 0 <= relative < len(slices['studentStrings']):
+            raise ValueError('student string outside pinned region')
+        return slices['studentStrings'][relative:].split(b'\0', 1)[0].decode('ascii')
+    pointers = struct.unpack('<'+'H'*12, slices['studentPointers'])
+    students = dict(characters=[student_string(pointers[i]) for i in (0,2,4)],
+                    worlds=[student_string(pointers[i]) for i in (6,8,10)],
+                    labels={hex(p):student_string(p) for p in (0xa9f0,0xa9fe,0xaa06,0xaa10,0xaa16,0xaa26,0xaa3c,0xaa4a,0xaa50,0xaa5e,0xaa64,0xaa6a,0xaa6e,0xaa74)})
     offsets = words(slices['fingerOffsets'])
     return dict(schema='mario2-presentation.v1', setupMovies=list(slices['setupMovies']), nameKeyFlags=list(slices['nameKeyFlags']),
-                overlays=overlays, hotspots=hotspots,
+                overlays=overlays, hotspots=hotspots, students=students,
                 fingers=dict(mapping=list(slices['fingerMap']), dx=offsets[:10], dy=offsets[10:],
                              bitmaps=words(slices['handIds'])[1:]),
                 report=dict(formats=formats, x=words(slices['reportX']), y=words(slices['reportY'])))
