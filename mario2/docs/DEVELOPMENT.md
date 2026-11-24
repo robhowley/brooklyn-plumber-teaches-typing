@@ -1,0 +1,39 @@
+# Mario 2 assets: build and integrate
+
+Build the ordinary Windows Expert Express assets from the pinned disc, without running original software. This standalone pipeline does not call or modify the Mario 1 pipeline.
+
+## Commands
+
+From the repository root, using Python 3.13+ and its standard library:
+
+```sh
+python3 -B mario2/tools/build.py
+python3 -B -m unittest discover -s mario2/tests -v
+MARIO2_TEST_ISO="$HOME/Downloads/Mario Teaches Typing 2 (1997)(Interplay)[Mac-PC].iso" python3 -B -m unittest discover -s mario2/tests -v
+python3 -m http.server 4187 --bind 127.0.0.1 --directory mario2/dist
+```
+
+Use `structured_return` for build/tests, with `unittest-text` for tests. The server serves assets only, not a playable app. Choose an unused port; do not replace a user server.
+
+The default disc is `~/Downloads/Mario Teaches Typing 2 (1997)(Interplay)[Mac-PC].iso`. Override with `MARIO2_ISO=/absolute/path.iso` or `build.py --iso /absolute/path.iso`. An explicit missing/wrong source fails, without fallback or download. `--pins` supports negative pin tests, not alternate game editions.
+
+Build output is `mario2/dist/`, with JSON summary counts. Each build removes the previous dist before checking pins, verifies the whole ISO and executable, reads only pinned inert member extents, regenerates assets, and checks every artifact against the authored hash/size pins before publishing. A failure leaves no dist; rerun after correcting the input. Do not run two builds in the same checkout concurrently. No extracted executable, ISO, installer, listing or research report is published.
+
+## Verification recipe
+
+- Unit tests need no disc and cover wrong/missing source, incomplete pins, row padding/orientation, RLE runs, odd-length literals, row changes and retained delta pixels, SZDD overlap/bounds and lesson source offsets.
+- Disc tests build twice into temporary outputs, inject a stale file, compare every file hash, independently reconstruct every bitmap from ISO bytes and compare all 4,541 movie frames byte-for-byte with a test-only bottom-up RLE8 interpreter. Its separate RIFF walk reads the pinned AVI members directly, not the production frame metadata. Coverage requires runs, literals, row changes and delta commands. Failures cite the member hash and AVI FILE payload offset.
+- Negative tests reject missing assets and wrong member, selector, font and decoded-output pins, including swapped movie members with otherwise valid hashes and artifacts and swapped selectors with valid slice hashes.
+- Build conversion matches decoded artifact pins for storage integrity. Separately, movie joins resolve each filename far pointer through the executable's inert NE segment fixup chain and require the pinned member path and selector ID to match.
+- To verify independence from research, run these commands from a fresh checkout with only the pinned ISO available. No research path is read or imported. Only `mario2/tools/` authored Python is executed.
+- Before publication: `git status --short --untracked-files=all` and `git check-ignore mario2/dist/assets.json`. Only authored tools, tests, pins, instructions and build/play documentation belong in Git.
+
+Ignored paths are `mario2/dist/`, `mario2/.build-*/`, `mario2/.tmp/` and Python bytecode. Temporary build directories are removed on success and ordinary failures. The ISO stays outside the checkout. Source art/audio is not MIT-licensed.
+
+## Evidence and ownership
+
+`mario2/pins.json` is the reviewed input/decode allowlist, not a generated asset table. It records disc/member hashes, ISO byte ranges, all 77 identities, executable FILE offsets, selector-slice hashes, decoded artifact pins and lesson normalization pins. It contains no glyphs, palettes, lesson text or other raw game bytes. Original members are never loaded as code.
+
+The authored decoder is adapted from the static research readers, reduced to the required Windows DIB/RLE AVI, PCM, MIDI events and Win16 UI formats. No research output or Mario 1 implementation is copied into the runtime. Research claim IDs in pins identify the earlier Express evidence; source hashes and FILE ranges are the reproducible proof.
+
+The separate renderer/media work consumes [PLAYING.md](PLAYING.md)'s frozen `mario2-assets.v1` loading contract. This phase does not implement browser playback, composition, palette realization, controls, progression or saves. Existing Mario 1 storage and all three specified legacy save keys remain untouched.
