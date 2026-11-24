@@ -1,4 +1,4 @@
-# Mario 2 assets: build and integrate
+# Mario 2: build, test and serve
 
 Build the ordinary Windows Expert Express assets from the pinned disc, without running original software. This standalone pipeline does not call or modify the Mario 1 pipeline.
 
@@ -10,10 +10,13 @@ From the repository root, using Python 3.13+ and its standard library:
 python3 -B mario2/tools/build.py
 python3 -B -m unittest discover -s mario2/tests -v
 MARIO2_TEST_ISO="$HOME/Downloads/Mario Teaches Typing 2 (1997)(Interplay)[Mac-PC].iso" python3 -B -m unittest discover -s mario2/tests -v
-python3 -m http.server 4187 --bind 127.0.0.1 --directory mario2/dist
+node --test mario2/tests/*.test.mjs
+npm ci --ignore-scripts --no-audit --no-fund
+PLAYWRIGHT_CHANNEL=chrome TRANSLATION_PORT=4287 PLAYWRIGHT_JUNIT_OUTPUT_FILE=mario2/.tmp/browser.xml ./node_modules/.bin/playwright test --config=mario2/playwright.config.mjs --project=root --project=pages-prefix --reporter=junit
+python3 -B mario2/tools/serve.py --port 4187
 ```
 
-Use `structured_return` for build/tests, with `unittest-text` for tests. The server serves assets only, not a playable app. Choose an unused port; do not replace a user server.
+Open http://127.0.0.1:4187/ for setup and renderer fixtures, not a typing engine. The same build works at `/brooklyn-plumber-teaches-typing/`. Use `structured_return` for build/tests, with `unittest-text`, `node-test-text` and `junit-xml` respectively. Browser tests launch their own dist-only server, refuse reuse and isolate storage for each test. Choose an unused port; do not replace a user server. Install locked root dependencies only in this checkout if missing. Chrome is used above; omit `PLAYWRIGHT_CHANNEL` if Playwright Chromium is installed.
 
 The default disc is `~/Downloads/Mario Teaches Typing 2 (1997)(Interplay)[Mac-PC].iso`. Override with `MARIO2_ISO=/absolute/path.iso` or `build.py --iso /absolute/path.iso`. An explicit missing/wrong source fails, without fallback or download. `--pins` supports negative pin tests, not alternate game editions.
 
@@ -36,4 +39,8 @@ Ignored paths are `mario2/dist/`, `mario2/.build-*/`, `mario2/.tmp/` and Python 
 
 The authored decoder is adapted from the static research readers, reduced to the required Windows DIB/RLE AVI, PCM, MIDI events and Win16 UI formats. No research output or Mario 1 implementation is copied into the runtime. Research claim IDs in pins identify the earlier Express evidence; source hashes and FILE ranges are the reproducible proof.
 
-The separate renderer/media work consumes [PLAYING.md](PLAYING.md)'s frozen `mario2-assets.v1` loading contract. This phase does not implement browser playback, composition, palette realization, controls, progression or saves. Existing Mario 1 storage and all three specified legacy save keys remain untouched.
+The entrypoint composes the indexed backdrops, source overlay atlases, font and hand cues through [PLAYING.md](PLAYING.md)'s `mario2-assets.v1` contract. The staged allowlist explicitly includes `index.html`, `main.js`, `styles.css`, `setup.js`, `storage.js`, `assets.js`, `render.js`, `presentation.json`, `assets.json`, `font.bin` and the pinned converted artifacts. No original raw members are published.
+
+Setup stops at state21 with typing explicitly unimplemented in this setup and renderer preview. Fixtures supply rows, expected byte and six report strings, without calculating gameplay or statistics. Movies, audio and progression remain later work. Browser checks cover all 15 setup combinations, indexed hotspots, name editing, duplicate alternatives, reload, persistence/load refusals and fixtures at root and prefix. Pixel tests independently compare glyph bits and every displayed typing/report pixel; overlay tests cover gates, wrap and restore. Screenshots and JUnit evidence stay ignored under `mario2/.tmp/`.
+
+Existing Mario 1 storage and all three protected save keys remain untouched. Mario2 uses only `mtt2-static-translation.students.v1`, preserving opaque bytes in each 292-byte record. Malformed or inaccessible data visibly refuses persistence rather than resetting it.

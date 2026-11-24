@@ -104,6 +104,15 @@ class DiscTests(unittest.TestCase):
                 manifest = json.loads((build.DIST/'assets.json').read_text())
                 self.assertEqual(len(manifest['assets']),77)
                 self.assertEqual(len(manifest['lessons']),5)
+                runtime = {'index.html','main.js','styles.css','setup.js','storage.js','assets.js','render.js'}
+                for name in runtime:
+                    self.assertEqual((build.DIST/name).read_bytes(), (build.ROOT/name).read_bytes())
+                presentation = json.loads((build.DIST/manifest['presentation']['url']).read_text())
+                self.assertEqual(presentation['schema'], 'mario2-presentation.v1')
+                self.assertEqual(len(presentation['nameKeyFlags']), 256)
+                self.assertEqual(set(first), runtime | {'assets.json','presentation.json','font.bin'} |
+                                 {url for a in manifest['assets'].values() for url in a['files'].values()})
+                self.assertFalse(any(Path(p).suffix.lower() in {'.exe','.iso','.lee','.dll'} for p in first))
                 source = Source(PINS,iso)
                 try:
                     coverage = set()

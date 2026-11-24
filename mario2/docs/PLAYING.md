@@ -1,10 +1,28 @@
-# Mario 2 loading contract
+# Mario 2: setup and renderer fixtures
 
-This phase supplies assets, not a playable browser application. Build with [DEVELOPMENT.md](DEVELOPMENT.md). The following IDs and shapes are frozen for the upcoming renderer/media implementation.
+Build and serve with [DEVELOPMENT.md](DEVELOPMENT.md). This iteration implements setup, not typing.
+
+## Controls and saves
+
+1. Click New student on the source screen or the matching accessible button.
+2. Choose Mario, Princess or Luigi. Type a name, up to eight accepted bytes. Backspace edits, Enter confirms; blank becomes NONAME.
+3. If the name exists, OK replaces its record; Cancel returns to editing. These labels match RT_DIALOG626, not a guessed Yes/No dialog.
+4. Choose lesson plan, Express, then Home, Top, Bottom, Numbers or Symbols.
+5. State21 visibly stops here. Typing is unimplemented in this setup and renderer preview. No results, progression or terminal certificate are invented.
+
+Reload retains the current student and setup selections. Continue resumes an ordinary Express handoff. This immediate selection persistence is a browser adaptation, not proof of original manual Express save timing. Saves use only `mtt2-static-translation.students.v1` with the `mario2-students.v1` envelope. The original app's three save keys are never read, changed, imported or deleted. A visible Persistence refused message means the setup was not saved; existing malformed data is not reset or overwritten.
+
+Open Renderer fixtures for supplied typing rows, hand cues and report strings. These are presentation examples, not a playable lesson or calculated report. Deliver one overlay visit applies one source-table visit with gates open; some visits have no visible frame. Return to setup restores its screen. No autonomous timer, movie playback, audio or typing progression runs.
+
+Indexed backdrops and atlases, source glyphs, overlay tables and hand maps come from pinned executable FILE ranges in `pins.json` and `presentation-pins.json`. Browser adaptations are explicit palette endpoints (10 low and 10 high Windows-style colors), nearest-neighbor scaling, accessible buttons and an HTML duplicate dialog. Historical OS palette equality is unsupported. Missing assets fail visibly, without replacement art.
+
+## Runtime loading contract
+
+The following IDs and shapes remain the asset contract for later media implementation.
 
 ## Load by ID, not filename resemblance
 
-Fetch `assets.json` relative to the app's deployment base URL. It has `schema: "mario2-assets.v1"`, `assets`, `font` and `lessons`. Resolve every relative `files` URL against the manifest URL, never `/` or the page pathname. This supports both domain-root and project-prefix deployments. Non-OK fetches, missing IDs and wrong schema are load failures, not substitute artwork. Browser failure/skip policy is not implemented here.
+Fetch `assets.json` relative to the app's deployment base URL. It has `schema: "mario2-assets.v1"`, `assets`, `font` and `lessons`. Resolve every relative `files` URL against the manifest URL, never `/` or the page pathname. This supports both domain-root and project-prefix deployments. Non-OK fetches, missing IDs and wrong schema are load failures, not substitute artwork. The entrypoint displays load refusal on failure; it does not substitute missing assets.
 
 Each asset entry has `files` (artifact name to relative URL), `data` (decoded metadata), `placement` and `source` (member name/hash and executable FILE offset where applicable). Files are deduplicated by member SHA256 under `decoded/<sha256>/`; callers must use the manifest, not construct those paths. No raw source members are served.
 
@@ -42,4 +60,4 @@ There is no movie 20, 50 or 55 in this contract. Total: 34 NE resources, 38 movi
 
 `lessons` has `lesson-h`, `lesson-t`, `lesson-b`, `lesson-n`, `lesson-s` in keyset order (home, top, bottom, numbers, symbols). Each contains `normalized`, `tokens` and `source_sha256`. Every token has `text` and `raw_file_offsets` into its expanded external `.LEE` member. Normalization clears bit 7, removes tilde markers, converts tab/CR/LF to spaces and collapses repeated spaces. Tokens exclude bytes 0..32. No row packing, RNG or lesson progression is invented here. The external files are the gameplay input; embedded LESSON resources are not substituted.
 
-Native pixel/audio decoding is recovered behavior. Browser composition, asynchronous scheduling, media errors/autoplay, palette endpoints and UI adaptation remain separate work. The terminal Express certificate text is unknown due to the source's malformed far pointer; these assets do not invent a certificate or successful terminal outcome.
+Native pixel/audio decoding is recovered behavior. Browser composition, palette endpoints and setup UI adaptations are described above. Media scheduling, playback errors and autoplay remain later work. The terminal Express certificate text is unknown due to the source's malformed far pointer; these assets do not invent a certificate or successful terminal outcome.
