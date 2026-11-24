@@ -73,7 +73,7 @@ def build(iso=None, pins_path=PINS):
             stage = Path(temp)
             decode.HERE = stage
             catalog = {'schema': 'mario2-assets.v1', 'assets': {}, 'lessons': {}}
-            runtime = ('index.html', 'main.js', 'styles.css', 'setup.js', 'storage.js', 'assets.js', 'render.js', 'typing.js', 'media.js', 'selection.js', 'report.js')
+            runtime = ('index.html', 'main.js', 'startup.js', 'styles.css', 'setup.js', 'storage.js', 'assets.js', 'render.js', 'typing.js', 'media.js', 'selection.js', 'report.js')
             allowed = {'assets.json', 'font.bin', 'presentation.json', *runtime}
             for name in runtime:
                 shutil.copyfile(ROOT/name, stage/name)

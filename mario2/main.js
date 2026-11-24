@@ -1,3 +1,4 @@
+import {createStartup} from './startup.js';
 import {loadAssets} from './assets.js';
 import {createRenderer} from './render.js';
 import {createSetup} from './setup.js';
@@ -17,7 +18,7 @@ try {
   const assets=await loadAssets(new URL('./assets.json',import.meta.url));
   const setup=createSetup({store:createStudentStore(()=>window.localStorage),nameKeyFlags:assets.presentation.nameKeyFlags});
   const renderer=createRenderer(canvas,assets,{paletteEndpoints:{low,high}});
-  let view, fixture=false, typing=null, movie=false, continuation=null, finished=false, focused=true, timer, musicSelector=1;
+  let view, fixture=false, typing=null, movie=false, continuation=null, finished=false, focused=true, timer, musicSelector=0, startup;
   const date=new Date();
   // Browser input mapping: local calendar tuple, recovered absent-TZ defaults.
   const random=createRandom(seedFromCalendar({year:date.getFullYear(),month:date.getMonth()+1,
@@ -44,7 +45,7 @@ try {
     const clip=media.snapshot().movie;
     if(movie && clip) play(clip.selector,continuation);
   }};
-  const skip=document.createElement('button'); skip.textContent='Skip movie'; skip.onclick=()=>media.skip();
+  const skip=document.createElement('button'); skip.textContent='Skip movie'; skip.onclick=()=>startup?.active() ? startup.skip() : media.skip();
   controls.before(enable,skip);
   const quit=document.createElement('dialog');
   quit.setAttribute('aria-label','Quit confirmation (resource624)');
@@ -99,7 +100,9 @@ try {
   function startTimer() {
     clearInterval(timer);
     timer=setInterval(()=>{
-      if(fixture||movie||quit.open||document.hidden||exited||terminal||!view) return;
+      if(document.hidden||exited||terminal||quit.open) return;
+      if(startup?.active()) {startup.tick();return;}
+      if(fixture||movie||!view) return;
       if(view.state===21 && typing) update(typing.acceptedUpdate(performance.now()));
       renderer.visitOverlay({state:view.state,transition:0,movie:0,timerDelivered:true});
     },100);
@@ -154,6 +157,7 @@ try {
     else if(!view.duplicate && dialog.open) dialog.close();
   }
   function dispatch(action){
+    if(startup?.active()) {startup.skip();return;}
     if(fixture||quit.open||terminal||exited) return;
     if(movie){media.skip();return;}
     if(action.type==='select' && action.selector===16){confirmQuit(true);return;}
@@ -167,6 +171,7 @@ try {
   dialog.querySelectorAll('button').forEach(b=>b.onclick=()=>dispatch({type:'duplicate-result',result:Number(b.value)}));
   dialog.addEventListener('cancel',event=>{event.preventDefault();dispatch({type:'duplicate-result',result:2});});
   window.addEventListener('keydown',event=>{
+    if(startup?.active()) {event.preventDefault();startup.skip();return;}
     if(fixture||terminal||exited) return;
     if(movie){event.preventDefault();media.skip();return;}
     if(quit.open) {
@@ -191,6 +196,7 @@ try {
     }
   });
   canvas.addEventListener('click',event=>{
+    if(startup?.active()) {startup.skip();return;}
     if(movie){media.skip();return;}
     if(fixture || view.duplicate || quit.open || terminal || exited) return;
     const bounds=canvas.getBoundingClientRect();
@@ -211,10 +217,21 @@ try {
   document.querySelector('#report').onclick=()=>{fixture=true;display({state:10,reportStrings:['FIXTURE','0','0','0','0','0']});};
   document.querySelector('#overlay').onclick=()=>renderer.visitOverlay({state:view.state,transition:0,movie:0,timerDelivered:true});
   document.querySelector('#setup').onclick=()=>{fixture=false;display(setup.snapshot());};
-  display(setup.snapshot());
-  // FILE 0x154e4..0x155b2: selection music before welcome speech.
-  media.audio(1,3);
-  startTimer(); play(welcomeMovie(random));
+  // Existing fixture controls cannot bypass the startup handoff.
+  document.querySelectorAll('details button').forEach(button=>button.disabled=true);
+  startup=createStartup({
+    backdrop(bitmap){view={state:0,bitmap};renderer.enter(view);controls.replaceChildren();status.textContent='Startup '+(bitmap===485?'LOGO':'INTRO');},
+    play,
+    close(){movie=false;continuation=null;media.closeMovie();},
+    fade:renderer.fade,restore:renderer.restore,
+    welcome(){
+      document.querySelectorAll('details button').forEach(button=>button.disabled=false);
+      display(setup.snapshot());
+      // FILE 0x154e4..0x155b2: selection music before existing welcome speech.
+      media.audio(10,1);musicSelector=1;media.audio(1,3);play(welcomeMovie(random));
+    },
+  });
+  startTimer();
 } catch (failure) {
   status.textContent='Unable to start.';
   error.textContent='Load refused: '+failure.message;

@@ -117,7 +117,7 @@ class DiscTests(unittest.TestCase):
                 manifest = json.loads((build.DIST/'assets.json').read_text())
                 self.assertEqual(len(manifest['assets']),81)
                 self.assertEqual(len(manifest['lessons']),5)
-                runtime = {'index.html','main.js','styles.css','setup.js','storage.js','assets.js','render.js','typing.js','media.js','selection.js','report.js'}
+                runtime = {'index.html','main.js','startup.js','styles.css','setup.js','storage.js','assets.js','render.js','typing.js','media.js','selection.js','report.js'}
                 for name in runtime:
                     self.assertEqual((build.DIST/name).read_bytes(), (build.ROOT/name).read_bytes())
                 presentation = json.loads((build.DIST/manifest['presentation']['url']).read_text())

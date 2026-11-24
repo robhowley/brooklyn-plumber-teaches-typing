@@ -2,6 +2,8 @@
 
 Build and serve with [DEVELOPMENT.md](DEVELOPMENT.md). Ordinary Express includes setup, typing, calculated reports, progression, Repeat and quit/Continue.
 
+On each fresh launch, watch LOGO then INTRO, or skip each with a key, canvas click or Skip movie. Startup consumes that input before Welcome controls. Transitions deliver one source palette-decrement pass (including the source counter alias), not an invented timed splash. Failed/blocked startup movies hold for explicit Enable audio / Retry or Skip, an approved browser transport adaptation rather than the original failed-start stale flags. Focus changes do not reset or skip startup. Returning to Welcome within the session does not replay startup.
+
 ## Controls and saves
 
 1. Click New student on the source screen or the matching accessible button.
@@ -31,6 +33,8 @@ Each asset entry has `files` (artifact name to relative URL), `data` (decoded me
 
 | IDs | Contents |
 | --- | --- |
+| `ne-2-485`, `ne-2-613` | LOGO and INTRO startup backdrops |
+| `movies-0`, `movies-1` | Opaque 640x480 LOGO and INTRO at (0,0), using their AVI palettes |
 | `ne-2-103`, `ne-2-619` | Welcome without/with current name |
 | `ne-2-104`, `ne-2-105`, `ne-2-106`, `ne-2-107` | Character, name, lesson-plan, mode backdrops |
 | `ne-2-119`, `ne-2-123`, `ne-2-112` | Keyset, typing, report backdrops |
@@ -44,7 +48,7 @@ Each asset entry has `files` (artifact name to relative URL), `data` (decoded me
 | `audio-1`, `audio-5`, `audio-7`, `audio-8` | MIDI events (menu, typing, report branches) |
 | `audio-10` | Click PCM from WAVEFILE resource 499 |
 
-There is no movie 20, 50 or 55 in this contract. Total: 34 NE resources, 38 movies, five audio selectors. Font and lessons are additional entries, not part of 77.
+There is no movie 20, 50 or 55 in this contract. Total: 36 NE resources, 40 movies, five audio selectors (81 identities). The original 77 Express identities remain unchanged; startup adds four. Font and lessons are additional entries.
 
 ## Pixel and media data
 
@@ -52,7 +56,7 @@ There is no movie 20, 50 or 55 in this contract. Total: 34 NE resources, 38 movi
 - Atlas/hand indices use the active backdrop palette. Do not recolor the scene using the atlas palette. Historical GDI system palette realization is not recovered by these data.
 - Cursor/icon `and-mask.zlib` inflates to one byte per pixel (0 or 1). `pixels.zlib` is the XOR index plane. The cursor hotspot is in `data.hotspot`. Preserve AND/XOR semantics, not alpha inference.
 - Movies have `files["frames.zlib"]`, `data.streams` and `data.decoded_frames`. Each frame has `output_offset`, `compressed_bytes`, `decoded_bytes`, `decoded_sha256`, width/height, `palette_rgb_hex` and rational `time: [numerator, denominator]` in seconds. Slice the compressed file first, then inflate that independent zlib stream. Never decompress the concatenated file as one image array.
-- Frames remain indexed. Movie `placement.field_u16_2`/`field_u16_4` are destination x/y; `placement.byte6` is the transparent **index**, not an RGB color. Restore the bound background before compositing each frame. Movie 14 uses key 245, ordinary reports key 10.
+- Frames remain indexed. Movie `placement.field_u16_2`/`field_u16_4` are destination x/y; `placement.byte6` is the transparent **index**, not an RGB color, for Express movies. Startup selectors0/1 are opaque, despite their selector records' byte6 values. Restore the bound background before compositing each frame. Movie 14 uses key 245, ordinary reports key 10.
 - Movie PCM uses `stream-<index>-audio.wav`; stream metadata retains start, scale, rate and PCM format. WAV is uncompressed browser-loadable PCM. No synthesized speech or transcoded replacement video is supplied.
 - MIDI `events.json` contains tracks with ordered tick/delta/status/data events and tempo metadata. `data.division` and `division_mode` describe timing. Events are decoded, not synthesized. Playback uses approximate Web Audio oscillators, not historical instrument waveforms.
 - Dialog/group metadata retains native fields and resource references. No replacement browser UI behavior is implied.
@@ -63,4 +67,4 @@ There is no movie 20, 50 or 55 in this contract. Total: 34 NE resources, 38 movi
 
 `lessons` has `lesson-h`, `lesson-t`, `lesson-b`, `lesson-n`, `lesson-s` in keyset order (home, top, bottom, numbers, symbols). Each contains `normalized`, `tokens` and `source_sha256`. Every token has `text` and `raw_file_offsets` into its expanded external `.LEE` member. Normalization clears bit 7, removes tilde markers, converts tab/CR/LF to spaces and collapses repeated spaces. Tokens exclude bytes 0..32. Runtime entries also include expanded bytes, delimiter_count and starts. Starts preserve byte zero and one-based delimiter choices, excluding the final delimiter. One shared historical RNG stream selects movies and lesson starts. The external files are the gameplay input; embedded LESSON resources are not substituted.
 
-Native pixel/audio decoding is recovered behavior. Browser composition, palette endpoints and setup UI adaptations are described above. Movie frames and PCM share the audio clock. Each frame restores the background and uses its selector's transparent index. Errors and autoplay refusal are distinct from completion. The terminal Express certificate text is unknown due to the source's malformed far pointer; these assets do not invent a certificate or successful terminal outcome.
+Native pixel/audio decoding is recovered behavior. Browser composition, palette endpoints and setup UI adaptations are described above. Movie frames and PCM share the audio clock. Each frame restores the background; Express uses its selector's transparent index and startup is opaque. Errors and autoplay refusal are distinct from completion. The terminal Express certificate text is unknown due to the source's malformed far pointer; these assets do not invent a certificate or successful terminal outcome.
