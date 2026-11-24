@@ -73,7 +73,7 @@ def build(iso=None, pins_path=PINS):
             stage = Path(temp)
             decode.HERE = stage
             catalog = {'schema': 'mario2-assets.v1', 'assets': {}, 'lessons': {}}
-            runtime = ('index.html', 'main.js', 'styles.css', 'setup.js', 'storage.js', 'assets.js', 'render.js')
+            runtime = ('index.html', 'main.js', 'styles.css', 'setup.js', 'storage.js', 'assets.js', 'render.js', 'typing.js', 'media.js', 'selection.js')
             allowed = {'assets.json', 'font.bin', 'presentation.json', *runtime}
             for name in runtime:
                 shutil.copyfile(ROOT/name, stage/name)
@@ -118,7 +118,10 @@ def build(iso=None, pins_path=PINS):
                 if hashlib.sha256(normalized).hexdigest() != lesson['normalized_sha256']:
                     raise ValueError(lesson['id']+': normalized pin mismatch')
                 tokens = [{'text':m[0].decode('ascii'),'raw_file_offsets':offsets[m.start():m.end()]} for m in re.finditer(rb'[^\x00-\x20]+', normalized)]
-                catalog['lessons'][lesson['id']] = {'tokens':tokens,'normalized':normalized.decode('ascii'),'source_sha256':lesson['expanded_sha256']}
+                catalog['lessons'][lesson['id']] = {'tokens':tokens,'normalized':normalized.decode('ascii'),
+                    'bytes':list(data), 'starts':[0]+[i for i,b in enumerate(data) if b & 127 == 126][:-1],
+                    'delimiter_count':sum(b & 127 == 126 for b in data),
+                    'source_sha256':lesson['expanded_sha256']}
             decode.save_json(stage/'assets.json', catalog)
             actual_files = {str(p.relative_to(stage)) for p in stage.rglob('*') if p.is_file()}
             if actual_files != allowed:

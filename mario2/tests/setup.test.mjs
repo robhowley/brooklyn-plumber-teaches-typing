@@ -37,7 +37,7 @@ test('all 15 character/keyset routes, exact source defaults, independent reload'
     enterName(h.setup, '', character);
     assert.equal(h.setup.snapshot().state, 3);
     const view = express(h.setup, keyset);
-    assert.deepEqual(view, {state: 21, name: 'NONAME', character, mode: 3, keyset, duplicate: null, storageError: null});
+    assert.deepEqual(view, {state: 21, name: 'NONAME', character, mode: 3, keyset, durationSeconds: 300, duplicate: null, storageError: null});
     const record = h.store.load().value.students[0].record;
     const expected = Array(292).fill(0);
     expected[1] = keyset; expected[3] = character; expected[5] = 3;

@@ -37,7 +37,7 @@ export function createSetup({store, nameKeyFlags}) {
   let state = 1;
   let duplicate = null;
   const snapshot = () => ({state, name: recordName(record), character: word(record, 3),
-    mode: word(record, 5), keyset: word(record, 1),
+    mode: word(record, 5), keyset: word(record, 1), durationSeconds: word(record, 27)*60,
     duplicate: duplicate && {...duplicate}, storageError: storageError && {...storageError}});
 
   function persist(candidate, nextState) {

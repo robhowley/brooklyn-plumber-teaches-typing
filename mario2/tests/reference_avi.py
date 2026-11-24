@@ -63,6 +63,14 @@ def frames(data, coverage):
             assert (size, planes, bits, codec) == (40, 1, 8, 1)
             assert width > 0 and height > 0
             rows = [bytearray(width) for _ in range(height)]
+            count = struct.unpack_from('<I',payload,32)[0] or 256
+            palette = [bytes((payload[40+i*4+2],payload[40+i*4+1],payload[40+i*4])) for i in range(count)]
+        elif tag[2:] == b'pc':
+            first, count = payload[:2]
+            count = count or 256
+            assert len(payload) == 4+count*4
+            for i in range(count):
+                palette[first+i] = payload[4+i*4:7+i*4]
         elif tag[2:] in (b'dc', b'db'):
             assert rows is not None
             if payload:
@@ -70,4 +78,4 @@ def frames(data, coverage):
             else:
                 coverage.add('empty')
                 pixels = b''.join(reversed(rows))
-            yield offset, pixels
+            yield offset, pixels, b''.join(palette).hex()

@@ -24,6 +24,14 @@ PINS = json.loads(build.PINS.read_text())
 class UnitTests(unittest.TestCase):
     def test_pin_set(self):
         build.validate_pins(PINS)
+        # Independent verify-express/joins.json projection: selector, consumer
+        # FILE offset, exact member and member SHA256 for all 38 original joins.
+        identities = sorted((int(a['id'].split('-')[1]),a['join']['file_offset'],
+                             a['source']['path'],a['source']['sha256'])
+                            for a in PINS['assets'] if a['kind']=='movies')
+        self.assertEqual(len(identities),38)
+        self.assertEqual(hashlib.sha256(json.dumps(identities,separators=(',',':')).encode()).hexdigest(),
+                         'c75aba1876fd78c86f52a2fa72cf73dd8921dac48f439bb5c443fe3907a9b031')
         for field in ('assets', 'lessons'):
             pins = copy.deepcopy(PINS)
             pins[field].pop()
@@ -104,7 +112,7 @@ class DiscTests(unittest.TestCase):
                 manifest = json.loads((build.DIST/'assets.json').read_text())
                 self.assertEqual(len(manifest['assets']),77)
                 self.assertEqual(len(manifest['lessons']),5)
-                runtime = {'index.html','main.js','styles.css','setup.js','storage.js','assets.js','render.js'}
+                runtime = {'index.html','main.js','styles.css','setup.js','storage.js','assets.js','render.js','typing.js','media.js','selection.js'}
                 for name in runtime:
                     self.assertEqual((build.DIST/name).read_bytes(), (build.ROOT/name).read_bytes())
                 presentation = json.loads((build.DIST/manifest['presentation']['url']).read_text())
@@ -115,6 +123,12 @@ class DiscTests(unittest.TestCase):
                 self.assertFalse(any(Path(p).suffix.lower() in {'.exe','.iso','.lee','.dll'} for p in first))
                 source = Source(PINS,iso)
                 try:
+                    executable = source.read(PINS['executable'])
+                    # Independent FILE 0x20046 setup-list pin, not a supplied mock table.
+                    setup = executable[0x20046:0x2005e]
+                    self.assertEqual(hashlib.sha256(setup).hexdigest(),
+                                     '7a504184809c203f29bce8bddf5b8a085bd3972dbe56ec3983ac56f48c7eacb9')
+                    self.assertEqual(presentation['setupMovies'], list(setup))
                     coverage = set()
                     movie_frames = 0
                     for a in PINS['assets']:
@@ -130,12 +144,24 @@ class DiscTests(unittest.TestCase):
                             actual = zlib.decompress((build.DIST/entry['files']['pixels.zlib']).read_bytes())
                             self.assertEqual(actual,expected,a['id'])
                         if a['kind'] == 'movies':
+                            # Read selector-specific placement/key from the original 13-byte
+                            # record, independently of the production placement dictionary.
+                            off = a['join']['file_offset']
+                            selector,x,y,key = struct.unpack_from('<HHHB',executable,off)
+                            self.assertEqual(a['id'], f'movies-{selector}')
+                            self.assertEqual(entry['placement'],
+                                             dict(field_u16_2=x,field_u16_4=y,byte6=key))
+                            self.assertEqual(a['placement'],entry['placement'])
+                            self.assertEqual(entry['source']['member'],a['source']['path'])
+                            self.assertEqual(entry['source']['sha256'],a['source']['sha256'])
                             packed = (build.DIST/entry['files']['frames.zlib']).read_bytes()
                             expected_frames = reference_avi.frames(source.read(a['source']), coverage)
-                            for f, (offset, expected) in zip(entry['data']['decoded_frames'], expected_frames, strict=True):
+                            for f, (offset, expected, palette) in zip(entry['data']['decoded_frames'], expected_frames, strict=True):
                                 frame = zlib.decompress(packed[f['output_offset']:f['output_offset']+f['compressed_bytes']])
                                 self.assertEqual(len(frame),f['width']*f['height'])
                                 self.assertEqual(frame, expected, f"{a['id']} {a['source']['sha256']} AVI FILE {offset:#x}")
+                                self.assertEqual(f['palette_rgb_hex'],palette,
+                                                 f"{a['id']} {a['source']['sha256']} AVI FILE {offset:#x} palette")
                                 movie_frames += 1
                             for name,path in entry['files'].items():
                                 if name.endswith('.wav'):
