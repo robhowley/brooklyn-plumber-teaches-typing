@@ -1,6 +1,6 @@
-# Mario 2: setup and renderer fixtures
+# Mario 2: Express typing and media
 
-Build and serve with [DEVELOPMENT.md](DEVELOPMENT.md). This iteration implements setup, not typing.
+Build and serve with [DEVELOPMENT.md](DEVELOPMENT.md). This iteration runs ordinary Express typing and setup movies, stopping at an explicit finish handoff.
 
 ## Controls and saves
 
@@ -8,11 +8,13 @@ Build and serve with [DEVELOPMENT.md](DEVELOPMENT.md). This iteration implements
 2. Choose Mario, Princess or Luigi. Type a name, up to eight accepted bytes. Backspace edits, Enter confirms; blank becomes NONAME.
 3. If the name exists, OK replaces its record; Cancel returns to editing. These labels match RT_DIALOG626, not a guessed Yes/No dialog.
 4. Choose lesson plan, Express, then Home, Top, Bottom, Numbers or Symbols.
-5. State21 visibly stops here. Typing is unimplemented in this setup and renderer preview. No results, progression or terminal certificate are invented.
+5. Type the displayed rows in state21. Correct keys advance; wrong keys count without advancing. Repeated keydowns count; Enter and keyup do not type. Hand cues follow the expected byte.
+6. Enable audio / Retry unlocks browser audio. Any key or canvas click skips an active movie before other input. Failed or blocked media holds the current screen until explicit Retry or Skip.
+7. Expiry stops at Finish handoff for I6. Reports, progression, repeat, quit and the unanswered terminal certificate are not implemented.
 
 Reload retains the current student and setup selections. Continue resumes an ordinary Express handoff. This immediate selection persistence is a browser adaptation, not proof of original manual Express save timing. Saves use only `mtt2-static-translation.students.v1` with the `mario2-students.v1` envelope. The original app's three save keys are never read, changed, imported or deleted. A visible Persistence refused message means the setup was not saved; existing malformed data is not reset or overwritten.
 
-Open Renderer fixtures for supplied typing rows, hand cues and report strings. These are presentation examples, not a playable lesson or calculated report. Deliver one overlay visit applies one source-table visit with gates open; some visits have no visible frame. Return to setup restores its screen. No autonomous timer, movie playback, audio or typing progression runs.
+Open Renderer fixtures for supplied typing rows, hand cues and report strings. These are presentation examples, not a playable lesson or calculated report. Deliver one overlay visit applies one source-table visit with gates open; some visits have no visible frame. Return to setup restores its screen. Live mode delivers 100ms timer visits. Blur stops future visits without resetting rows, counters or sample phase; resume catches up at most two seconds per sample.
 
 Indexed backdrops and atlases, source glyphs, overlay tables and hand maps come from pinned executable FILE ranges in `pins.json` and `presentation-pins.json`. Browser adaptations are explicit palette endpoints (10 low and 10 high Windows-style colors), nearest-neighbor scaling, accessible buttons and an HTML duplicate dialog. Historical OS palette equality is unsupported. Missing assets fail visibly, without replacement art.
 
@@ -51,13 +53,13 @@ There is no movie 20, 50 or 55 in this contract. Total: 34 NE resources, 38 movi
 - Movies have `files["frames.zlib"]`, `data.streams` and `data.decoded_frames`. Each frame has `output_offset`, `compressed_bytes`, `decoded_bytes`, `decoded_sha256`, width/height, `palette_rgb_hex` and rational `time: [numerator, denominator]` in seconds. Slice the compressed file first, then inflate that independent zlib stream. Never decompress the concatenated file as one image array.
 - Frames remain indexed. Movie `placement.field_u16_2`/`field_u16_4` are destination x/y; `placement.byte6` is the transparent **index**, not an RGB color. Restore the bound background before compositing each frame. Movie 14 uses key 245, ordinary reports key 10.
 - Movie PCM uses `stream-<index>-audio.wav`; stream metadata retains start, scale, rate and PCM format. WAV is uncompressed browser-loadable PCM. No synthesized speech or transcoded replacement video is supplied.
-- MIDI `events.json` contains tracks with ordered tick/delta/status/data events and tempo metadata. `data.division` and `division_mode` describe timing. Events are decoded, not synthesized. A browser music implementation still needs an explicitly chosen instrument/playback adaptation.
+- MIDI `events.json` contains tracks with ordered tick/delta/status/data events and tempo metadata. `data.division` and `division_mode` describe timing. Events are decoded, not synthesized. Playback uses approximate Web Audio oscillators, not historical instrument waveforms.
 - Dialog/group metadata retains native fields and resource references. No replacement browser UI behavior is implied.
 
 ## Font and lessons
 
 `font.url` is `font.bin`, exactly 1,024 bytes from WINMARIO FILE `0x1fa00..0x1fe00` (segment 4 offset 0). It contains 128 glyphs, eight bytes per glyph, rows top-down, bit 7 leftmost. A glyph row is byte `character*8+row`. This is the game font, not an OS font. Controls and bytes 128..255 do not gain invented Unicode glyphs.
 
-`lessons` has `lesson-h`, `lesson-t`, `lesson-b`, `lesson-n`, `lesson-s` in keyset order (home, top, bottom, numbers, symbols). Each contains `normalized`, `tokens` and `source_sha256`. Every token has `text` and `raw_file_offsets` into its expanded external `.LEE` member. Normalization clears bit 7, removes tilde markers, converts tab/CR/LF to spaces and collapses repeated spaces. Tokens exclude bytes 0..32. No row packing, RNG or lesson progression is invented here. The external files are the gameplay input; embedded LESSON resources are not substituted.
+`lessons` has `lesson-h`, `lesson-t`, `lesson-b`, `lesson-n`, `lesson-s` in keyset order (home, top, bottom, numbers, symbols). Each contains `normalized`, `tokens` and `source_sha256`. Every token has `text` and `raw_file_offsets` into its expanded external `.LEE` member. Normalization clears bit 7, removes tilde markers, converts tab/CR/LF to spaces and collapses repeated spaces. Tokens exclude bytes 0..32. Runtime entries also include expanded bytes, delimiter_count and starts. Starts preserve byte zero and one-based delimiter choices, excluding the final delimiter. One shared historical RNG stream selects movies and lesson starts. The external files are the gameplay input; embedded LESSON resources are not substituted.
 
-Native pixel/audio decoding is recovered behavior. Browser composition, palette endpoints and setup UI adaptations are described above. Media scheduling, playback errors and autoplay remain later work. The terminal Express certificate text is unknown due to the source's malformed far pointer; these assets do not invent a certificate or successful terminal outcome.
+Native pixel/audio decoding is recovered behavior. Browser composition, palette endpoints and setup UI adaptations are described above. Movie frames and PCM share the audio clock. Each frame restores the background and uses its selector's transparent index. Errors and autoplay refusal are distinct from completion. The terminal Express certificate text is unknown due to the source's malformed far pointer; these assets do not invent a certificate or successful terminal outcome.

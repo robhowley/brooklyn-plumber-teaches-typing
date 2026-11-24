@@ -2,6 +2,8 @@ import {test,expect} from '@playwright/test';
 const own='mtt2-static-translation.students.v1';
 const chars=['Mario','Princess','Luigi'],keysets=['Home','Top','Bottom','Numbers','Symbols'];
 test.beforeEach(async({page})=>{
+ await page.clock.install({time:new Date(2026,0,1)});
+ await page.clock.pauseAt(new Date(2026,0,1,0,0,1));
  await page.addInitScript(()=>{
   const forbidden=['mtt-static-translation.students.v1','typing-kingdom-v1','typing-kingdom-v2'];
   window.protectedAccesses=[];
@@ -14,7 +16,8 @@ test.beforeEach(async({page})=>{
   }
  });
 });
-async function open(page){await page.goto('./');await expect(page.getByRole('button',{name:'New student',exact:true})).toBeVisible();}
+async function skip(page){await page.getByRole('button',{name:'Skip movie',exact:true}).click();}
+async function open(page){await page.goto('./');await expect(page.getByRole('button',{name:'New student',exact:true})).toBeVisible();await skip(page);}
 async function name(page,c=0,value='ALICE'){
  await page.getByRole('button',{name:'New student',exact:true}).click();
  await page.getByRole('button',{name:chars[c],exact:true}).click();
@@ -22,10 +25,10 @@ async function name(page,c=0,value='ALICE'){
  await page.keyboard.press('Enter');
 }
 async function finish(page,k=0){
- await page.getByRole('button',{name:'Choose lesson plan',exact:true}).click();
- await page.getByRole('button',{name:'Express',exact:true}).click();
+ await page.getByRole('button',{name:'Choose lesson plan',exact:true}).click();await skip(page);
+ await page.getByRole('button',{name:'Express',exact:true}).click();await skip(page);
  await page.getByRole('button',{name:keysets[k],exact:true}).click();
- await expect(page.getByRole('status')).toContainText('State 21: typing is not implemented');
+ await expect(page.getByRole('status')).toContainText('State 21 | Typed:');
 }
 for(let c=0;c<3;c++)for(let k=0;k<5;k++)test('setup '+chars[c]+' / '+keysets[k],async({page},info)=>{
  await open(page);await name(page,c);await finish(page,k);
@@ -37,13 +40,13 @@ for(let c=0;c<3;c++)for(let k=0;k<5;k++)test('setup '+chars[c]+' / '+keysets[k],
   await info.attach(filename+'.status',{body:await page.getByRole('status').innerText(),contentType:'text/plain'});
   await page.screenshot({path:info.outputPath(filename+'.png')});
  };
- await expect(page.getByRole('status')).toHaveText('State 21: typing is not implemented in this setup and renderer preview.');
+ await expect(page.getByRole('status')).toContainText('State 21 | Typed: 0 | Errors: 0');
  await capture('setup-handoff');
  await page.reload();
  await expect(page.getByRole('status')).toHaveText('Setup state 1 | Name: ALICE | Character: '+c+' | Keyset: '+k);
  await capture('setup-reload');
- await page.getByRole('button',{name:'Continue',exact:true}).click();
- await expect(page.getByRole('status')).toHaveText('State 21: typing is not implemented in this setup and renderer preview.');
+ await skip(page);await page.getByRole('button',{name:'Continue',exact:true}).click();
+ await expect(page.getByRole('status')).toContainText('State 21 | Typed: 0 | Errors: 0');
  await capture('setup-continued');
  expect(await page.evaluate(()=>window.protectedAccesses)).toEqual([]);
 });
@@ -61,12 +64,12 @@ test('indexed hotspot path, name editing, duplicates and blank name',async({page
  await page.keyboard.press('Backspace');await expect(page.getByRole('status')).toContainText('ABCDEFG');
  await page.keyboard.type('!');await expect(page.getByRole('status')).toContainText('ABCDEFG!');
  await page.keyboard.press('Backspace');
- await page.keyboard.press('Enter');await hit(4,5);await hit(5,14,3);await hit(14,17,2);
- await page.reload();await name(page,0,'ABCDEFG');await expect(page.locator('dialog')).toBeVisible();
+ await page.keyboard.press('Enter');await hit(4,5);await skip(page);await hit(5,14,3);await skip(page);await hit(14,17,2);
+ await page.reload();await skip(page);await name(page,0,'ABCDEFG');await expect(page.locator('dialog')).toBeVisible();
  await page.getByRole('button',{name:'Cancel',exact:true}).click();
  await expect(page.getByRole('status')).toContainText('Setup state 3');
  await page.keyboard.press('Enter');await page.getByRole('button',{name:'OK',exact:true}).click();await finish(page);
- await page.reload();await name(page,2,'');await expect(page.getByRole('status')).toContainText('NONAME');
+ await page.reload();await skip(page);await name(page,2,'');await expect(page.getByRole('status')).toContainText('NONAME');
  await page.screenshot({path:info.outputPath('blank-name.png')});
 });
 for(const failure of ['getter','read','write','invalid'])test('visible persistence refusal: '+failure,async({page})=>{

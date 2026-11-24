@@ -54,7 +54,7 @@ def decode_presentation(executable, pins):
             raise ValueError('report string pointer outside pinned region')
         formats.append(slices['reportStrings'][relative:].split(b'\0', 1)[0].decode('ascii'))
     offsets = words(slices['fingerOffsets'])
-    return dict(schema='mario2-presentation.v1', nameKeyFlags=list(slices['nameKeyFlags']),
+    return dict(schema='mario2-presentation.v1', setupMovies=list(slices['setupMovies']), nameKeyFlags=list(slices['nameKeyFlags']),
                 overlays=overlays, hotspots=hotspots,
                 fingers=dict(mapping=list(slices['fingerMap']), dx=offsets[:10], dy=offsets[10:],
                              bitmaps=words(slices['handIds'])[1:]),

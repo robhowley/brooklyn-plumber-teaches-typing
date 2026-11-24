@@ -3,6 +3,8 @@
   "executable_sha256": "39a4fb53384afbfec13063c2f4c67d51013b1f8ea494788c88f1ac6c12f47f22",
   "member": "/MARIO/WINMARIO.EXE;1",
   "slices": {
+    "setupMovies": {"file_offset": 131142, "size": 24, "sha256": "7a504184809c203f29bce8bddf5b8a085bd3972dbe56ec3983ac56f48c7eacb9"},
+    "reportSelection": {"file_offset": 106224, "size": 261, "sha256": "9c2f3e88e06a49b4f7b6908434bb9ede7442428266b0e442fbb323dffc7aa0a4"},
     "nameKeyFlags": {
       "file_offset": 141119,
       "size": 256,

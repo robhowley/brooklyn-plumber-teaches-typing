@@ -46,7 +46,7 @@ export function createRenderer(canvas, assets, {paletteEndpoints}) {
       drawGlyph(surface, assets.font, ch.charCodeAt(0), x+8*i++, y, fg, bg);
     }
   }
-  function present(surface) {
+  function present(surface, frame=null) {
     const palette=backdrop.palette.slice();
     palette.set(paletteEndpoints.low, 0); palette.set(paletteEndpoints.high, 246*3);
     const image=context.createImageData(640,480);
@@ -54,7 +54,12 @@ export function createRenderer(canvas, assets, {paletteEndpoints}) {
     for (let y=0; y<480; y++) for (let x=0; x<640; x++) {
       const index=surface.pixels[Math.floor(y/scale)*surface.width+Math.floor(x/scale)];
       const at=(y*640+x)*4;
-      image.data.set(palette.subarray(index*3,index*3+3),at); image.data[at+3]=255;
+      const fx=x/scale-(frame?.x??0), fy=y/scale-(frame?.y??0);
+      const movieIndex=frame && fx>=0 && fy>=0 && fx<frame.width && fy<frame.height
+        ? frame.pixels[Math.floor(fy)*frame.width+Math.floor(fx)] : frame?.transparentIndex;
+      const rgb=frame && movieIndex!==frame.transparentIndex
+        ? frame.palette.subarray(movieIndex*3,movieIndex*3+3) : palette.subarray(index*3,index*3+3);
+      image.data.set(rgb,at); image.data[at+3]=255;
     }
     context.putImageData(image,0,0);
   }
@@ -67,8 +72,11 @@ export function createRenderer(canvas, assets, {paletteEndpoints}) {
     if (owner===21) {
       // Fixture rows/expectedByte/cursorColumn are supplied, never advanced here.
       for (const [i,row] of (view.rows ?? []).slice(0,7).entries())
-        text(surface, row,28,142+12*i,58);
-      drawGlyph(surface,assets.font,32,28+8*(view.cursorColumn ?? 0),120,39,null,true);
+        text(surface, Array.isArray(row) ? String.fromCharCode(...row) : row,28,142+12*i,58);
+      // FILE 0x35f4..0x3728: correct glyph31, distinct from lesson row58.
+      for(const [i,byte] of (view.typedLine??[]).entries()) if(byte!==null)
+        drawGlyph(surface,assets.font,byte,28+8*i,120,31);
+      drawGlyph(surface,assets.font,32,28+8*(view.cursorColumn ?? view.cursor ?? 0),120,39,null,true);
       const fingers=assets.presentation.fingers;
       copyIndexed(surface,bitmap(fingers.bitmaps[10]),65,53,0,0,undefined,undefined,[0,63]);
       copyIndexed(surface,bitmap(fingers.bitmaps[11]),215,53,0,0,undefined,undefined,[0,63]);
@@ -108,5 +116,10 @@ export function createRenderer(canvas, assets, {paletteEndpoints}) {
     }
     draw();
   }
-  return {enter,draw,visitOverlay};
+  function movieFrame(frame) {
+    // Restore the saved indexed background before EVERY frame. Index, not RGB, is keyed.
+    // Opaque AVI indices use the AVI palette, not the saved DIB palette.
+    present(animated,frame);
+  }
+  return {enter,draw,visitOverlay,movieFrame};
 }
