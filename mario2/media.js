@@ -164,7 +164,7 @@ export function createMedia({manifest, manifestURL, fetch = globalThis.fetch,
         const frame = clip.frames[clip.nextFrame++], placement = clip.entry.placement;
         event(clip, 'frame', {frame:frame.frame, width:frame.width, height:frame.height,
           pixels:frame.pixels.slice(), palette:Uint8Array.from(frame.palette_rgb_hex.match(/../g), x => parseInt(x,16)),
-          x:placement.field_u16_2, y:placement.field_u16_4, transparentIndex:placement.byte6,
+          x:placement.field_u16_2, y:placement.field_u16_4, transparentIndex:clip.selector===0||clip.selector===1 ? undefined : placement.byte6,
           restoreBackground:true, time:frame.time});
         if (!live(clip)) return; // emit may synchronously skip/start another movie.
       }
@@ -256,6 +256,7 @@ export function createMedia({manifest, manifestURL, fetch = globalThis.fetch,
       // Operation16 was an MCI device command, not an invented browser sound.
       return clip?.id ?? null;
     },
+    closeMovie() { cancel(movie); },
     skip() {
       if (disposed || !movie || movie.state === 'ended' || movie.state === 'skipped') return false;
       if (movie.retired) { movie.retired = false; }

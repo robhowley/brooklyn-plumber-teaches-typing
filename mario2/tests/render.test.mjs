@@ -41,6 +41,24 @@ test('overlay visits obey all gates, restore backdrop, wrap, and draw never adva
   renderer.enter(view); assert.deepEqual(pixel(),[3,4,5,255]);
 });
 
+test('startup repaint and single fade preserve source palette1, saturate 2..245 and restore',()=>{
+  let displayed;
+  const bg=surface(640,480);bg.pixels.forEach((_,i)=>bg.pixels[i]=i%256);
+  for(let i=0;i<256;i++)bg.palette.set([i,255-i,100],i*3);
+  const context={createImageData:()=>({data:new Uint8ClampedArray(640*480*4)}),putImageData:image=>{displayed=image.data;}};
+  const renderer=createRenderer({getContext:()=>context},{bitmaps:new Map([[485,bg]]),presentation:{overlays:{}}},
+    {paletteEndpoints:{low:bg.palette.slice(0,30),high:bg.palette.slice(738)}});
+  const check=amount=>{
+    for(let i=0;i<640*480;i++)for(let c=0;c<3;c++){
+      const index=i%256,original=bg.palette[index*3+c];
+      assert.equal(displayed[i*4+c],index>=2&&index<=245?Math.max(0,original-amount):original);
+    }
+  };
+  renderer.enter({state:0,bitmap:485});check(0);renderer.draw();check(0);
+  renderer.fade(75);check(75);renderer.draw();check(75);
+  renderer.restore();check(0);
+});
+
 test('all embedded glyph row bits independently match the original font plane',
   {skip:!existsSync(new URL('../dist/font.bin',import.meta.url))},()=>{
   const font=new Uint8Array(readFileSync(new URL('../dist/font.bin',import.meta.url)));

@@ -34,7 +34,7 @@ export function createRenderer(canvas, assets, {paletteEndpoints}) {
   if (!context) throw new Error('Canvas unavailable');
   canvas.width=640; canvas.height=480;
   context.imageSmoothingEnabled=false;
-  let owner=null, backdrop, animated, overlay, rows, view;
+  let owner=null, backdrop, animated, overlay, rows, view, fadeAmount=0;
   const bitmap=id => {
     const value=assets.bitmaps.get(id);
     if (!value) throw new Error(`Missing bitmap ${id}`);
@@ -49,6 +49,9 @@ export function createRenderer(canvas, assets, {paletteEndpoints}) {
   function present(surface, frame=null) {
     const palette=backdrop.palette.slice();
     palette.set(paletteEndpoints.low, 0); palette.set(paletteEndpoints.high, 246*3);
+    // FILE 0x18a86..0x18b80: source palette1 is copied first and left
+    // unchanged; the loop starts at the second copied entry (source index2).
+    for(let i=6;i<246*3;i++) palette[i]=Math.max(0,palette[i]-fadeAmount);
     const image=context.createImageData(640,480);
     const scale=640/surface.width;
     for (let y=0; y<480; y++) for (let x=0; x<640; x++) {
@@ -97,7 +100,7 @@ export function createRenderer(canvas, assets, {paletteEndpoints}) {
     present(surface);
   }
   function enter(next) {
-    const id=({1:next.name ? 619:103,2:104,3:105,4:106,5:107,14:119,21:123,10:112})[next.state];
+    const id=next.bitmap ?? ({1:next.name ? 619:103,2:104,3:105,4:106,5:107,14:119,21:123,10:112})[next.state];
     if (!id) throw new Error(`Unsupported render state ${next.state}`);
     owner=next.state; view=next; backdrop=bitmap(id);
     animated={...backdrop,pixels:backdrop.pixels.slice()};
@@ -121,5 +124,7 @@ export function createRenderer(canvas, assets, {paletteEndpoints}) {
     // Opaque AVI indices use the AVI palette, not the saved DIB palette.
     present(animated,frame);
   }
-  return {enter,draw,visitOverlay,movieFrame};
+  return {enter,draw,visitOverlay,movieFrame,
+    fade(amount){fadeAmount=amount;draw();},
+    restore(){fadeAmount=0;draw();}};
 }

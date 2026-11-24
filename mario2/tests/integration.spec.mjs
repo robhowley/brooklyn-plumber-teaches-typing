@@ -1,3 +1,4 @@
+import {finishStartup} from './startup-entry.mjs';
 import {test,expect} from '@playwright/test';
 const own='mtt2-static-translation.students.v1';
 test.beforeEach(async({page})=>{
@@ -12,10 +13,10 @@ test.beforeEach(async({page})=>{
  await page.clock.pauseAt(new Date(2026,0,1,0,0,1));
 });
 test('indexed menu hit requests source audio10 before selection, rejected and consumed clicks do not',async({page})=>{
- await page.goto('./');
+ await page.goto('./');await finishStartup(page);
  await expect(page.getByRole('button',{name:'Skip movie',exact:true})).toBeVisible();
  const canvas=page.locator('canvas');
- const calls=()=>page.evaluate(()=>window.audioCalls.filter(([s])=>s===10));
+ const calls=()=>page.evaluate(()=>window.audioCalls.filter(([s,f])=>s===10&&f===3));
  // Same hotspot during Welcome speech consumes the click as movie skip.
  await canvas.click({position:{x:140,y:210}});
  expect(await calls()).toEqual([]);
@@ -43,14 +44,14 @@ test('live typing and fixture canvas clicks never request menu audio10',async({p
  await enter(page);
  await page.locator('canvas').click({position:{x:140,y:210}});
  await page.keyboard.press('z');
- expect(await page.evaluate(()=>window.audioCalls.filter(([s])=>s===10))).toEqual([]);
+ expect(await page.evaluate(()=>window.audioCalls.filter(([s,f])=>s===10&&f===3))).toEqual([]);
  await page.locator('summary').click();
  await page.locator('#report').click();
  await page.locator('canvas').click({position:{x:140,y:210}});
- expect(await page.evaluate(()=>window.audioCalls.filter(([s])=>s===10))).toEqual([]);
+ expect(await page.evaluate(()=>window.audioCalls.filter(([s,f])=>s===10&&f===3))).toEqual([]);
 });
 async function enter(page) {
- await page.goto('./');
+ await page.goto('./');await finishStartup(page);
  await expect(page.getByRole('button',{name:'New student',exact:true})).toBeVisible();
  await page.getByRole('button',{name:'Skip movie',exact:true}).click();
  for(const label of ['New student','Mario']) await page.getByRole('button',{name:label,exact:true}).click();
@@ -107,7 +108,7 @@ test('expiry is sampled then handed off on the next visit, input can intervene',
   const file=JSON.parse(localStorage.getItem(key));file.students[0].record[27]=0;file.students[0].record[28]=0;
   localStorage.setItem(key,JSON.stringify(file));
  },own);
- await page.reload();await page.getByRole('button',{name:'Skip movie',exact:true}).click();
+ await page.reload();await finishStartup(page);await page.getByRole('button',{name:'Skip movie',exact:true}).click();
  await page.getByRole('button',{name:'Continue',exact:true}).click();
  await page.clock.runFor(1000);
  await page.keyboard.press('z');
@@ -119,9 +120,9 @@ test('expiry is sampled then handed off on the next visit, input can intervene',
  await page.screenshot({path:info.outputPath('finish-handoff.png')});
 });
 test('real welcome movie emits a displayed frame before explicit skip',async({page},info)=>{
- await page.goto('./');
+ await page.goto('./');await finishStartup(page);
  await expect(page.locator('#media-status')).toContainText('playing');
- expect(await page.evaluate(()=>window.audioCalls[0])).toEqual([1,3]);
+ expect(await page.evaluate(()=>window.audioCalls.find(([s])=>s===1))).toEqual([1,3]);
  await page.screenshot({path:info.outputPath('welcome-movie.png')});
  await page.keyboard.press('Enter');
  await expect(page.locator('#media-status')).toContainText('skipped');
@@ -129,7 +130,7 @@ test('real welcome movie emits a displayed frame before explicit skip',async({pa
 });
 test('injected autoplay refusal is visible and does not complete welcome',async({page})=>{
  await page.addInitScript(()=>{const Native=AudioContext;window.AudioContext=class extends Native {get state(){return 'suspended';} async resume(){throw Error('Injected autoplay denial');}};});
- await page.goto('./');
+ await page.goto('./');await finishStartup(page);
  await expect(page.locator('#media-status')).toContainText('autoplay-blocked');
  await page.getByRole('button',{name:'New student',exact:true}).click();
  await expect(page.getByRole('status')).toContainText('Setup state 1');
@@ -145,13 +146,13 @@ test('explicit audio unlock restarts selection1 while retrying welcome speech',a
    async resume(){await super.resume();this.enabled=true;}
   };
  });
- await page.goto('./');await expect(page.locator('#media-status')).toContainText('autoplay-blocked');
+ await page.goto('./');await finishStartup(page);await expect(page.locator('#media-status')).toContainText('autoplay-blocked');
  await page.getByRole('button',{name:'Enable audio / Retry',exact:true}).click();
  await expect(page.locator('#media-status')).toContainText('playing');
- expect(await page.evaluate(()=>window.audioCalls)).toEqual([[1,3],[1,3]]);
+ expect(await page.evaluate(()=>window.audioCalls)).toEqual([[10,1],[1,3],[1,3]]);
 });
 test('late retired fetch cannot emit or revive an older clip (browser transport vector)',async({page})=>{
- await page.goto('./');await expect(page.getByRole('button',{name:'New student',exact:true})).toBeVisible();
+ await page.goto('./');await finishStartup(page);await expect(page.getByRole('button',{name:'New student',exact:true})).toBeVisible();
  const events=await page.evaluate(async()=>{
   const {createMedia}=await import('./media.js');
   const manifest=await (await fetch('./assets.json')).json();
@@ -167,7 +168,7 @@ test('late retired fetch cannot emit or revive an older clip (browser transport 
  expect(events).toEqual([{id:2,type:'autoplay-blocked'},{id:2,type:'skipped'}]);
 });
 test('browser renderer vectors restore each frame and distinguish index245 from10',async({page},info)=>{
- await page.goto('./');
+ await page.goto('./');await finishStartup(page);
  await expect(page.getByRole('button',{name:'New student',exact:true})).toBeVisible();
  const result=await page.evaluate(async()=>{
   const {loadAssets}=await import('./assets.js'),{createRenderer}=await import('./render.js');
@@ -191,7 +192,7 @@ test('browser renderer vectors restore each frame and distinguish index245 from1
  await page.screenshot({path:info.outputPath('movie-index-vectors.png')});
 });
 test('integrated original movie14 frame uses AVI RGB for opaque indices',async({page},info)=>{
- await page.goto('./');await page.getByRole('button',{name:'Skip movie',exact:true}).click();
+ await page.goto('./');await finishStartup(page);await page.getByRole('button',{name:'Skip movie',exact:true}).click();
  for(const label of ['New student','Mario']) await page.getByRole('button',{name:label,exact:true}).click();
  await page.keyboard.press('Enter');await page.getByRole('button',{name:'Choose lesson plan',exact:true}).click();
  await page.getByRole('button',{name:'Skip movie',exact:true}).click();
@@ -221,7 +222,7 @@ test('integrated original movie14 frame uses AVI RGB for opaque indices',async({
  await page.screenshot({path:info.outputPath('original-movie14-palette.png')});
 });
 test('original movie40 and51 frames retain DIB colors through their real key77 and10 pixels',async({page},info)=>{
- await page.goto('./');
+ await page.goto('./');await finishStartup(page);
  const proofs=await page.evaluate(async()=>{
   const {loadAssets}=await import('./assets.js'),{createRenderer}=await import('./render.js');
   const a=await loadAssets(new URL('./assets.json',location.href));const proofs=[];
@@ -252,7 +253,7 @@ test('original movie40 and51 frames retain DIB colors through their real key77 a
  await page.screenshot({path:info.outputPath('original-keyed-frames.png'),fullPage:true});
 });
 test('pinned setup list drives every one of the 24 RNG positions',async({page})=>{
- await page.goto('./');
+ await page.goto('./');await finishStartup(page);
  const proof=await page.evaluate(async()=>{
   const table=(await (await fetch('./presentation.json')).json()).setupMovies;
   const {setupMovie}=await import('./selection.js');
@@ -264,7 +265,7 @@ test('pinned setup list drives every one of the 24 RNG positions',async({page})=
 });
 test('failed movies visibly hold setup; a skip key cannot also select or type',async({page})=>{
  await page.route('**/stream-*-audio.wav',route=>route.fulfill({status:404,body:'missing'}));
- await page.goto('./');
+ await page.goto('./');await finishStartup(page);
  await expect(page.getByRole('button',{name:'New student',exact:true})).toBeVisible();
  await page.clock.runFor(20);
  // Wait for the fetch failure, no completion deadline is installed.
@@ -284,7 +285,7 @@ async function fastContinue(page,keyset=0,threshold=0,previous=0) {
   r[1]=keyset;r[27]=0;r[28]=0;r[35]=threshold;r[36]=0;r[11]=previous;r[12]=0;
   localStorage.setItem(own,JSON.stringify(file));
  },{own,keyset,threshold,previous});
- await page.reload();await page.getByRole('button',{name:'Skip movie',exact:true}).click();
+ await page.reload();await finishStartup(page);await page.getByRole('button',{name:'Skip movie',exact:true}).click();
  await page.getByRole('button',{name:'Continue',exact:true}).click();
 }
 for(const [label,threshold,previous,selectors,audio] of [
@@ -370,7 +371,7 @@ test('full-minute lifecycle and speed boundary: '+count+' correct keys',async({p
   r[27]=1;r[28]=0;r[35]=10;r[36]=0;
   localStorage.setItem(key,JSON.stringify(file));
  },own);
- await page.reload();await page.getByRole('button',{name:'Skip movie',exact:true}).click();
+ await page.reload();await finishStartup(page);await page.getByRole('button',{name:'Skip movie',exact:true}).click();
  await page.getByRole('button',{name:'Continue',exact:true}).click();
  for(let i=0;i<count;i++) {
   const key=(await page.locator('canvas').getAttribute('aria-label')).slice('Next key: '.length);

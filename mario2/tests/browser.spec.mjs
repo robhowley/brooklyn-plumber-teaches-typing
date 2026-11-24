@@ -1,3 +1,4 @@
+import {finishStartup} from './startup-entry.mjs';
 import {test,expect} from '@playwright/test';
 const own='mtt2-static-translation.students.v1';
 const chars=['Mario','Princess','Luigi'],keysets=['Home','Top','Bottom','Numbers','Symbols'];
@@ -17,7 +18,7 @@ test.beforeEach(async({page})=>{
  });
 });
 async function skip(page){await page.getByRole('button',{name:'Skip movie',exact:true}).click();}
-async function open(page){await page.goto('./');await expect(page.getByRole('button',{name:'New student',exact:true})).toBeVisible();await skip(page);}
+async function open(page){await page.goto('./');await finishStartup(page);await expect(page.getByRole('button',{name:'New student',exact:true})).toBeVisible();await skip(page);}
 async function name(page,c=0,value='ALICE'){
  await page.getByRole('button',{name:'New student',exact:true}).click();
  await page.getByRole('button',{name:chars[c],exact:true}).click();
@@ -42,7 +43,7 @@ for(let c=0;c<3;c++)for(let k=0;k<5;k++)test('setup '+chars[c]+' / '+keysets[k],
  };
  await expect(page.getByRole('status')).toContainText('State 21 | Typed: 0 | Errors: 0');
  await capture('setup-handoff');
- await page.reload();
+ await page.reload();await finishStartup(page);
  await expect(page.getByRole('status')).toHaveText('Setup state 1 | Name: ALICE | Character: '+c+' | Keyset: '+k);
  await capture('setup-reload');
  await skip(page);await page.getByRole('button',{name:'Continue',exact:true}).click();
@@ -65,11 +66,11 @@ test('indexed hotspot path, name editing, duplicates and blank name',async({page
  await page.keyboard.type('!');await expect(page.getByRole('status')).toContainText('ABCDEFG!');
  await page.keyboard.press('Backspace');
  await page.keyboard.press('Enter');await hit(4,5);await skip(page);await hit(5,14,3);await skip(page);await hit(14,17,2);
- await page.reload();await skip(page);await name(page,0,'ABCDEFG');await expect(page.locator('#duplicate')).toBeVisible();
+ await page.reload();await finishStartup(page);await skip(page);await name(page,0,'ABCDEFG');await expect(page.locator('#duplicate')).toBeVisible();
  await page.getByRole('button',{name:'Cancel',exact:true}).click();
  await expect(page.getByRole('status')).toContainText('Setup state 3');
  await page.keyboard.press('Enter');await page.getByRole('button',{name:'OK',exact:true}).click();await finish(page);
- await page.reload();await skip(page);await name(page,2,'');await expect(page.getByRole('status')).toContainText('NONAME');
+ await page.reload();await finishStartup(page);await skip(page);await name(page,2,'');await expect(page.getByRole('status')).toContainText('NONAME');
  await page.screenshot({path:info.outputPath('blank-name.png')});
 });
 for(const failure of ['getter','read','write','invalid'])test('visible persistence refusal: '+failure,async({page})=>{
