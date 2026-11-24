@@ -9,6 +9,7 @@ import shutil
 import tempfile
 
 import decode
+from presentation import decode_presentation
 from source import Source, check, expand_szdd, normalize_lesson
 from ne import resources, movie_member
 
@@ -72,7 +73,13 @@ def build(iso=None, pins_path=PINS):
             stage = Path(temp)
             decode.HERE = stage
             catalog = {'schema': 'mario2-assets.v1', 'assets': {}, 'lessons': {}}
-            allowed = {'assets.json', 'font.bin'}
+            runtime = ('index.html', 'main.js', 'styles.css', 'setup.js', 'storage.js', 'assets.js', 'render.js')
+            allowed = {'assets.json', 'font.bin', 'presentation.json', *runtime}
+            for name in runtime:
+                shutil.copyfile(ROOT/name, stage/name)
+            presentation_pins = json.loads((ROOT/'presentation-pins.json').read_text())
+            decode.save_json(stage/'presentation.json', decode_presentation(executable, presentation_pins))
+            catalog['presentation'] = {'url':'presentation.json'}
             font = pins['font']
             (stage/'font.bin').write_bytes(check(executable[font['file_offset']:font['file_offset']+font['size']], font, 'font'))
             catalog['font'] = {'url':'font.bin','glyphs':128,'width':8,'height':8,'sha256':font['sha256']}

@@ -1,5 +1,7 @@
 # Build, test and deploy
 
+Standalone Mario2: [build and test](../mario2/docs/DEVELOPMENT.md), [play](../mario2/docs/PLAYING.md).
+
 ## Requirements
 
 - Node.js 24+, Python 3.13 and LLVM `llvm-objdump` on PATH (Ubuntu: `sudo apt-get install llvm`).

@@ -1,0 +1,167 @@
+{
+  "schema": "mario2-presentation-pins.v1",
+  "executable_sha256": "39a4fb53384afbfec13063c2f4c67d51013b1f8ea494788c88f1ac6c12f47f22",
+  "member": "/MARIO/WINMARIO.EXE;1",
+  "slices": {
+    "nameKeyFlags": {
+      "file_offset": 141119,
+      "size": 256,
+      "sha256": "ef03ba64464890ccee91900315ab3f38d0340a429bcc542521379e08977d0012"
+    },
+    "fingerMap": {
+      "file_offset": 134080,
+      "size": 128,
+      "sha256": "abcf750563a7fc9ead977ddd032f34dfbbf418788faf6265c1507215cd445e4a"
+    },
+    "fingerOffsets": {
+      "file_offset": 134208,
+      "size": 40,
+      "sha256": "4fea23b7bed288d12eca6651082fb7354e97560e636c7adca725cf2521d2bfac"
+    },
+    "handIds": {
+      "file_offset": 133304,
+      "size": 26,
+      "sha256": "09aa251a97b35597cca725bc71f35d65db7336d6ada3e802659c91e652595896"
+    },
+    "reportPointers": {
+      "file_offset": 133128,
+      "size": 24,
+      "sha256": "cb212d99c3a64d97074c26163c49c9088a1e099175f31582eeb94725b9770c58"
+    },
+    "reportX": {
+      "file_offset": 133156,
+      "size": 12,
+      "sha256": "3704e3f896f6798d0f93483ca0baba7fb944bdc491bf98681e8e20f9f65d037c"
+    },
+    "reportY": {
+      "file_offset": 133168,
+      "size": 12,
+      "sha256": "d90059782f95f61c4be7475af9c47382ec120ce61d1facef0b883ea09a3000a8"
+    },
+    "reportStrings": {
+      "file_offset": 106486,
+      "size": 110,
+      "sha256": "397d88b823bad9c63ca6c142eae7b1e360d5fa861e847545918d34ba97f241a2"
+    },
+    "font": {
+      "file_offset": 129536,
+      "size": 1024,
+      "sha256": "d2853c38432296795ba56bb4dfe8f27e5024857c0f3f3681cafbe39d5088030a"
+    },
+    "overlayCode": {
+      "file_offset": 123796,
+      "size": 459,
+      "sha256": "da151e1db7c9e18d7b295c4c364d5a634155956c5d72bfb019bf0a9e80c331d1"
+    },
+    "handCode": {
+      "file_offset": 109992,
+      "size": 152,
+      "sha256": "d244d2e78c72b4f3c67fb1d72d155ced891366800d412e0764701ef3e43d54e9"
+    },
+    "glyphCode": {
+      "file_offset": 97880,
+      "size": 1960,
+      "sha256": "ed427382e41c6a9251d14f7771799bf5d01c3aa7c7333bd92c3fa348ec4ffadb"
+    },
+    "reportCode": {
+      "file_offset": 9926,
+      "size": 1170,
+      "sha256": "999e154ae3c8d4cb76ed4c19e538a4850aa8a44e6ad72aa12c016e0ad9f2d1cf"
+    }
+  },
+  "overlays": [
+    {
+      "state": 1,
+      "bitmap": 599,
+      "file_offset": 136106,
+      "size": 380,
+      "sha256": "45985b7b585d56990d16dbdded65308fd48ac2fd702a09074b8254535ec4a12b"
+    },
+    {
+      "state": 2,
+      "bitmap": 600,
+      "file_offset": 136538,
+      "size": 56,
+      "sha256": "52600d784442e698960731ed0f90c94aaf1ad445160b2a0d8d717e0491e2d7d9"
+    },
+    {
+      "state": 3,
+      "bitmap": 600,
+      "file_offset": 136538,
+      "size": 56,
+      "sha256": "52600d784442e698960731ed0f90c94aaf1ad445160b2a0d8d717e0491e2d7d9"
+    },
+    {
+      "state": 4,
+      "bitmap": 608,
+      "file_offset": 137780,
+      "size": 272,
+      "sha256": "79a8b4a5e39b59ecff984dc6a5d64f4328d592d9e07a36638f24612c394880b5"
+    },
+    {
+      "state": 5,
+      "bitmap": 601,
+      "file_offset": 136646,
+      "size": 218,
+      "sha256": "4fbfd5a59474ebae7b915fe42e56e4f3318eb685b6f6901606487acbd00077e6"
+    },
+    {
+      "state": 10,
+      "bitmap": 610,
+      "file_offset": 138698,
+      "size": 110,
+      "sha256": "147658e86c77472549ec0c9c446f26a1a8ba83828fecfa27a32ba8101da5e778"
+    },
+    {
+      "state": 14,
+      "bitmap": 609,
+      "file_offset": 138104,
+      "size": 380,
+      "sha256": "dea69857ac016f0a415c09340a58e1421cf1a3876001038af17b35d3f62039db"
+    }
+  ],
+  "hotspots": [
+    {
+      "state": 1,
+      "file_offset": 131214,
+      "size": 84,
+      "sha256": "8e895ac3943e432648a9f68a8834d0cebaf14541e492db539dfdf963666a36c6"
+    },
+    {
+      "state": 2,
+      "file_offset": 131514,
+      "size": 48,
+      "sha256": "28930e31636ca9d6fbdccb6e0725479d106dbb2bea81dbbeb4abc2c0ec70c20a"
+    },
+    {
+      "state": 3,
+      "file_offset": 131862,
+      "size": 24,
+      "sha256": "0e62af07872d084572f5da09ab97dab78e7c8a63d4b4a0aa4db26e1ce2d39aaf"
+    },
+    {
+      "state": 4,
+      "file_offset": 131310,
+      "size": 48,
+      "sha256": "062fb08a20138dba594b58105f0461520b036a7f272fd1ed4799f014a8ebbed2"
+    },
+    {
+      "state": 5,
+      "file_offset": 131370,
+      "size": 60,
+      "sha256": "f3cc289bf1c91c42ec55d6b4b6969bac5e7adece41ea101e589a5477b71fb65f"
+    },
+    {
+      "state": 10,
+      "file_offset": 131814,
+      "size": 36,
+      "sha256": "2fee46a8dee592f5dbfc712ae282b9992159928a42826b68d8b00907e61859c4"
+    },
+    {
+      "state": 14,
+      "file_offset": 131694,
+      "size": 72,
+      "sha256": "0d59a7f9b86db06dac876357b67b2b98d6cd18b723c6d066ab94ee3a2a02bd84"
+    }
+  ]
+}
