@@ -538,3 +538,54 @@ def icon(b,out,cursor=False):
     out.put('pixels.zlib',zlib.compress(raw));out.put('and-mask.zlib',zlib.compress(mask))
     return dict(status='decoded-xor-pixels-and-mask',image=h,pixel_format=mode,hotspot=hot,
                 xor_pixels_sha256=sha(raw),and_mask_sha256=sha(mask),**tail(b,end+len(maskraw)))
+
+
+def decode_outside(b, out, extension):
+    """Inert FULLSCREENANIM resources, WINMARIO FILE0x2b70..0x2ec4.
+
+    BAN is run metadata, not executable bytecode. Each nonempty plane is cleared;
+    ANI records advance only for nonempty BAN records (the caller owns that join).
+    """
+    frames, planes = [], bytearray()
+    if extension == 'BAN':
+        p = 0
+        while u16(b, p, '<') != 65535:
+            start = p
+            pos, count = struct.unpack('<HH', sl(b, p, 4))
+            empty = pos == count == 0
+            p += 4 if empty else 12
+            plane = bytearray(64000)
+            if not empty:
+                for _ in range(count):
+                    c = sl(b, p, 1)[0]; p += 1
+                    if c == 128:
+                        n = u16(b, p, '<'); p += 2; data = None
+                    elif c < 128:
+                        n = c+1; data = sl(b, p, n); p += n
+                    else:
+                        n = 257-c; v = sl(b, p, 1)[0]; p += 1
+                        data = bytes([v])*n if v else None
+                    need(pos+n <= 64000, 'BAN plane bounds')
+                    if data is not None:
+                        plane[pos:pos+n] = data
+                    pos += n
+            frames.append(dict(file_offset=start, empty=empty, offset=len(planes), size=0 if empty else 64000))
+            if not empty:
+                planes.extend(plane)
+        need(not any(b[p+2:]), 'BAN trailing data')
+    elif extension == 'ANI':
+        first = u32(b, 4, '<')
+        need(first % 8 == 0 and 8 <= first <= len(b), 'ANI table bounds')
+        for p in range(0, first, 8):
+            x, y, pointer = struct.unpack('<hhI', sl(b, p, 8))
+            if not pointer:
+                break
+            _, _, w, h = struct.unpack('<hhhh', sl(b, pointer, 8))
+            need(0 < w <= 320 and 0 < h <= 240, 'ANI dimensions')
+            pixels = sl(b, pointer+8, w*h)
+            frames.append(dict(file_offset=p, x=x, y=y, width=w, height=h, offset=len(planes), size=len(pixels)))
+            planes.extend(pixels)
+    else:
+        raise Unsupported('Outside animation extension')
+    out.put('planes.zlib', zlib.compress(planes))
+    return dict(status='decoded', format=extension, frames=frames)

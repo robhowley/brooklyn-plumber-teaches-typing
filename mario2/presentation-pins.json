@@ -3,8 +3,41 @@
   "executable_sha256": "39a4fb53384afbfec13063c2f4c67d51013b1f8ea494788c88f1ac6c12f47f22",
   "member": "/MARIO/WINMARIO.EXE;1",
   "slices": {
-    "studentListBehavior": {"file_offset": 15432, "size": 364, "sha256": "fdc9e74e0533090cb14fa036cce8047c0cc512c94b2d5a09c9bcc5f980f0bba0"},
-    "studentCompositionBehavior": {"file_offset": 17018, "size": 1148, "sha256": "98ce2de54982e0ac2b0131936454cadc8584b03a4d5d5689a24f347fb8636c6d"},
+    "outsideJumpY": {
+      "file_offset": 132764,
+      "size": 24,
+      "sha256": "cad78266f3bbae6788970e5bc870e06b71f545fa8c53fc0b985bac7816671857"
+    },
+    "outsideIdleLength": {
+      "file_offset": 133082,
+      "size": 6,
+      "sha256": "fa9748ee69faffc31fc09f7fe60a411e0afaff560a75faadd2b28d0b8c858b71"
+    },
+    "outsideIdleMario": {
+      "file_offset": 132792,
+      "size": 94,
+      "sha256": "6111a836bcc18305ba78b96f9b2a76a8993bedb824116c4f522ade2c017c5f85"
+    },
+    "outsideIdlePeach": {
+      "file_offset": 132980,
+      "size": 102,
+      "sha256": "a227c64fc66b4b8dac179f82bab3f2b5319bb4d66c6fbb41559f797d173c4597"
+    },
+    "outsideIdleLuigi": {
+      "file_offset": 132886,
+      "size": 94,
+      "sha256": "20524acf41c279b48c6e6b9c49d91f0ce66c49be9a41b61398df342dc4830dc5"
+    },
+    "studentListBehavior": {
+      "file_offset": 15432,
+      "size": 364,
+      "sha256": "fdc9e74e0533090cb14fa036cce8047c0cc512c94b2d5a09c9bcc5f980f0bba0"
+    },
+    "studentCompositionBehavior": {
+      "file_offset": 17018,
+      "size": 1148,
+      "sha256": "98ce2de54982e0ac2b0131936454cadc8584b03a4d5d5689a24f347fb8636c6d"
+    },
     "setupMovies": {
       "file_offset": 131142,
       "size": 24,
@@ -143,7 +176,12 @@
     }
   ],
   "hotspots": [
-    {"state": 6, "file_offset": 131778, "size": 24, "sha256": "ba691beb39696132ef17f816316160a269bc6a9b265163842d1eee27beea8350"},
+    {
+      "state": 6,
+      "file_offset": 131778,
+      "size": 24,
+      "sha256": "ba691beb39696132ef17f816316160a269bc6a9b265163842d1eee27beea8350"
+    },
     {
       "state": 1,
       "file_offset": 131214,
@@ -185,6 +223,278 @@
       "file_offset": 131694,
       "size": 72,
       "sha256": "0d59a7f9b86db06dac876357b67b2b98d6cd18b723c6d066ab94ee3a2a02bd84"
+    }
+  ],
+  "outsideSprites": [
+    {
+      "selector": 10,
+      "table": {
+        "file_offset": 133294,
+        "size": 10,
+        "sha256": "9ac36a590b0a3d41db05bd224cac17540354798c2caa4c19ba4c9bba5d18e7b9"
+      },
+      "target": {
+        "file_offset": 106698,
+        "size": 3,
+        "sha256": "bbfc2739d0832bdbabc15ab466dd18d3dd425e097f4ae0ec5926ebfbce71028e"
+      },
+      "switch_record": {
+        "file_offset": 106630,
+        "size": 2,
+        "sha256": "ee6ce9a392a31437ac7764e4323114eb8229976cf7f28295c58026f17c70fc6a"
+      }
+    },
+    {
+      "selector": 11,
+      "table": {
+        "file_offset": 133288,
+        "size": 6,
+        "sha256": "0aead4c7a426b0ae2b74834070d6add77b902880f6a88911cf4f6d43c375566b"
+      },
+      "target": {
+        "file_offset": 106704,
+        "size": 3,
+        "sha256": "4d48cd58d88c3eb6f77d90d59e0bbac15d61bfa8419e5ae77ddf84930d811930"
+      },
+      "switch_record": {
+        "file_offset": 106632,
+        "size": 2,
+        "sha256": "86a734820c8a43ba10862ba05a53bfbc830ec0dac92012d8a4e9d95b423151f3"
+      }
+    },
+    {
+      "selector": 12,
+      "table": {
+        "file_offset": 133256,
+        "size": 6,
+        "sha256": "4505278d99dbcebc10c4ae77879e319543b7f4f88796536b6331b9712f1475ba"
+      },
+      "target": {
+        "file_offset": 106710,
+        "size": 3,
+        "sha256": "c7d395d05a6bf247c75463b60543ef5a2b9bca170ba9a771a75ea818e769c75b"
+      },
+      "switch_record": {
+        "file_offset": 106634,
+        "size": 2,
+        "sha256": "469dc151da627b311c34da3d22a4f2def3647c60a8c89ca95882a9138317a7ab"
+      }
+    },
+    {
+      "selector": 13,
+      "table": {
+        "file_offset": 133262,
+        "size": 4,
+        "sha256": "21b304f14974be6861be04d6017c90da6ef698c390cd8060e5a2212b1e1e8848"
+      },
+      "target": {
+        "file_offset": 106716,
+        "size": 3,
+        "sha256": "44f28072ac780b6bc99720d15d66dcd93584e397aac8213cc89c38913af53716"
+      },
+      "switch_record": {
+        "file_offset": 106636,
+        "size": 2,
+        "sha256": "4716a60f627a2ad16ee9a7b6737cf1578469615c7071af568d7aace0be8343d0"
+      }
+    },
+    {
+      "selector": 14,
+      "table": {
+        "file_offset": 133266,
+        "size": 22,
+        "sha256": "12b91b6027675b14651038e0cfd53831729a5ee69ac88b92325070fa631e5fc8"
+      },
+      "target": {
+        "file_offset": 106722,
+        "size": 3,
+        "sha256": "1824c55cd5bc965a1540b5d5ce57fef7d633b0cf605dcc600fb654ba3168105a"
+      },
+      "switch_record": {
+        "file_offset": 106638,
+        "size": 2,
+        "sha256": "41fb5baa7cded6567f75a9f373d072c4a1841d86d38484a39f185541a16d22c8"
+      }
+    },
+    {
+      "selector": 15,
+      "table": {
+        "file_offset": 133304,
+        "size": 26,
+        "sha256": "09aa251a97b35597cca725bc71f35d65db7336d6ada3e802659c91e652595896"
+      },
+      "target": {
+        "file_offset": 106728,
+        "size": 3,
+        "sha256": "ef0a0214b8ea05993d42d47b907ab06fe6e038ed7b2bacd51008b8481c08a6e4"
+      },
+      "switch_record": {
+        "file_offset": 106640,
+        "size": 2,
+        "sha256": "0c3c6057c2c3fc2bfe639e4d0a7cc6713ddfebdc4b6ffba5b50b56b2b5ba304d"
+      }
+    },
+    {
+      "selector": 16,
+      "table": {
+        "file_offset": 133330,
+        "size": 26,
+        "sha256": "a6ec4a9c1b9882d112d9c0d523d220c7ec63299d0d5878af244add45cd0c65d0"
+      },
+      "target": {
+        "file_offset": 106734,
+        "size": 3,
+        "sha256": "76951e0debe456d222f78b9064522519cae8976620d87022d381983d9fea0a75"
+      },
+      "switch_record": {
+        "file_offset": 106642,
+        "size": 2,
+        "sha256": "e2e46d89f50df8312e3a03e7d37c786cbcbc3d7d5f27ce30573686191718c396"
+      }
+    },
+    {
+      "selector": 17,
+      "table": {
+        "file_offset": 133382,
+        "size": 26,
+        "sha256": "eb4ab4dcb897775e1d3ddb12f7fd5f67373186f4ddc891b14807c51b6357df9b"
+      },
+      "target": {
+        "file_offset": 106740,
+        "size": 3,
+        "sha256": "3e03c9162fba85e479dfdb1c8be4636e464e72a433b19e23b614dd786257359d"
+      },
+      "switch_record": {
+        "file_offset": 106644,
+        "size": 2,
+        "sha256": "95f66c3e3f52829941e6434d9c7d7899e9eac75be9c769ad6cf814a0cbd535af"
+      }
+    },
+    {
+      "selector": 18,
+      "table": {
+        "file_offset": 133356,
+        "size": 26,
+        "sha256": "3c9146b8f2cc56f84a07df1759e901b884ae2c773b482268931be5b2faec08a3"
+      },
+      "target": {
+        "file_offset": 106748,
+        "size": 3,
+        "sha256": "25b023d140cdf8d549ef33b8e2b1e95a44b51f44cde97d95b5deb8a6b2a37a9e"
+      },
+      "switch_record": {
+        "file_offset": 106646,
+        "size": 2,
+        "sha256": "5e1e6a052ff8ac8f252b08c862ca3ef4273268a50bb38a55472e1f60c4282971"
+      }
+    },
+    {
+      "selector": 19,
+      "table": {
+        "file_offset": 133408,
+        "size": 96,
+        "sha256": "21713db31b27ea1aba6081d55b50bc5e696aa0447f2ac960fb4a4e92e395b8aa"
+      },
+      "target": {
+        "file_offset": 106754,
+        "size": 3,
+        "sha256": "1d7a38e3895f8693d2f68301fd4ac98919b4dd2e23f2836ecac541d796fafe4e"
+      },
+      "switch_record": {
+        "file_offset": 106648,
+        "size": 2,
+        "sha256": "231294e87b0115001c4bd79df310f8b8c9e556c25fd7f82551d988e75ed15174"
+      }
+    },
+    {
+      "selector": 20,
+      "table": {
+        "file_offset": 133532,
+        "size": 104,
+        "sha256": "8b09af5b288b1567dc48eed00d91788bd348d1a21edd9dd758dba58883c9ae56"
+      },
+      "target": {
+        "file_offset": 106760,
+        "size": 3,
+        "sha256": "0eea3a499651a99adfbcd47a64850e4435ac811d4707283c81ad6105d6404dd6"
+      },
+      "switch_record": {
+        "file_offset": 106650,
+        "size": 2,
+        "sha256": "a4584b109a0070fa920f3a55574a307f09631ab756125fa6adb33a1d4b1745d4"
+      }
+    },
+    {
+      "selector": 21,
+      "table": {
+        "file_offset": 133664,
+        "size": 98,
+        "sha256": "e09e6a40305e24e9e934146167304792d3a5f98bd84d00d4ced494288b1bdb32"
+      },
+      "target": {
+        "file_offset": 106766,
+        "size": 3,
+        "sha256": "2f8eaaf6037fa5fcfdb53bc4c7e62c54804a12e0816a000605aa8bc6a0f41d8a"
+      },
+      "switch_record": {
+        "file_offset": 106652,
+        "size": 2,
+        "sha256": "221fd68a8396e66ec8ced7035cab1c18fda0be75eeb26667a989c980c8ec6b35"
+      }
+    },
+    {
+      "selector": 22,
+      "table": {
+        "file_offset": 133504,
+        "size": 28,
+        "sha256": "8c867de10bf739f17b2a03d2faf6096866821f9fb0277f0568bcb169da2a8225"
+      },
+      "target": {
+        "file_offset": 106772,
+        "size": 3,
+        "sha256": "2e114a9a6176821bdd67e475757e6373a46bc3510484e53025f4226b784538d1"
+      },
+      "switch_record": {
+        "file_offset": 106654,
+        "size": 2,
+        "sha256": "c0bc6e5ef03317028b86bfc69fe30cc0ac046ba922dfd493ee153b1371e40a71"
+      }
+    },
+    {
+      "selector": 23,
+      "table": {
+        "file_offset": 133636,
+        "size": 28,
+        "sha256": "5cb2ded5aeec5e002523890fb8192b398f325565364429c6d588f29080e30a66"
+      },
+      "target": {
+        "file_offset": 106778,
+        "size": 3,
+        "sha256": "183d1d1a26f1faddf6ef83a40d120aaa9772e23e896120c6700a3cd3d28af4d0"
+      },
+      "switch_record": {
+        "file_offset": 106656,
+        "size": 2,
+        "sha256": "684aabfe9e657d501ca2d0cf24edaa96128ca52912ac249d2d724f646077ce01"
+      }
+    },
+    {
+      "selector": 24,
+      "table": {
+        "file_offset": 133762,
+        "size": 28,
+        "sha256": "002f33679af16cd6acf1e6b17230b5422244ce6391f12a11ce2cb64832fbb5ea"
+      },
+      "target": {
+        "file_offset": 106784,
+        "size": 3,
+        "sha256": "48806bbd69c2fa59a813781e26de05d646f3ccbddbf4f84f2cfc567d092e8454"
+      },
+      "switch_record": {
+        "file_offset": 106658,
+        "size": 2,
+        "sha256": "5f3ff264061a0e921b183f7e25c5d2a4df1ce7bb810228e43d0f149df5a40d97"
+      }
     }
   ]
 }
