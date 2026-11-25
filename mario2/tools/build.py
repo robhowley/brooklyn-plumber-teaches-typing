@@ -28,6 +28,10 @@ def validate_pins(pins):
     outside_bitmaps = {103,107,112,119,120,*range(142,327),*range(328,334),*range(335,381),*range(382,387),616,619,620}
     expected |= {f'ne-2-{n}' for n in outside_bitmaps}
     expected |= {f'ne-FULLSCREENANIM-{c}OUT.{ext}' for c in 'MPL' for ext in ('ANI','BAN')}
+    expected |= {f'ne-2-{n}' for n in (121,617, *range(387,451))}
+    expected |= {f'ne-FULLSCREENANIM-{c}SWM.{ext}' for c in 'MPL' for ext in ('ANI','BAN')}
+    expected |= {'audio-3','audio-12','movies-50'}
+    expected |= {f'movies-{n}' for n in (4,5,6,43,44,45,49,71,72,73,74,75,76,78,79)}
     if len(assets) != len(expected) or {a['id'] for a in assets} != expected:
         raise ValueError('missing, duplicate or unexpected asset pin')
     if len(pins['lessons']) != 5 or {l['id'] for l in pins['lessons']} != {'lesson-'+p for p in 'htbns'}:
@@ -50,7 +54,7 @@ def convert(asset, data, out):
         result = fn(data, out)
         return {k:v for k,v in result.items() if k not in ('chunks',)}
     if asset.get('type') == 'FULLSCREENANIM':
-        return decode.decode_outside(data, out, asset['index'].rsplit('.', 1)[1])
+        return decode.decode_outside(data, out, asset['index'].rsplit('.', 1)[1], persistent='SWM.' in asset['index'])
     typ = asset['type']
     if typ == 2:
         return decode.decode_dib(data, out)
@@ -79,7 +83,7 @@ def build(iso=None, pins_path=PINS):
             stage = Path(temp)
             decode.HERE = stage
             catalog = {'schema': 'mario2-assets.v1', 'assets': {}, 'lessons': {}}
-            runtime = ('index.html', 'main.js', 'startup.js', 'styles.css', 'setup.js', 'storage.js', 'assets.js', 'render.js', 'typing.js', 'media.js', 'selection.js', 'report.js', 'outside.js', 'outside-render.js')
+            runtime = ('index.html', 'main.js', 'startup.js', 'styles.css', 'setup.js', 'storage.js', 'assets.js', 'render.js', 'typing.js', 'media.js', 'selection.js', 'report.js', 'outside.js', 'outside-render.js', 'water-render.js')
             allowed = {'assets.json', 'font.bin', 'presentation.json', *runtime}
             for name in runtime:
                 shutil.copyfile(ROOT/name, stage/name)

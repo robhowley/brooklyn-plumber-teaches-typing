@@ -24,10 +24,13 @@ export async function loadAssets(manifestURL) {
     const response = await get(entry.files['pixels.zlib']);
     const stream = response.body.pipeThrough(new DecompressionStream('deflate'));
     const pixels = new Uint8Array(await new Response(stream).arrayBuffer());
-    if (pixels.length !== width*height || palette.length !== 256) throw new Error(`Invalid bitmap ${id}`);
-    bitmaps.set(id, {width, height, pixels, palette:Uint8Array.from(palette.flat())});
+    if (pixels.length !== width*height || ![255,256].includes(palette.length)) throw new Error(`Invalid bitmap ${id}`);
+    // Bitmap121 declares255 entries. Preserve those RGB values and reserve the
+    // last slot for the existing supplied system endpoint, not invented game RGB.
+    const rgb=new Uint8Array(768);rgb.set(palette.flat());
+    bitmaps.set(id, {width, height, pixels, palette:rgb});
   }));
-  const outsideAnimations=new Map();
+  const outsideAnimations=new Map(), waterAnimations=new Map();
   await Promise.all(Object.entries(manifest.assets).filter(([key])=>key.startsWith('ne-FULLSCREENANIM-')).map(async ([key,entry])=>{
     const response=await get(entry.files['planes.zlib']);
     const planes=new Uint8Array(await new Response(response.body.pipeThrough(new DecompressionStream('deflate'))).arrayBuffer());
@@ -35,10 +38,14 @@ export async function loadAssets(manifestURL) {
       if(frame.offset+frame.size>planes.length) throw new Error('Invalid Outside animation plane');
       return {...frame,pixels:planes.slice(frame.offset,frame.offset+frame.size)};
     });
-    outsideAnimations.set(key.slice('ne-FULLSCREENANIM-'.length),frames);
+    const name=key.slice('ne-FULLSCREENANIM-'.length);
+    (name.includes('SWM.')?waterAnimations:outsideAnimations).set(name,frames);
   }));
   if(presentation.outsideAnimation) for(const c of 'MPL') for(const ext of ['ANI','BAN']) {
     if(!outsideAnimations.get(c+'OUT.'+ext)?.length) throw new Error('Missing Outside animation '+c+'OUT.'+ext);
   }
-  return {manifest, font, bitmaps, presentation, outsideAnimations};
+  if(presentation.waterAnimation) for(const c of 'MPL') for(const ext of ['ANI','BAN']) {
+    if(!waterAnimations.get(c+'SWM.'+ext)?.length) throw new Error('Missing Water animation '+c+'SWM.'+ext);
+  }
+  return {manifest, font, bitmaps, presentation, outsideAnimations, waterAnimations};
 }

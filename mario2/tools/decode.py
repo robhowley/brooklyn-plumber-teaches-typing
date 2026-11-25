@@ -540,13 +540,15 @@ def icon(b,out,cursor=False):
                 xor_pixels_sha256=sha(raw),and_mask_sha256=sha(mask),**tail(b,end+len(maskraw)))
 
 
-def decode_outside(b, out, extension):
+def decode_outside(b, out, extension, *, persistent=False):
     """Inert FULLSCREENANIM resources, WINMARIO FILE0x2b70..0x2ec4.
 
-    BAN is run metadata, not executable bytecode. Each nonempty plane is cleared;
-    ANI records advance only for nonempty BAN records (the caller owns that join).
+    BAN is run metadata, not executable bytecode. Outside clears each plane;
+    Water (persistent=True, FILE0x1cc90) clears once, retaining skips/zero repeats.
+    Literal zeros overwrite either plane. ANI advances only for nonempty BAN.
     """
     frames, planes = [], bytearray()
+    plane = bytearray(64000)
     if extension == 'BAN':
         p = 0
         while u16(b, p, '<') != 65535:
@@ -554,7 +556,8 @@ def decode_outside(b, out, extension):
             pos, count = struct.unpack('<HH', sl(b, p, 4))
             empty = pos == count == 0
             p += 4 if empty else 12
-            plane = bytearray(64000)
+            if not persistent:
+                plane = bytearray(64000)
             if not empty:
                 for _ in range(count):
                     c = sl(b, p, 1)[0]; p += 1
