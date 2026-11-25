@@ -39,9 +39,10 @@ export function createSetup({store, nameKeyFlags}) {
   let displayName = recordName(record), scratchWpm = word(record,11), loadedOrigin = false;
   let preview = null, scroll = 0, deletePrompt = null, listError = null;
   let duplicate = null;
-  let report = null, terminal = false;
+  let report = null, terminal = false, certificatePending = false;
   const snapshot = () => ({state, name: recordName(record), character: word(record, 3),
-    mode: word(record, 5), keyset: word(record, 1), durationSeconds: word(record, 27)*60,
+    mode: word(record, 5), keyset: word(record, 1), durationSeconds: (word(record, 21+2*word(record,5))*60)&65535,
+    ...(certificatePending?{certificatePending:true}:{}), ...(state===19?{pendingWater:true}:{}),
     duplicate: duplicate && {...duplicate}, storageError: storageError && {...storageError},
     ...(displayName!==recordName(record) ? {displayName} : {}),
     ...(state===6 ? {students:file?.students.slice(scroll,scroll+19).map(s=>s.name)??[], scroll,
@@ -88,11 +89,11 @@ export function createSetup({store, nameKeyFlags}) {
     reportContext: () => ({previous:word(record,11),threshold:word(record,29+2*word(record,5))}),
     beginTyping() {
       // FILE 0x19ab8: application+979 is the serialized ticking word.
-      if(state===21) setWord(record,17,1);
+      if(state===21 || state===18) setWord(record,17,1);
       return snapshot();
     },
     beginReport(value) {
-      if(state!==21 || report || terminal) return snapshot();
+      if(![18,21].includes(state) || report || terminal) return snapshot();
       // FILE 0x19c58..0x19ccb: mode cleanup clears ticking, then loaded
       // teardown writes BEFORE report history/progression. Refusal keeps live
       // memory separate from the last accepted browser envelope.
@@ -102,7 +103,7 @@ export function createSetup({store, nameKeyFlags}) {
       return snapshot();
     },
     finishReport() {
-      if(state!==10 || !report || report.applied) return snapshot();
+      if(state!==10 || !report || report.applied || certificatePending) return snapshot();
       report.applied=true;
       // FILE 0x2ac4..0x2b54: WPM always changes; the other history
       // fields and second writer require application+920, not record+17.
@@ -117,7 +118,10 @@ export function createSetup({store, nameKeyFlags}) {
         record[253+text.length]=0;
       }
       if(qualifies(report,word(record,29+2*word(record,5)),word(record,21+2*word(record,5)))) {
-        if(word(record,1)===4) terminal=true;
+        if(word(record,1)===4) {
+          if(word(record,5)===0) {certificatePending=true;report.applied=false;return snapshot();}
+          terminal=true;
+        }
         else setWord(record,1,word(record,1)+1);
       }
       // Certificate STOP is before the source modal returns, so its following
@@ -125,7 +129,21 @@ export function createSetup({store, nameKeyFlags}) {
       if(loadedOrigin && !terminal) persist(record.slice(),state);
       return snapshot();
     },
-    welcome() {if(!terminal) {state=1;setWord(record,17,0);} return snapshot();},
+    // FILE 0x1de47 returns before counter/mode and the second writer.
+    certificateReturn() {
+      if(!certificatePending) return snapshot();
+      certificatePending=false;report.applied=true;
+      setWord(record,37,word(record,37)+1);setWord(record,5,1);setWord(record,1,0);
+      if(loadedOrigin) persist(record.slice(),state);
+      return snapshot();
+    },
+    welcome() {
+      if(!terminal && !certificatePending) {
+        if([18,21].includes(state)) {setWord(record,17,0);if(loadedOrigin) persist(record.slice(),state);}
+        state=1;setWord(record,17,0);
+      }
+      return snapshot();
+    },
     dispatch(action) {
       if (!action || (action.type==='select' && action.argument===28 && !displayName)) return snapshot();
       if (state===6) {
@@ -162,13 +180,13 @@ export function createSetup({store, nameKeyFlags}) {
           else if(inside(266,410,391,468)) {
             if(preview) {
               const mode=word(preview,5);
-              if(mode!==3) listError=`Mode ${mode} requires scene state ${18+mode}, not yet available.`;
+              if(mode!==3 && mode!==0) listError=`Mode ${mode} requires scene state ${18+mode}, not yet available.`;
               else {
                 // Source apply copies292 bytes (FILE 0x3cec). Only the envelope
                 // selection write is a browser adaptation, transactional on refusal.
                 const next=structuredClone(file);next.currentName=recordName(preview);
                 const saved=store.save(next);storageError=saved.ok?null:saved.error;
-                if(saved.ok) {file=next;record=preview.slice();state=21;report=null;loadedOrigin=true;listError=null;}
+                if(saved.ok) {file=next;record=preview.slice();state=18+mode;report=null;loadedOrigin=true;listError=null;}
               }
             }
           } else if(inside(404,410,530,468) && preview)
@@ -205,20 +223,20 @@ export function createSetup({store, nameKeyFlags}) {
           state = 3;
         } else if (state === 3 && selector === 4) confirmName();
         else if (state === 4 && selector === 5) state = 5;
-        else if (state === 5 && selector === 14 && arg === 3) {
+        else if (state === 5 && selector === 14 && (arg === 3 || arg === 0)) {
           const candidate = record.slice();
-          setWord(candidate, 5, 3);
+          setWord(candidate, 5, arg);
           loadedOrigin=false;
           persist(candidate, 14);
         } else if (state === 14 && selector === 17 && Number.isInteger(arg) && arg >= 0 && arg <= 4) {
           const candidate = record.slice();
           setWord(candidate, 1, arg);
-          persist(candidate, 21);
-        } else if ((state === 1 || state === 10) && (selector === 38 || selector === 39) && recordName(record) && word(record, 5) === 3 && !terminal) {
+          persist(candidate, 18+word(candidate,5));
+        } else if ((state === 1 || state === 10) && (selector === 38 || selector === 39) && recordName(record) && [0,1,3].includes(word(record, 5)) && !terminal && !certificatePending) {
           // FILE 0x143b2..0x143e6: only selector38 sets application+920.
           if(selector===38) loadedOrigin=true;
           report=null;
-          state = 21; // Repeat and Continue use the actual in-memory record.
+          state = 18+word(record,5); // Repeat and Continue use the actual in-memory record.
         }
       }
       return snapshot();

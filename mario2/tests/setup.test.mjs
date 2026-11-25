@@ -173,7 +173,7 @@ test('unsupported modes, out-of-range selectors, invalid name table refuse witho
   select(h.setup, 2);
   for (const n of [-1, 3, 0.5, NaN]) assert.equal(select(h.setup, 3, n).state, 2);
   select(h.setup, 3, 0); h.setup.dispatch({type: 'confirm-name'}); select(h.setup, 5);
-  for (const n of [0, 1, 2, 4]) assert.equal(select(h.setup, 14, n).state, 5);
+  for (const n of [1, 2, 4]) assert.equal(select(h.setup, 14, n).state, 5);
   select(h.setup, 14, 3);
   for (const n of [-1, 5, 0.5]) assert.equal(select(h.setup, 17, n).state, 14);
 });
@@ -243,12 +243,34 @@ test('argument28 gate is independent of selector; unsupported scene load is expl
   const s=studentHarness(0).setup;
   assert.equal(s.accepts({type:'select',selector:39,argument:28}),false);
   assert.equal(s.accepts({type:'select',selector:28,argument:0}),true);
-  for(let mode=0;mode<3;mode++) {
+  for(let mode=1;mode<3;mode++) {
     const h=studentHarness(1),file=h.store.load().value;file.students[0].record[5]=mode;h.store.save(file);
     const setup=createSetup({store:h.store,nameKeyFlags:flags});select(setup,6);click(setup,370,80);click(setup,300,440);
     assert.equal(setup.snapshot().state,6);assert.match(setup.snapshot().listError,new RegExp('state '+(18+mode)));
     assert.equal(setup.studentContext().loadedOrigin,false);
   }
+});
+
+for(const character of [0,1,2]) for(const keyset of [0,1,2,3,4])
+test(`Beginning manual/load writers and modal ${character}/${keyset}`,()=>{
+  const h=harness();enterName(h.setup,'A',character);h.setup.dispatch({type:'confirm-name'});
+  select(h.setup,5);select(h.setup,14,0);const entry=select(h.setup,17,keyset);
+  assert.equal(entry.state,18);assert.equal(entry.durationSeconds,120);
+  const manual=h.store.load().value;
+  h.setup.beginTyping();h.setup.beginReport({speed:20,accuracy:100,elapsed:120,problem:'None!'});
+  h.setup.finishReport();
+  assert.deepEqual(h.store.load().value,manual);
+  if(keyset===4){assert.equal(h.setup.snapshot().certificatePending,true);h.setup.certificateReturn();h.setup.certificateReturn();assert.equal(h.setup.studentContext().record[37],1);assert.equal(select(h.setup,39).state,19);}
+  else assert.equal(select(h.setup,39).keyset,keyset+1);
+  const s=createSetup({store:h.store,nameKeyFlags:flags});select(s,6);click(s,370,80);click(s,300,440);
+  assert.equal(s.snapshot().state,18);assert.equal(s.studentContext().loadedOrigin,true);
+  s.beginTyping();s.beginReport({speed:20,accuracy:100,elapsed:120,problem:'None!'});
+  const teardown=h.store.load().value;assert.equal(teardown.students[0].record[17],0);assert.equal(teardown.students[0].record[11],0);
+  s.finishReport();
+  if(keyset===4){assert.deepEqual(h.store.load().value,teardown);s.finishReport();assert.equal(s.studentContext().record[37],0);s.certificateReturn();}
+  const done=h.store.load().value.students[0].record;
+  assert.equal(done[11],20);assert.equal(done[9],100);assert.equal(done[19],120);assert.equal(done[1],keyset===4?0:keyset+1);
+  assert.equal(done[5],keyset===4?1:0);assert.equal(done[37],keyset===4?1:0);
 });
 
 // Optional source test reads the original executable ONLY as inert bytes, using

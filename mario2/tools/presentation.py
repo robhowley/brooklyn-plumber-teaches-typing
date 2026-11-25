@@ -62,9 +62,25 @@ def decode_presentation(executable, pins):
     students = dict(characters=[student_string(pointers[i]) for i in (0,2,4)],
                     worlds=[student_string(pointers[i]) for i in (6,8,10)],
                     labels={hex(p):student_string(p) for p in (0xa9f0,0xa9fe,0xaa06,0xaa10,0xaa16,0xaa26,0xaa3c,0xaa4a,0xaa50,0xaa5e,0xaa64,0xaa6a,0xaa6e,0xaa74)})
+    # FILE0x1a086 switch and segment6 sprite lists. Hash each static join,
+    # derive bitmap IDs from inert words rather than shipping copied source tables.
+    outside_sprites = {}
+    for pin in pins['outsideSprites']:
+        read(pin['target']); read(pin['switch_record'])
+        ids = words(read(pin['table']))
+        if ids[0] != len(ids)-1 or any(i <= 0 for i in ids[1:]):
+            raise ValueError('Outside sprite list count')
+        outside_sprites[str(pin['selector'])] = ids[1:]
     offsets = words(slices['fingerOffsets'])
     return dict(schema='mario2-presentation.v1', setupMovies=list(slices['setupMovies']), nameKeyFlags=list(slices['nameKeyFlags']),
-                overlays=overlays, hotspots=hotspots, students=students,
+                overlays=overlays, hotspots=hotspots, students=students, outsideSprites=outside_sprites,
+                outsideRepeatSpeech=list(slices['outsideRepeatSpeech']),
+                # FILE 0x2069c, 0x207da; character order Mario/Peach/Luigi.
+                # Read only pinned inert words into ignored presentation.json.
+                outsideAnimation=dict(jumpY=words(slices['outsideJumpY']),
+                                      idleLength=words(slices['outsideIdleLength']),
+                                      idleThresholds=[words(slices[k]) for k in
+                                                      ('outsideIdleMario', 'outsideIdlePeach', 'outsideIdleLuigi')]),
                 fingers=dict(mapping=list(slices['fingerMap']), dx=offsets[:10], dy=offsets[10:],
                              bitmaps=words(slices['handIds'])[1:]),
                 report=dict(formats=formats, x=words(slices['reportX']), y=words(slices['reportY'])))

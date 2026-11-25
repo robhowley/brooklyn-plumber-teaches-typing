@@ -54,13 +54,39 @@ def rle_frame(commands, rows, coverage):
     raise AssertionError('missing RLE end marker')
 
 
+def msvc_frame(packet, rows, coverage):
+    # Independent bottom-up row storage, not production top-down blit indices.
+    width=len(rows[0]); blocks=width//4*len(rows)//4; block=cursor=0
+    while block<blocks:
+        low,high=packet[cursor:cursor+2];cursor+=2
+        if 0x84<=high<=0x87:
+            count=low+256*(high-0x84);assert count and block+count<=blocks
+            coverage.add('msvc-skip');block+=count;continue
+        if 0x80<=high<0x90:
+            colors=[low];coverage.add('msvc-solid')
+        else:
+            count=2 if high<0x80 else 8
+            colors=list(packet[cursor:cursor+count]);cursor+=count
+            assert len(colors)==count;coverage.add('msvc-'+str(count))
+        bx=4*(block%(width//4));by=4*(block//(width//4));flags=low+256*high
+        for bit in range(16):
+            x,y=bit%4,bit//4
+            quadrant=(y//2)*2+x//2
+            color=colors[0] if len(colors)==1 else colors[(2*quadrant if len(colors)==8 else 0)+(0 if flags&(1<<bit) else 1)]
+            rows[by+y][bx+x]=color
+        block+=1
+    assert packet[cursor:] in (b'',b'\0\0')
+    return b''.join(reversed(rows))
+
+
 def frames(data, coverage):
     assert data[:4] == b'RIFF' and data[8:12] == b'AVI '
     rows = None
     for tag, offset, payload in chunks(data, 12, 8+struct.unpack_from('<I', data, 4)[0]):
         if tag == b'strf' and len(payload) >= 40:
             size, width, height, planes, bits, codec = struct.unpack_from('<IiiHHI', payload)
-            assert (size, planes, bits, codec) == (40, 1, 8, 1)
+            assert (size, planes, bits) == (40, 1, 8)
+            assert codec in (1,int.from_bytes(b'MSVC','little'),int.from_bytes(b'msvc','little'),int.from_bytes(b'CRAM','little'))
             assert width > 0 and height > 0
             rows = [bytearray(width) for _ in range(height)]
             count = struct.unpack_from('<I',payload,32)[0] or 256
@@ -74,7 +100,7 @@ def frames(data, coverage):
         elif tag[2:] in (b'dc', b'db'):
             assert rows is not None
             if payload:
-                pixels = rle_frame(payload, rows, coverage)
+                pixels = rle_frame(payload, rows, coverage) if codec==1 else msvc_frame(payload,rows,coverage)
             else:
                 coverage.add('empty')
                 pixels = b''.join(reversed(rows))
