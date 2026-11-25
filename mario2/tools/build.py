@@ -22,8 +22,8 @@ def validate_pins(pins):
     assets = pins['assets']
     expected_ne = {(2, n) for n in (103, 485, 613, 619, 104, 105, 106, 107, 108, 119, 123, 112, 599, 600, 601, 608, 609, 610, *range(152, 164))}
     expected_ne |= {(5, 102), (5, 624), (5, 626), (12, 118), (1, 2), (14, 2), (3, 1)}
-    expected_movies = {0,1,14,15,16,17,18,19,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,51,52,53,54,56,57,58,59,60,61}
-    expected = {f'ne-{t}-{n}' for t,n in expected_ne} | {f'movies-{n}' for n in expected_movies} | {f'audio-{n}' for n in (1,5,7,8,10)}
+    expected_movies = {2,3,47,62,63,64,65,66,67,68,69,70,0,1,14,15,16,17,18,19,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,51,52,53,54,56,57,58,59,60,61}
+    expected = {f'ne-{t}-{n}' for t,n in expected_ne} | {f'movies-{n}' for n in expected_movies} | {f'audio-{n}' for n in (1,2,5,7,8,10,11,16,17)}
     # Selected Outside closure, unioned with (never replacing) all82 prior assets.
     outside_bitmaps = {103,107,112,119,120,*range(142,327),*range(328,334),*range(335,381),*range(382,387),616,619,620}
     expected |= {f'ne-2-{n}' for n in outside_bitmaps}
@@ -79,7 +79,7 @@ def build(iso=None, pins_path=PINS):
             stage = Path(temp)
             decode.HERE = stage
             catalog = {'schema': 'mario2-assets.v1', 'assets': {}, 'lessons': {}}
-            runtime = ('index.html', 'main.js', 'startup.js', 'styles.css', 'setup.js', 'storage.js', 'assets.js', 'render.js', 'typing.js', 'media.js', 'selection.js', 'report.js', 'outside-render.js')
+            runtime = ('index.html', 'main.js', 'startup.js', 'styles.css', 'setup.js', 'storage.js', 'assets.js', 'render.js', 'typing.js', 'media.js', 'selection.js', 'report.js', 'outside.js', 'outside-render.js')
             allowed = {'assets.json', 'font.bin', 'presentation.json', *runtime}
             for name in runtime:
                 shutil.copyfile(ROOT/name, stage/name)

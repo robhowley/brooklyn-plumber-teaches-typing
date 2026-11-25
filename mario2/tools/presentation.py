@@ -74,6 +74,7 @@ def decode_presentation(executable, pins):
     offsets = words(slices['fingerOffsets'])
     return dict(schema='mario2-presentation.v1', setupMovies=list(slices['setupMovies']), nameKeyFlags=list(slices['nameKeyFlags']),
                 overlays=overlays, hotspots=hotspots, students=students, outsideSprites=outside_sprites,
+                outsideRepeatSpeech=list(slices['outsideRepeatSpeech']),
                 # FILE 0x2069c, 0x207da; character order Mario/Peach/Luigi.
                 # Read only pinned inert words into ignored presentation.json.
                 outsideAnimation=dict(jumpY=words(slices['outsideJumpY']),

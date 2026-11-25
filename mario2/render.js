@@ -3,6 +3,8 @@
 // Student composition: FILE 0x3f5e..0x3f78 and 0x427a..0x46f6,
 // bitmap108 FILE 0x1a1400, same WINMARIO member hash as setup.js/pins.json.
 // Browser adaptation: deterministic supplied system palette endpoints and nearest-neighbor display.
+import {renderOutside,renderOutsideSpecial} from './outside-render.js';
+
 export function copyIndexed(target, source, x, y, sx=0, sy=0,
   width=source.width, height=source.height, transparent=[]) {
   for (let row=0; row<height; row++) for (let col=0; col<width; col++) {
@@ -36,7 +38,7 @@ export function createRenderer(canvas, assets, {paletteEndpoints}) {
   if (!context) throw new Error('Canvas unavailable');
   canvas.width=640; canvas.height=480;
   context.imageSmoothingEnabled=false;
-  let owner=null, backdrop, animated, overlay, rows, view, fadeAmount=0;
+  let owner=null, backdrop, animated, overlay, rows, view, fadeAmount=0, appliedOutside=null;
   const bitmap=id => {
     const value=assets.bitmaps.get(id);
     if (!value) throw new Error(`Missing bitmap ${id}`);
@@ -72,6 +74,11 @@ export function createRenderer(canvas, assets, {paletteEndpoints}) {
     if (next.state!==owner) throw new Error('Call enter before drawing a new state');
     view=next;
     const surface={...animated,pixels:animated.pixels.slice()};
+    if(owner===18 && view.outsideOperations && view.outsideOperations!==appliedOutside) {
+      appliedOutside=view.outsideOperations;
+      renderOutside({backing:backdrop.pixels,current:animated.pixels,operations:outsideOperations(view.outsideOperations,view)});
+      surface.pixels.set(animated.pixels);
+    }
     if (owner===3) text(surface,view.name,153,133,136,10);
     const displayName=view.displayName??view.name;
     if (owner===1 && displayName) text(surface,displayName,117+4*(8-displayName.length),74,130,67);
@@ -124,8 +131,32 @@ export function createRenderer(canvas, assets, {paletteEndpoints}) {
     }
     present(surface);
   }
+  // FILE 0x1a438..0x1a7db. Preserve callback order, bottom anchors and
+  // the last printable finger input carried by the scene, including controls.
+  function outsideOperations(effects,v) {
+    return effects.filter(e=>e.type==='draw').map(({operation:op})=>{
+      if(op.type==='restore') return {kind:'restore'};
+      if(op.type==='hud') return {kind:'hud',font:assets.font,elapsed:v.elapsed,typed:v.counters.total,wrong:v.counters.errors,wpm:v.counters.speed};
+      if(op.type==='glyph') return {kind:'glyph',font:assets.font,character:op.byte,x:op.x,y:op.y,color:op.color};
+      const o=op.object;
+      if(o.kind==='label') return {kind:'glyph',font:assets.font,character:o.byte,x:o.x,y:o.y,restore:false};
+      let image,x=o.x,y=o.y;
+      if(o.kind==='finger') {
+        if(o.expectedByte===undefined) return null;
+        const f=assets.presentation.fingers;let index=f.mapping[o.expectedByte];
+        if(index>=40) index-=40;
+        const right=index>=6;if(right) index--;
+        image=bitmap(f.bitmaps[index]);x=90+(right?90:0)+f.dx[index];y=190+f.dy[index];
+      } else {
+        image=bitmap(o.sprite.bitmap??assets.presentation.outsideSprites[o.sprite.selector][o.sprite.frame]);
+        if(o.anchor==='bottom') y-=image.height;
+      }
+      if(y<0||y>=240||x>=320) return null;
+      return {kind:'sprite',image,x,y};
+    }).filter(Boolean);
+  }
   function enter(next) {
-    const id=next.bitmap ?? ({1:(next.displayName??next.name) ? 619:103,2:104,3:105,4:106,5:107,6:108,14:119,21:123,10:112})[next.state];
+    const id=next.bitmap ?? ({1:(next.displayName??next.name) ? 619:103,2:104,3:105,4:106,5:107,6:108,14:119,18:120,19:616,21:123,10:112})[next.state];
     if (!id) throw new Error(`Unsupported render state ${next.state}`);
     owner=next.state; view=next; backdrop=bitmap(id);
     animated={...backdrop,pixels:backdrop.pixels.slice()};
@@ -150,6 +181,8 @@ export function createRenderer(canvas, assets, {paletteEndpoints}) {
     present(animated,frame);
   }
   return {enter,draw,visitOverlay,movieFrame,
+    outsideBackground(id){backdrop=bitmap(id);animated={...backdrop,pixels:backdrop.pixels.slice()};present(animated);},
+    outsideSpecial(ban,ani){renderOutsideSpecial({backing:backdrop.pixels,current:animated.pixels,ban,ani});present(animated);},
     fade(amount){fadeAmount=amount;draw();},
     restore(){fadeAmount=0;draw();}};
 }

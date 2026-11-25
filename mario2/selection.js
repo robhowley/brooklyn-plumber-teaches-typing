@@ -1,5 +1,6 @@
 // WINMARIO.EXE hash and FILE slices verified by presentation-pins.json.
-// FILE 0x19ef0..0x19ff5 (ordinary state21 comparison); no report progression.
+// FILE 0x19ef0..0x19ff5, called for ordinary report10 at
+// FILE 0x15ef7..0x15f1a, including Outside. No report progression.
 export function reportMovie({speed, threshold, previous}, random) {
   const draw=n=>random.next()%n;
   if ((speed & 65535)>=(threshold & 65535)) return draw(2)===1 ? 51:52;

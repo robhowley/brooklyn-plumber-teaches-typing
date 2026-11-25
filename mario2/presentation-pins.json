@@ -3,6 +3,11 @@
   "executable_sha256": "39a4fb53384afbfec13063c2f4c67d51013b1f8ea494788c88f1ac6c12f47f22",
   "member": "/MARIO/WINMARIO.EXE;1",
   "slices": {
+    "outsideRepeatSpeech": {
+      "file_offset": 131166,
+      "size": 7,
+      "sha256": "d58e70a0af87ae70ea543c5f514fb9760b77cf4a64af5850a4fc2a1a1350f53f"
+    },
     "outsideJumpY": {
       "file_offset": 132764,
       "size": 24,
