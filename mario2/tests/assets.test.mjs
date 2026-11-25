@@ -43,7 +43,8 @@ test('loads every built indexed bitmap and the original embedded font without su
     for (const [id,bitmap] of assets.bitmaps) {
       const entry=assets.manifest.assets[`ne-2-${id}`];
       assert.deepEqual(bitmap.pixels,new Uint8Array(inflateSync(readFileSync(new URL(entry.files['pixels.zlib'],base)))));
-      assert.deepEqual([...bitmap.palette],entry.data.image.palette.flat());
+      assert.deepEqual([...bitmap.palette.subarray(0,entry.data.image.palette.length*3)],entry.data.image.palette.flat());
+      assert.equal(bitmap.palette.length,768);
     }
   } finally {globalThis.fetch=original;}
 });

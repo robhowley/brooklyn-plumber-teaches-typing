@@ -28,7 +28,7 @@ class UnitTests(unittest.TestCase):
         # FILE offset, exact member and member SHA256 for all 38 original joins.
         identities = sorted((int(a['id'].split('-')[1]),a['join']['file_offset'],
                              a['source']['path'],a['source']['sha256'])
-                            for a in PINS['assets'] if a['kind']=='movies' and 14 <= int(a['id'].split('-')[1]) <= 61 and a['id']!='movies-47')
+                            for a in PINS['assets'] if a['kind']=='movies' and 14 <= int(a['id'].split('-')[1]) <= 61 and a['id'] not in {'movies-43','movies-44','movies-45','movies-47','movies-49','movies-50'})
         self.assertEqual(len(identities),38)
         self.assertEqual(hashlib.sha256(json.dumps(identities,separators=(',',':')).encode()).hexdigest(),
                          'c75aba1876fd78c86f52a2fa72cf73dd8921dac48f439bb5c443fe3907a9b031')
@@ -115,9 +115,9 @@ class DiscTests(unittest.TestCase):
                 build.build(iso)
                 self.assertEqual(first,snapshot())
                 manifest = json.loads((build.DIST/'assets.json').read_text())
-                self.assertEqual(len(manifest['assets']),337)
+                self.assertEqual(len(manifest['assets']),427)
                 self.assertEqual(len(manifest['lessons']),5)
-                runtime = {'index.html','main.js','startup.js','styles.css','setup.js','storage.js','assets.js','render.js','typing.js','media.js','selection.js','report.js','outside-render.js','outside.js'}
+                runtime = {'index.html','main.js','startup.js','styles.css','setup.js','storage.js','assets.js','render.js','typing.js','media.js','selection.js','report.js','outside-render.js','outside.js','water-render.js'}
                 for name in runtime:
                     self.assertEqual((build.DIST/name).read_bytes(), (build.ROOT/name).read_bytes())
                 presentation = json.loads((build.DIST/manifest['presentation']['url']).read_text())
@@ -137,6 +137,7 @@ class DiscTests(unittest.TestCase):
                     coverage = set()
                     movie_frames = 0
                     beginning_frames = 0
+                    water_frames = 0
                     for a in PINS['assets']:
                         entry = manifest['assets'][a['id']]
                         if a.get('type') == 2:
@@ -171,6 +172,7 @@ class DiscTests(unittest.TestCase):
                                 self.assertEqual(f['palette_rgb_hex'],palette,
                                                  f"{a['id']} {a['source']['sha256']} AVI FILE {offset:#x} palette")
                                 if selector in (2,3,47,62,63,64,65,66,67,68,69,70): beginning_frames += 1
+                                elif selector in (4,5,6,43,44,45,49,50,71,72,73,74,75,76,78,79): water_frames += 1
                                 else: movie_frames += 1
                             for name,path in entry['files'].items():
                                 if name.endswith('.wav'):
@@ -178,6 +180,7 @@ class DiscTests(unittest.TestCase):
                                         self.assertGreater(wav.getnframes(),0)
                     self.assertEqual(movie_frames,4541)
                     self.assertGreater(beginning_frames,0)
+                    self.assertGreater(water_frames,0)
                     self.assertTrue({'run','literal','eol','delta'} <= coverage, coverage)
                 finally:
                     source.close()

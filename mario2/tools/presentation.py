@@ -71,9 +71,24 @@ def decode_presentation(executable, pins):
         if ids[0] != len(ids)-1 or any(i <= 0 for i in ids[1:]):
             raise ValueError('Outside sprite list count')
         outside_sprites[str(pin['selector'])] = ids[1:]
+    water_sprites = {}
+    for pin in pins['waterSprites']:
+        read(pin['target']); read(pin['switch_record'])
+        ids = words(read(pin['table']))
+        if ids[0] != len(ids)-1 or any(i <= 0 for i in ids[1:]):
+            raise ValueError('Water sprite list count')
+        water_sprites[str(pin['selector'])] = ids[1:]
+    bubbles = words(slices['waterBubblePositions'])
+    water_animation = dict(swimSelectors=words(slices['waterSwimSelectors']),
+        bubblePositions=[bubbles[i:i+2] for i in range(0,20,2)],
+        pursuerY=[struct.unpack_from('<h', slices['waterPursuerY'], i*4)[0] for i in range(10)],
+        fingerMap=list(slices['waterFingerMap']), fingerX=words(slices['waterFingerX']),
+        fingerY=words(slices['waterFingerY']), frameLengths={k:len(v) for k,v in water_sprites.items()})
     offsets = words(slices['fingerOffsets'])
     return dict(schema='mario2-presentation.v1', setupMovies=list(slices['setupMovies']), nameKeyFlags=list(slices['nameKeyFlags']),
                 overlays=overlays, hotspots=hotspots, students=students, outsideSprites=outside_sprites,
+                waterSprites=water_sprites, waterAnimation=water_animation,
+                waterRepeatSpeech=list(slices['waterRepeatSpeech']),
                 outsideRepeatSpeech=list(slices['outsideRepeatSpeech']),
                 # FILE 0x2069c, 0x207da; character order Mario/Peach/Luigi.
                 # Read only pinned inert words into ignored presentation.json.

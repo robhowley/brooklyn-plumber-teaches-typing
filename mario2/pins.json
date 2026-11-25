@@ -11083,6 +11083,2905 @@
           "bytes": 32297
         }
       ]
+    },
+    {
+      "id": "ne-2-121",
+      "kind": "resource",
+      "source": {
+        "id": "rc533b425cf881fe627668eec",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:2:121",
+        "size": 78336,
+        "sha256": "f58ce4c06ce043042bf52a47ac290c5f0058c9cc6d90abe976b404a7fca19968",
+        "image_extents": [
+          {
+            "image_offset": 481039360,
+            "length": 78336
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "type": 2,
+      "index": 121,
+      "executable_file_offset": 4566016,
+      "expected_artifacts": [
+        {
+          "name": "pixels.zlib",
+          "sha256": "35b8a17578b01176c31a0f4877b9e242aaa6828579005eb911e96aa39cef5ff2",
+          "bytes": 13015
+        }
+      ]
+    },
+    {
+      "id": "ne-2-423",
+      "kind": "resource",
+      "source": {
+        "id": "r94011d9212f7d9a53baa0147",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:2:423",
+        "size": 1536,
+        "sha256": "8d7b124553fc010206e779294669434e7eec8671c45447a6b355d7ba133a9f5f",
+        "image_extents": [
+          {
+            "image_offset": 486720000,
+            "length": 1536
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "type": 2,
+      "index": 423,
+      "executable_file_offset": 10246656,
+      "expected_artifacts": [
+        {
+          "name": "pixels.zlib",
+          "sha256": "cc8706318a7503f3d88acdc85bab7f905c92f29e40654e3ffbb1179d63434e8c",
+          "bytes": 17
+        }
+      ]
+    },
+    {
+      "id": "ne-2-424",
+      "kind": "resource",
+      "source": {
+        "id": "r82f53ac72504ad82e3bf65e0",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:2:424",
+        "size": 1536,
+        "sha256": "484380b5cfcf2a5e06f6be51ea279b3672ea908729369e2f525d75afb3c66fd7",
+        "image_extents": [
+          {
+            "image_offset": 486721536,
+            "length": 1536
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "type": 2,
+      "index": 424,
+      "executable_file_offset": 10248192,
+      "expected_artifacts": [
+        {
+          "name": "pixels.zlib",
+          "sha256": "574613389bd2828da03e5c2f55ff701e0edca24481ae19d38a1e0ee5b9f05505",
+          "bytes": 22
+        }
+      ]
+    },
+    {
+      "id": "ne-2-425",
+      "kind": "resource",
+      "source": {
+        "id": "r317a1c4d9d726d47da3cb7dd",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:2:425",
+        "size": 1536,
+        "sha256": "466ed3fdc29dce342709b239285811bb59871a536bbc884426077ae62cea5f0a",
+        "image_extents": [
+          {
+            "image_offset": 486723072,
+            "length": 1536
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "type": 2,
+      "index": 425,
+      "executable_file_offset": 10249728,
+      "expected_artifacts": [
+        {
+          "name": "pixels.zlib",
+          "sha256": "8d454440347d8f251e150fd0e9cd908cbe17043e31b68b8357200146bbd94ad2",
+          "bytes": 22
+        }
+      ]
+    },
+    {
+      "id": "ne-2-426",
+      "kind": "resource",
+      "source": {
+        "id": "r8c9e21890f736d37d77623f2",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:2:426",
+        "size": 1536,
+        "sha256": "660bc2493339549da1e0742da693a6db5e00e0650271dcd89e0245ed07777ebc",
+        "image_extents": [
+          {
+            "image_offset": 486724608,
+            "length": 1536
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "type": 2,
+      "index": 426,
+      "executable_file_offset": 10251264,
+      "expected_artifacts": [
+        {
+          "name": "pixels.zlib",
+          "sha256": "4d70209ccc3998ec18118e4aff0ded6517d50bc53a03b8218bc995070d2fbb5a",
+          "bytes": 22
+        }
+      ]
+    },
+    {
+      "id": "ne-2-427",
+      "kind": "resource",
+      "source": {
+        "id": "r5ee73575dd09e84aa4a7d398",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:2:427",
+        "size": 1536,
+        "sha256": "10fefe349f0a599970d029ceaa3cf44790e7ad414b55c24020719661ac5fb23e",
+        "image_extents": [
+          {
+            "image_offset": 486726144,
+            "length": 1536
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "type": 2,
+      "index": 427,
+      "executable_file_offset": 10252800,
+      "expected_artifacts": [
+        {
+          "name": "pixels.zlib",
+          "sha256": "67632cc346a67f023cb0292a3ba86f472dd694fd493cad6318b29cac6bc45b9c",
+          "bytes": 22
+        }
+      ]
+    },
+    {
+      "id": "ne-2-428",
+      "kind": "resource",
+      "source": {
+        "id": "re6e498868dc91c244469a2fb",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:2:428",
+        "size": 1536,
+        "sha256": "06c721719537dd9877656359dad241bd1c5ce36467bd0fed1a054dbf6aea891b",
+        "image_extents": [
+          {
+            "image_offset": 486727680,
+            "length": 1536
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "type": 2,
+      "index": 428,
+      "executable_file_offset": 10254336,
+      "expected_artifacts": [
+        {
+          "name": "pixels.zlib",
+          "sha256": "545b419c0517b13e987ee52a24115ca187f6d2b06e6e5d8af04f230273690f79",
+          "bytes": 22
+        }
+      ]
+    },
+    {
+      "id": "ne-2-429",
+      "kind": "resource",
+      "source": {
+        "id": "rfd039d153e02fb2ec85a9e8b",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:2:429",
+        "size": 1536,
+        "sha256": "41a61fcc2aa697e7ab280123192727ab8da78ead97234f4e6a587f0c884640d6",
+        "image_extents": [
+          {
+            "image_offset": 486729216,
+            "length": 1536
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "type": 2,
+      "index": 429,
+      "executable_file_offset": 10255872,
+      "expected_artifacts": [
+        {
+          "name": "pixels.zlib",
+          "sha256": "35fc353a64a7f0cbad104a4f62265bb9ee1c610b306e394fe20b06201b366ce3",
+          "bytes": 24
+        }
+      ]
+    },
+    {
+      "id": "ne-2-430",
+      "kind": "resource",
+      "source": {
+        "id": "r2d3ee1b08b5176d6a89e9ccb",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:2:430",
+        "size": 1536,
+        "sha256": "98c80c7c418f62aeb1be67e0244001e9ea6d1c6edf08f583b0fa6dd982c4df68",
+        "image_extents": [
+          {
+            "image_offset": 486730752,
+            "length": 1536
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "type": 2,
+      "index": 430,
+      "executable_file_offset": 10257408,
+      "expected_artifacts": [
+        {
+          "name": "pixels.zlib",
+          "sha256": "fc9863ba5fe0c1f6f54b255704609106c82dab32ea40e5a2ee20cdcd1a07d83a",
+          "bytes": 24
+        }
+      ]
+    },
+    {
+      "id": "ne-2-431",
+      "kind": "resource",
+      "source": {
+        "id": "re4fdf1428b09565910390143",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:2:431",
+        "size": 1536,
+        "sha256": "cfd6b2162f447414db50cf9c476140647bd1b52311194e9632027e7aebc26837",
+        "image_extents": [
+          {
+            "image_offset": 486732288,
+            "length": 1536
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "type": 2,
+      "index": 431,
+      "executable_file_offset": 10258944,
+      "expected_artifacts": [
+        {
+          "name": "pixels.zlib",
+          "sha256": "fb100a41d92f35ca4364f87e53c404a7af54f38d577b0307cf9e64a11daf8645",
+          "bytes": 24
+        }
+      ]
+    },
+    {
+      "id": "ne-2-432",
+      "kind": "resource",
+      "source": {
+        "id": "rf47112d8f0b2c94e85b20679",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:2:432",
+        "size": 1536,
+        "sha256": "0eede8e1cfabd9f8e0c80d1d3f1f940fb4189fe17de7cf119459d1293864a05e",
+        "image_extents": [
+          {
+            "image_offset": 486733824,
+            "length": 1536
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "type": 2,
+      "index": 432,
+      "executable_file_offset": 10260480,
+      "expected_artifacts": [
+        {
+          "name": "pixels.zlib",
+          "sha256": "2dd891ddfd93f0a740464c29ee1c68b4c8dc8ee8243c3cfb7344057623ecc7a3",
+          "bytes": 20
+        }
+      ]
+    },
+    {
+      "id": "ne-2-433",
+      "kind": "resource",
+      "source": {
+        "id": "rb99a282bfdc3ebafa6253b3d",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:2:433",
+        "size": 1536,
+        "sha256": "aa8cf5ef2fd570cfd8886ca8672029f78f569eb2ffec6bb7a8bed65e4325f763",
+        "image_extents": [
+          {
+            "image_offset": 486735360,
+            "length": 1536
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "type": 2,
+      "index": 433,
+      "executable_file_offset": 10262016,
+      "expected_artifacts": [
+        {
+          "name": "pixels.zlib",
+          "sha256": "e5fc6d62f8c2c74f8825763764003752015f1a8d5648a3c1187ef032f21c7ac8",
+          "bytes": 15
+        }
+      ]
+    },
+    {
+      "id": "ne-2-434",
+      "kind": "resource",
+      "source": {
+        "id": "re568126edc8122fa7ecd18e6",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:2:434",
+        "size": 1536,
+        "sha256": "a346495156c4b3f0891ad27eaafb28e5bbfb7e337c12d0b3fb4167c6983735d2",
+        "image_extents": [
+          {
+            "image_offset": 486736896,
+            "length": 1536
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "type": 2,
+      "index": 434,
+      "executable_file_offset": 10263552,
+      "expected_artifacts": [
+        {
+          "name": "pixels.zlib",
+          "sha256": "fe30aa5cad06276e1f8655d1804780fc0c38e8b6ee397e78f8ed9856f9a6e2e2",
+          "bytes": 22
+        }
+      ]
+    },
+    {
+      "id": "ne-2-435",
+      "kind": "resource",
+      "source": {
+        "id": "r3beb3908a60100b00aaf78e1",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:2:435",
+        "size": 1536,
+        "sha256": "5a0f2fc14cfb6490feab9e2acbaac750eeacdaa29837410b715e35d0174d2c83",
+        "image_extents": [
+          {
+            "image_offset": 486738432,
+            "length": 1536
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "type": 2,
+      "index": 435,
+      "executable_file_offset": 10265088,
+      "expected_artifacts": [
+        {
+          "name": "pixels.zlib",
+          "sha256": "6fbfcb572f40c6af84e94246cfcfa3501a6577d4a06c10523fb06a0c325b533c",
+          "bytes": 25
+        }
+      ]
+    },
+    {
+      "id": "ne-2-436",
+      "kind": "resource",
+      "source": {
+        "id": "re59069d52eb6f7a38f9deaa4",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:2:436",
+        "size": 1536,
+        "sha256": "b8469b09837ae19e12f0fbe5521c92aace463e45d6b88535ea0b1e5c97c47a4e",
+        "image_extents": [
+          {
+            "image_offset": 486739968,
+            "length": 1536
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "type": 2,
+      "index": 436,
+      "executable_file_offset": 10266624,
+      "expected_artifacts": [
+        {
+          "name": "pixels.zlib",
+          "sha256": "70ea2fb59780528f53d0a7ee256478a7f765a3b3099d34a676f316881efbd6e1",
+          "bytes": 25
+        }
+      ]
+    },
+    {
+      "id": "ne-2-437",
+      "kind": "resource",
+      "source": {
+        "id": "ra4a0ea417f63830673a30301",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:2:437",
+        "size": 1536,
+        "sha256": "948429f175bd7aecd8d0a9c9265e66febd4f7a966e6e439380a16ea9141d9119",
+        "image_extents": [
+          {
+            "image_offset": 486741504,
+            "length": 1536
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "type": 2,
+      "index": 437,
+      "executable_file_offset": 10268160,
+      "expected_artifacts": [
+        {
+          "name": "pixels.zlib",
+          "sha256": "9cbe8420f667af80eb57ae6335880442676eb1816225a3eb40018159d02a4cf1",
+          "bytes": 25
+        }
+      ]
+    },
+    {
+      "id": "ne-2-438",
+      "kind": "resource",
+      "source": {
+        "id": "r307adb737e4c4734520fca59",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:2:438",
+        "size": 1536,
+        "sha256": "7876087e224790a78bca3c4e8d4eb9f8b9db0996483040e2afcae83510e6ad1f",
+        "image_extents": [
+          {
+            "image_offset": 486743040,
+            "length": 1536
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "type": 2,
+      "index": 438,
+      "executable_file_offset": 10269696,
+      "expected_artifacts": [
+        {
+          "name": "pixels.zlib",
+          "sha256": "f35eca520bdd1970c4204dca2c44a0e7b6eae13fb2f4d3252dddcddfc18dc525",
+          "bytes": 25
+        }
+      ]
+    },
+    {
+      "id": "ne-2-439",
+      "kind": "resource",
+      "source": {
+        "id": "r2e2fb962eb79c8d42f9e3aaa",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:2:439",
+        "size": 1536,
+        "sha256": "e81d478f0a16ad20d991d21e6559e49c002d9d8e088869e145c55ff46cf7d652",
+        "image_extents": [
+          {
+            "image_offset": 486744576,
+            "length": 1536
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "type": 2,
+      "index": 439,
+      "executable_file_offset": 10271232,
+      "expected_artifacts": [
+        {
+          "name": "pixels.zlib",
+          "sha256": "c3a27bef019993d58e98198c8af07d7dad8a9d6e604fbe93946b44c538d819f5",
+          "bytes": 25
+        }
+      ]
+    },
+    {
+      "id": "ne-2-440",
+      "kind": "resource",
+      "source": {
+        "id": "r47eba6efcbb6b7e3a38e7f28",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:2:440",
+        "size": 1536,
+        "sha256": "e992bca357cbf952e826b5d4b6085a7838820b0b3a8db561ece3662ae0f8d9e4",
+        "image_extents": [
+          {
+            "image_offset": 486746112,
+            "length": 1536
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "type": 2,
+      "index": 440,
+      "executable_file_offset": 10272768,
+      "expected_artifacts": [
+        {
+          "name": "pixels.zlib",
+          "sha256": "a56ce6bad8df73d60f84ee6efcddd3fd453095fe4b2437858b0045f9d99ea494",
+          "bytes": 25
+        }
+      ]
+    },
+    {
+      "id": "ne-2-441",
+      "kind": "resource",
+      "source": {
+        "id": "r45094db4ded638f8a6c6518c",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:2:441",
+        "size": 1536,
+        "sha256": "9cf045de14f7375403625fe6221455f5d3a4fec773f4ff24fbf2322455cf1bc4",
+        "image_extents": [
+          {
+            "image_offset": 486747648,
+            "length": 1536
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "type": 2,
+      "index": 441,
+      "executable_file_offset": 10274304,
+      "expected_artifacts": [
+        {
+          "name": "pixels.zlib",
+          "sha256": "f05f61f2ec57f24a9cbc55d5495e554359d5f31dc1794d93f042f25f87c8cdb6",
+          "bytes": 25
+        }
+      ]
+    },
+    {
+      "id": "ne-2-442",
+      "kind": "resource",
+      "source": {
+        "id": "rd7e978a2372c2bcd78562dc2",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:2:442",
+        "size": 1536,
+        "sha256": "852cd063c23c34e11dd73357e8397be60d5814361c4dc73482d009902a0fb01b",
+        "image_extents": [
+          {
+            "image_offset": 486749184,
+            "length": 1536
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "type": 2,
+      "index": 442,
+      "executable_file_offset": 10275840,
+      "expected_artifacts": [
+        {
+          "name": "pixels.zlib",
+          "sha256": "4cba243f2940969e127c66c54caa24f4a6073379a3ee820428dcd0cc472290aa",
+          "bytes": 25
+        }
+      ]
+    },
+    {
+      "id": "ne-2-387",
+      "kind": "resource",
+      "source": {
+        "id": "rf9cb2b264d81a2a30813fbd3",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:2:387",
+        "size": 3584,
+        "sha256": "52d13ee15f98373939b09ee5df681be64c1df62dca528540a6c672ea2036bbe4",
+        "image_extents": [
+          {
+            "image_offset": 486598144,
+            "length": 3584
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "type": 2,
+      "index": 387,
+      "executable_file_offset": 10124800,
+      "expected_artifacts": [
+        {
+          "name": "pixels.zlib",
+          "sha256": "d6f27bb38dd345ff0550bb811145effdbc7c3146605c740d251d48efaa9086bf",
+          "bytes": 457
+        }
+      ]
+    },
+    {
+      "id": "ne-2-408",
+      "kind": "resource",
+      "source": {
+        "id": "raab18ed9728dfe21ec2ccbb0",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:2:408",
+        "size": 4096,
+        "sha256": "af4a0fc3ee9a272eeb963a65a89722601e5035d39dafa28cdcae3ba70c7dd0ae",
+        "image_extents": [
+          {
+            "image_offset": 486668800,
+            "length": 4096
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "type": 2,
+      "index": 408,
+      "executable_file_offset": 10195456,
+      "expected_artifacts": [
+        {
+          "name": "pixels.zlib",
+          "sha256": "3c54f9987efd15caa80a5eb7381081ba357b7a29ee2a884e6744f2d4e73820a6",
+          "bytes": 471
+        }
+      ]
+    },
+    {
+      "id": "ne-2-405",
+      "kind": "resource",
+      "source": {
+        "id": "r556d3c9fbc252e7885dd5911",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:2:405",
+        "size": 3072,
+        "sha256": "b9aef00fe57fa7716c8ea0b410a2fcafd7875ce3f21d24840415e3ce028adea1",
+        "image_extents": [
+          {
+            "image_offset": 486659584,
+            "length": 3072
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "type": 2,
+      "index": 405,
+      "executable_file_offset": 10186240,
+      "expected_artifacts": [
+        {
+          "name": "pixels.zlib",
+          "sha256": "96529540408317e436aaef8c3838455fbaca1db32dd0a0f58d87cf61121916e7",
+          "bytes": 509
+        }
+      ]
+    },
+    {
+      "id": "ne-2-393",
+      "kind": "resource",
+      "source": {
+        "id": "r828e0f56cfa5a641f99dbacb",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:2:393",
+        "size": 3072,
+        "sha256": "1447dfb45697189913fd07e20f2138c4f62fff532202ae1f44b4ac65473d48c1",
+        "image_extents": [
+          {
+            "image_offset": 486619648,
+            "length": 3072
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "type": 2,
+      "index": 393,
+      "executable_file_offset": 10146304,
+      "expected_artifacts": [
+        {
+          "name": "pixels.zlib",
+          "sha256": "bc41f149d0b6e917696af2d34f5b094bbbcde53e6050d43b370018e1591579ef",
+          "bytes": 548
+        }
+      ]
+    },
+    {
+      "id": "ne-2-406",
+      "kind": "resource",
+      "source": {
+        "id": "r228340841d0b82f50d3d44d0",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:2:406",
+        "size": 3072,
+        "sha256": "501c33e4afdc5ac1b6938cc707f426ad48e3fb0ac22dfb5c7ac1fbfb5c40c995",
+        "image_extents": [
+          {
+            "image_offset": 486662656,
+            "length": 3072
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "type": 2,
+      "index": 406,
+      "executable_file_offset": 10189312,
+      "expected_artifacts": [
+        {
+          "name": "pixels.zlib",
+          "sha256": "52e3296bc569748ed59981f0401ca39444ed8ffa18f7156ecf7ada2d54eb9b40",
+          "bytes": 620
+        }
+      ]
+    },
+    {
+      "id": "ne-2-399",
+      "kind": "resource",
+      "source": {
+        "id": "r708a440a09ba6169fb1c6bd6",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:2:399",
+        "size": 3584,
+        "sha256": "b4615d91822bd881c390f8fbdb81ed99e1e7b4f95e7c3bbcfbe522a9bb00fdd1",
+        "image_extents": [
+          {
+            "image_offset": 486638080,
+            "length": 3584
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "type": 2,
+      "index": 399,
+      "executable_file_offset": 10164736,
+      "expected_artifacts": [
+        {
+          "name": "pixels.zlib",
+          "sha256": "69359e403534f027389a725e3806b73228dcc3b91d2a8c60242568860b6082f8",
+          "bytes": 463
+        }
+      ]
+    },
+    {
+      "id": "ne-2-407",
+      "kind": "resource",
+      "source": {
+        "id": "rc4d0fc821a330d8c997c831b",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:2:407",
+        "size": 3072,
+        "sha256": "5675669ba2ff04de3b8d5d2535953d1667f31833eb4082dcdb59ce99852da6ef",
+        "image_extents": [
+          {
+            "image_offset": 486665728,
+            "length": 3072
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "type": 2,
+      "index": 407,
+      "executable_file_offset": 10192384,
+      "expected_artifacts": [
+        {
+          "name": "pixels.zlib",
+          "sha256": "6485c1122d5ae3bdab937753dafd0f80e370e4572a035b04e1c800d2466bf9c8",
+          "bytes": 518
+        }
+      ]
+    },
+    {
+      "id": "ne-2-388",
+      "kind": "resource",
+      "source": {
+        "id": "rc355b116e2580a5bc09ab4d7",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:2:388",
+        "size": 3584,
+        "sha256": "6bdf038b048a962f70ed4b4d8b52821762882576ece52c8d9389adaa28882535",
+        "image_extents": [
+          {
+            "image_offset": 486601728,
+            "length": 3584
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "type": 2,
+      "index": 388,
+      "executable_file_offset": 10128384,
+      "expected_artifacts": [
+        {
+          "name": "pixels.zlib",
+          "sha256": "5625e57d88ea4fe262bb5bfbf5d6ee13c38f443c263c184cf14daedd5593b3e0",
+          "bytes": 494
+        }
+      ]
+    },
+    {
+      "id": "ne-2-389",
+      "kind": "resource",
+      "source": {
+        "id": "r75045644b7e0a4da62fb1e36",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:2:389",
+        "size": 3584,
+        "sha256": "032ef5cdce9c77d5c123831d587e78178feb56d203f554fe78086c0c6c923987",
+        "image_extents": [
+          {
+            "image_offset": 486605312,
+            "length": 3584
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "type": 2,
+      "index": 389,
+      "executable_file_offset": 10131968,
+      "expected_artifacts": [
+        {
+          "name": "pixels.zlib",
+          "sha256": "81cd61bb4cc32027eaa143256e9b5127af170804e062461183241ac2070b6b59",
+          "bytes": 525
+        }
+      ]
+    },
+    {
+      "id": "ne-2-390",
+      "kind": "resource",
+      "source": {
+        "id": "r8ffbc559dc324595d3fb0925",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:2:390",
+        "size": 3584,
+        "sha256": "6ac6562c1a1c3122c9db875b13b9ff3a4bd0439f0aae4a33c1474af3df62b25c",
+        "image_extents": [
+          {
+            "image_offset": 486608896,
+            "length": 3584
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "type": 2,
+      "index": 390,
+      "executable_file_offset": 10135552,
+      "expected_artifacts": [
+        {
+          "name": "pixels.zlib",
+          "sha256": "f8295aa83115e6a8d71c5f70892b87b7fd5eb3d4b647cfce3ffde169f740b3bb",
+          "bytes": 496
+        }
+      ]
+    },
+    {
+      "id": "ne-2-391",
+      "kind": "resource",
+      "source": {
+        "id": "ra3c7ec1955cb93b14344254d",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:2:391",
+        "size": 3584,
+        "sha256": "7a05e2da2df266362676a16ac335a2ec5c9345f9aacb2c80b0d6778034592c5c",
+        "image_extents": [
+          {
+            "image_offset": 486612480,
+            "length": 3584
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "type": 2,
+      "index": 391,
+      "executable_file_offset": 10139136,
+      "expected_artifacts": [
+        {
+          "name": "pixels.zlib",
+          "sha256": "8725fb2b70a5ef954a3c1f5cf700dbd308a865025f6994132e383ac2c0f52f78",
+          "bytes": 463
+        }
+      ]
+    },
+    {
+      "id": "ne-2-392",
+      "kind": "resource",
+      "source": {
+        "id": "r1016fdcf60c9ffb34e3eabce",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:2:392",
+        "size": 3584,
+        "sha256": "b988c999ef0371e5d06eceb6ac671faf1fde83c1a42a7cb5fd4f3ed4d4b29d29",
+        "image_extents": [
+          {
+            "image_offset": 486616064,
+            "length": 3584
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "type": 2,
+      "index": 392,
+      "executable_file_offset": 10142720,
+      "expected_artifacts": [
+        {
+          "name": "pixels.zlib",
+          "sha256": "6bd4cf80540f936276515ff316f6bec1a5e0c61869affc937a065a27e3460189",
+          "bytes": 503
+        }
+      ]
+    },
+    {
+      "id": "ne-2-394",
+      "kind": "resource",
+      "source": {
+        "id": "r2fc3c35bab03247ac542c695",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:2:394",
+        "size": 3072,
+        "sha256": "753f18b82b9d82fc7285e262ddc019939524699c5ee21766ebf640f75906d2c9",
+        "image_extents": [
+          {
+            "image_offset": 486622720,
+            "length": 3072
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "type": 2,
+      "index": 394,
+      "executable_file_offset": 10149376,
+      "expected_artifacts": [
+        {
+          "name": "pixels.zlib",
+          "sha256": "0c77391d1603c978c08d5cc3ae58586c16933bda91de0a8a04cad5b9a5ef2f08",
+          "bytes": 613
+        }
+      ]
+    },
+    {
+      "id": "ne-2-395",
+      "kind": "resource",
+      "source": {
+        "id": "rdf71edbdadbd190148d387b5",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:2:395",
+        "size": 3072,
+        "sha256": "5543c31c4d2ac7d518eb77aa09efe327c5c6495e3f51ccb897e522679cf96444",
+        "image_extents": [
+          {
+            "image_offset": 486625792,
+            "length": 3072
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "type": 2,
+      "index": 395,
+      "executable_file_offset": 10152448,
+      "expected_artifacts": [
+        {
+          "name": "pixels.zlib",
+          "sha256": "e96227dea50a7a2b13452eb426d1c2bfb1cb357194598cf4413e5aaa971e7ce4",
+          "bytes": 562
+        }
+      ]
+    },
+    {
+      "id": "ne-2-396",
+      "kind": "resource",
+      "source": {
+        "id": "reb29defb72afd4ad1b28ca10",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:2:396",
+        "size": 3072,
+        "sha256": "2d92322a95e4385895e2dbfdf8e31e6b0406b4634ef4b3312ed2876de09fd247",
+        "image_extents": [
+          {
+            "image_offset": 486628864,
+            "length": 3072
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "type": 2,
+      "index": 396,
+      "executable_file_offset": 10155520,
+      "expected_artifacts": [
+        {
+          "name": "pixels.zlib",
+          "sha256": "a0992298bf53a7e0e10fb6e6ca6350580414cf7df380ab1b1942ad854ded50bc",
+          "bytes": 482
+        }
+      ]
+    },
+    {
+      "id": "ne-2-397",
+      "kind": "resource",
+      "source": {
+        "id": "rdd34dd988becb76769413ca0",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:2:397",
+        "size": 3072,
+        "sha256": "dbde0cc7cc8d621296bf0818bedc41796734f1a516ca5e2582ae5885487f8b49",
+        "image_extents": [
+          {
+            "image_offset": 486631936,
+            "length": 3072
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "type": 2,
+      "index": 397,
+      "executable_file_offset": 10158592,
+      "expected_artifacts": [
+        {
+          "name": "pixels.zlib",
+          "sha256": "b385f1b2439573a3d35ad45b8384446fbaccbdadb28de5480780765cd1881c85",
+          "bytes": 518
+        }
+      ]
+    },
+    {
+      "id": "ne-2-398",
+      "kind": "resource",
+      "source": {
+        "id": "rfba423006500ecba3bb1a79d",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:2:398",
+        "size": 3072,
+        "sha256": "ded533c552f37da7aa92ddbb984d088ae6e1b11a562c1eb752b97d5fb2e6df89",
+        "image_extents": [
+          {
+            "image_offset": 486635008,
+            "length": 3072
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "type": 2,
+      "index": 398,
+      "executable_file_offset": 10161664,
+      "expected_artifacts": [
+        {
+          "name": "pixels.zlib",
+          "sha256": "00e2c213885ad77bc0ad4243d6c4b968faaacf88822ba0ff85a181bf8866d5fe",
+          "bytes": 455
+        }
+      ]
+    },
+    {
+      "id": "ne-2-400",
+      "kind": "resource",
+      "source": {
+        "id": "r5b3eabae86c12450b65906b7",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:2:400",
+        "size": 3584,
+        "sha256": "003c9730f01d73da9409cc54d7c1a395ddd8773fcb74a9c301fc37279842e634",
+        "image_extents": [
+          {
+            "image_offset": 486641664,
+            "length": 3584
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "type": 2,
+      "index": 400,
+      "executable_file_offset": 10168320,
+      "expected_artifacts": [
+        {
+          "name": "pixels.zlib",
+          "sha256": "ed777495d8740bce3e8f64cdeca5fee098d8981b6784c290fc5c236c7310fdf6",
+          "bytes": 506
+        }
+      ]
+    },
+    {
+      "id": "ne-2-401",
+      "kind": "resource",
+      "source": {
+        "id": "rad84f1782d6048ce6599a54e",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:2:401",
+        "size": 3584,
+        "sha256": "04e11f281a149bac1b402fb4af9f18c8b0fd97bc042f9af5a7a7e01a39ab9452",
+        "image_extents": [
+          {
+            "image_offset": 486645248,
+            "length": 3584
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "type": 2,
+      "index": 401,
+      "executable_file_offset": 10171904,
+      "expected_artifacts": [
+        {
+          "name": "pixels.zlib",
+          "sha256": "bba42f4aa47ad01caf61579eb221431c2fd445f4b4a35757e00df26d1e352f2d",
+          "bytes": 541
+        }
+      ]
+    },
+    {
+      "id": "ne-2-402",
+      "kind": "resource",
+      "source": {
+        "id": "r8627c70051881ca4412a9667",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:2:402",
+        "size": 3584,
+        "sha256": "e6d83fb568fb0af613b22d7af20d844d0ea10a1da2f152cc9f9025509a8f05fe",
+        "image_extents": [
+          {
+            "image_offset": 486648832,
+            "length": 3584
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "type": 2,
+      "index": 402,
+      "executable_file_offset": 10175488,
+      "expected_artifacts": [
+        {
+          "name": "pixels.zlib",
+          "sha256": "7685db3cf99e9d454f110e91534929d48b9363624a9eed436f2b964bed9d9402",
+          "bytes": 499
+        }
+      ]
+    },
+    {
+      "id": "ne-2-403",
+      "kind": "resource",
+      "source": {
+        "id": "raee1445f54f4283911fdecae",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:2:403",
+        "size": 3584,
+        "sha256": "593a9901222886b6a5b016482833486af390dde4722632cb57571dedf28a3556",
+        "image_extents": [
+          {
+            "image_offset": 486652416,
+            "length": 3584
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "type": 2,
+      "index": 403,
+      "executable_file_offset": 10179072,
+      "expected_artifacts": [
+        {
+          "name": "pixels.zlib",
+          "sha256": "e930956f1eeca9fd8c2d08b9aa71efa41b313f0d826cdf686b86e862d9f525b3",
+          "bytes": 454
+        }
+      ]
+    },
+    {
+      "id": "ne-2-404",
+      "kind": "resource",
+      "source": {
+        "id": "r487ee866332b805b50b673da",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:2:404",
+        "size": 3584,
+        "sha256": "513e4d2db313bac96414cca040f750f3bb383e8262038c9c92069af7c308f57d",
+        "image_extents": [
+          {
+            "image_offset": 486656000,
+            "length": 3584
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "type": 2,
+      "index": 404,
+      "executable_file_offset": 10182656,
+      "expected_artifacts": [
+        {
+          "name": "pixels.zlib",
+          "sha256": "7c0916a63b8a5e781e5be514e5600d83bf4a002c9aa087b08b66925bff8afa72",
+          "bytes": 529
+        }
+      ]
+    },
+    {
+      "id": "ne-2-409",
+      "kind": "resource",
+      "source": {
+        "id": "r84b9d3d3d372f5dbcbfbb6eb",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:2:409",
+        "size": 4096,
+        "sha256": "1480a87fd58b1000f0651f68e6b4b768f6487b20d07b02008d59a9d576da07d8",
+        "image_extents": [
+          {
+            "image_offset": 486672896,
+            "length": 4096
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "type": 2,
+      "index": 409,
+      "executable_file_offset": 10199552,
+      "expected_artifacts": [
+        {
+          "name": "pixels.zlib",
+          "sha256": "811d46bec83fd405342b50359d792721f44746e9d2b0c9ce170760f3e2ed18e2",
+          "bytes": 512
+        }
+      ]
+    },
+    {
+      "id": "ne-2-410",
+      "kind": "resource",
+      "source": {
+        "id": "rbd3e3575b3c711026a5a36b8",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:2:410",
+        "size": 4096,
+        "sha256": "5c08e7007e5fea0295dc937d884dde04ae4832e58838a2ad0cf51a68547f1305",
+        "image_extents": [
+          {
+            "image_offset": 486676992,
+            "length": 4096
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "type": 2,
+      "index": 410,
+      "executable_file_offset": 10203648,
+      "expected_artifacts": [
+        {
+          "name": "pixels.zlib",
+          "sha256": "6b50a786d03c227913627598b9084913336f3cdce48f19ff813c2f7788bdb283",
+          "bytes": 486
+        }
+      ]
+    },
+    {
+      "id": "ne-2-411",
+      "kind": "resource",
+      "source": {
+        "id": "r364cb9d9be8f61bd06336b21",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:2:411",
+        "size": 4096,
+        "sha256": "c28731c478a6c80541ee2ca6a7ed29d7d630a52ed19517dbe2cff4461aeb57c5",
+        "image_extents": [
+          {
+            "image_offset": 486681088,
+            "length": 4096
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "type": 2,
+      "index": 411,
+      "executable_file_offset": 10207744,
+      "expected_artifacts": [
+        {
+          "name": "pixels.zlib",
+          "sha256": "4e04d4ef81c97a5b1ce3c1ca2b3abbd82285ede6b73d48ad8febba46a197eaa7",
+          "bytes": 532
+        }
+      ]
+    },
+    {
+      "id": "ne-2-412",
+      "kind": "resource",
+      "source": {
+        "id": "re413dc38ef0d560d5558d9a1",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:2:412",
+        "size": 4096,
+        "sha256": "4428cf47f0adbf6f4369af47376d4e3c129abe02662cbe09bf689d0f495bafb1",
+        "image_extents": [
+          {
+            "image_offset": 486685184,
+            "length": 4096
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "type": 2,
+      "index": 412,
+      "executable_file_offset": 10211840,
+      "expected_artifacts": [
+        {
+          "name": "pixels.zlib",
+          "sha256": "31dbe16692c1a2301e4d345a84e17eac84800eb773021baf7e06fb4421d42a7f",
+          "bytes": 467
+        }
+      ]
+    },
+    {
+      "id": "ne-2-413",
+      "kind": "resource",
+      "source": {
+        "id": "rbfc202279461ff86de68b126",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:2:413",
+        "size": 3072,
+        "sha256": "80aa8041ca73e25db23ddf4a37cb05a6d72b0e893fddbd0508698561528f6dd8",
+        "image_extents": [
+          {
+            "image_offset": 486689280,
+            "length": 3072
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "type": 2,
+      "index": 413,
+      "executable_file_offset": 10215936,
+      "expected_artifacts": [
+        {
+          "name": "pixels.zlib",
+          "sha256": "5fb3d6c154924e561b936fee9933dc37f066b3e6169d8867def0d1a4c2a19ff5",
+          "bytes": 269
+        }
+      ]
+    },
+    {
+      "id": "ne-2-414",
+      "kind": "resource",
+      "source": {
+        "id": "r1afbd316d972036585fc3a6a",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:2:414",
+        "size": 3072,
+        "sha256": "71189a8ba49aa566f82297df5b087fe831acad8d6983a1847440baa87d53b243",
+        "image_extents": [
+          {
+            "image_offset": 486692352,
+            "length": 3072
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "type": 2,
+      "index": 414,
+      "executable_file_offset": 10219008,
+      "expected_artifacts": [
+        {
+          "name": "pixels.zlib",
+          "sha256": "6b22c41f726ab7d84ceba9c5f912df6a570951f19ca496154c76847e4cf38723",
+          "bytes": 285
+        }
+      ]
+    },
+    {
+      "id": "ne-2-415",
+      "kind": "resource",
+      "source": {
+        "id": "ra7d24f1d3aa8ff21f2164a42",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:2:415",
+        "size": 3072,
+        "sha256": "6e2c283f621ef22f7f0ca3cbf210d41a8dc102c95f99cd7bc13dc2ad1bd65ede",
+        "image_extents": [
+          {
+            "image_offset": 486695424,
+            "length": 3072
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "type": 2,
+      "index": 415,
+      "executable_file_offset": 10222080,
+      "expected_artifacts": [
+        {
+          "name": "pixels.zlib",
+          "sha256": "ee18a5edeaef9e4c81423a91b357c0223dfe905d83ba426121f9595a40219388",
+          "bytes": 278
+        }
+      ]
+    },
+    {
+      "id": "ne-2-416",
+      "kind": "resource",
+      "source": {
+        "id": "rc4daef20e6f5e34842d180ea",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:2:416",
+        "size": 3072,
+        "sha256": "0e152e7f9f8578696392c46190a01a5babe0e5fc714fd2a75076d21f5e6c21db",
+        "image_extents": [
+          {
+            "image_offset": 486698496,
+            "length": 3072
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "type": 2,
+      "index": 416,
+      "executable_file_offset": 10225152,
+      "expected_artifacts": [
+        {
+          "name": "pixels.zlib",
+          "sha256": "02cb858504fa595476771c1341f37c538b845865b30d21b67445ba393f47aee2",
+          "bytes": 272
+        }
+      ]
+    },
+    {
+      "id": "ne-2-417",
+      "kind": "resource",
+      "source": {
+        "id": "ra0b3a3fa01f7aa8beab336d6",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:2:417",
+        "size": 3072,
+        "sha256": "6a7f008d5c3be4bfa4a6036fb0f494cedfcaa96bfc00e81a325dd48360254f51",
+        "image_extents": [
+          {
+            "image_offset": 486701568,
+            "length": 3072
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "type": 2,
+      "index": 417,
+      "executable_file_offset": 10228224,
+      "expected_artifacts": [
+        {
+          "name": "pixels.zlib",
+          "sha256": "835346ca198c19e15ab1dbd1a8a92407de80631c1f247095fb5cadf2045ebc6f",
+          "bytes": 272
+        }
+      ]
+    },
+    {
+      "id": "ne-2-418",
+      "kind": "resource",
+      "source": {
+        "id": "ra525d68b2426fc2f71957b81",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:2:418",
+        "size": 3072,
+        "sha256": "97cda148b887204166f2e7ba182df527a58d5d06461e5a0b76d9a9cca861405a",
+        "image_extents": [
+          {
+            "image_offset": 486704640,
+            "length": 3072
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "type": 2,
+      "index": 418,
+      "executable_file_offset": 10231296,
+      "expected_artifacts": [
+        {
+          "name": "pixels.zlib",
+          "sha256": "a4ec9c26b3081fcaf4e994093342a372ed8d2ad520cb12487cb9a04a9c7936a4",
+          "bytes": 271
+        }
+      ]
+    },
+    {
+      "id": "ne-2-419",
+      "kind": "resource",
+      "source": {
+        "id": "rab65c48746e632b38e0a560f",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:2:419",
+        "size": 3072,
+        "sha256": "2c168f173d416388200839494d36703a4abb8c8c7b21555ea873cb587266e0a2",
+        "image_extents": [
+          {
+            "image_offset": 486707712,
+            "length": 3072
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "type": 2,
+      "index": 419,
+      "executable_file_offset": 10234368,
+      "expected_artifacts": [
+        {
+          "name": "pixels.zlib",
+          "sha256": "5e6f2504280d150389857379a69813206a6b024c8cc7870f4c9b07951bdf7491",
+          "bytes": 286
+        }
+      ]
+    },
+    {
+      "id": "ne-2-420",
+      "kind": "resource",
+      "source": {
+        "id": "r39338233e55c5bf7bb7a6c96",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:2:420",
+        "size": 3072,
+        "sha256": "0c5315aa87cd79f0650d3596e3c2d33ec01baa361121572586dea8faf8357c13",
+        "image_extents": [
+          {
+            "image_offset": 486710784,
+            "length": 3072
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "type": 2,
+      "index": 420,
+      "executable_file_offset": 10237440,
+      "expected_artifacts": [
+        {
+          "name": "pixels.zlib",
+          "sha256": "d3fe0f4c354814d6c1df62921df71860fe58a1572f49dda8c3276c27f811e712",
+          "bytes": 277
+        }
+      ]
+    },
+    {
+      "id": "ne-2-421",
+      "kind": "resource",
+      "source": {
+        "id": "r318ce8b092412a5fdfb55718",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:2:421",
+        "size": 3072,
+        "sha256": "71189a8ba49aa566f82297df5b087fe831acad8d6983a1847440baa87d53b243",
+        "image_extents": [
+          {
+            "image_offset": 486713856,
+            "length": 3072
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "type": 2,
+      "index": 421,
+      "executable_file_offset": 10240512,
+      "expected_artifacts": [
+        {
+          "name": "pixels.zlib",
+          "sha256": "6b22c41f726ab7d84ceba9c5f912df6a570951f19ca496154c76847e4cf38723",
+          "bytes": 285
+        }
+      ]
+    },
+    {
+      "id": "ne-2-422",
+      "kind": "resource",
+      "source": {
+        "id": "r3cfd1141c56f550e6dd5ac28",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:2:422",
+        "size": 3072,
+        "sha256": "2c168f173d416388200839494d36703a4abb8c8c7b21555ea873cb587266e0a2",
+        "image_extents": [
+          {
+            "image_offset": 486716928,
+            "length": 3072
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "type": 2,
+      "index": 422,
+      "executable_file_offset": 10243584,
+      "expected_artifacts": [
+        {
+          "name": "pixels.zlib",
+          "sha256": "5e6f2504280d150389857379a69813206a6b024c8cc7870f4c9b07951bdf7491",
+          "bytes": 286
+        }
+      ]
+    },
+    {
+      "id": "ne-2-443",
+      "kind": "resource",
+      "source": {
+        "id": "r7962cf6a4cc8ed4dcb3646ef",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:2:443",
+        "size": 1536,
+        "sha256": "ed5fb297948c1a9a485efb7f271b175516b14ab1faf1b355c2b8fa998139f2f3",
+        "image_extents": [
+          {
+            "image_offset": 486750720,
+            "length": 1536
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "type": 2,
+      "index": 443,
+      "executable_file_offset": 10277376,
+      "expected_artifacts": [
+        {
+          "name": "pixels.zlib",
+          "sha256": "976ea1440d1cd5456bded5897db5b207b9d1b53798e5a85873897133c5f0bc7c",
+          "bytes": 25
+        }
+      ]
+    },
+    {
+      "id": "ne-2-444",
+      "kind": "resource",
+      "source": {
+        "id": "rf1785d3d9dd4c604b31ee253",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:2:444",
+        "size": 1536,
+        "sha256": "2491d92549ce9c4ba23302c68757f9bcd5982ab8acfac5fc6c36d0f22d41c12d",
+        "image_extents": [
+          {
+            "image_offset": 486752256,
+            "length": 1536
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "type": 2,
+      "index": 444,
+      "executable_file_offset": 10278912,
+      "expected_artifacts": [
+        {
+          "name": "pixels.zlib",
+          "sha256": "c06b8bbfe0a61984e3157ff815914bac05e4a2b30cfcc58bb9a108bef627fd84",
+          "bytes": 25
+        }
+      ]
+    },
+    {
+      "id": "ne-2-445",
+      "kind": "resource",
+      "source": {
+        "id": "r6220f54fbb75bdbffc1e4213",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:2:445",
+        "size": 1536,
+        "sha256": "2a1424f4fc06c13a752ed546bcbcb323a7d51134806b41f24c87e78b2afe48ba",
+        "image_extents": [
+          {
+            "image_offset": 486753792,
+            "length": 1536
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "type": 2,
+      "index": 445,
+      "executable_file_offset": 10280448,
+      "expected_artifacts": [
+        {
+          "name": "pixels.zlib",
+          "sha256": "dca318332fa04e0d541e3c79e85365d24a7aa6bf9d4cc58c4a96889fb620cd40",
+          "bytes": 25
+        }
+      ]
+    },
+    {
+      "id": "ne-2-446",
+      "kind": "resource",
+      "source": {
+        "id": "rf0b9aa839a9192191f5be876",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:2:446",
+        "size": 1536,
+        "sha256": "8d7b124553fc010206e779294669434e7eec8671c45447a6b355d7ba133a9f5f",
+        "image_extents": [
+          {
+            "image_offset": 486755328,
+            "length": 1536
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "type": 2,
+      "index": 446,
+      "executable_file_offset": 10281984,
+      "expected_artifacts": [
+        {
+          "name": "pixels.zlib",
+          "sha256": "cc8706318a7503f3d88acdc85bab7f905c92f29e40654e3ffbb1179d63434e8c",
+          "bytes": 17
+        }
+      ]
+    },
+    {
+      "id": "ne-2-447",
+      "kind": "resource",
+      "source": {
+        "id": "rf6ed45ea89176961f7055ff5",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:2:447",
+        "size": 1536,
+        "sha256": "8d7b124553fc010206e779294669434e7eec8671c45447a6b355d7ba133a9f5f",
+        "image_extents": [
+          {
+            "image_offset": 486756864,
+            "length": 1536
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "type": 2,
+      "index": 447,
+      "executable_file_offset": 10283520,
+      "expected_artifacts": [
+        {
+          "name": "pixels.zlib",
+          "sha256": "cc8706318a7503f3d88acdc85bab7f905c92f29e40654e3ffbb1179d63434e8c",
+          "bytes": 17
+        }
+      ]
+    },
+    {
+      "id": "ne-2-448",
+      "kind": "resource",
+      "source": {
+        "id": "rfe61ba2e87b0a5d598202104",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:2:448",
+        "size": 1536,
+        "sha256": "745ddab69916597a4085e118ce8b9df0f9fac02015be47d5c2006f4e17a9c935",
+        "image_extents": [
+          {
+            "image_offset": 486758400,
+            "length": 1536
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "type": 2,
+      "index": 448,
+      "executable_file_offset": 10285056,
+      "expected_artifacts": [
+        {
+          "name": "pixels.zlib",
+          "sha256": "3b42e5f6f2473278a810387725a947b2f8594d69f4687a7cfa69f538503ec899",
+          "bytes": 12
+        }
+      ]
+    },
+    {
+      "id": "ne-2-449",
+      "kind": "resource",
+      "source": {
+        "id": "r858ab23a7ca44213d9e330b9",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:2:449",
+        "size": 1536,
+        "sha256": "33a90f8339a2ebd116a80412787f82b2d20d3d9146eb19ababee171c3eb8ade4",
+        "image_extents": [
+          {
+            "image_offset": 486759936,
+            "length": 1536
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "type": 2,
+      "index": 449,
+      "executable_file_offset": 10286592,
+      "expected_artifacts": [
+        {
+          "name": "pixels.zlib",
+          "sha256": "dd62416f4f71087cb977caf1b3dfa6f3db6b6118353b1d0643ed316304f889c5",
+          "bytes": 12
+        }
+      ]
+    },
+    {
+      "id": "ne-2-450",
+      "kind": "resource",
+      "source": {
+        "id": "r9ac686d798e3dd2f2bf7c0f8",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:2:450",
+        "size": 2048,
+        "sha256": "c751bc3429835157d51f0305c7007e0c34f7b61b2582c82c272bda239239f5ae",
+        "image_extents": [
+          {
+            "image_offset": 486761472,
+            "length": 2048
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "type": 2,
+      "index": 450,
+      "executable_file_offset": 10288128,
+      "expected_artifacts": [
+        {
+          "name": "pixels.zlib",
+          "sha256": "e05aa49281bc845e07c6f5374c9e03c4aca79dbebee444d7dd832c82983816d0",
+          "bytes": 76
+        }
+      ]
+    },
+    {
+      "id": "ne-2-617",
+      "kind": "resource",
+      "source": {
+        "id": "r045ebf2e063b9d400c63fb77",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:2:617",
+        "size": 308736,
+        "sha256": "cdbf7e6809a4075665dbb631094240afaa5247cfa5611c087296cb1565766bbc",
+        "image_extents": [
+          {
+            "image_offset": 495723520,
+            "length": 308736
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "type": 2,
+      "index": 617,
+      "executable_file_offset": 19250176,
+      "expected_artifacts": [
+        {
+          "name": "pixels.zlib",
+          "sha256": "29757a17f804d608adee82a6b4dac4ec42f203fbd3f72e05ba3de7f07b06dc3d",
+          "bytes": 16890
+        }
+      ]
+    },
+    {
+      "id": "ne-FULLSCREENANIM-LSWM.ANI",
+      "kind": "resource",
+      "source": {
+        "id": "r29364bcc787575dec2464d8c",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:FULLSCREENANIM:LSWM.ANI",
+        "size": 23040,
+        "sha256": "fd916494f2213ec65a95ff232d93eae042d4a29cd3261dc9447809288b627b69",
+        "image_extents": [
+          {
+            "image_offset": 499603456,
+            "length": 23040
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "type": "FULLSCREENANIM",
+      "index": "LSWM.ANI",
+      "executable_file_offset": 23130112,
+      "expected_artifacts": [
+        {
+          "name": "planes.zlib",
+          "sha256": "38f798a2e2bac45fb9e4e4999d50d2f58a24336a1dd92b7e370036716dcb9129",
+          "bytes": 4564
+        }
+      ]
+    },
+    {
+      "id": "ne-FULLSCREENANIM-MSWM.ANI",
+      "kind": "resource",
+      "source": {
+        "id": "r9ee56c3628322707a2a9de81",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:FULLSCREENANIM:MSWM.ANI",
+        "size": 33792,
+        "sha256": "84a051ce58237819bbed8d6f65a9b7771bc1130a88ae503a44ed92a32c7951f4",
+        "image_extents": [
+          {
+            "image_offset": 499693056,
+            "length": 33792
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "type": "FULLSCREENANIM",
+      "index": "MSWM.ANI",
+      "executable_file_offset": 23219712,
+      "expected_artifacts": [
+        {
+          "name": "planes.zlib",
+          "sha256": "87b18659896ab1cfeb2726b4d89954e6d332ff3d3aacbdd2f5eabf486b9c8334",
+          "bytes": 5175
+        }
+      ]
+    },
+    {
+      "id": "ne-FULLSCREENANIM-PSWM.ANI",
+      "kind": "resource",
+      "source": {
+        "id": "r3fb8f42ae164e47e54345db7",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:FULLSCREENANIM:PSWM.ANI",
+        "size": 14336,
+        "sha256": "c0cee86bc8c328ea8fe3bb1d0f8ed2ad0feb4ae4dd8c6fc71fdbca191d4e6337",
+        "image_extents": [
+          {
+            "image_offset": 499803648,
+            "length": 14336
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "type": "FULLSCREENANIM",
+      "index": "PSWM.ANI",
+      "executable_file_offset": 23330304,
+      "expected_artifacts": [
+        {
+          "name": "planes.zlib",
+          "sha256": "50cc9db1e108bb90b661c1bf0ec74600c6a3a478093fe3f8726854a7c4114a8e",
+          "bytes": 3975
+        }
+      ]
+    },
+    {
+      "id": "ne-FULLSCREENANIM-LSWM.BAN",
+      "kind": "resource",
+      "source": {
+        "id": "r7ca1d7df8f3a4926f47af952",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:FULLSCREENANIM:LSWM.BAN",
+        "size": 45568,
+        "sha256": "710c1249665bf19871c162a86415a68c26ba4d457db8982e1f4da9db327045f9",
+        "image_extents": [
+          {
+            "image_offset": 499920384,
+            "length": 45568
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "type": "FULLSCREENANIM",
+      "index": "LSWM.BAN",
+      "executable_file_offset": 23447040,
+      "expected_artifacts": [
+        {
+          "name": "planes.zlib",
+          "sha256": "7f0bf0b8a317ebe507d72da01e7a21c1c1542fe28356a71a6973d4a474a41e06",
+          "bytes": 84490
+        }
+      ]
+    },
+    {
+      "id": "ne-FULLSCREENANIM-MSWM.BAN",
+      "kind": "resource",
+      "source": {
+        "id": "r4b4e397bd6d4dddb1536d1a0",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:FULLSCREENANIM:MSWM.BAN",
+        "size": 45568,
+        "sha256": "ed33f17331f7e63a201f577a06719191718636258903af395a4f1a650431bb31",
+        "image_extents": [
+          {
+            "image_offset": 500068352,
+            "length": 45568
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "type": "FULLSCREENANIM",
+      "index": "MSWM.BAN",
+      "executable_file_offset": 23595008,
+      "expected_artifacts": [
+        {
+          "name": "planes.zlib",
+          "sha256": "806b8fd2e962bcda81d9a6dab47303352ca15d3ea57000cdf529705d6c89808b",
+          "bytes": 82831
+        }
+      ]
+    },
+    {
+      "id": "ne-FULLSCREENANIM-PSWM.BAN",
+      "kind": "resource",
+      "source": {
+        "id": "r650765ff226c8fbf29ecc8d2",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:FULLSCREENANIM:PSWM.BAN",
+        "size": 45568,
+        "sha256": "213f375736fac868c94269a0cb61049127b240a9bbef110dcdc30418bbac7add",
+        "image_extents": [
+          {
+            "image_offset": 500217856,
+            "length": 45568
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "type": "FULLSCREENANIM",
+      "index": "PSWM.BAN",
+      "executable_file_offset": 23744512,
+      "expected_artifacts": [
+        {
+          "name": "planes.zlib",
+          "sha256": "e5eeaabc6c67074c2591d14f3a436afc2cf243a52018f93e4dcb12bf22437636",
+          "bytes": 82571
+        }
+      ]
+    },
+    {
+      "id": "audio-3",
+      "kind": "audio",
+      "source": {
+        "id": "r8e3dc70b10231bdabff7ed74",
+        "path": "/MARIO/UWATER.MID;1",
+        "size": 15343,
+        "sha256": "5a66eb646fa60fe479aabb1faef0172e2ef29f060a2e8b125667e252b360d0bf",
+        "image_extents": [
+          {
+            "image_offset": 476452864,
+            "length": 15343
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "join": {
+        "file_offset": 134920,
+        "size": 10,
+        "sha256": "67adf7e36d08b70b7e7ef48b4cb08f946527f30a12e57af561bea4d9d7f285cc"
+      },
+      "expected_artifacts": [
+        {
+          "name": "events.json",
+          "sha256": "9fde7e3bb282747559bbc5a3b2d3e1a5f0a22e1e8aafa3327a0b94db2219dd97",
+          "bytes": 711605
+        }
+      ]
+    },
+    {
+      "id": "audio-12",
+      "kind": "audio",
+      "source": {
+        "id": "r0cdb518d0a18bba0e1240acb",
+        "path": "/MARIO/WINMARIO.EXE;1::NE:WAVEFILE:502",
+        "size": 3072,
+        "sha256": "0a4ed333368b9d234a6b84cc1bc2d2151eafaf58adbd0bb78a6f91611827156c",
+        "image_extents": [
+          {
+            "image_offset": 501225984,
+            "length": 3072
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "join": {
+        "file_offset": 135010,
+        "size": 10,
+        "sha256": "2eba0e7718c32f98fea36e3f33825fdbd16ac8386ff6a410ade56c5b11cdaba9"
+      },
+      "resource_type": "WAVEFILE",
+      "resource_index": 502,
+      "executable_file_offset": 24752640,
+      "expected_artifacts": [
+        {
+          "name": "audio.wav",
+          "sha256": "7416ddcf4fffdd20510d547d1ff68db948424870039828e6480d647e75501367",
+          "bytes": 3028
+        }
+      ]
+    },
+    {
+      "id": "movies-50",
+      "kind": "movies",
+      "source": {
+        "id": "rc16896336d3e4392f2b50a12",
+        "path": "/MARIO/MARIO076.AVI;1",
+        "size": 1594444,
+        "sha256": "7681a127a2958afeda032769523c591b4c50187263707e17f493fb59261d0fe0",
+        "image_extents": [
+          {
+            "image_offset": 348739584,
+            "length": 1594444
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "join": {
+        "file_offset": 140156,
+        "size": 13,
+        "sha256": "5d201343bade30fdda60962c61cc7f906b8de6c1cd298c5fe901a5690fb09a03"
+      },
+      "placement": {
+        "field_u16_2": 85,
+        "field_u16_4": 100,
+        "byte6": 10
+      },
+      "expected_artifacts": [
+        {
+          "name": "stream-1-audio.wav",
+          "sha256": "1248585249bde73bd651bb3918b7e9f3142d76d553c0f3f776db20ee24a9f4e2",
+          "bytes": 77219
+        },
+        {
+          "name": "frames.zlib",
+          "sha256": "589977456df9c56b67d929f5a0ff25019401baca6e5f614ff8659760cb7c0586",
+          "bytes": 615395
+        }
+      ]
+    },
+    {
+      "id": "movies-4",
+      "kind": "movies",
+      "source": {
+        "id": "r1e6bc5615b26056ff1b05550",
+        "path": "/MARIO/SCENE3.AVI;1",
+        "size": 5753178,
+        "sha256": "9bfb434e371fa13b11af3ad15c11e84ba8150cba6bb37ea774a7e00147cb3971",
+        "image_extents": [
+          {
+            "image_offset": 418883584,
+            "length": 5753178
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "join": {
+        "file_offset": 139246,
+        "size": 13,
+        "sha256": "bc5e23e93096e5b1881c8b6a1d11f2ce870f683d31e154bb14c49969445b4085"
+      },
+      "placement": {
+        "field_u16_2": 0,
+        "field_u16_4": 0,
+        "byte6": 0
+      },
+      "expected_artifacts": [
+        {
+          "name": "stream-1-audio.wav",
+          "sha256": "9e5b34ee00360b826c9b3d1e0c4ec105f481c32ca842e460714b7042c8025c8a",
+          "bytes": 1361284
+        },
+        {
+          "name": "frames.zlib",
+          "sha256": "e4a386cb548c8d4acbdbc6793d51614a238566f244b4b873054bd6e964a433c3",
+          "bytes": 5190869
+        }
+      ]
+    },
+    {
+      "id": "movies-5",
+      "kind": "movies",
+      "source": {
+        "id": "r83fb0b5570c26173eaf01e84",
+        "path": "/MARIO/SCENE4.AVI;1",
+        "size": 11408650,
+        "sha256": "862eed40c0187cee68eeac81f12522cab4e6e1d6a1293967db767e866db7f3c8",
+        "image_extents": [
+          {
+            "image_offset": 424638464,
+            "length": 11408650
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "join": {
+        "file_offset": 139259,
+        "size": 13,
+        "sha256": "29ddb7059f72a7a424d056320280c6849342c5c8cc11e4a5db9d34ab585c0bed"
+      },
+      "placement": {
+        "field_u16_2": 0,
+        "field_u16_4": 0,
+        "byte6": 0
+      },
+      "expected_artifacts": [
+        {
+          "name": "stream-1-audio.wav",
+          "sha256": "85500f20cf68d5c358d3ea468e70ea1b7ed227ecea70a65e01a85902ec5c726d",
+          "bytes": 2306608
+        },
+        {
+          "name": "frames.zlib",
+          "sha256": "a4c3a355d31e2f7ab476f0cfe3742d41933b18a0b5cb9ca9dd84bc7efb608d6c",
+          "bytes": 9442998
+        }
+      ]
+    },
+    {
+      "id": "movies-6",
+      "kind": "movies",
+      "source": {
+        "id": "r740572638e57ad8fc141d088",
+        "path": "/MARIO/SCENE5.AVI;1",
+        "size": 10133034,
+        "sha256": "aefcc81ed902f5c2d0a82a25f580c3fca466a8d92f6f691c34f22e5707256504",
+        "image_extents": [
+          {
+            "image_offset": 436056064,
+            "length": 10133034
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "join": {
+        "file_offset": 139272,
+        "size": 13,
+        "sha256": "e365b6e05531fb91d5e267005d1ed86327e2c321d55bce9f4bfaff4c2b756178"
+      },
+      "placement": {
+        "field_u16_2": 0,
+        "field_u16_4": 0,
+        "byte6": 0
+      },
+      "expected_artifacts": [
+        {
+          "name": "stream-1-audio.wav",
+          "sha256": "be4a4044719ff0e531062c18e812a1c71e1e974c503ad34f9012a57754f07740",
+          "bytes": 3170120
+        },
+        {
+          "name": "frames.zlib",
+          "sha256": "fd0aa18339dc27ed9da8f0f083a77cd443bb41d545c658e95d038f6a044699e5",
+          "bytes": 12412148
+        }
+      ]
+    },
+    {
+      "id": "movies-43",
+      "kind": "movies",
+      "source": {
+        "id": "rfefb9aa74bc902a5ae8eba38",
+        "path": "/MARIO/MARIO068.AVI;1",
+        "size": 1114492,
+        "sha256": "47f34106770d8f75cf256177e1ea84a33680b8d9c6c749ee229f19c9f56c4d9e",
+        "image_extents": [
+          {
+            "image_offset": 340414464,
+            "length": 1114492
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "join": {
+        "file_offset": 139870,
+        "size": 13,
+        "sha256": "2ff6620acec31c963ade2047286b073b821fb42798eb36bfd0f5b2d433357c6c"
+      },
+      "placement": {
+        "field_u16_2": 160,
+        "field_u16_4": 66,
+        "byte6": 245
+      },
+      "expected_artifacts": [
+        {
+          "name": "stream-1-audio.wav",
+          "sha256": "7299bf6e0ed9529d24bd63575527ebbb8412017a4b96e460fbc03f81611200d8",
+          "bytes": 66194
+        },
+        {
+          "name": "frames.zlib",
+          "sha256": "a9d5e496bcade34bfec92be2eb5119423e1aa2950b59d903062dbad7fdde49d3",
+          "bytes": 637551
+        }
+      ]
+    },
+    {
+      "id": "movies-44",
+      "kind": "movies",
+      "source": {
+        "id": "r4d1833d51ae61ba7a1d64ecd",
+        "path": "/MARIO/MARIO069.AVI;1",
+        "size": 1037996,
+        "sha256": "0ef999785629b71d25e30b48cf2973bd4afcebcb38dfefd89f5f4e52b7b0eca6",
+        "image_extents": [
+          {
+            "image_offset": 341530624,
+            "length": 1037996
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "join": {
+        "file_offset": 139883,
+        "size": 13,
+        "sha256": "236ff4f2bca5d670eedbc4202baa1ca5d792c60e9bfdcce1ce89044b494cd737"
+      },
+      "placement": {
+        "field_u16_2": 160,
+        "field_u16_4": 66,
+        "byte6": 245
+      },
+      "expected_artifacts": [
+        {
+          "name": "stream-1-audio.wav",
+          "sha256": "a942e85875e1c14dd8a4d31b5ab5d7e922e096d440c42355f05c2e9b2a310e26",
+          "bytes": 55169
+        },
+        {
+          "name": "frames.zlib",
+          "sha256": "f722a1cde10175b5f5ed0ea8a97565e09a0efb7dec0952cfd555f87922d42b0c",
+          "bytes": 541633
+        }
+      ]
+    },
+    {
+      "id": "movies-45",
+      "kind": "movies",
+      "source": {
+        "id": "reb14085f452a87c59e4cbcc6",
+        "path": "/MARIO/MARIO070.AVI;1",
+        "size": 711356,
+        "sha256": "5bb7436e01dcf8126472ce2d2709f10458d0e59da5554875af0b76e7bcd23f99",
+        "image_extents": [
+          {
+            "image_offset": 342575104,
+            "length": 711356
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "join": {
+        "file_offset": 139896,
+        "size": 13,
+        "sha256": "b3dec2e17302a1b413510cbe7f5cda46144deb18c337204288f68ebbdf57bd01"
+      },
+      "placement": {
+        "field_u16_2": 160,
+        "field_u16_4": 66,
+        "byte6": 245
+      },
+      "expected_artifacts": [
+        {
+          "name": "stream-1-audio.wav",
+          "sha256": "482022b279ca470f7d9224af907df131fc8781dd4f72ac12149eb09b7889d89a",
+          "bytes": 39734
+        },
+        {
+          "name": "frames.zlib",
+          "sha256": "6e49cd1a406f81936416a4c5233f0869f2ad953d64fb4acae6677e2cc01983e3",
+          "bytes": 361877
+        }
+      ]
+    },
+    {
+      "id": "movies-49",
+      "kind": "movies",
+      "source": {
+        "id": "r7c68cdda081130f67446821e",
+        "path": "/MARIO/MARIO075.AVI;1",
+        "size": 1652508,
+        "sha256": "b3549406afae3285180052d1ee2bbcbe6dee1017889f5d32bb6cc119ba7caf1e",
+        "image_extents": [
+          {
+            "image_offset": 347080704,
+            "length": 1652508
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "join": {
+        "file_offset": 139909,
+        "size": 13,
+        "sha256": "34d3183441a2eb169107057bccfcb3ab5a97bc6649c86c3fc85f4a42403e26fb"
+      },
+      "placement": {
+        "field_u16_2": 160,
+        "field_u16_4": 66,
+        "byte6": 245
+      },
+      "expected_artifacts": [
+        {
+          "name": "stream-1-audio.wav",
+          "sha256": "88d7a2d27549c45e1f454eeec6ee75445082654ddabcd1272978238ada8f9e6e",
+          "bytes": 88244
+        },
+        {
+          "name": "frames.zlib",
+          "sha256": "d6172c1cae68d5c1478f9a303eff618a1ca98b97cf59dcebfc519b66f9f222c7",
+          "bytes": 877047
+        }
+      ]
+    },
+    {
+      "id": "movies-71",
+      "kind": "movies",
+      "source": {
+        "id": "ref65bddbc247245da4f14290",
+        "path": "/MARIO/MARIOB55.AVI;1",
+        "size": 1015468,
+        "sha256": "700017266e73522851c4ba81ec4d9656cbf6094f762ecea94e3e30df15305461",
+        "image_extents": [
+          {
+            "image_offset": 376879104,
+            "length": 1015468
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "join": {
+        "file_offset": 139922,
+        "size": 13,
+        "sha256": "c86250dc902f6faac25eb8d1f9b0832100f1b9fb4087e56c5c41ba626649bca7"
+      },
+      "placement": {
+        "field_u16_2": 160,
+        "field_u16_4": 66,
+        "byte6": 245
+      },
+      "expected_artifacts": [
+        {
+          "name": "stream-1-audio.wav",
+          "sha256": "2a404447745746660ad1001f7c894d006eb8bf6fcf8f12b96499279f84897cdb",
+          "bytes": 55169
+        },
+        {
+          "name": "frames.zlib",
+          "sha256": "7e92445a50543bfb13e54e41514e079e66806d23ab27a06797ebafbad648acd0",
+          "bytes": 546123
+        }
+      ]
+    },
+    {
+      "id": "movies-72",
+      "kind": "movies",
+      "source": {
+        "id": "r0f260dc3b14b5140b66f5216",
+        "path": "/MARIO/MARIOB56.AVI;1",
+        "size": 850860,
+        "sha256": "7c432cc3cdcb4fdd5c6ba6d83ef1fb0c87da2137301bdfe77b90b768509b892d",
+        "image_extents": [
+          {
+            "image_offset": 377903104,
+            "length": 850860
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "join": {
+        "file_offset": 139935,
+        "size": 13,
+        "sha256": "d33608f2f4d57bdc49051367c18d026d0d0fd55b8a71f1742d6d982852dc7291"
+      },
+      "placement": {
+        "field_u16_2": 160,
+        "field_u16_4": 66,
+        "byte6": 245
+      },
+      "expected_artifacts": [
+        {
+          "name": "stream-1-audio.wav",
+          "sha256": "6eb079f31db1a7c9ca41fc46b25f1b956e82c98a2d06952521058f8c1523c07b",
+          "bytes": 43405
+        },
+        {
+          "name": "frames.zlib",
+          "sha256": "e77375af4cee6e21094576379419d7a172724f84c91e376fb42b3d75d4f5b839",
+          "bytes": 427034
+        }
+      ]
+    },
+    {
+      "id": "movies-73",
+      "kind": "movies",
+      "source": {
+        "id": "r7afb34927aef67b767d51ff1",
+        "path": "/MARIO/MARIOB57.AVI;1",
+        "size": 1044140,
+        "sha256": "6d94196960b568c1d1cf16b4e54b5fc801ddf40dc2d10878070a39b069977df6",
+        "image_extents": [
+          {
+            "image_offset": 378763264,
+            "length": 1044140
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "join": {
+        "file_offset": 139948,
+        "size": 13,
+        "sha256": "d6df1a7ef1d8217e63e466ed494b55e9af482e3e3bab8809f28cb33fad9dcbeb"
+      },
+      "placement": {
+        "field_u16_2": 160,
+        "field_u16_4": 66,
+        "byte6": 245
+      },
+      "expected_artifacts": [
+        {
+          "name": "stream-1-audio.wav",
+          "sha256": "c60a1215226b7eb90c6f4f6d4ee9587bbf96ae6e5851e913128d2fc31ae1c376",
+          "bytes": 55169
+        },
+        {
+          "name": "frames.zlib",
+          "sha256": "b97175a1ce0bb43e92267ccaf8833413381a7ca8060d27cc1b422408effcc667",
+          "bytes": 547312
+        }
+      ]
+    },
+    {
+      "id": "movies-74",
+      "kind": "movies",
+      "source": {
+        "id": "r99506463379489255c8421fb",
+        "path": "/MARIO/MARIOB61.AVI;1",
+        "size": 1214844,
+        "sha256": "8ead488d18a5f73fc033329a50f85fdca076fcca08bc4685a5fef20fb9b70eb7",
+        "image_extents": [
+          {
+            "image_offset": 379807744,
+            "length": 1214844
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "join": {
+        "file_offset": 139961,
+        "size": 13,
+        "sha256": "6606f6e3c49d419c0b56aafc8494c583e7ddaf57fa77cf2015387fabf2c0b449"
+      },
+      "placement": {
+        "field_u16_2": 160,
+        "field_u16_4": 66,
+        "byte6": 245
+      },
+      "expected_artifacts": [
+        {
+          "name": "stream-1-audio.wav",
+          "sha256": "58a3ba05a2feeb9f9cd25a1e58ce8f9c99b2de4f073d022ebfec596d5b2af64f",
+          "bytes": 66194
+        },
+        {
+          "name": "frames.zlib",
+          "sha256": "3168459cedfcc861525311e2c2f8ece14c600e362e8e7b6c2c1d8fddaa43d53c",
+          "bytes": 649176
+        }
+      ]
+    },
+    {
+      "id": "movies-75",
+      "kind": "movies",
+      "source": {
+        "id": "rca5843c773888d768afa9ce9",
+        "path": "/MARIO/MARIOB62.AVI;1",
+        "size": 1311100,
+        "sha256": "778fd5fc01666093aa1c72347c3dcca3bec420e52ae74b7de8db4da63a6ef5ae",
+        "image_extents": [
+          {
+            "image_offset": 381026304,
+            "length": 1311100
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "join": {
+        "file_offset": 139974,
+        "size": 13,
+        "sha256": "4f3cc6f6d962060baf7d5bd586e16af3a824785ffdae94e3ddb50ed7b851d432"
+      },
+      "placement": {
+        "field_u16_2": 160,
+        "field_u16_4": 66,
+        "byte6": 245
+      },
+      "expected_artifacts": [
+        {
+          "name": "stream-1-audio.wav",
+          "sha256": "6093abd70cc53111dddc73f5f7b8f2a46823bb13c499276e7abdd4ea95c976f6",
+          "bytes": 66194
+        },
+        {
+          "name": "frames.zlib",
+          "sha256": "f770a59945be87deb31b167456d118c2c61ac652b4540ebbf51b873c6f5336a6",
+          "bytes": 665809
+        }
+      ]
+    },
+    {
+      "id": "movies-76",
+      "kind": "movies",
+      "source": {
+        "id": "r444451457007b9f12a660a5f",
+        "path": "/MARIO/MARIOB63.AVI;1",
+        "size": 1500236,
+        "sha256": "08381009c8e97036cb44b99cf40c5e090b11aaf0c72824b8d0e3c72b3578d583",
+        "image_extents": [
+          {
+            "image_offset": 382347264,
+            "length": 1500236
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "join": {
+        "file_offset": 139987,
+        "size": 13,
+        "sha256": "2f70aac6791e7cbb50fdfa36673c7504d4716bbeb615a0aba3cced30c08f61e0"
+      },
+      "placement": {
+        "field_u16_2": 160,
+        "field_u16_4": 66,
+        "byte6": 245
+      },
+      "expected_artifacts": [
+        {
+          "name": "stream-1-audio.wav",
+          "sha256": "26bd0a14454fb4c80e2b00a47411dbf17fe549adc2da92b830a6bce9c653e5ed",
+          "bytes": 77219
+        },
+        {
+          "name": "frames.zlib",
+          "sha256": "a5b27dafdd789b7ab7401dc0df58caa5a7c5177fc03d82efcf546c7cf59133d5",
+          "bytes": 778966
+        }
+      ]
+    },
+    {
+      "id": "movies-78",
+      "kind": "movies",
+      "source": {
+        "id": "r1c191378523ea21a6b5661af",
+        "path": "/MARIO/MARIOB65.AVI;1",
+        "size": 908492,
+        "sha256": "be566ea2d6de394b30f74824cedb8ba53eaf0c258b8cbdb6ad7d2fd151867ac5",
+        "image_extents": [
+          {
+            "image_offset": 383852544,
+            "length": 908492
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "join": {
+        "file_offset": 140000,
+        "size": 13,
+        "sha256": "cc5f076f068f2da4799de2f5211266e56f359c1d9d819a3478d00a1c1b4be9d5"
+      },
+      "placement": {
+        "field_u16_2": 160,
+        "field_u16_4": 66,
+        "byte6": 245
+      },
+      "expected_artifacts": [
+        {
+          "name": "stream-1-audio.wav",
+          "sha256": "ba2630be0f7ad496176a6cc51aec62794925bd2a7f38fa099ef23c6720bce2be",
+          "bytes": 47815
+        },
+        {
+          "name": "frames.zlib",
+          "sha256": "69b002ad45cc27c7f02ac7d023bd29a3ad34b13be752b56918c851fe8d7a817b",
+          "bytes": 466441
+        }
+      ]
+    },
+    {
+      "id": "movies-79",
+      "kind": "movies",
+      "source": {
+        "id": "r64fa8f0e2e7c0668e1339c0f",
+        "path": "/MARIO/MARIOB66.AVI;1",
+        "size": 2168716,
+        "sha256": "947157119b0c1be224a441d32899dae58418fe121b56d1a583bcb9310804a75c",
+        "image_extents": [
+          {
+            "image_offset": 384763904,
+            "length": 2168716
+          }
+        ]
+      },
+      "roles": [],
+      "claims": [
+        "WATER"
+      ],
+      "join": {
+        "file_offset": 140013,
+        "size": 13,
+        "sha256": "c1d87ad25e6c54c963d834033a1b44ea9786f860d27554e1704f5942cf6ded0b"
+      },
+      "placement": {
+        "field_u16_2": 160,
+        "field_u16_4": 66,
+        "byte6": 245
+      },
+      "expected_artifacts": [
+        {
+          "name": "stream-1-audio.wav",
+          "sha256": "2464cd088f25a4d584be8687fb619767717604749c3e5f7887fe7a8842c1f0ab",
+          "bytes": 121319
+        },
+        {
+          "name": "frames.zlib",
+          "sha256": "64bea1ec7032ccf6792f0f5020ce28ece0639960d80ab26ccfc17d842e45fd87",
+          "bytes": 1110570
+        }
+      ]
     }
   ],
   "lessons": [
